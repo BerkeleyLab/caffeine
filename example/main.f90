@@ -1,30 +1,33 @@
 program testhello_f
-  use iso_c_binding, only : c_int, c_char, c_ptr
+  use iso_c_binding, only : c_int, c_char, c_null_char, c_ptr, c_loc
   implicit none
 
-  integer, parameter :: max_len = 1024
 
   interface
 
     integer(c_int) function testhello(argc, argv) bind(C)
       !! C function prototype: int testhello(int argc, char **argv)
-      import c_int, c_char, max_len
+      import c_int, c_char , c_ptr
       integer(c_int), value :: argc
-      character(kind=c_char, len=max_len) argv(*)
+      type(c_ptr) argv(*)
     end function
 
   end interface
 
-  character(kind=c_char, len=max_len), allocatable :: argv(:)
+  integer, parameter :: max_arg_len = 1024
+  character(kind=c_char, len=max_arg_len), allocatable, target :: arg(:)
   integer argnum, arglen
 
   associate(argc => int(command_argument_count(),c_int))
-    allocate(argv(argc))
-    do argnum=1, argc
-      call get_command_argument(argnum, argv, arglen) 
-      if (arglen>max_len) error stop "maximum argument length exceeded"
+    allocate( arg(0:argc))
+    do argnum=0, argc
+      call get_command_argument(argnum, arg(argnum), arglen) 
+      if (arglen+1>max_arg_len) error stop "maximum argument length exceeded"
+      arg(argnum)(arglen+1:arglen+1) = c_null_char
     end do
-    if (testhello(argc, argv) /= 0) error stop "testhello.c returned a non-zero exit code"
+    associate(argv => [(c_loc(arg(argnum)),argnum=0,argc)])
+      if (testhello(argc, argv) /= 0) error stop "testhello returned a non-zero exit code"
+    end associate
   end associate
 
 end program
