@@ -1,6 +1,6 @@
 gasnet_prefix=/Users/rouson/.local
 
-include $(gasnet_prefix)/include/smp-conduit/smp-seq.mak 
+include $(gasnet_prefix)/include/smp-conduit/smp-seq.mak
 
 testhello: main.o testhello.o
 	$(GASNET_LD) $(GASNET_LDFLAGS) main.o testhello.o -o testhello  -lgfortran $(GASNET_LIBS)
@@ -14,5 +14,3 @@ testhello.o: testhello.c
 .PHONY: clean
 clean:
 	rm -f testhello *.o
-	
-
