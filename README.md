@@ -1,3 +1,26 @@
-# caffeine
+Caffeine
+========
 
-The CoArray Fortran Framework for Efficient Implementation of Numerics Engines.
+CoArray Fortran Framework of Efficient Interfaces to Network Environments
+
+                    .
+                        `:.
+                          `:.
+                  .:'     ,::
+                 .:'      ;:'
+                 ::      ;:'
+                  :    .:'
+                   `.  :.
+          _________________________
+         : _ _ _ _ _ _ _ _ _ _ _ _ :
+     ,---:".".".".".".".".".".".".":
+    : ,'"`::.:.:.:.:.:.:.:.:.:.:.::'
+    `.`.  `:-===-===-===-===-===-:'
+      `.`-._:                   :
+        `-.__`.               ,' 
+    ,--------`"`-------------'--------.
+     `"--.__                   __.--"'
+            `""-------------""'
+
+
+Art from [ascii.co.uk](https://ascii.co.uk/art/cup).
