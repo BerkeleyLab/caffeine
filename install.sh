@@ -65,18 +65,27 @@ if [ ! -d $DEPENDENCIES_DIR ]; then
   mkdir -pv $DEPENDENCIES_DIR
 fi
 cd $DEPENDENCIES_DIR
+
 $FETCH $GASNET_SOURCE_URL > $GASNET_TAR_FILE
+
+if [ ! -f $GASNET_TAR_FILE ]; then
+  echo "$GASNET_TAR_FILE not found"
+  exit 1
+fi
+
 if [ -d GASNet-stable ]; then
   rm -rf GASNet-stable
 fi
-tar xf GASNet-stable.tar.gz
-if [ -d build ]; then
-  rm -rf build
+tar xf $GASNET_TAR_FILE
+
+if [ -d gasnet ]; then
+  rm -rf gasnet
 fi
+
 mkdir -v gasnet
 cd gasnet
 ../GASNET-stable/configure --prefix "$PREFIX"
-make all
+make -j 8 all
 make check
 make install
-fpm build
+fpm build  --c-flag "$GASNET_CFLAGS"  --c-flag "$GASNET_CPPFLAGS" --link-flag "$GASNET_LIBS" --link-flag "$GASNET_LDFLAGS"
