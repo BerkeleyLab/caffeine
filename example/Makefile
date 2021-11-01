@@ -8,8 +8,8 @@ testhello: main.o testhello.o
 main.o: main.f90
 	$(FC) -c -o main.o main.f90
 	
-testhello.o: testhello.c
-	$(GASNET_CC) $(GASNET_CPPFLAGS) $(GASNET_CFLAGS) -c testhello.c
+testhello.o: ../src/caffeine/testhello.c
+	$(GASNET_CC) $(GASNET_CPPFLAGS) $(GASNET_CFLAGS) -c ../src/caffeine/testhello.c
 
 .PHONY: clean
 clean:
