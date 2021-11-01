@@ -16,5 +16,4 @@ testhello.a: testhello.o
 
 .PHONY: clean
 clean:
-	rm -f testhello *.o
-
+	rm -f testhello *.o *.a
