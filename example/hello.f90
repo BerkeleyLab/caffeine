@@ -5,7 +5,7 @@ program testhello_f
 
   interface
 
-    integer(c_int) function testhello(argc, argv) bind(C)
+    integer(c_int) function c_caffeinate(argc, argv) bind(C)
       !! C function prototype: int testhello(int argc, char **argv)
       import c_int, c_char , c_ptr
       integer(c_int), value :: argc
@@ -26,7 +26,7 @@ program testhello_f
       arg(argnum)(arglen+1:arglen+1) = c_null_char
     end do
     associate(argv => [(c_loc(arg(argnum)),argnum=0,argc)])
-      if (testhello(argc, argv) /= 0) error stop "testhello returned a non-zero exit code"
+      if (c_caffeinate(argc, argv) /= 0) error stop "testhello returned a non-zero exit code"
     end associate
   end associate
 
