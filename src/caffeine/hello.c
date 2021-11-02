@@ -44,8 +44,5 @@ int hello(int argc, char *argv[], gex_EP_t myep, gex_TM_t myteam)
   gasnet_barrier_notify(0,GASNET_BARRIERFLAG_ANONYMOUS);
   gasnet_barrier_wait(0,GASNET_BARRIERFLAG_ANONYMOUS);
 
-  gasnet_exit(0);
-
-  /* Not reached in most implementations */
   return 0;
 }

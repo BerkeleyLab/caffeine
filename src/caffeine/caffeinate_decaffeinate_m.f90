@@ -4,6 +4,9 @@ module caffeinate_decaffeinate_m
 
   private
   public :: caffeinate, decaffeinate, default_team
+
+  type(team_type), target :: default_team
+
   interface
 
     module function caffeinate() result(exit_code)
@@ -11,12 +14,11 @@ module caffeinate_decaffeinate_m
       integer exit_code
     end function
 
-    module subroutine decaffeinate()
+    module subroutine decaffeinate(exit_code)
       implicit none
+      integer, intent(in) :: exit_code
     end subroutine
 
   end interface
-
-  type(team_type), target :: default_team
 
 end module caffeinate_decaffeinate_m
