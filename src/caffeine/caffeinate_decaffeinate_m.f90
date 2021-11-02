@@ -1,5 +1,4 @@
 module caffeinate_decaffeinate_m
-  use iso_c_binding, only : c_int, c_ptr
   use team_type_m, only: team_type
   implicit none
 
@@ -7,11 +6,10 @@ module caffeinate_decaffeinate_m
   public :: caffeinate, decaffeinate, default_team
   interface
 
-    module subroutine caffeinate(argc, argv)
+    module function caffeinate() result(exit_code)
       implicit none 
-      integer(c_int), value :: argc
-      type(c_ptr) argv(*)
-    end subroutine
+      integer exit_code
+    end function
 
     module subroutine decaffeinate()
       implicit none
