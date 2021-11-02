@@ -12,13 +12,13 @@
 #include "gasnet_safe.h"
 #endif
 
+gex_Client_t myclient;
+gex_EP_t myep;
+gex_TM_t myteam;
+
 int c_caffeinate(int argc, char *argv[])
 {
-  gex_Client_t myclient;
-  gex_EP_t myep;
-  gex_TM_t myteam;
-
-  GASNET_SAFE(gex_Client_Init(&myclient, &myep, &myteam, "hello", &argc, &argv, 0));
+  GASNET_SAFE(gex_Client_Init(&myclient, &myep, &myteam, "", &argc, &argv, 0));
 
   hello(argc, argv, myep, myteam);
 }
