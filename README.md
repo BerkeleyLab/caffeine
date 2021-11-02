@@ -2,6 +2,8 @@ Caffeine
 ========
 
 CoArray Fortran Framework of Efficient Interfaces to Network Environments
+
+```
                     .
                         `:.
                           `:.
@@ -20,6 +22,7 @@ CoArray Fortran Framework of Efficient Interfaces to Network Environments
     ,--------`"`-------------'--------.
      `"--.__                   __.--"'
             `""-------------""'
+```
 
 Download, Build, and Run Example
 -------------------------------
