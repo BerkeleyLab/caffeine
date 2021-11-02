@@ -51,40 +51,38 @@ else
     exit 1
 fi
 
-if [ ${skip+x} ]; then
-
 GASNET_TAR_FILE="GASNet-stable.tar.gz"
 GASNET_SOURCE_URL="https://bitbucket.org/berkeleylab/gasnet/downloads/$GASNET_TAR_FILE"
 DEPENDENCIES_DIR="build/dependencies"
 if [ ! -d $DEPENDENCIES_DIR ]; then
   mkdir -pv $DEPENDENCIES_DIR
 fi
+
 cd $DEPENDENCIES_DIR
+  $FETCH $GASNET_SOURCE_URL > $GASNET_TAR_FILE
+  
+  if [ ! -f $GASNET_TAR_FILE ]; then
+    echo "$GASNET_TAR_FILE not found"
+    exit 1
+  fi
+  
+  if [ -d GASNet-stable ]; then
+    rm -rf GASNet-stable
+  fi
+  tar xf $GASNET_TAR_FILE
+  
+  if [ -d gasnet ]; then
+    rm -rf gasnet
+  fi
+cd -
 
-$FETCH $GASNET_SOURCE_URL > $GASNET_TAR_FILE
-
-if [ ! -f $GASNET_TAR_FILE ]; then
-  echo "$GASNET_TAR_FILE not found"
-  exit 1
-fi
-
-if [ -d GASNet-stable ]; then
-  rm -rf GASNet-stable
-fi
-tar xf $GASNET_TAR_FILE
-
-if [ -d gasnet ]; then
-  rm -rf gasnet
-fi
-
-mkdir -v gasnet
-cd gasnet
-../GASNET-stable/configure --prefix "$PREFIX"
-make -j 8 all
-make check
-make install
-
-fi
+mkdir -v "$DEPENDENCIES_DIR"/gasnet
+cd "$DEPENDENCIES_DIR"/gasnet
+  ../GASNET-stable/configure --prefix "$PREFIX"
+  make -j 8 all
+  make check
+  make install
+cd -
 
 export gasnet_prefix="$HOME"/.local
 export PKG_CONFIG_PATH="$gasnet_prefix"/lib/pkgconfig
@@ -96,10 +94,40 @@ export GASNET_CC=`pkg-config $pkg --variable=GASNET_CC`
 export GASNET_CFLAGS=`pkg-config $pkg --variable=GASNET_CFLAGS`
 export GASNET_CPPFLAGS=`pkg-config $pkg --variable=GASNET_CPPFLAGS`
 
-export FPM_LDFLAGS="$GASNET_CFLAGS $GASNET_LDFLAGS $GASNET_LIBS"
+export FPM_LDFLAGS="$GASNET_LDFLAGS $GASNET_LIBS"
 export FPM_CC="$GASNET_CC"
 export FPM_CFLAGS="$GASNET_CFLAGS $GASNET_CPPFLAGS"
 
-fpm build  --c-compiler "$GASNET_CC" \
-  --c-flag "$GASNET_CFLAGS $GASNET_CPPFLAGS" \
-  --link-flag "$GASNET_CFLAGS $GASNET_LDFLAGS $GASNET_LIBS"
+fpm build
+
+mkdir -p build/pkgconfig
+cd build/pkgconfig
+  echo "CAFFEINE_FPM_LDFLAGS=$FPM_LDFLAGS"                     >  caffeine.pc
+  echo "CAFFEINE_FPM_CC=$FPM_CC"                               >> caffeine.pc
+  echo "CAFFEINE_FPM_CFLAGS=$FPM_CFLAGS"                       >> caffeine.pc
+  echo "Name: caffeine"                                        >> caffeine.pc
+  echo "Description: coarray fortran parallel runtime library" >> caffeine.pc
+  echo "URL: https://gitlab.lbl.gov/rouson/caffeine"           >> caffeine.pc
+  echo "Version: 0.1.0"                                        >> caffeine.pc
+cd -
+
+cd build
+  export PKG_CONFIG_PATH="pkgconfig"
+  echo "#!/bin/sh"                                                             >  run-fpm.sh
+  echo "#-- DO NOT EDIT -- created by caffeine/install.sh"                     >> run-fpm.sh
+  echo "fpm \$@ \\"                                                            >> run-fpm.sh
+  echo "--c-compiler \"`pkg-config caffeine --variable=CAFFEINE_FPM_CC`\" \\"  >> run-fpm.sh
+  echo "--c-flag \"`pkg-config caffeine --variable=CAFFEINE_FPM_CFLAGS`\" \\"  >> run-fpm.sh
+  echo "--link-flag \"`pkg-config caffeine --variable=CAFFEINE_FPM_LDFLAGS`\"" >> run-fpm.sh
+  chmod u+x run-fpm.sh
+cd -
+
+echo ""
+echo "________________ Caffeine has been dispensed! ________________" 
+echo ""
+echo "To rebuild or to run tests or examples via the Fortran Package"
+echo "Manager (fpm) with the required compiler/linker flags, pass a"
+echo "fpm command to the build/run-fpm.sh script. For example, run"
+echo "the program example/hello.f90 as follows:"
+echo ""
+echo "./build/run-fpm.sh run --example hello"
