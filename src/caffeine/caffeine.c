@@ -6,11 +6,26 @@
 
 #include <gasnetex.h>
 #include <stdio.h>
-#include "hello.h"
 
 #ifndef _GASNET_SAFE_
 #include "gasnet_safe.h"
 #endif
+
+gex_Client_t myclient;
+gex_EP_t myep;
+gex_TM_t myteam;
+
+int c_caffeinate(int argc, char *argv[])
+{
+  GASNET_SAFE(gex_Client_Init(&myclient, &myep, &myteam, "caffeine", &argc, &argv, 0));
+
+  hello(argc, argv, myep, myteam);
+}
+
+int c_decaffeinate(int exit_code)
+{
+  gasnet_exit(exit_code);
+}
 
 int hello(int argc, char *argv[], gex_EP_t myep, gex_TM_t myteam)
 {
