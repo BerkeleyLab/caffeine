@@ -46,15 +46,15 @@ contains
 
     interface
 
-      subroutine gasnet_exit(exit_code) bind(C, name="gasnetc_exit")
-        !! C function prototype: extern void gasnetc_exit(int _exitcode) GASNETI_NORETURN;
+      subroutine c_decaffeinate(exit_code) bind(C)
+        !! C function prototype: extern void gasnet_exit(int _exitcode) GASNETI_NORETURN;
         import c_int 
         integer(c_int), value :: exit_code
       end subroutine
 
     end interface
 
-    call gasnet_exit(0) 
+    call c_decaffeinate(0) 
   end procedure
 
 end submodule caffeinate_decaffeinate_s
