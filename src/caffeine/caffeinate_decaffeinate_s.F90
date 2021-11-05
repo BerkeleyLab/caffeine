@@ -22,26 +22,9 @@ contains
   integer, parameter :: max_arg_len = 1024
 
   associate(argc => int(command_argument_count(),c_int))
-#ifndef __GFORTRAN__
     associate(argv => [(c_loc(c_interop_arg(i)), i=0,argc)])
       call c_caffeinate(argc, argv)
     end associate
-#else
-    workaround_gfortran_bug: &
-    block 
-      type ptr_array
-        character(kind=c_char, len=max_arg_len), pointer :: arg_ptr
-      end type
-      type(ptr_array) argv(argc)
-      do i=1, argc
-        argv(i)%arg_ptr => c_interop_arg(i)
-      end do
-      call c_caffeinate(argc, [(c_loc(argv(i)%arg_ptr), i=1, argc)])
-      do i=1, argc
-        deallocate(argv(i)%arg_ptr)
-      end do
-    end block workaround_gfortran_bug
-#endif
   end associate
 
   contains
@@ -49,12 +32,12 @@ contains
     function c_interop_arg(argnum) result(arg)
       integer, intent(in) :: argnum
       integer arglen
-      
 #ifndef __GFORTRAN__
       character(kind=c_char, len=max_arg_len), target :: arg 
 #else
+      character(kind=c_char, len=max_arg_len), target :: targ  ! work around gfortran bug
       character(kind=c_char, len=max_arg_len), pointer :: arg 
-      allocate(arg)
+      arg => targ
 #endif
       call get_command_argument(argnum, arg, arglen) 
       if (arglen+1>max_arg_len) error stop "maximum argument length exceeded"
