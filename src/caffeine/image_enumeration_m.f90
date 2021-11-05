@@ -24,22 +24,25 @@ module image_enumeration_m
 
   interface caf_this_image
 
-    integer module function this_image_team(team) 
+    module function this_image_team(team) result(image_number)
       implicit none
       type(team_type), intent(in), optional :: team
+      integer image_number
     end function
 
-    integer module function this_image_coarray_team(coarray, team)
+    module function this_image_coarray_team(coarray, team) result(image_number)
       implicit none
       type(team_type), intent(in), optional :: team
       class(*), intent(in) :: coarray(..)
+      integer image_number
     end function
 
-    integer module function this_image_coarray_dim_team(coarray, dim, team)
+    module function this_image_coarray_dim_team(coarray, dim, team) result(image_number)
       implicit none
       class(*), intent(in) :: coarray(..)
       integer, intent(in) :: dim
       type(team_type), intent(in), optional :: team
+      integer image_number
     end function
 
   end interface

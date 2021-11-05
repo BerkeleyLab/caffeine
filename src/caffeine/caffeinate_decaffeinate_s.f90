@@ -8,13 +8,13 @@ contains
 
     interface
 
-      function c_caffeinate(argc, argv) bind(C) result(exit_code)
+      subroutine c_caffeinate(argc, argv) bind(C)
         !! C function prototype: int testhello(int argc, char **argv)
         import c_int, c_ptr
         integer(c_int), value :: argc
         integer(c_int) :: exit_code
         type(c_ptr) argv(*)
-      end function
+      end subroutine
 
     end interface
 
@@ -22,7 +22,7 @@ contains
 
   associate(argc => int(command_argument_count(),c_int))
     associate(argv => [(c_loc(c_interop_arg(i)), i=0,argc)])
-      exit_code = c_caffeinate(argc, argv)
+      call c_caffeinate(argc, argv)
     end associate
   end associate
 
@@ -47,12 +47,16 @@ contains
     interface
 
       subroutine c_decaffeinate(exit_code) bind(C)
-        !! C function prototype: extern void gasnet_exit(int _exitcode) GASNETI_NORETURN;
         import c_int 
         integer(c_int), value :: exit_code
       end subroutine
+      
+      subroutine c_sync_all() bind(C)
+      end subroutine
 
     end interface
+    
+    call c_sync_all
 
     call c_decaffeinate(0) 
   end procedure
