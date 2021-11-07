@@ -39,7 +39,7 @@ export GASNET_PSHM_NODES=8
 
 Run tests
 ---------
-``
+```
 ./build/run-fpm.sh test
 ```
 
@@ -48,10 +48,9 @@ Generate documentation
 ```
 ford doc-generator.md
 ```
-Open doc/html/index.htmtl in a web browser.
-
-
-[GASNet-EX]: https://gasnet.lbl.gov
+Open `doc/html/index.htmtl` in a web browser.
 
 Art from [ascii.co.uk](https://ascii.co.uk/art/cup).
+
+[GASNet-EX]: https://gasnet.lbl.gov
 
