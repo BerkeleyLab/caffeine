@@ -3,7 +3,7 @@ Caffeine
 
 **CoArray Fortran Framework of Efficient Interfaces to Network Environments**
 
-Caffeine is a parallel runtime library that aims to support Fortran compilers with a programming-model-agnostic application binary interface (ABI) to various communication libraries.  Current work is on supporting the ABI with the [GASNet-EX] or POSIX proceses.  Future plans include support for an alternative MPI back end.
+Caffeine is a parallel runtime library that aims to support Fortran compilers with a programming-model-agnostic application binary interface (ABI) to various communication libraries.  Current work is on supporting the ABI with the [GASNet-EX] or with POSIX processes.  Future plans include support for an alternative MPI back end.
 
 ```
 
