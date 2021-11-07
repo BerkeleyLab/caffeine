@@ -48,6 +48,7 @@ Generate documentation
 ```
 ford doc-generator.md
 ```
+Open doc/html/index.htmtl in a web browser.
 
 
 [GASNet-EX]: https://gasnet.lbl.gov
