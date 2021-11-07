@@ -27,6 +27,10 @@ contains
     end associate
   end associate
 
+  ! TODO: establish non-allocatable coarrays
+
+  call caf_sync_all
+
   contains
  
     function c_interop_arg(argnum) result(arg)
