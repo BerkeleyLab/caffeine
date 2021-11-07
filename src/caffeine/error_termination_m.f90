@@ -7,7 +7,7 @@ module error_termination_m
 
       module subroutine caf_error_stop_integer(stop_code)
         !! stop all images and provide the stop_code as the process exit status
-        integer, intent(in) :: stop_code
+        integer, intent(in), optional :: stop_code
       end subroutine
 
       module subroutine caf_error_stop_character(stop_code)

@@ -1,4 +1,4 @@
-submodule(sync_m) sync_s
+submodule(synchronization_m) sychronization_s
   implicit none
 
 contains

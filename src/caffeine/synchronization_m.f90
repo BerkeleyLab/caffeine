@@ -1,4 +1,4 @@
-module sync_m
+module synchronization_m
     implicit none
     private
     public :: caf_sync_all
@@ -10,4 +10,4 @@ module sync_m
 
     end interface
 
-end module sync_m
+end module synchronization_m

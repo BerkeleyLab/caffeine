@@ -1,5 +1,6 @@
 submodule(caffeinate_decaffeinate_m) caffeinate_decaffeinate_s
   use iso_c_binding, only : c_int, c_ptr, c_loc, c_char, c_null_char
+  use synchronization_m, only : caf_sync_all
   implicit none
 
 contains
@@ -63,10 +64,12 @@ contains
       end subroutine
 
     end interface
+
+    integer(c_int), parameter :: normal_termination=0
     
     call c_sync_all
 
-    call c_decaffeinate(0) 
+    call c_decaffeinate(normal_termination) 
   end procedure
 
 end submodule caffeinate_decaffeinate_s
