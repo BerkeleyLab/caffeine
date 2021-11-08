@@ -1,6 +1,6 @@
 module caf_this_image_test
     use caffeine_m, only : caf_this_image, caf_num_images, caf_co_sum
-    use vegetables, only: result_t, test_item_t, assert_that, describe, it
+    use vegetables, only: result_t, test_item_t, assert_that, describe, it, succeed
 
     implicit none
     private
@@ -9,11 +9,13 @@ module caf_this_image_test
 contains
     function test_caf_this_image() result(tests)
         type(test_item_t) :: tests
+    
+        integer, parameter :: initiation_success = 0
 
         tests = describe( &
-                "The caf_this_image function result", &
-                [ it("is the proper member of the set {1,2,...,num_images()} when invoked as this_image()", check_this_image_set) &
-                ])
+          "The caf_this_image function result", &
+          [ it("is the proper member of the set {1,2,...,num_images()} when invoked as this_image()", check_this_image_set) &
+        ])
     end function
 
     function check_this_image_set() result(result_)
