@@ -1,7 +1,7 @@
 name = "caffeine"
 version = "0.1.0"
 license = "BSD"
-author = ["Damian Rouson", "Harris Snyder" ]
+author = ["Damian Rouson", "Harris Snyder", "Brad Richardson"]
 maintainer = "rouson@lbl.gov"
 copyright = "2021 UC Regents"
 
