@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/dash
 
 set -e # exit on error
 
@@ -12,9 +12,6 @@ usage()
     echo " --help             Display this help text"
     echo " --prefix=PREFIX    Install binary in 'PREFIX/bin'"
     echo "                    Default prefix='\$HOME/.local/bin'"
-    echo ""
-    echo "Set the environment variables FPM_{FC,CC,CXX} and FPM_{F,C,CC}FLAGS to specify"
-    echo "the Fortran/C/C++ compilers and build flags this script will use."
     echo ""
 }
 
@@ -40,6 +37,8 @@ while [ "$1" != "" ]; do
     shift
 done
 
+PREFIX=`realpath $PREFIX`
+
 set -u # error on use of undefined variable
 
 if command -v curl > /dev/null 2>&1; then
@@ -59,6 +58,7 @@ if [ ! -d $DEPENDENCIES_DIR ]; then
 fi
 
 cd $DEPENDENCIES_DIR
+  echo "caffeine: $FETCH $GASNET_SOURCE_URL > $GASNET_TAR_FILE"
   $FETCH $GASNET_SOURCE_URL > $GASNET_TAR_FILE
   
   if [ ! -f $GASNET_TAR_FILE ]; then
@@ -78,33 +78,30 @@ cd -
 
 mkdir -v "$DEPENDENCIES_DIR"/gasnet
 cd "$DEPENDENCIES_DIR"/gasnet
-  ../GASNET-stable/configure --prefix "$PREFIX"
+  ../GASNet-stable/configure --prefix "$PREFIX"
   make -j 8 all
   make check
   make install
 cd -
 
-export gasnet_prefix="$HOME"/.local
-export PKG_CONFIG_PATH="$gasnet_prefix"/lib/pkgconfig
+git clone https://github.com/fortran-lang/fpm build/dependencies/fpm
+cd build/dependencies/fpm
+  ./install.sh --prefix="$PREFIX"
+cd -
+
+export PKG_CONFIG_PATH="$PREFIX"/lib/pkgconfig
 export pkg="gasnet-smp-seq"
 
-export GASNET_LDFLAGS=`pkg-config $pkg --variable=GASNET_LDFLAGS`
-export GASNET_LIBS=`pkg-config $pkg --variable=GASNET_LIBS`
-export GASNET_CC=`pkg-config $pkg --variable=GASNET_CC`
-export GASNET_CFLAGS=`pkg-config $pkg --variable=GASNET_CFLAGS`
-export GASNET_CPPFLAGS=`pkg-config $pkg --variable=GASNET_CPPFLAGS`
+export GASNET_LDFLAGS="`pkg-config $pkg --variable=GASNET_LDFLAGS`"
+export GASNET_LIBS="`pkg-config $pkg --variable=GASNET_LIBS`"
+export GASNET_CC="`pkg-config $pkg --variable=GASNET_CC`"
+export GASNET_CFLAGS="`pkg-config $pkg --variable=GASNET_CFLAGS`"
+export GASNET_CPPFLAGS="`pkg-config $pkg --variable=GASNET_CPPFLAGS`"
 
-export FPM_LDFLAGS="$GASNET_LDFLAGS $GASNET_LIBS"
-export FPM_CC="$GASNET_CC"
-export FPM_CFLAGS="$GASNET_CFLAGS $GASNET_CPPFLAGS"
-
-fpm build
-
-mkdir -p build/pkgconfig
-cd build/pkgconfig
-  echo "CAFFEINE_FPM_LDFLAGS=$FPM_LDFLAGS"                     >  caffeine.pc
-  echo "CAFFEINE_FPM_CC=$FPM_CC"                               >> caffeine.pc
-  echo "CAFFEINE_FPM_CFLAGS=$FPM_CFLAGS"                       >> caffeine.pc
+cd "$PKG_CONFIG_PATH"
+  echo "CAFFEINE_FPM_LDFLAGS=$GASNET_LDFLAGS $GASNET_LIBS"     >  caffeine.pc
+  echo "CAFFEINE_FPM_CC=$GASNET_CC"                            >> caffeine.pc
+  echo "CAFFEINE_FPM_CFLAGS=$GASNET_CFLAGS $GASNET_CPPFLAGS"   >> caffeine.pc
   echo "Name: caffeine"                                        >> caffeine.pc
   echo "Description: coarray fortran parallel runtime library" >> caffeine.pc
   echo "URL: https://gitlab.lbl.gov/rouson/caffeine"           >> caffeine.pc
@@ -112,15 +109,16 @@ cd build/pkgconfig
 cd -
 
 cd build
-  export PKG_CONFIG_PATH="pkgconfig"
   echo "#!/bin/sh"                                                             >  run-fpm.sh
   echo "#-- DO NOT EDIT -- created by caffeine/install.sh"                     >> run-fpm.sh
-  echo "fpm \$@ \\"                                                            >> run-fpm.sh
+  echo "\"${PREFIX}\"/bin/fpm \$@ \\"                                          >> run-fpm.sh
   echo "--c-compiler \"`pkg-config caffeine --variable=CAFFEINE_FPM_CC`\" \\"  >> run-fpm.sh
   echo "--c-flag \"`pkg-config caffeine --variable=CAFFEINE_FPM_CFLAGS`\" \\"  >> run-fpm.sh
   echo "--link-flag \"`pkg-config caffeine --variable=CAFFEINE_FPM_LDFLAGS`\"" >> run-fpm.sh
   chmod u+x run-fpm.sh
 cd -
+
+./build/run-fpm.sh build
 
 echo ""
 echo "________________ Caffeine has been dispensed! ________________" 
