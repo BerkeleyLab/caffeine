@@ -31,6 +31,8 @@ contains
   ! TODO: establish non-allocatable coarrays
 
   call caf_sync_all
+  
+  exit_code = 0
 
   contains
  

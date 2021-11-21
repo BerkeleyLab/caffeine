@@ -37,6 +37,11 @@ while [ "$1" != "" ]; do
     shift
 done
 
+if ! command -v brew > /dev/null ; then
+  /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+fi
+brew install pkg-config coreutils gcc # TODO: brew install fpm 0.5.0 afer its release
+
 PREFIX=`realpath $PREFIX`
 
 set -u # error on use of undefined variable
@@ -84,28 +89,37 @@ cd "$DEPENDENCIES_DIR"/gasnet
   make install
 cd -
 
-git clone https://github.com/fortran-lang/fpm build/dependencies/fpm
-cd build/dependencies/fpm
-  ./install.sh --prefix="$PREFIX"
-cd -
-
 export PKG_CONFIG_PATH="$PREFIX"/lib/pkgconfig
-export pkg="gasnet-smp-seq"
+pkg="gasnet-smp-seq"
 
-export GASNET_LDFLAGS="`pkg-config $pkg --variable=GASNET_LDFLAGS`"
-export GASNET_LIBS="`pkg-config $pkg --variable=GASNET_LIBS`"
-export GASNET_CC="`pkg-config $pkg --variable=GASNET_CC`"
-export GASNET_CFLAGS="`pkg-config $pkg --variable=GASNET_CFLAGS`"
-export GASNET_CPPFLAGS="`pkg-config $pkg --variable=GASNET_CPPFLAGS`"
+GASNET_LDFLAGS="`pkg-config $pkg --variable=GASNET_LDFLAGS`"
+GASNET_LIBS="`pkg-config $pkg --variable=GASNET_LIBS`"
+GASNET_CC="`pkg-config $pkg --variable=GASNET_CC`"
+GASNET_CFLAGS="`pkg-config $pkg --variable=GASNET_CFLAGS`"
+GASNET_CPPFLAGS="`pkg-config $pkg --variable=GASNET_CPPFLAGS`"
+
+echo "# DO NOT EDIT OR COMMIT -- Created by caffeine/install.sh" > build/fpm.toml
+if [ $(uname) = "Darwin" ]; then
+  GASNET_LIB_LOCATIONS="$GASNET_LIBS"
+  cat manifests/common-fpm.toml >> build/fpm.toml
+elif [ $(uname) = "Linux" ]; then
+  GASNET_LIB_LOCATIONS=`echo $GASNET_LIBS | awk '{locs=""; for(i = 1; i <= NF; i++) if ($i ~ /^-L/) {locs=(locs " " $i);}; print locs; }'`
+  cat manifests/common-fpm.toml manifests/linux-fpm.toml-tail >> build/fpm.toml
+else
+  echo ""
+  echo "------> ERROR: unrecognized operating system <-------"
+  exit 1
+fi
+ln -f -s build/fpm.toml
 
 cd "$PKG_CONFIG_PATH"
-  echo "CAFFEINE_FPM_LDFLAGS=$GASNET_LDFLAGS $GASNET_LIBS"     >  caffeine.pc
-  echo "CAFFEINE_FPM_CC=$GASNET_CC"                            >> caffeine.pc
-  echo "CAFFEINE_FPM_CFLAGS=$GASNET_CFLAGS $GASNET_CPPFLAGS"   >> caffeine.pc
-  echo "Name: caffeine"                                        >> caffeine.pc
-  echo "Description: coarray fortran parallel runtime library" >> caffeine.pc
-  echo "URL: https://gitlab.lbl.gov/rouson/caffeine"           >> caffeine.pc
-  echo "Version: 0.1.0"                                        >> caffeine.pc
+  echo "CAFFEINE_FPM_LDFLAGS=$GASNET_LDFLAGS $GASNET_LIB_LOCATIONS" >  caffeine.pc
+  echo "CAFFEINE_FPM_CC=$GASNET_CC"                                 >> caffeine.pc
+  echo "CAFFEINE_FPM_CFLAGS=$GASNET_CFLAGS $GASNET_CPPFLAGS"        >> caffeine.pc
+  echo "Name: caffeine"                                             >> caffeine.pc
+  echo "Description: coarray fortran parallel runtime library"      >> caffeine.pc
+  echo "URL: https://gitlab.lbl.gov/rouson/caffeine"                >> caffeine.pc
+  echo "Version: 0.1.0"                                             >> caffeine.pc
 cd -
 
 cd build
@@ -117,6 +131,11 @@ cd build
   echo "--link-flag \"`pkg-config caffeine --variable=CAFFEINE_FPM_LDFLAGS`\"" >> run-fpm.sh
   chmod u+x run-fpm.sh
 cd -
+
+git clone https://github.com/fortran-lang/fpm build/dependencies/fpm 
+cd build/dependencies/fpm                                            
+  ./install.sh --prefix="$PREFIX"
+cd -                                                                 
 
 ./build/run-fpm.sh build
 

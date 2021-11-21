@@ -7,7 +7,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [macOS-11]
+        os: [macOS-11, ubuntu-latest]
 
 
     env:
