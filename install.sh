@@ -37,23 +37,22 @@ while [ "$1" != "" ]; do
     shift
 done
 
-if ! command -v brew > /dev/null ; then
-  /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-fi
-brew install pkg-config coreutils gcc # TODO: brew install fpm 0.5.0 afer its release
-
-PREFIX=`realpath $PREFIX`
-
 set -u # error on use of undefined variable
 
 if command -v curl > /dev/null 2>&1; then
-    FETCH="curl -L"
-elif command -v wget > /dev/null 2>&1; then
-    FETCH="wget -O -"
-else
-    echo "No download mechanism found. Please install curl or wget first."
-    exit 1
+  echo "No download mechanism found. Please install curl and rerun ./install.sh"
+  exit 1
 fi
+
+if ! command -v brew > /dev/null ; then
+  /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+  BREW_COMMAND=/home/linuxbrew/.linuxbrew/bin/brew
+else
+  BREW_COMMAND="brew"
+fi
+"$BREW_COMMAND" install pkg-config coreutils gcc
+
+PREFIX=`realpath $PREFIX`
 
 GASNET_TAR_FILE="GASNet-stable.tar.gz"
 GASNET_SOURCE_URL="https://bitbucket.org/berkeleylab/gasnet/downloads/$GASNET_TAR_FILE"
@@ -63,8 +62,7 @@ if [ ! -d $DEPENDENCIES_DIR ]; then
 fi
 
 cd $DEPENDENCIES_DIR
-  echo "caffeine: $FETCH $GASNET_SOURCE_URL > $GASNET_TAR_FILE"
-  $FETCH $GASNET_SOURCE_URL > $GASNET_TAR_FILE
+  curl -L $GASNET_SOURCE_URL > $GASNET_TAR_FILE
   
   if [ ! -f $GASNET_TAR_FILE ]; then
     echo "$GASNET_TAR_FILE not found"
@@ -99,17 +97,19 @@ GASNET_CFLAGS="`pkg-config $pkg --variable=GASNET_CFLAGS`"
 GASNET_CPPFLAGS="`pkg-config $pkg --variable=GASNET_CPPFLAGS`"
 
 echo "# DO NOT EDIT OR COMMIT -- Created by caffeine/install.sh" > build/fpm.toml
-if [ $(uname) = "Darwin" ]; then
-  GASNET_LIB_LOCATIONS="$GASNET_LIBS"
-  cat manifests/common-fpm.toml >> build/fpm.toml
-elif [ $(uname) = "Linux" ]; then
-  GASNET_LIB_LOCATIONS=`echo $GASNET_LIBS | awk '{locs=""; for(i = 1; i <= NF; i++) if ($i ~ /^-L/) {locs=(locs " " $i);}; print locs; }'`
-  cat manifests/common-fpm.toml manifests/linux-fpm.toml-tail >> build/fpm.toml
-else
-  echo ""
-  echo "------> ERROR: unrecognized operating system <-------"
-  exit 1
-fi
+cd manifests
+  if [ $(uname) = "Darwin" ]; then
+    GASNET_LIB_LOCATIONS="$GASNET_LIBS"
+    cat common-fpm.toml >> ../build/fpm.toml
+  elif [ $(uname) = "Linux" ]; then
+    GASNET_LIB_LOCATIONS=`echo $GASNET_LIBS | awk '{locs=""; for(i = 1; i <= NF; i++) if ($i ~ /^-L/) {locs=(locs " " $i);}; print locs; }'`
+    cat common-fpm.toml linux-fpm.toml-tail >> ../build/fpm.toml
+  else
+    echo ""
+    echo "------> ERROR: unrecognized operating system <-------"
+    exit 1
+  fi
+cd -
 ln -f -s build/fpm.toml
 
 cd "$PKG_CONFIG_PATH"
