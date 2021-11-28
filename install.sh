@@ -39,7 +39,7 @@ done
 
 set -u # error on use of undefined variable
 
-if command -v curl > /dev/null 2>&1; then
+if ! command -v curl > /dev/null 2>&1; then
   echo "No download mechanism found. Please install curl and rerun ./install.sh"
   exit 1
 fi
