@@ -50,7 +50,11 @@ if ! command -v brew > /dev/null ; then
 else
   BREW_COMMAND="brew"
 fi
-"$BREW_COMMAND" install pkg-config coreutils gcc
+export GCC_VER=11
+"$BREW_COMMAND" install pkg-config coreutils gcc@$GCC_VER
+export CC=`which gcc-$GCC_VER`
+export CXX=`which g++-$GCC_VER`
+export FC=`which gfortran-$GCC_VER`
 
 PREFIX=`realpath $PREFIX`
 
@@ -132,6 +136,9 @@ cd build
   chmod u+x run-fpm.sh
 cd -
 
+
+export FPM_FC="$FC"
+export FPM_CC="$CC"
 git clone https://github.com/fortran-lang/fpm build/dependencies/fpm 
 cd build/dependencies/fpm                                            
   ./install.sh --prefix="$PREFIX"
