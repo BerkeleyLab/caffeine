@@ -44,6 +44,7 @@ if ! command -v gcc-$GCC_VER > /dev/null 2>&1 \
     || ! command -v g++-$GCC_VER > /dev/null 2>&1 \
     || ! command -v gfortran-$GCC_VER > /dev/null 2>&1 \
     || ! command -v pkg-config > /dev/null 2>&1 \
+    || ! command -v realpath > /dev/null 2>&1 \
     || ! command -v make > /dev/null 2>&1; then
   if ! command -v curl > /dev/null 2>&1; then
     echo "No download mechanism found. Please install curl and rerun ./install.sh"
