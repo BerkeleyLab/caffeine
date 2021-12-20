@@ -7,3 +7,5 @@ copyright = "2021 UC Regents"
 
 [dev-dependencies]
 vegetables = {git = "https://gitlab.com/everythingfunctional/vegetables", tag = "v7.2.1"}
+
+[build]

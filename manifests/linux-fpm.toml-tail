@@ -1,3 +1,0 @@
-
-[build]
-link = ["gasnet-smp-seq", "rt", "gcc", "m"]
