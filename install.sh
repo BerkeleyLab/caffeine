@@ -38,20 +38,27 @@ while [ "$1" != "" ]; do
 done
 
 set -u # error on use of undefined variable
+GCC_VER=11
 
-if ! command -v curl > /dev/null 2>&1; then
-  echo "No download mechanism found. Please install curl and rerun ./install.sh"
-  exit 1
-fi
+if ! command -v gcc-$GCC_VER > /dev/null 2>&1 \
+    || ! command -v g++-$GCC_VER > /dev/null 2>&1 \
+    || ! command -v gfortran-$GCC_VER > /dev/null 2>&1 \
+    || ! command -v pkg-config > /dev/null 2>&1 \
+    || ! command -v realpath > /dev/null 2>&1 \
+    || ! command -v make > /dev/null 2>&1; then
+  if ! command -v curl > /dev/null 2>&1; then
+    echo "No download mechanism found. Please install curl and rerun ./install.sh"
+    exit 1
+  fi
 
-if ! command -v brew > /dev/null ; then
-  /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-  BREW_COMMAND=/home/linuxbrew/.linuxbrew/bin/brew
-else
-  BREW_COMMAND="brew"
+  if ! command -v brew > /dev/null ; then
+    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+    BREW_COMMAND=/home/linuxbrew/.linuxbrew/bin/brew
+  else
+    BREW_COMMAND="brew"
+  fi
+  "$BREW_COMMAND" install pkg-config coreutils gcc@$GCC_VER
 fi
-export GCC_VER=11
-"$BREW_COMMAND" install pkg-config coreutils gcc@$GCC_VER
 export CC=`which gcc-$GCC_VER`
 export CXX=`which g++-$GCC_VER`
 export FC=`which gfortran-$GCC_VER`
@@ -66,30 +73,25 @@ if [ ! -d $DEPENDENCIES_DIR ]; then
 fi
 
 cd $DEPENDENCIES_DIR
-  curl -L $GASNET_SOURCE_URL > $GASNET_TAR_FILE
-  
-  if [ ! -f $GASNET_TAR_FILE ]; then
-    echo "$GASNET_TAR_FILE not found"
-    exit 1
-  fi
-  
-  if [ -d GASNet-stable ]; then
-    rm -rf GASNet-stable
-  fi
-  tar xf $GASNET_TAR_FILE
-  
-  if [ -d gasnet ]; then
-    rm -rf gasnet
-  fi
-cd -
 
-mkdir -v "$DEPENDENCIES_DIR"/gasnet
-cd "$DEPENDENCIES_DIR"/gasnet
-  ../GASNet-stable/configure --prefix "$PREFIX"
-  make -j 8 all
-  make check
-  make install
-cd -
+  if [ ! -f $GASNET_TAR_FILE ]; then
+    curl -L $GASNET_SOURCE_URL > $GASNET_TAR_FILE
+  fi
+
+  if [ ! -d GASNet-stable ]; then
+    tar xf $GASNET_TAR_FILE
+  fi
+
+  if [ ! -d gasnet ]; then
+    mkdir -v gasnet
+    cd gasnet
+      ../GASNet-stable/configure --prefix "$PREFIX"
+      make -j 8 all
+      make check
+      make install
+    cd ..
+  fi
+cd ../..
 
 export PKG_CONFIG_PATH="$PREFIX"/lib/pkgconfig
 pkg="gasnet-smp-seq"
@@ -101,19 +103,11 @@ GASNET_CFLAGS="`pkg-config $pkg --variable=GASNET_CFLAGS`"
 GASNET_CPPFLAGS="`pkg-config $pkg --variable=GASNET_CPPFLAGS`"
 
 echo "# DO NOT EDIT OR COMMIT -- Created by caffeine/install.sh" > build/fpm.toml
-cd manifests
-  if [ $(uname) = "Darwin" ]; then
-    GASNET_LIB_LOCATIONS="$GASNET_LIBS"
-    cat common-fpm.toml >> ../build/fpm.toml
-  elif [ $(uname) = "Linux" ]; then
-    GASNET_LIB_LOCATIONS=`echo $GASNET_LIBS | awk '{locs=""; for(i = 1; i <= NF; i++) if ($i ~ /^-L/) {locs=(locs " " $i);}; print locs; }'`
-    cat common-fpm.toml linux-fpm.toml-tail >> ../build/fpm.toml
-  else
-    echo ""
-    echo "------> ERROR: unrecognized operating system <-------"
-    exit 1
-  fi
-cd -
+cat manifest/fpm.toml.template >> build/fpm.toml
+GASNET_LIB_LOCATIONS=`echo $GASNET_LIBS | awk '{locs=""; for(i = 1; i <= NF; i++) if ($i ~ /^-L/) {locs=(locs " " $i);}; print locs; }'`
+GASNET_LIB_NAMES=`echo $GASNET_LIBS | awk '{names=""; for(i = 1; i <= NF; i++) if ($i ~ /^-l/) {names=(names " " $i);}; print names; }' | sed 's/-l//g'`
+FPM_TOML_LINK_ENTRY="link = [\"$(echo ${GASNET_LIB_NAMES} | sed 's/ /", "/g')\"]"
+echo "${FPM_TOML_LINK_ENTRY}" >> build/fpm.toml
 ln -f -s build/fpm.toml
 
 cd "$PKG_CONFIG_PATH"
@@ -139,15 +133,17 @@ cd -
 
 export FPM_FC="$FC"
 export FPM_CC="$CC"
-git clone https://github.com/fortran-lang/fpm build/dependencies/fpm 
-cd build/dependencies/fpm                                            
-  ./install.sh --prefix="$PREFIX"
-cd -                                                                 
+if [ ! -d build/dependencies/fpm ]; then
+  git clone https://github.com/fortran-lang/fpm build/dependencies/fpm
+  cd build/dependencies/fpm
+    ./install.sh --prefix="$PREFIX"
+  cd -
+fi
 
 ./build/run-fpm.sh build
 
 echo ""
-echo "________________ Caffeine has been dispensed! ________________" 
+echo "________________ Caffeine has been dispensed! ________________"
 echo ""
 echo "To rebuild or to run tests or examples via the Fortran Package"
 echo "Manager (fpm) with the required compiler/linker flags, pass a"
