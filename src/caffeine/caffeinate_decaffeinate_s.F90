@@ -1,3 +1,5 @@
+! Copyright (c), The Regents of the University of California
+! Terms of use are as specified in LICENSE.txt
 submodule(caffeinate_decaffeinate_m) caffeinate_decaffeinate_s
   use iso_c_binding, only : c_int, c_ptr, c_loc, c_char, c_null_char
   use synchronization_m, only : caf_sync_all

@@ -1,8 +1,5 @@
-/*   $Source: bitbucket.org:berkeleylab/gasnet.git/tests/testhello.c $
- * Description: GASNet "Hello, World" test/example
- * Copyright 2010, The Regents of the University of California
- * Terms of use are as specified in license.txt
- */
+// Copyright (c), The Regents of the University of California
+// Terms of use are as specified in LICENSE.txt
 
 #include <gasnetex.h>
 #define _GASNET_SAFE_

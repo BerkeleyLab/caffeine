@@ -1,3 +1,5 @@
+! Copyright (c), The Regents of the University of California
+! Terms of use are as specified in LICENSE.txt
 submodule(image_enumeration_m) image_enumeration_s
   use iso_c_binding, only : c_int
   implicit none

@@ -1,3 +1,5 @@
+! Copyright (c), The Regents of the University of California
+! Terms of use are as specified in LICENSE.txt
 module caffeine_m
   use error_termination_m, only : caf_error_stop
   use image_enumeration_m, only : caf_this_image, caf_num_images

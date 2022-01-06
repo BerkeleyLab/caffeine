@@ -1,3 +1,5 @@
+! Copyright (c), The Regents of the University of California
+! Terms of use are as specified in LICENSE.txt
 submodule(error_termination_m) error_termination_s
   use iso_fortran_env, only : error_unit
   use iso_c_binding, only : c_char, c_int

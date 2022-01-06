@@ -1,3 +1,5 @@
+! Copyright (c), The Regents of the University of California
+! Terms of use are as specified in LICENSE.txt
 module image_enumeration_m
   use team_type_m, only : team_type
   implicit none
