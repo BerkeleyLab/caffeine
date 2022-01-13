@@ -2,7 +2,7 @@
 
 set -e # exit on error
 
-usage()
+print_usage_info()
 {
     echo "Caffeine Installation Script"
     echo ""
@@ -18,15 +18,16 @@ usage()
 
 GCC_VER=11
 FPM_VERSION="0.5.0"
+GASNET_VERSION="2021.9.0"
 
-prerequisites()
+list_prerequisites()
 {
     echo "Caffeine and this installer were developed with the following prerequisite package" 
     echo "versions, which also indicate the versions that the installer will install if"
     echo "missing and if granted permission:"
     echo ""
     echo "  GCC $GCC_VER"
-    echo "  GASNet-EX 2021.9.1 (gex-stable-2022_01_11-0-g66a0eaf) s"
+    echo "  GASNet-EX $GASNET_VERSION"
     echo "  fpm $FPM_VERSION"
     echo "  pkg-config 0.29.2"
     echo "  realpath 9.0 (Homebrew coreutils 9.0)"
@@ -35,17 +36,16 @@ prerequisites()
     echo "In some cases, earlier versions might also work."
 }
 
-
 while [ "$1" != "" ]; do
     PARAM=$(echo "$1" | awk -F= '{print $1}')
     VALUE=$(echo "$1" | awk -F= '{print $2}')
     case $PARAM in
         -h | --help)
-            usage
+            print_usage_info
             exit
             ;;
         --prereqs)
-            prerequisites
+            list_prerequisites
             exit
             ;;
         --prefix)
@@ -64,6 +64,7 @@ set -u # error on use of undefined variable
 
 if [ -z ${PREFIX+x} ] ; then
   PREFIX="$HOME/.local"
+  echo ""
   echo "Using default installation prefix: $PREFIX"
 fi
 
@@ -91,24 +92,49 @@ if command -v make > /dev/null 2>&1; then
   MAKE=make
 fi
 
-if [ -z ${FC+x} ] || [ -z ${CC+x} ] || [ -z ${CXX+x} ] || [ -z ${PKG_CONFIG+x} ] || [ -z ${REALPATH+x} ] || [ -z ${MAKE+x} ] ; then
+ask_homebrew_permission()
+{
   echo ""
-  echo "One or more of the following prerequisites was not found:"
+  echo "One or more of the following packages are missing: " 
   echo "gfortran $GCC_VER, gcc $GCC_VER, g++ $GCC_VER, pkg-config, realpath, make"
+  echo "If you grant permission to install prerequisites, you will be prompted before each installation." 
+  echo "Press 'Enter' to choose the square-bracketed default answers: "
   echo ""
-  echo "Press 'Enter' to choose the square-bracketed default answers:"
-  echo "[Y] denotes 'Yes.'"
+  printf "Is it ok to install prerequisites using Homebrew? [yes] "
+}
 
-  printf "Is it ok to to install the missing prerequisites using Homebrew? [Y]"
+ask_homebrew_package_permission()
+{
+  echo ""
+  case $1 in  
+    *gcc*) echo "To use pre-installed compilers, set the FC, CC, and CXX environment variables and rerun './install.sh'." ;;
+  esac
+  if [ ! -z ${2+x} ]; then
+    echo "Homebrew installs $1 collectively in one package ($2):"
+  fi
+  echo ""
+  printf "Is it ok to install $1 using Homebrew? [yes] "
+}
+
+exit_if_user_declines()
+{
   read answer
   if [ -n "$answer" -a "$answer" != "y" -a "$answer" != "Y" -a "$answer" != "Yes" -a "$answer" != "YES" -a "$answer" != "yes" ]; then
     echo "Installation declined."
     echo "Please ensure that the listed prerequisites are installed and in your PATH and then rerun './install.sh'."
-    echo "To use compilers other than gcc-$GCC_VER,g++-$GCC_VER, and gfortran-$GCC_VER," 
-    echo "please also set the FC, CC, and CXX environment variables."
+    if [ $1 = "*gcc*" ]; then
+      echo "To use compilers other than gcc-$GCC_VER, g++-$GCC_VER, and gfortran-$GCC_VER," 
+      echo "please also set the FC, CC, and CXX environment variables."
+    fi
     echo "Caffeine was not installed." 
     exit 1
   fi
+}
+
+if [ -z ${FC+x} ] || [ -z ${CC+x} ] || [ -z ${CXX+x} ] || [ -z ${PKG_CONFIG+x} ] || [ -z ${REALPATH+x} ] || [ -z ${MAKE+x} ] ; then
+
+  ask_homebrew_permission 
+  exit_if_user_declines
 
   if command -v brew > /dev/null; then
     BREW_COMMAND="brew"
@@ -122,7 +148,23 @@ if [ -z ${FC+x} ] || [ -z ${CC+x} ] || [ -z ${CXX+x} ] || [ -z ${PKG_CONFIG+x} ]
       BREW_COMMAND=/home/linuxbrew/.linuxbrew/bin/brew
     fi
   fi
-  "$BREW_COMMAND" install pkg-config coreutils gcc@$GCC_VER
+
+  if [ -z ${FC+x} ] || [ -z ${CC+x} ] || [ -z ${CXX+x} ]; then
+    ask_homebrew_package_permission "gfortran, gcc, and g++" "gcc@$GCC_VER" 
+    exit_if_user_declines
+    "$BREW_COMMAND" install gcc@$GCC_VER
+  fi
+  if [ -z ${PKG_CONFIG+x} ]; then
+    ask_homebrew_package_permission "pkg-config"
+    exit_if_user_declines
+    "$BREW_COMMAND" install pkg-config
+  fi
+  if [ -z ${REALPATH+x} ] || [ -z ${MAKE+x} ] ; then
+    ask_homebrew_package_permission "realpath and make" "coreutils"
+    exit_if_user_declines
+    "$BREW_COMMAND" install coreutils
+  fi
+
   CC=`which gcc-$GCC_VER`
   CXX=`which g++-$GCC_VER`
   FC=`which gfortran-$GCC_VER`
@@ -137,18 +179,19 @@ if [ ! -d build/dependencies ]; then
   mkdir -p build/dependencies
 fi
 
+ask_package_permission()
+{
+  echo ""
+  echo "$1 not found."
+  echo ""
+  printf "Is it ok to download and install $1? [yes] (Press 'Enter' for the square-bracketed default answer.) "
+}
+
 if command -v fpm > /dev/null 2>&1; then
   FPM="fpm"
 else
-  echo "Fortran Package Manager (fpm) not found."
-  printf "Is it ok to to downloand and install fpm? [yes] ('Enter' for square-bracketed default.)"
-  read answer
-  if [ -n "$answer" -a "$answer" != "y" -a "$answer" != "Y" -a "$answer" != "Yes" -a "$answer" != "YES" -a "$answer" != "yes" ]; then
-    echo "Installation declined."
-    echo "Please ensure fpm $FPM_VERSION or greater is in your PATH and then rerun './install.sh'."
-    echo "Caffeine not installed."
-    exit 1
-  fi
+  ask_package_permission "fpm"
+  exit_if_user_declines
   curl -L $FPM_SOURCE_URL | tar xvz -C build/dependencies/
   (cd build/dependencies/fpm-$FPM_VERSION && ./install.sh --prefix="$PREFIX")
 fi
@@ -156,11 +199,10 @@ fi
 export PKG_CONFIG_PATH="$PREFIX"/lib/pkgconfig
 pkg="gasnet-smp-seq"
 if [ ! -f "$PKG_CONFIG_PATH/$pkg.pc" ]; then
+  echo ""
   echo "GASNet-EX $pkg.pc file not found in $PKG_CONFIG_PATH."
-
-  echo "Press 'Enter' to choose the square-bracketed default answers:"
-  echo "[Y] denotes 'Yes.'"
-  printf "Is it ok to to download and install GASNet-EX? [Y]"
+  echo ""
+  printf "Is it ok to download and install GASNet-EX? [yes] (Press 'Enter' for the square-bracketed default answer.) "
   read answer
   if [ -n "$answer" -a "$answer" != "y" -a "$answer" != "Y" -a "$answer" != "Yes" -a "$answer" != "YES" -a "$answer" != "yes" ]; then
     echo "Installation declined."
@@ -168,8 +210,8 @@ if [ ! -f "$PKG_CONFIG_PATH/$pkg.pc" ]; then
     echo "Caffeine was not installed."
   fi
 
-  GASNET_TAR_FILE="GASNet-stable.tar.gz"
-  GASNET_SOURCE_URL="https://bitbucket.org/berkeleylab/gasnet/downloads/$GASNET_TAR_FILE"
+  GASNET_TAR_FILE="GASNet-$GASNET_VERSION.tar.gz"
+  GASNET_SOURCE_URL="https://gasnet.lbl.gov/EX/GASNet-$GASNET_VERSION.tar.gz"
   DEPENDENCIES_DIR="build/dependencies"
   if [ ! -d $DEPENDENCIES_DIR ]; then
     mkdir -pv $DEPENDENCIES_DIR
@@ -177,9 +219,9 @@ if [ ! -f "$PKG_CONFIG_PATH/$pkg.pc" ]; then
   
   curl -L $GASNET_SOURCE_URL | tar xvz - -C $DEPENDENCIES_DIR
   
-  if [ -d $DEPENDENCIES_DIR/GASNet-stable ]; then
-    cd $DEPENDENCIES_DIR/GASNet-stable
-      ../GASNet-stable/configure --prefix "$PREFIX"
+  if [ -d $DEPENDENCIES_DIR/GASNet-$GASNET_VERSION ]; then
+    cd $DEPENDENCIES_DIR/GASNet-$GASNET_VERSION
+      FC="$FC" CC="$CC" CXX="$CXX" ../GASNet-$GASNET_VERSION/configure --prefix "$PREFIX"
       make -j 8 all
       make check
       make install
