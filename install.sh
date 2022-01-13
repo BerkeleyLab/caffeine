@@ -92,6 +92,7 @@ if command -v make > /dev/null 2>&1; then
 fi
 
 if [ -z ${FC+x} ] || [ -z ${CC+x} ] || [ -z ${CXX+x} ] || [ -z ${PKG_CONFIG+x} ] || [ -z ${REALPATH+x} ] || [ -z ${MAKE+x} ] ; then
+  echo ""
   echo "One or more of the following prerequisites was not found:"
   echo "gfortran $GCC_VER, gcc $GCC_VER, g++ $GCC_VER, pkg-config, realpath, make"
   echo ""
@@ -117,7 +118,9 @@ if [ -z ${FC+x} ] || [ -z ${CC+x} ] || [ -z ${CXX+x} ] || [ -z ${PKG_CONFIG+x} ]
       exit 1
     fi
     /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-    BREW_COMMAND=/home/linuxbrew/.linuxbrew/bin/brew
+    if [ $(uname) == "Linux" ]; then
+      BREW_COMMAND=/home/linuxbrew/.linuxbrew/bin/brew
+    fi
   fi
   "$BREW_COMMAND" install pkg-config coreutils gcc@$GCC_VER
   CC=`which gcc-$GCC_VER`
