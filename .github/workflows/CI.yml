@@ -32,14 +32,14 @@ jobs:
         --slave /usr/bin/gfortran gfortran /usr/bin/gfortran-${GCC_V} \
         --slave /usr/bin/g++ g++ /usr/bin/g++-${GCC_V} \
         --slave /usr/bin/gcov gcov /usr/bin/gcov-${GCC_V}
-        ./install.sh --prefix=${PREFIX}
+        yes | ./install.sh --prefix=${PREFIX}
 
     - name: Install on macOS
       if: contains(matrix.os, 'macos')
       run: |
         brew install gcc@${GCC_V} coreutils
         sudo ln -s $(which gfortran-${GCC_V}) $(dirname $(which gfortran-${GCC_V}))/gfortran
-        ./install.sh --prefix=${PREFIX}
+        yes | ./install.sh --prefix=${PREFIX}
 
     - name: Run unit tests
       run: |
