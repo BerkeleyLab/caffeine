@@ -62,11 +62,11 @@ done
 
 set -u # error on use of undefined variable
 
-if [ -z ${PREFIX+x} ] ; then
-  PREFIX="$HOME/.local"
-  echo ""
-  echo "Using default installation prefix: $PREFIX"
-fi
+PREFIX=${PREFIX:-"$HOME/.local"}
+echo "Using installation prefix $PREFIX"
+
+PKG_CONFIG_PATH=${PKG_CONFIG_PATH:-"$PREFIX/lib/pkgconfig"}
+echo "Using pkg-config prefix $PKG_CONFIG_PATH"
 
 if [ -z ${FC+x} ] || [ -z ${CC+x} ] || [ -z ${CXX+x} ]; then
   if command -v gfortran-$GCC_VER > /dev/null 2>&1; then
@@ -106,13 +106,10 @@ ask_homebrew_permission()
 ask_homebrew_package_permission()
 {
   echo ""
-  case $1 in  
-    *gcc*) echo "To use pre-installed compilers, set the FC, CC, and CXX environment variables and rerun './install.sh'." ;;
-  esac
   if [ ! -z ${2+x} ]; then
     echo "Homebrew installs $1 collectively in one package named '$2'."
+    echo ""
   fi
-  echo ""
   printf "Is it ok to use Homebrew to install $1? [yes] "
 }
 
@@ -121,12 +118,15 @@ exit_if_user_declines()
   read answer
   if [ -n "$answer" -a "$answer" != "y" -a "$answer" != "Y" -a "$answer" != "Yes" -a "$answer" != "YES" -a "$answer" != "yes" ]; then
     echo "Installation declined."
-    echo "Please ensure that the listed prerequisites are installed and in your PATH and then rerun './install.sh'."
     case ${1:-} in  
-      *GCC*) echo "To use pre-installed compilers, set the FC, CC, and CXX environment variables and rerun './install.sh'." ;;
+      *GASNet*) 
+        echo "Please ensure the $pkg.pc file is in $PKG_CONFIG_PATH and then rerun './install.sh'." ;;
+      *GCC*) 
+        echo "To use compilers other than Homebrew-installed gcc-$GCC_VER, g++-$GCC_VER, and gfortran-$GCC_VER,"
+        echo "please set the FC, CC, and CXX environment variables and rerun './install.sh'." ;;
+      *) 
+        echo "Please ensure that the listed prerequisites are installed and in your PATH and then rerun './install.sh'." ;;
     esac
-    echo "To use compilers other than gcc-$GCC_VER, g++-$GCC_VER, and gfortran-$GCC_VER," 
-    echo "please also set the FC, CC, and CXX environment variables."
     echo "Caffeine was not installed." 
     exit 1
   fi
@@ -137,9 +137,9 @@ if [ -z ${FC+x} ] || [ -z ${CC+x} ] || [ -z ${CXX+x} ] || [ -z ${PKG_CONFIG+x} ]
   ask_homebrew_permission 
   exit_if_user_declines
 
-  if command -v brew > /dev/null; then
-    BREW_COMMAND="brew"
-  else
+  BREW_COMMAND="brew"
+
+  if ! command -v brew > /dev/null 2>&1; then
     if ! command -v curl > /dev/null 2>&1; then
       echo "No download mechanism found. Please install curl and rerun ./install.sh"
       exit 1
@@ -156,12 +156,12 @@ if [ -z ${FC+x} ] || [ -z ${CC+x} ] || [ -z ${CXX+x} ] || [ -z ${PKG_CONFIG+x} ]
     "$BREW_COMMAND" install gcc@$GCC_VER
   fi
   if [ -z ${PKG_CONFIG+x} ]; then
-    ask_homebrew_package_permission "pkg-config"
+    ask_homebrew_package_permission "'pkg-config'"
     exit_if_user_declines 
     "$BREW_COMMAND" install pkg-config
   fi
   if [ -z ${REALPATH+x} ] || [ -z ${MAKE+x} ] ; then
-    ask_homebrew_package_permission "realpath and make" "coreutils"
+    ask_homebrew_package_permission "'realpath' and 'make'" "coreutils"
     exit_if_user_declines 
     "$BREW_COMMAND" install coreutils
   fi
@@ -173,66 +173,62 @@ fi
 
 PREFIX=`realpath $PREFIX`
 
-export FPM_FC="$FC"
-export FPM_CC="$CC"
+FPM_FC="$FC"
+FPM_CC="$CC"
 FPM_SOURCE_URL="https://github.com/fortran-lang/fpm/archive/refs/tags/v$FPM_VERSION.tar.gz"
-
-if [ ! -d build/dependencies ]; then
-  mkdir -p build/dependencies
-fi
 
 ask_package_permission()
 {
   echo ""
-  echo "$1 not found."
+  echo "$1 not found in $2"
   echo ""
   echo "Press 'Enter' for the square-bracketed default answer:"
   printf "Is it ok to download and install $1? [yes] "
 }
 
-if command -v fpm > /dev/null 2>&1; then
-  FPM="fpm"
-else
-  ask_package_permission "fpm"
-  exit_if_user_declines
-  curl -L $FPM_SOURCE_URL | tar xvz -C build/dependencies/
-  (cd build/dependencies/fpm-$FPM_VERSION && ./install.sh --prefix="$PREFIX")
+DEPENDENCIES_DIR="build/dependencies"
+if [ ! -d $DEPENDENCIES_DIR ]; then
+  mkdir -p $DEPENDENCIES_DIR
 fi
 
-export PKG_CONFIG_PATH="$PREFIX"/lib/pkgconfig
+if command -v fpm > /dev/null 2>&1; then
+  FPM_COMMAND=`which fpm`
+else
+  ask_package_permission "fpm" "PATH"
+  exit_if_user_declines
+  curl -L $FPM_SOURCE_URL | tar xvzf - -C $DEPENDENCIES_DIR
+  (cd $DEPENDENCIES_DIR/fpm-$FPM_VERSION  && ./install.sh --prefix="$PREFIX")
+  FPM_COMMAND="${PREFIX}/bin/fpm"
+fi
+
 pkg="gasnet-smp-seq"
+
 if [ ! -f "$PKG_CONFIG_PATH/$pkg.pc" ]; then
-  echo ""
-  echo "GASNet-EX $pkg.pc file not found in $PKG_CONFIG_PATH."
-  echo ""
-  echo "Press 'Enter' for the square-bracketed default answer:"
-  printf "Is it ok to download and install GASNet-EX? [yes] "
-  read answer
+  ask_package_permission "GASNet-EX" "PKG_CONFIG_PATH"
+  exit_if_user_declines "GASNet-EX"
   if [ -n "$answer" -a "$answer" != "y" -a "$answer" != "Y" -a "$answer" != "Yes" -a "$answer" != "YES" -a "$answer" != "yes" ]; then
     echo "Installation declined."
-    echo "Please ensure the $pkg.pc file is in $PKG_CONFIG_PATH and then rerun './install.sh'."
     echo "Caffeine was not installed."
   fi
 
   GASNET_TAR_FILE="GASNet-$GASNET_VERSION.tar.gz"
   GASNET_SOURCE_URL="https://gasnet.lbl.gov/EX/GASNet-$GASNET_VERSION.tar.gz"
-  DEPENDENCIES_DIR="build/dependencies"
   if [ ! -d $DEPENDENCIES_DIR ]; then
     mkdir -pv $DEPENDENCIES_DIR
   fi
   
-  curl -L $GASNET_SOURCE_URL | tar xvz - -C $DEPENDENCIES_DIR
+  curl -L $GASNET_SOURCE_URL | tar xvzf - -C $DEPENDENCIES_DIR
   
   if [ -d $DEPENDENCIES_DIR/GASNet-$GASNET_VERSION ]; then
     cd $DEPENDENCIES_DIR/GASNet-$GASNET_VERSION
-      FC="$FC" CC="$CC" CXX="$CXX" ../GASNet-$GASNET_VERSION/configure --prefix "$PREFIX"
+      FC="$FC" CC="$CC" CXX="$CXX" ./configure --prefix "$PREFIX"
       make -j 8 all
-      make check
-      make install
+      make -j 8 install
     cd -
   fi
 fi
 
+export PKG_CONFIG_PATH
 GASNET_LDFLAGS="`pkg-config $pkg --variable=GASNET_LDFLAGS`"
 GASNET_LIBS="`pkg-config $pkg --variable=GASNET_LIBS`"
 GASNET_CC="`pkg-config $pkg --variable=GASNET_CC`"
@@ -260,7 +256,7 @@ cd -
 cd build
   echo "#!/bin/sh"                                                             >  run-fpm.sh
   echo "#-- DO NOT EDIT -- created by caffeine/install.sh"                     >> run-fpm.sh
-  echo "\"${PREFIX}\"/bin/fpm \$@ \\"                                          >> run-fpm.sh
+  echo "\"${FPM_COMMAND}\" \$@ \\"                                             >> run-fpm.sh
   echo "--c-compiler \"`pkg-config caffeine --variable=CAFFEINE_FPM_CC`\" \\"  >> run-fpm.sh
   echo "--c-flag \"`pkg-config caffeine --variable=CAFFEINE_FPM_CFLAGS`\" \\"  >> run-fpm.sh
   echo "--link-flag \"`pkg-config caffeine --variable=CAFFEINE_FPM_LDFLAGS`\"" >> run-fpm.sh
