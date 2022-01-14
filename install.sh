@@ -145,8 +145,9 @@ if [ -z ${FC+x} ] || [ -z ${CC+x} ] || [ -z ${CXX+x} ] || [ -z ${PKG_CONFIG+x} ]
       exit 1
     fi
     /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-    if [ $(uname) == "Linux" ]; then
+    if [ $(uname) = "Linux" ]; then
       BREW_COMMAND=/home/linuxbrew/.linuxbrew/bin/brew
+      eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
     fi
   fi
 
@@ -160,10 +161,12 @@ if [ -z ${FC+x} ] || [ -z ${CC+x} ] || [ -z ${CXX+x} ] || [ -z ${PKG_CONFIG+x} ]
     exit_if_user_declines 
     "$BREW_COMMAND" install pkg-config
   fi
+
   if [ -z ${REALPATH+x} ] || [ -z ${MAKE+x} ] ; then
     ask_homebrew_package_permission "'realpath' and 'make'" "coreutils"
     exit_if_user_declines 
     "$BREW_COMMAND" install coreutils
+    which $BREW_COMMAND
   fi
 
   CC=`which gcc-$GCC_VER`
