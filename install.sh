@@ -169,8 +169,9 @@ if [ -z ${FC+x} ] || [ -z ${CC+x} ] || [ -z ${CXX+x} ] || [ -z ${PKG_CONFIG+x} ]
   CC=`which gcc-$GCC_VER`
   CXX=`which g++-$GCC_VER`
   FC=`which gfortran-$GCC_VER`
-  PREFIX=`realpath $PREFIX`
 fi
+
+PREFIX=`realpath $PREFIX`
 
 export FPM_FC="$FC"
 export FPM_CC="$CC"
