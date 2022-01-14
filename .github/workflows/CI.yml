@@ -37,7 +37,7 @@ jobs:
     - name: Install on macOS
       if: contains(matrix.os, 'macos')
       run: |
-        brew install gcc@${GCC_V} coreutils
+        brew install gcc@${GCC_V} coreutils pkg-config
         sudo ln -s $(which gfortran-${GCC_V}) $(dirname $(which gfortran-${GCC_V}))/gfortran
         yes | ./install.sh --prefix=${PREFIX}
 
