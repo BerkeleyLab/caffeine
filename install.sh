@@ -17,7 +17,6 @@ print_usage_info()
 }
 
 GCC_VER=11
-FPM_VERSION="0.5.0"
 GASNET_VERSION="2021.9.0"
 
 list_prerequisites()
@@ -28,7 +27,7 @@ list_prerequisites()
     echo ""
     echo "  GCC $GCC_VER"
     echo "  GASNet-EX $GASNET_VERSION"
-    echo "  fpm $FPM_VERSION"
+    echo "  fpm 0.5.0"
     echo "  pkg-config 0.29.2"
     echo "  realpath 9.0 (Homebrew coreutils 9.0)"
     echo "  GNU Make 3.1 (Homebrew coreutils 9.0)"
@@ -81,15 +80,15 @@ if [ -z ${FC+x} ] || [ -z ${CC+x} ] || [ -z ${CXX+x} ]; then
 fi
 
 if command -v pkg-config > /dev/null 2>&1; then
-  PKG_CONFIG=pkg-config
+  PKG_CONFIG=`which pkg-config`
 fi
   
 if command -v realpath > /dev/null 2>&1; then
-  REALPATH=realpath
+  REALPATH=`which realpath`
 fi
 
 if command -v make > /dev/null 2>&1; then
-  MAKE=make
+  MAKE=`which make`
 fi
 
 if command -v fpm > /dev/null 2>&1; then
@@ -160,10 +159,10 @@ if [ -z ${FC+x} ] || [ -z ${CC+x} ] || [ -z ${CXX+x} ] || [ -z ${PKG_CONFIG+x} ]
     exit_if_user_declines "GCC"
     "$BREW_COMMAND" install gcc@$GCC_VER
   fi
-
   CC=`which gcc-$GCC_VER`
   CXX=`which g++-$GCC_VER`
   FC=`which gfortran-$GCC_VER`
+
 
   if [ -z ${PKG_CONFIG+x} ]; then
     ask_homebrew_package_permission "'pkg-config'"
@@ -171,22 +170,25 @@ if [ -z ${FC+x} ] || [ -z ${CC+x} ] || [ -z ${CXX+x} ] || [ -z ${PKG_CONFIG+x} ]
     "$BREW_COMMAND" install pkg-config
   fi
 
+  PKG_CONFIG=`which pkg-config`
+
   if [ -z ${REALPATH+x} ] || [ -z ${MAKE+x} ] ; then
     ask_homebrew_package_permission "'realpath' and 'make'" "coreutils"
     exit_if_user_declines 
     "$BREW_COMMAND" install coreutils
   fi
+  REALPATH=`which realpath`
 
   if [ -z ${FPM+x} ] ; then
     ask_homebrew_package_permission "'fpm'"
     exit_if_user_declines 
     "$BREW_COMMAND" tap awvwgk/fpm
     "$BREW_COMMAND" install fpm
-    FPM=`which fpm`
   fi
+  FPM=`which fpm`
 fi
 
-PREFIX=`realpath $PREFIX`
+PREFIX=`$REALPATH $PREFIX`
 
 FPM_FC="$FC"
 FPM_CC="$CC"
@@ -226,18 +228,18 @@ if [ ! -f "$PKG_CONFIG_PATH/$pkg.pc" ]; then
   if [ -d $DEPENDENCIES_DIR/GASNet-$GASNET_VERSION ]; then
     cd $DEPENDENCIES_DIR/GASNet-$GASNET_VERSION
       FC="$FC" CC="$CC" CXX="$CXX" ./configure --prefix "$PREFIX"
-      make -j 8 all
-      make -j 8 install
+      $MAKE -j 8 all
+      $MAKE -j 8 install
     cd -
   fi
 fi
 
 export PKG_CONFIG_PATH
-GASNET_LDFLAGS="`pkg-config $pkg --variable=GASNET_LDFLAGS`"
-GASNET_LIBS="`pkg-config $pkg --variable=GASNET_LIBS`"
-GASNET_CC="`pkg-config $pkg --variable=GASNET_CC`"
-GASNET_CFLAGS="`pkg-config $pkg --variable=GASNET_CFLAGS`"
-GASNET_CPPFLAGS="`pkg-config $pkg --variable=GASNET_CPPFLAGS`"
+GASNET_LDFLAGS="`$PKG_CONFIG $pkg --variable=GASNET_LDFLAGS`"
+GASNET_LIBS="`$PKG_CONFIG $pkg --variable=GASNET_LIBS`"
+GASNET_CC="`$PKG_CONFIG $pkg --variable=GASNET_CC`"
+GASNET_CFLAGS="`$PKG_CONFIG $pkg --variable=GASNET_CFLAGS`"
+GASNET_CPPFLAGS="`$PKG_CONFIG $pkg --variable=GASNET_CPPFLAGS`"
 
 echo "# DO NOT EDIT OR COMMIT -- Created by caffeine/install.sh" > build/fpm.toml
 cp manifest/fpm.toml.template build/fpm.toml
@@ -262,10 +264,10 @@ cd build
   echo "#!/bin/sh"                                                             >  run-fpm.sh
   echo "#-- DO NOT EDIT -- created by caffeine/install.sh"                     >> run-fpm.sh
   echo "\"${FPM}\" \$@ \\"                                                     >> run-fpm.sh
-  echo "--compiler \"`pkg-config caffeine --variable=CAFFEINE_FC`\"       \\"  >> run-fpm.sh
-  echo "--c-compiler \"`pkg-config caffeine --variable=CAFFEINE_FPM_CC`\" \\"  >> run-fpm.sh
-  echo "--c-flag \"`pkg-config caffeine --variable=CAFFEINE_FPM_CFLAGS`\" \\"  >> run-fpm.sh
-  echo "--link-flag \"`pkg-config caffeine --variable=CAFFEINE_FPM_LDFLAGS`\"" >> run-fpm.sh
+  echo "--compiler \"`$PKG_CONFIG caffeine --variable=CAFFEINE_FC`\"       \\"  >> run-fpm.sh
+  echo "--c-compiler \"`$PKG_CONFIG caffeine --variable=CAFFEINE_FPM_CC`\" \\"  >> run-fpm.sh
+  echo "--c-flag \"`$PKG_CONFIG caffeine --variable=CAFFEINE_FPM_CFLAGS`\" \\"  >> run-fpm.sh
+  echo "--link-flag \"`$PKG_CONFIG caffeine --variable=CAFFEINE_FPM_LDFLAGS`\"" >> run-fpm.sh
   chmod u+x run-fpm.sh
 cd -
 
