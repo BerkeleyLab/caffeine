@@ -92,11 +92,15 @@ if command -v make > /dev/null 2>&1; then
   MAKE=make
 fi
 
+if command -v fpm > /dev/null 2>&1; then
+  FPM=fpm
+fi
+
 ask_homebrew_permission()
 {
   echo ""
   echo "Either one or more of the environment variables FC, CC, and CXX are unset or"
-  echo "one or more of the following packages are not in the PATH: pkg-config, realpath, make."
+  echo "one or more of the following packages are not in the PATH: pkg-config, realpath, make, fpm."
   echo "If you grant permission to install prerequisites, you will be prompted before each installation." 
   echo ""
   echo "Press 'Enter' to choose the square-bracketed default answer:"
@@ -132,7 +136,7 @@ exit_if_user_declines()
   fi
 }
 
-if [ -z ${FC+x} ] || [ -z ${CC+x} ] || [ -z ${CXX+x} ] || [ -z ${PKG_CONFIG+x} ] || [ -z ${REALPATH+x} ] || [ -z ${MAKE+x} ] ; then
+if [ -z ${FC+x} ] || [ -z ${CC+x} ] || [ -z ${CXX+x} ] || [ -z ${PKG_CONFIG+x} ] || [ -z ${REALPATH+x} ] || [ -z ${MAKE+x} ] || [ -z ${FPM+x} ] ; then
 
   ask_homebrew_permission 
   exit_if_user_declines
@@ -156,6 +160,11 @@ if [ -z ${FC+x} ] || [ -z ${CC+x} ] || [ -z ${CXX+x} ] || [ -z ${PKG_CONFIG+x} ]
     exit_if_user_declines "GCC"
     "$BREW_COMMAND" install gcc@$GCC_VER
   fi
+
+  CC=`which gcc-$GCC_VER`
+  CXX=`which g++-$GCC_VER`
+  FC=`which gfortran-$GCC_VER`
+
   if [ -z ${PKG_CONFIG+x} ]; then
     ask_homebrew_package_permission "'pkg-config'"
     exit_if_user_declines 
@@ -166,19 +175,21 @@ if [ -z ${FC+x} ] || [ -z ${CC+x} ] || [ -z ${CXX+x} ] || [ -z ${PKG_CONFIG+x} ]
     ask_homebrew_package_permission "'realpath' and 'make'" "coreutils"
     exit_if_user_declines 
     "$BREW_COMMAND" install coreutils
-    which $BREW_COMMAND
   fi
 
-  CC=`which gcc-$GCC_VER`
-  CXX=`which g++-$GCC_VER`
-  FC=`which gfortran-$GCC_VER`
+  if [ -z ${FPM+x} ] ; then
+    ask_homebrew_package_permission "'fpm'"
+    exit_if_user_declines 
+    "$BREW_COMMAND" tap awvwgk/fpm
+    "$BREW_COMMAND" install fpm
+    FPM=`which fpm`
+  fi
 fi
 
 PREFIX=`realpath $PREFIX`
 
 FPM_FC="$FC"
 FPM_CC="$CC"
-FPM_SOURCE_URL="https://github.com/fortran-lang/fpm/archive/refs/tags/v$FPM_VERSION.tar.gz"
 
 ask_package_permission()
 {
@@ -192,16 +203,6 @@ ask_package_permission()
 DEPENDENCIES_DIR="build/dependencies"
 if [ ! -d $DEPENDENCIES_DIR ]; then
   mkdir -p $DEPENDENCIES_DIR
-fi
-
-if command -v fpm > /dev/null 2>&1; then
-  FPM_COMMAND=`which fpm`
-else
-  ask_package_permission "fpm" "PATH"
-  exit_if_user_declines
-  curl -L $FPM_SOURCE_URL | tar xvzf - -C $DEPENDENCIES_DIR
-  (cd $DEPENDENCIES_DIR/fpm-$FPM_VERSION  && ./install.sh --prefix="$PREFIX")
-  FPM_COMMAND="${PREFIX}/bin/fpm"
 fi
 
 pkg="gasnet-smp-seq"
@@ -259,7 +260,7 @@ cd -
 cd build
   echo "#!/bin/sh"                                                             >  run-fpm.sh
   echo "#-- DO NOT EDIT -- created by caffeine/install.sh"                     >> run-fpm.sh
-  echo "\"${FPM_COMMAND}\" \$@ \\"                                             >> run-fpm.sh
+  echo "\"${FPM}\" \$@ \\"                                             >> run-fpm.sh
   echo "--c-compiler \"`pkg-config caffeine --variable=CAFFEINE_FPM_CC`\" \\"  >> run-fpm.sh
   echo "--c-flag \"`pkg-config caffeine --variable=CAFFEINE_FPM_CFLAGS`\" \\"  >> run-fpm.sh
   echo "--link-flag \"`pkg-config caffeine --variable=CAFFEINE_FPM_LDFLAGS`\"" >> run-fpm.sh
