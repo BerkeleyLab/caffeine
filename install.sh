@@ -70,13 +70,13 @@ echo "Using pkg-config prefix $PKG_CONFIG_PATH"
 
 if [ -z ${FC+x} ] || [ -z ${CC+x} ] || [ -z ${CXX+x} ]; then
   if command -v gfortran-$GCC_VER > /dev/null 2>&1; then
-    FC=gfortran-$GCC_VER
+    FC=`which gfortran-$GCC_VER`
   fi
   if command -v gcc-$GCC_VER > /dev/null 2>&1; then
-    CC=gcc-$GCC_VER
+    CC=`which gcc-$GCC_VER`
   fi
   if command -v g++-$GCC_VER > /dev/null 2>&1; then
-    CXX=g++-$GCC_VER
+    CXX=`which g++-$GCC_VER`
   fi
 fi
 
@@ -93,7 +93,7 @@ if command -v make > /dev/null 2>&1; then
 fi
 
 if command -v fpm > /dev/null 2>&1; then
-  FPM=fpm
+  FPM=`which fpm`
 fi
 
 ask_homebrew_permission()
@@ -248,7 +248,8 @@ echo "${FPM_TOML_LINK_ENTRY}" >> build/fpm.toml
 ln -f -s build/fpm.toml
 
 cd "$PKG_CONFIG_PATH"
-  echo "CAFFEINE_FPM_LDFLAGS=$GASNET_LDFLAGS $GASNET_LIB_LOCATIONS" >  caffeine.pc
+  echo "CAFFEINE_FC=$FC"                                            >  caffeine.pc
+  echo "CAFFEINE_FPM_LDFLAGS=$GASNET_LDFLAGS $GASNET_LIB_LOCATIONS" >> caffeine.pc
   echo "CAFFEINE_FPM_CC=$GASNET_CC"                                 >> caffeine.pc
   echo "CAFFEINE_FPM_CFLAGS=$GASNET_CFLAGS $GASNET_CPPFLAGS"        >> caffeine.pc
   echo "Name: caffeine"                                             >> caffeine.pc
@@ -260,7 +261,8 @@ cd -
 cd build
   echo "#!/bin/sh"                                                             >  run-fpm.sh
   echo "#-- DO NOT EDIT -- created by caffeine/install.sh"                     >> run-fpm.sh
-  echo "\"${FPM}\" \$@ \\"                                             >> run-fpm.sh
+  echo "\"${FPM}\" \$@ \\"                                                     >> run-fpm.sh
+  echo "--compiler \"`pkg-config caffeine --variable=CAFFEINE_FC`\"       \\"  >> run-fpm.sh
   echo "--c-compiler \"`pkg-config caffeine --variable=CAFFEINE_FPM_CC`\" \\"  >> run-fpm.sh
   echo "--c-flag \"`pkg-config caffeine --variable=CAFFEINE_FPM_CFLAGS`\" \\"  >> run-fpm.sh
   echo "--link-flag \"`pkg-config caffeine --variable=CAFFEINE_FPM_LDFLAGS`\"" >> run-fpm.sh
