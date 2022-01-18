@@ -9,9 +9,7 @@ jobs:
       matrix:
         os: [macOS-11, ubuntu-latest]
 
-
     env:
-      GCC_V: 11
       PREFIX: install
 
     steps:
