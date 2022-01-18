@@ -251,10 +251,6 @@ export PKG_CONFIG_PATH
 if ! $PKG_CONFIG $pkg ; then
   ask_package_permission "GASNet-EX" "PKG_CONFIG_PATH"
   exit_if_user_declines "GASNet-EX"
-  if [ -n "$answer" -a "$answer" != "y" -a "$answer" != "Y" -a "$answer" != "Yes" -a "$answer" != "YES" -a "$answer" != "yes" ]; then
-    echo "Installation declined."
-    echo "Caffeine was not installed."
-  fi
 
   GASNET_TAR_FILE="GASNet-$GASNET_VERSION.tar.gz"
   GASNET_SOURCE_URL="https://gasnet.lbl.gov/EX/GASNet-$GASNET_VERSION.tar.gz"
