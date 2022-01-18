@@ -14,6 +14,8 @@ print_usage_info()
     echo " --prereqs          Display a list of prerequisite software."
     echo "                    Default prefix='\$HOME/.local/bin'"
     echo ""
+    echo "For a non-interactive build with the 'yes' utility installed, execute"
+    echo "yes | ./install.sh"
 }
 
 GCC_VERSION=11
