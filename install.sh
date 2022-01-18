@@ -64,12 +64,15 @@ set -u # error on use of undefined variable
 if [ -z ${FC+x} ] || [ -z ${CC+x} ] || [ -z ${CXX+x} ]; then
   if command -v gfortran-$GCC_VER > /dev/null 2>&1; then
     FC=`which gfortran-$GCC_VER`
+    echo "Setting FC=$FC"
   fi
   if command -v gcc-$GCC_VER > /dev/null 2>&1; then
     CC=`which gcc-$GCC_VER`
+    echo "Setting CC=$CC"
   fi
   if command -v g++-$GCC_VER > /dev/null 2>&1; then
     CXX=`which g++-$GCC_VER`
+    echo "Setting CXX=$CXX"
   fi
 fi
 
@@ -121,10 +124,10 @@ ask_permission_to_install_homebrew_package()
 }
 
 PREFIX=${PREFIX:-"$HOME/.local"}
-echo "Using installation prefix $PREFIX"
+echo "Setting PREFIX=$PREFIX"
 
 export PKG_CONFIG_PATH=${PKG_CONFIG_PATH:-"$PREFIX/lib/pkgconfig"}
-echo "Using pkg-config prefix $PKG_CONFIG_PATH"
+echo "Setting PKG_CONFIG_PATH=$PKG_CONFIG_PATH"
 
 exit_if_user_declines()
 {
