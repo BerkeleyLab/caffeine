@@ -30,7 +30,7 @@ Caffeine is a parallel runtime library that aims to support Fortran compilers wi
 Download, build, and run an example
 -----------------------------------
 ```
-git clone https://gitlab.lbl.gov/rouson/caffeine
+git clone https://gitlab.lbl.gov/BerkeleyLab/caffeine
 cd caffeine
 ./install.sh
 export GASNET_PSHM_NODES=8
