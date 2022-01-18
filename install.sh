@@ -16,7 +16,7 @@ print_usage_info()
     echo ""
 }
 
-GCC_VER=11
+GCC_VERSION=11
 GASNET_VERSION="2021.9.0"
 
 list_prerequisites()
@@ -25,7 +25,7 @@ list_prerequisites()
     echo "versions, which also indicate the versions that the installer will install if"
     echo "missing and if granted permission:"
     echo ""
-    echo "  GCC $GCC_VER"
+    echo "  GCC $GCC_VERSION"
     echo "  GASNet-EX $GASNET_VERSION"
     echo "  fpm 0.5.0"
     echo "  pkg-config 0.29.2"
@@ -62,16 +62,16 @@ done
 set -u # error on use of undefined variable
 
 if [ -z ${FC+x} ] || [ -z ${CC+x} ] || [ -z ${CXX+x} ]; then
-  if command -v gfortran-$GCC_VER > /dev/null 2>&1; then
-    FC=`which gfortran-$GCC_VER`
+  if command -v gfortran-$GCC_VERSION > /dev/null 2>&1; then
+    FC=`which gfortran-$GCC_VERSION`
     echo "Setting FC=$FC"
   fi
-  if command -v gcc-$GCC_VER > /dev/null 2>&1; then
-    CC=`which gcc-$GCC_VER`
+  if command -v gcc-$GCC_VERSION > /dev/null 2>&1; then
+    CC=`which gcc-$GCC_VERSION`
     echo "Setting CC=$CC"
   fi
-  if command -v g++-$GCC_VER > /dev/null 2>&1; then
-    CXX=`which g++-$GCC_VER`
+  if command -v g++-$GCC_VERSION > /dev/null 2>&1; then
+    CXX=`which g++-$GCC_VERSION`
     echo "Setting CXX=$CXX"
   fi
 fi
@@ -132,7 +132,7 @@ exit_if_user_declines()
       *GASNet*) 
         echo "Please ensure the $pkg.pc file is in $PKG_CONFIG_PATH and then rerun './install.sh'." ;;
       *GCC*) 
-        echo "To use compilers other than Homebrew-installed gcc-$GCC_VER, g++-$GCC_VER, and gfortran-$GCC_VER,"
+        echo "To use compilers other than Homebrew-installed gcc-$GCC_VERSION, g++-$GCC_VERSION, and gfortran-$GCC_VERSION,"
         echo "please set the FC, CC, and CXX environment variables and rerun './install.sh'." ;;
       *) 
         echo "Please ensure that $1 is installed and in your PATH and then rerun './install.sh'." ;;
@@ -150,11 +150,11 @@ fi
 if [ -z ${FC+x} ] || [ -z ${CC+x} ] || [ -z ${CXX+x} ] || [ -z ${PKG_CONFIG+x} ] || [ -z ${REALPATH+x} ] || [ -z ${MAKE+x} ] || [ -z ${FPM+x} ] ; then
 
   ask_permission_to_use_homebrew 
-  exit_if_user_declines
+  exit_if_user_declines "brew"
 
-  BREW_COMMAND="brew"
+  BREW="brew"
 
-  if ! command -v brew > /dev/null 2>&1; then
+  if ! command -v $BREW > /dev/null 2>&1; then
 
     ask_permission_to_install_homebrew
     exit_if_user_declines "brew"
@@ -181,49 +181,45 @@ if [ -z ${FC+x} ] || [ -z ${CC+x} ] || [ -z ${CXX+x} ] || [ -z ${PKG_CONFIG+x} ]
     fi
 
     if [ $(uname) = "Linux" ]; then
-      BREW_COMMAND=/home/linuxbrew/.linuxbrew/bin/brew
-      eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+      BREW=/home/linuxbrew/.linuxbrew/bin/brew
+      eval "$($BREW shellenv)"
     fi
   fi
 
   if [ -z ${FC+x} ] || [ -z ${CC+x} ] || [ -z ${CXX+x} ]; then
-    ask_permission_to_install_homebrew_package "gfortran, gcc, and g++" "gcc@$GCC_VER" 
+    ask_permission_to_install_homebrew_package "gfortran, gcc, and g++" "gcc@$GCC_VERSION" 
     exit_if_user_declines "GCC"
-    "$BREW_COMMAND" install gcc@$GCC_VER
+    "$BREW" install gcc@$GCC_VERSION
   fi
-  CC=`which gcc-$GCC_VER`
-  CXX=`which g++-$GCC_VER`
-  FC=`which gfortran-$GCC_VER`
+  CC=`which gcc-$GCC_VERSION`
+  CXX=`which g++-$GCC_VERSION`
+  FC=`which gfortran-$GCC_VERSION`
 
 
   if [ -z ${PKG_CONFIG+x} ]; then
     ask_permission_to_install_homebrew_package "'pkg-config'"
     exit_if_user_declines "pkg-config"
-    "$BREW_COMMAND" install pkg-config
+    "$BREW" install pkg-config
   fi
-
   PKG_CONFIG=`which pkg-config`
 
   if [ -z ${REALPATH+x} ] || [ -z ${MAKE+x} ] ; then
     ask_permission_to_install_homebrew_package "'realpath' and 'make'" "coreutils"
     exit_if_user_declines "realpath"
-    "$BREW_COMMAND" install coreutils
+    "$BREW" install coreutils
   fi
   REALPATH=`which realpath`
 
   if [ -z ${FPM+x} ] ; then
     ask_permission_to_install_homebrew_package "'fpm'"
     exit_if_user_declines "fpm"
-    "$BREW_COMMAND" tap awvwgk/fpm
-    "$BREW_COMMAND" install fpm
+    "$BREW" tap awvwgk/fpm
+    "$BREW" install fpm
   fi
   FPM=`which fpm`
 fi
 
-if [ -z "${PREFIX+x}" ]; then
-  PREFIX="$HOME/.local"
-fi
-PREFIX=`$REALPATH $PREFIX`
+PREFIX=`$REALPATH ${PREFIX:-"${HOME}/.local"}`
 echo "PREFIX=$PREFIX"
 
 if [ -z ${PKG_CONFIG_PATH+x} ]; then
@@ -274,7 +270,7 @@ exit_if_pkg_config_pc_file_missing()
   if ! $PKG_CONFIG $1 ; then
     echo "$1.pc pkg-config file not found"
     exit 1
-fi
+  fi
 }
 
 exit_if_pkg_config_pc_file_missing "$pkg"
@@ -295,7 +291,7 @@ ln -f -s build/fpm.toml
 
 CAFFEINE_PC="$PREFIX/lib/pkgconfig/caffeine.pc"
 echo "CAFFEINE_FPM_LDFLAGS=$GASNET_LDFLAGS $GASNET_LIB_LOCATIONS" >  $CAFFEINE_PC
-echo "CAFFEINE_FPM_FC=$FC"                                        >> $CAFFEINE_PC
+echo "CAFFEINE_FPM_FC=$FPM_FC"                                    >> $CAFFEINE_PC
 echo "CAFFEINE_FPM_CC=$GASNET_CC"                                 >> $CAFFEINE_PC
 echo "CAFFEINE_FPM_CFLAGS=$GASNET_CFLAGS $GASNET_CPPFLAGS"        >> $CAFFEINE_PC
 echo "Name: caffeine"                                             >> $CAFFEINE_PC
