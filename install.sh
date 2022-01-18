@@ -123,12 +123,6 @@ ask_permission_to_install_homebrew_package()
   printf "Is it ok to use Homebrew to install $1? [yes] "
 }
 
-PREFIX=${PREFIX:-"$HOME/.local"}
-echo "Setting PREFIX=$PREFIX"
-
-export PKG_CONFIG_PATH=${PKG_CONFIG_PATH:-"$PREFIX/lib/pkgconfig"}
-echo "Setting PKG_CONFIG_PATH=$PKG_CONFIG_PATH"
-
 exit_if_user_declines()
 {
   read answer
@@ -226,7 +220,18 @@ if [ -z ${FC+x} ] || [ -z ${CC+x} ] || [ -z ${CXX+x} ] || [ -z ${PKG_CONFIG+x} ]
   FPM=`which fpm`
 fi
 
+if [ -z "${PREFIX+x}" ]; then
+  PREFIX="$HOME/.local"
+fi
 PREFIX=`$REALPATH $PREFIX`
+echo "PREFIX=$PREFIX"
+
+if [ -z ${PKG_CONFIG_PATH+x} ]; then
+  PKG_CONFIG_PATH="$PREFIX/lib/pkgconfig"
+else
+  PKG_CONFIG_PATH="$PREFIX/lib/pkgconfig:$PKG_CONFIG_PATH"
+fi
+echo "PKG_CONFIG_PATH=$PKG_CONFIG_PATH"
 
 FPM_FC="$FC"
 FPM_CC="$CC"
@@ -241,8 +246,9 @@ ask_package_permission()
 }
 
 pkg="gasnet-smp-seq"
+export PKG_CONFIG_PATH
 
-if [ ! -f "$PKG_CONFIG_PATH/$pkg.pc" ]; then
+if ! $PKG_CONFIG $pkg ; then
   ask_package_permission "GASNet-EX" "PKG_CONFIG_PATH"
   exit_if_user_declines "GASNet-EX"
   if [ -n "$answer" -a "$answer" != "y" -a "$answer" != "Y" -a "$answer" != "Yes" -a "$answer" != "YES" -a "$answer" != "yes" ]; then
@@ -265,9 +271,18 @@ if [ ! -f "$PKG_CONFIG_PATH/$pkg.pc" ]; then
       $MAKE -j 8 install
     cd -
   fi
-fi
+fi # if ! $PKG_CONFIG $pkg ; then
 
-export PKG_CONFIG_PATH
+exit_if_pkg_config_pc_file_missing()
+{
+  if ! $PKG_CONFIG $1 ; then
+    echo "$1.pc pkg-config file not found"
+    exit 1
+fi
+}
+
+exit_if_pkg_config_pc_file_missing "$pkg"
+
 GASNET_LDFLAGS="`$PKG_CONFIG $pkg --variable=GASNET_LDFLAGS`"
 GASNET_LIBS="`$PKG_CONFIG $pkg --variable=GASNET_LIBS`"
 GASNET_CC="`$PKG_CONFIG $pkg --variable=GASNET_CC`"
@@ -282,33 +297,29 @@ FPM_TOML_LINK_ENTRY="link = [\"$(echo ${GASNET_LIB_NAMES} | sed 's/ /", "/g')\"]
 echo "${FPM_TOML_LINK_ENTRY}" >> build/fpm.toml
 ln -f -s build/fpm.toml
 
-cd "$PKG_CONFIG_PATH"
-  echo "CAFFEINE_FPM_LDFLAGS=$GASNET_LDFLAGS $GASNET_LIB_LOCATIONS" >  caffeine.pc
-  echo "CAFFEINE_FPM_FC=$FC"                                        >> caffeine.pc
-  echo "CAFFEINE_FPM_CC=$GASNET_CC"                                 >> caffeine.pc
-  echo "CAFFEINE_FPM_CFLAGS=$GASNET_CFLAGS $GASNET_CPPFLAGS"        >> caffeine.pc
-  echo "Name: caffeine"                                             >> caffeine.pc
-  echo "Description: Coarray Fortran parallel runtime library"      >> caffeine.pc
-  echo "URL: https://gitlab.lbl.gov/berkeleylab/caffeine"           >> caffeine.pc
-  echo "Version: 0.1.0"                                             >> caffeine.pc
-cd -
-if [ ! -f "$PKG_CONFIG_PATH/caffeine.pc" ]; then
-  echo "Creation of $PKG_CONFIG_PATH/caffeine.pc unsuccessful."
-  exit 1
-fi
+CAFFEINE_PC="$PREFIX/lib/pkgconfig/caffeine.pc"
+echo "CAFFEINE_FPM_LDFLAGS=$GASNET_LDFLAGS $GASNET_LIB_LOCATIONS" >  $CAFFEINE_PC
+echo "CAFFEINE_FPM_FC=$FC"                                        >> $CAFFEINE_PC
+echo "CAFFEINE_FPM_CC=$GASNET_CC"                                 >> $CAFFEINE_PC
+echo "CAFFEINE_FPM_CFLAGS=$GASNET_CFLAGS $GASNET_CPPFLAGS"        >> $CAFFEINE_PC
+echo "Name: caffeine"                                             >> $CAFFEINE_PC
+echo "Description: Coarray Fortran parallel runtime library"      >> $CAFFEINE_PC
+echo "URL: https://gitlab.lbl.gov/berkeleylab/caffeine"           >> $CAFFEINE_PC
+echo "Version: 0.1.0"                                             >> $CAFFEINE_PC
 
-cd build
-  echo "#!/bin/sh"                                                              >  run-fpm.sh
-  echo "#-- DO NOT EDIT -- created by caffeine/install.sh"                      >> run-fpm.sh
-  echo "\"${FPM}\" \$@ \\"                                                      >> run-fpm.sh
-  echo "--compiler \"`$PKG_CONFIG caffeine --variable=CAFFEINE_FPM_FC`\"   \\"  >> run-fpm.sh
-  echo "--c-compiler \"`$PKG_CONFIG caffeine --variable=CAFFEINE_FPM_CC`\" \\"  >> run-fpm.sh
-  echo "--c-flag \"`$PKG_CONFIG caffeine --variable=CAFFEINE_FPM_CFLAGS`\" \\"  >> run-fpm.sh
-  echo "--link-flag \"`$PKG_CONFIG caffeine --variable=CAFFEINE_FPM_LDFLAGS`\"" >> run-fpm.sh
-  chmod u+x run-fpm.sh
-cd -
+exit_if_pkg_config_pc_file_missing "caffeine"
 
-./build/run-fpm.sh build
+RUN_FPM_SH="build/run-fpm.sh"
+echo "#!/bin/sh"                                                              >  $RUN_FPM_SH
+echo "#-- DO NOT EDIT -- created by caffeine/install.sh"                      >> $RUN_FPM_SH
+echo "\"${FPM}\" \$@ \\"                                                      >> $RUN_FPM_SH
+echo "--compiler \"`$PKG_CONFIG caffeine --variable=CAFFEINE_FPM_FC`\"   \\"  >> $RUN_FPM_SH
+echo "--c-compiler \"`$PKG_CONFIG caffeine --variable=CAFFEINE_FPM_CC`\" \\"  >> $RUN_FPM_SH
+echo "--c-flag \"`$PKG_CONFIG caffeine --variable=CAFFEINE_FPM_CFLAGS`\" \\"  >> $RUN_FPM_SH
+echo "--link-flag \"`$PKG_CONFIG caffeine --variable=CAFFEINE_FPM_LDFLAGS`\"" >> $RUN_FPM_SH
+chmod u+x $RUN_FPM_SH
+
+./$RUN_FPM_SH build
 
 echo ""
 echo "________________ Caffeine has been dispensed! ________________"
@@ -318,4 +329,4 @@ echo "Manager (fpm) with the required compiler/linker flags, pass a"
 echo "fpm command to the build/run-fpm.sh script. For example, run"
 echo "the program example/hello.f90 as follows:"
 echo ""
-echo "./build/run-fpm.sh run --example hello"
+echo "./$RUN_FPM_SH run --example hello"
