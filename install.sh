@@ -61,12 +61,6 @@ done
 
 set -u # error on use of undefined variable
 
-PREFIX=${PREFIX:-"$HOME/.local"}
-echo "Using installation prefix $PREFIX"
-
-PKG_CONFIG_PATH=${PKG_CONFIG_PATH:-"$PREFIX/lib/pkgconfig"}
-echo "Using pkg-config prefix $PKG_CONFIG_PATH"
-
 if [ -z ${FC+x} ] || [ -z ${CC+x} ] || [ -z ${CXX+x} ]; then
   if command -v gfortran-$GCC_VER > /dev/null 2>&1; then
     FC=`which gfortran-$GCC_VER`
@@ -125,6 +119,12 @@ ask_permission_to_install_homebrew_package()
   fi
   printf "Is it ok to use Homebrew to install $1? [yes] "
 }
+
+PREFIX=${PREFIX:-"$HOME/.local"}
+echo "Using installation prefix $PREFIX"
+
+export PKG_CONFIG_PATH=${PKG_CONFIG_PATH:-"$PREFIX/lib/pkgconfig"}
+echo "Using pkg-config prefix $PKG_CONFIG_PATH"
 
 exit_if_user_declines()
 {
@@ -280,8 +280,8 @@ echo "${FPM_TOML_LINK_ENTRY}" >> build/fpm.toml
 ln -f -s build/fpm.toml
 
 cd "$PKG_CONFIG_PATH"
-  echo "CAFFEINE_FC=$FC"                                            >  caffeine.pc
   echo "CAFFEINE_FPM_LDFLAGS=$GASNET_LDFLAGS $GASNET_LIB_LOCATIONS" >> caffeine.pc
+  echo "CAFFEINE_FPM_FC=$FC"                                            >  caffeine.pc
   echo "CAFFEINE_FPM_CC=$GASNET_CC"                                 >> caffeine.pc
   echo "CAFFEINE_FPM_CFLAGS=$GASNET_CFLAGS $GASNET_CPPFLAGS"        >> caffeine.pc
   echo "Name: caffeine"                                             >> caffeine.pc
@@ -291,10 +291,10 @@ cd "$PKG_CONFIG_PATH"
 cd -
 
 cd build
-  echo "#!/bin/sh"                                                             >  run-fpm.sh
-  echo "#-- DO NOT EDIT -- created by caffeine/install.sh"                     >> run-fpm.sh
-  echo "\"${FPM}\" \$@ \\"                                                     >> run-fpm.sh
-  echo "--compiler \"`$PKG_CONFIG caffeine --variable=CAFFEINE_FC`\"       \\"  >> run-fpm.sh
+  echo "#!/bin/sh"                                                              >  run-fpm.sh
+  echo "#-- DO NOT EDIT -- created by caffeine/install.sh"                      >> run-fpm.sh
+  echo "\"${FPM}\" \$@ \\"                                                      >> run-fpm.sh
+  echo "--compiler \"`$PKG_CONFIG caffeine --variable=CAFFEINE_FPM_FC`\"   \\"  >> run-fpm.sh
   echo "--c-compiler \"`$PKG_CONFIG caffeine --variable=CAFFEINE_FPM_CC`\" \\"  >> run-fpm.sh
   echo "--c-flag \"`$PKG_CONFIG caffeine --variable=CAFFEINE_FPM_CFLAGS`\" \\"  >> run-fpm.sh
   echo "--link-flag \"`$PKG_CONFIG caffeine --variable=CAFFEINE_FPM_LDFLAGS`\"" >> run-fpm.sh
