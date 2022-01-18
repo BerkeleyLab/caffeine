@@ -283,8 +283,8 @@ echo "${FPM_TOML_LINK_ENTRY}" >> build/fpm.toml
 ln -f -s build/fpm.toml
 
 cd "$PKG_CONFIG_PATH"
-  echo "CAFFEINE_FPM_LDFLAGS=$GASNET_LDFLAGS $GASNET_LIB_LOCATIONS" >> caffeine.pc
-  echo "CAFFEINE_FPM_FC=$FC"                                            >  caffeine.pc
+  echo "CAFFEINE_FPM_LDFLAGS=$GASNET_LDFLAGS $GASNET_LIB_LOCATIONS" >  caffeine.pc
+  echo "CAFFEINE_FPM_FC=$FC"                                        >> caffeine.pc
   echo "CAFFEINE_FPM_CC=$GASNET_CC"                                 >> caffeine.pc
   echo "CAFFEINE_FPM_CFLAGS=$GASNET_CFLAGS $GASNET_CPPFLAGS"        >> caffeine.pc
   echo "Name: caffeine"                                             >> caffeine.pc
@@ -292,6 +292,10 @@ cd "$PKG_CONFIG_PATH"
   echo "URL: https://gitlab.lbl.gov/berkeleylab/caffeine"           >> caffeine.pc
   echo "Version: 0.1.0"                                             >> caffeine.pc
 cd -
+if [ ! -f "$PKG_CONFIG_PATH/caffeine.pc" ]; then
+  echo "Creation of $PKG_CONFIG_PATH/caffeine.pc unsuccessful."
+  exit 1
+fi
 
 cd build
   echo "#!/bin/sh"                                                              >  run-fpm.sh
