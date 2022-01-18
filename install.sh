@@ -95,7 +95,7 @@ if command -v fpm > /dev/null 2>&1; then
   FPM=`which fpm`
 fi
 
-ask_homebrew_permission()
+ask_permission_to_use_homebrew()
 {
   echo ""
   echo "Either one or more of the environment variables FC, CC, and CXX are unset or"
@@ -106,7 +106,17 @@ ask_homebrew_permission()
   printf "Is it ok to use Homebrew to install prerequisite packages? [yes] "
 }
 
-ask_homebrew_package_permission()
+ask_permission_to_install_homebrew()
+{
+  echo ""
+  echo "Homebrew not found. Installing Homebrew requires sudo privileges."
+  echo "If you grant permission to install Homebrew, you may be prompted to enter your password." 
+  echo ""
+  echo "Press 'Enter' to choose the square-bracketed default answer:"
+  printf "Is it ok to download and install Homebrew? [yes] "
+}
+
+ask_permission_to_install_homebrew_package()
 {
   echo ""
   if [ ! -z ${2+x} ]; then
@@ -128,26 +138,51 @@ exit_if_user_declines()
         echo "To use compilers other than Homebrew-installed gcc-$GCC_VER, g++-$GCC_VER, and gfortran-$GCC_VER,"
         echo "please set the FC, CC, and CXX environment variables and rerun './install.sh'." ;;
       *) 
-        echo "Please ensure that the listed prerequisites are installed and in your PATH and then rerun './install.sh'." ;;
+        echo "Please ensure that $1 is installed and in your PATH and then rerun './install.sh'." ;;
     esac
     echo "Caffeine was not installed." 
     exit 1
   fi
 }
 
+DEPENDENCIES_DIR="build/dependencies"
+if [ ! -d $DEPENDENCIES_DIR ]; then
+  mkdir -p $DEPENDENCIES_DIR
+fi
+
 if [ -z ${FC+x} ] || [ -z ${CC+x} ] || [ -z ${CXX+x} ] || [ -z ${PKG_CONFIG+x} ] || [ -z ${REALPATH+x} ] || [ -z ${MAKE+x} ] || [ -z ${FPM+x} ] ; then
 
-  ask_homebrew_permission 
+  ask_permission_to_use_homebrew 
   exit_if_user_declines
 
   BREW_COMMAND="brew"
 
   if ! command -v brew > /dev/null 2>&1; then
+
+    ask_permission_to_install_homebrew
+    exit_if_user_declines "brew"
+
     if ! command -v curl > /dev/null 2>&1; then
       echo "No download mechanism found. Please install curl and rerun ./install.sh"
       exit 1
     fi
-    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+
+    curl -L https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh -o $DEPENDENCIES_DIR/install-homebrew.sh --create-dirs
+    chmod u+x $DEPENDENCIES_DIR/install-homebrew.sh
+
+    if [ -p /dev/stdin ]; then 
+       echo ""
+       echo "Pipe detected.  Installing Homebrew requires sudo privileges, which most likely will"
+       echo "not work if you are installing non-interactively, e.g., via 'yes | ./install.sh'."
+       echo "To install Caffeine non-interactiely, please rerun the Caffeine installer after" 
+       echo "executing the following command to install Homebrew:"
+       echo "\"./$DEPENDENCIES_DIR/install-homebrew.sh\""
+       exit 1
+    else
+      ./$DEPENDENCIES_DIR/install-homebrew.sh
+      rm $DEPENDENCIES_DIR/install-homebrew.sh
+    fi
+
     if [ $(uname) = "Linux" ]; then
       BREW_COMMAND=/home/linuxbrew/.linuxbrew/bin/brew
       eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
@@ -155,7 +190,7 @@ if [ -z ${FC+x} ] || [ -z ${CC+x} ] || [ -z ${CXX+x} ] || [ -z ${PKG_CONFIG+x} ]
   fi
 
   if [ -z ${FC+x} ] || [ -z ${CC+x} ] || [ -z ${CXX+x} ]; then
-    ask_homebrew_package_permission "gfortran, gcc, and g++" "gcc@$GCC_VER" 
+    ask_permission_to_install_homebrew_package "gfortran, gcc, and g++" "gcc@$GCC_VER" 
     exit_if_user_declines "GCC"
     "$BREW_COMMAND" install gcc@$GCC_VER
   fi
@@ -165,23 +200,23 @@ if [ -z ${FC+x} ] || [ -z ${CC+x} ] || [ -z ${CXX+x} ] || [ -z ${PKG_CONFIG+x} ]
 
 
   if [ -z ${PKG_CONFIG+x} ]; then
-    ask_homebrew_package_permission "'pkg-config'"
-    exit_if_user_declines 
+    ask_permission_to_install_homebrew_package "'pkg-config'"
+    exit_if_user_declines "pkg-config"
     "$BREW_COMMAND" install pkg-config
   fi
 
   PKG_CONFIG=`which pkg-config`
 
   if [ -z ${REALPATH+x} ] || [ -z ${MAKE+x} ] ; then
-    ask_homebrew_package_permission "'realpath' and 'make'" "coreutils"
-    exit_if_user_declines 
+    ask_permission_to_install_homebrew_package "'realpath' and 'make'" "coreutils"
+    exit_if_user_declines "realpath"
     "$BREW_COMMAND" install coreutils
   fi
   REALPATH=`which realpath`
 
   if [ -z ${FPM+x} ] ; then
-    ask_homebrew_package_permission "'fpm'"
-    exit_if_user_declines 
+    ask_permission_to_install_homebrew_package "'fpm'"
+    exit_if_user_declines "fpm"
     "$BREW_COMMAND" tap awvwgk/fpm
     "$BREW_COMMAND" install fpm
   fi
@@ -201,11 +236,6 @@ ask_package_permission()
   echo "Press 'Enter' for the square-bracketed default answer:"
   printf "Is it ok to download and install $1? [yes] "
 }
-
-DEPENDENCIES_DIR="build/dependencies"
-if [ ! -d $DEPENDENCIES_DIR ]; then
-  mkdir -p $DEPENDENCIES_DIR
-fi
 
 pkg="gasnet-smp-seq"
 
