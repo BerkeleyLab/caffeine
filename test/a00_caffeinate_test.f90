@@ -13,7 +13,7 @@ contains
 
         tests = describe( &
            "A caffeinated beverage", &
-           [ it("is served: caffeinate() result is zero.", check_caffeination) &
+           [ it("is served: the caffeinate() initiation function completes successfully.", check_caffeination) &
         ])
     end function
 
