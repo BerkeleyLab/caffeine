@@ -7,6 +7,8 @@ contains
     subroutine run()
         use a00_caffeinate_test, only: &
                 a00_caffeinate_caffeinate => test_caffeinate
+        use caf_co_sum_test, only: &
+                caf_co_sum_caf_co_sum => test_caf_co_sum
         use caf_error_stop_test, only: &
                 caf_error_stop_caf_this_image => test_caf_this_image
         use caf_num_images_test, only: &
@@ -18,13 +20,14 @@ contains
         use vegetables, only: test_item_t, test_that, run_tests
 
         type(test_item_t) :: tests
-        type(test_item_t) :: individual_tests(5)
+        type(test_item_t) :: individual_tests(6)
 
         individual_tests(1) = a00_caffeinate_caffeinate()
-        individual_tests(2) = caf_error_stop_caf_this_image()
-        individual_tests(3) = caf_num_images_caf_num_images()
-        individual_tests(4) = caf_this_image_caf_this_image()
-        individual_tests(5) = zzz_decaffeinate_decaffeinate()
+        individual_tests(2) = caf_co_sum_caf_co_sum()
+        individual_tests(3) = caf_error_stop_caf_this_image()
+        individual_tests(4) = caf_num_images_caf_num_images()
+        individual_tests(5) = caf_this_image_caf_this_image()
+        individual_tests(6) = zzz_decaffeinate_decaffeinate()
         tests = test_that(individual_tests)
 
         call run_tests(tests)

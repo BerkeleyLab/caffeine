@@ -3,10 +3,7 @@
 
 #include <gasnetex.h>
 #include <stdio.h>
-
-#ifndef _GASNET_SAFE_
 #include "gasnet_safe.h"
-#endif
 
 gex_Client_t myclient;
 gex_EP_t myep;
