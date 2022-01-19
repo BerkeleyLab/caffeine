@@ -1,14 +1,16 @@
 // Copyright (c), The Regents of the University of California
 // Terms of use are as specified in LICENSE.txt
 
+#include <stdint.h>
 #include <gasnetex.h>
+#include <gasnet_coll.h>
 #include <stdio.h>
 #include "gasnet_safe.h"
 
-gex_Client_t myclient;
-gex_EP_t myep;
-gex_TM_t myteam;
-gex_Rank_t rank, size;
+static gex_Client_t myclient;
+static gex_EP_t myep;
+static gex_TM_t myteam;
+static gex_Rank_t rank, size;
 
 void c_caffeinate(int argc, char *argv[])
 {
@@ -50,4 +52,11 @@ void c_sync_all()
 {
   gasnet_barrier_notify(0,GASNET_BARRIERFLAG_ANONYMOUS);
   gasnet_barrier_wait(0,GASNET_BARRIERFLAG_ANONYMOUS);
+}
+
+void c_co_sum_no_result_image_int32(void* c_loc_a, size_t Nelem)
+{
+      gex_Event_t ev
+        = gex_Coll_ReduceToAllNB(myteam, c_loc_a, c_loc_a, GEX_DT_I32, sizeof(int32_t), Nelem, GEX_OP_ADD, NULL, NULL, 0);
+      gex_Event_Wait(ev);  
 }
