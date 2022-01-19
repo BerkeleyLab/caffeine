@@ -14,7 +14,7 @@ module collective_subroutines_m
  
      module subroutine caf_co_sum(a, result_image, stat, errmsg)
        implicit none
-       class(*), intent(inout), contiguous :: a(..)
+       class(*), intent(inout), contiguous, target :: a(..)
        integer, optional, intent(in) :: result_image
        integer, optional, intent(out) :: stat
        character(len=*), intent(inout), optional :: errmsg
@@ -22,7 +22,7 @@ module collective_subroutines_m
 
      module subroutine caf_co_max(a, result_image, stat, errmsg)
        implicit none
-       class(*), intent(inout), contiguous :: a(..)
+       class(*), intent(inout), contiguous, target :: a(..)
        integer, optional, intent(in) :: result_image
        integer, optional, intent(out) :: stat
        character(len=*), intent(inout), optional :: errmsg
@@ -30,7 +30,7 @@ module collective_subroutines_m
 
      module subroutine caf_co_min(a, result_image, stat, errmsg)
        implicit none
-       class(*), intent(inout), contiguous :: a(..)
+       class(*), intent(inout), contiguous, target :: a(..)
        integer, optional, intent(in) :: result_image
        integer, optional, intent(out) :: stat
        character(len=*), intent(inout), optional :: errmsg
@@ -38,7 +38,7 @@ module collective_subroutines_m
 
      module subroutine caf_co_reduce(a, result_image, stat, errmsg)
        implicit none
-       class(*), intent(inout), contiguous :: a(..)
+       class(*), intent(inout), contiguous, target :: a(..)
        integer, optional, intent(in) :: result_image
        integer, optional, intent(out) :: stat
        character(len=*), intent(inout), optional :: errmsg
@@ -46,7 +46,7 @@ module collective_subroutines_m
 
      module subroutine caf_co_broadcast(a, source_image, stat, errmsg)
        implicit none
-       class(*), intent(inout), contiguous :: a(..)
+       class(*), intent(inout), contiguous, target :: a(..)
        integer, optional, intent(in) :: source_image
        integer, optional, intent(out) :: stat
        character(len=*), intent(inout), optional :: errmsg
