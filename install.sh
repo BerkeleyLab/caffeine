@@ -125,8 +125,14 @@ ask_permission_to_install_homebrew_package()
   printf "Is it ok to use Homebrew to install $1? [yes] "
 }
 
+CI=${CI:-"false"} # GitHub Actions workflows set CI=true
+
 exit_if_user_declines()
 {
+  if [ $CI = true ]; then 
+    echo " 'yes' assumed (GitHub Actions workflow detected)"
+    return
+  fi
   read answer
   if [ -n "$answer" -a "$answer" != "y" -a "$answer" != "Y" -a "$answer" != "Yes" -a "$answer" != "YES" -a "$answer" != "yes" ]; then
     echo "Installation declined."
