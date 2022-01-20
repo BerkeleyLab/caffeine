@@ -35,4 +35,6 @@ jobs:
 
     - name: Run unit tests
       run: |
+        export GASNET_PSHM_NODES=8
+        echo "Testing with $GASNET_PSHM_NODES images."
         ./build/run-fpm.sh test
