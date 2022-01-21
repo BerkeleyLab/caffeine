@@ -1,6 +1,6 @@
 ! Copyright (c), The Regents of the University of California
 ! Terms of use are as specified in LICENSE.txt
-submodule(collective_subroutines_m) collective_subroutines_s
+submodule(collective_subroutines_m) co_sum_s
   use iso_c_binding, only : c_int32_t, c_int64_t, c_ptr, c_size_t, c_loc, c_float, c_double
     
   implicit none
@@ -315,16 +315,4 @@ contains
 
   end procedure
 
-  module procedure caf_co_max
-  end procedure
-
-  module procedure caf_co_min
-  end procedure
-
-  module procedure caf_co_reduce
-  end procedure
-
-  module procedure caf_co_broadcast
-  end procedure
-
-end submodule collective_subroutines_s
+end submodule co_sum_s
