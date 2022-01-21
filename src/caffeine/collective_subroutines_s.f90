@@ -66,6 +66,10 @@ contains
            call c_co_sum_no_result_image_float(c_loc(a), nelem=size(a,kind=c_size_t))
          type is(real(c_double))
            call c_co_sum_no_result_image_double(c_loc(a), nelem=size(a,kind=c_size_t))
+         type is(complex(c_float))
+           call c_co_sum_no_result_image_float(c_loc(a), nelem=size(a,kind=c_size_t))
+         type is(complex(c_double))
+           call c_co_sum_no_result_image_double(c_loc(a), nelem=size(a,kind=c_size_t))
          class default
            error stop "caf_co_sum: unsupported type"
        end select
@@ -78,6 +82,10 @@ contains
          type is(real(c_float))
            call c_co_sum_no_result_image_float(c_loc(a), nelem=size(a,kind=c_size_t))
          type is(real(c_double))
+           call c_co_sum_no_result_image_double(c_loc(a), nelem=size(a,kind=c_size_t))
+         type is(complex(c_float))
+           call c_co_sum_no_result_image_float(c_loc(a), nelem=size(a,kind=c_size_t))
+         type is(complex(c_double))
            call c_co_sum_no_result_image_double(c_loc(a), nelem=size(a,kind=c_size_t))
          class default
            error stop "caf_co_sum: unsupported type"
@@ -92,6 +100,10 @@ contains
            call c_co_sum_no_result_image_float(c_loc(a), nelem=size(a,kind=c_size_t))
          type is(real(c_double))
            call c_co_sum_no_result_image_double(c_loc(a), nelem=size(a,kind=c_size_t))
+         type is(complex(c_float))
+           call c_co_sum_no_result_image_float(c_loc(a), nelem=size(a,kind=c_size_t))
+         type is(complex(c_double))
+           call c_co_sum_no_result_image_double(c_loc(a), nelem=size(a,kind=c_size_t))
          class default
            error stop "caf_co_sum: unsupported type"
        end select
@@ -104,6 +116,10 @@ contains
          type is(real(c_float))
            call c_co_sum_no_result_image_float(c_loc(a), nelem=size(a,kind=c_size_t))
          type is(real(c_double))
+           call c_co_sum_no_result_image_double(c_loc(a), nelem=size(a,kind=c_size_t))
+         type is(complex(c_float))
+           call c_co_sum_no_result_image_float(c_loc(a), nelem=size(a,kind=c_size_t))
+         type is(complex(c_double))
            call c_co_sum_no_result_image_double(c_loc(a), nelem=size(a,kind=c_size_t))
          class default
            error stop "caf_co_sum: unsupported type"
@@ -118,6 +134,10 @@ contains
            call c_co_sum_no_result_image_float(c_loc(a), nelem=size(a,kind=c_size_t))
          type is(real(c_double))
            call c_co_sum_no_result_image_double(c_loc(a), nelem=size(a,kind=c_size_t))
+         type is(complex(c_float))
+           call c_co_sum_no_result_image_float(c_loc(a), nelem=size(a,kind=c_size_t))
+         type is(complex(c_double))
+           call c_co_sum_no_result_image_double(c_loc(a), nelem=size(a,kind=c_size_t))
          class default
            error stop "caf_co_sum: unsupported type"
        end select
@@ -130,6 +150,10 @@ contains
          type is(real(c_float))
            call c_co_sum_no_result_image_float(c_loc(a), nelem=size(a,kind=c_size_t))
          type is(real(c_double))
+           call c_co_sum_no_result_image_double(c_loc(a), nelem=size(a,kind=c_size_t))
+         type is(complex(c_float))
+           call c_co_sum_no_result_image_float(c_loc(a), nelem=size(a,kind=c_size_t))
+         type is(complex(c_double))
            call c_co_sum_no_result_image_double(c_loc(a), nelem=size(a,kind=c_size_t))
          class default
            error stop "caf_co_sum: unsupported type"
@@ -144,6 +168,10 @@ contains
            call c_co_sum_no_result_image_float(c_loc(a), nelem=size(a,kind=c_size_t))
          type is(real(c_double))
            call c_co_sum_no_result_image_double(c_loc(a), nelem=size(a,kind=c_size_t))
+         type is(complex(c_float))
+           call c_co_sum_no_result_image_float(c_loc(a), nelem=size(a,kind=c_size_t))
+         type is(complex(c_double))
+           call c_co_sum_no_result_image_double(c_loc(a), nelem=size(a,kind=c_size_t))
          class default
            error stop "caf_co_sum: unsupported type"
        end select
@@ -156,6 +184,10 @@ contains
          type is(real(c_float))
            call c_co_sum_no_result_image_float(c_loc(a), nelem=size(a,kind=c_size_t))
          type is(real(c_double))
+           call c_co_sum_no_result_image_double(c_loc(a), nelem=size(a,kind=c_size_t))
+         type is(complex(c_float))
+           call c_co_sum_no_result_image_float(c_loc(a), nelem=size(a,kind=c_size_t))
+         type is(complex(c_double))
            call c_co_sum_no_result_image_double(c_loc(a), nelem=size(a,kind=c_size_t))
          class default
            error stop "caf_co_sum: unsupported type"
@@ -170,6 +202,10 @@ contains
            call c_co_sum_no_result_image_float(c_loc(a), nelem=size(a,kind=c_size_t))
          type is(real(c_double))
            call c_co_sum_no_result_image_double(c_loc(a), nelem=size(a,kind=c_size_t))
+         type is(complex(c_float))
+           call c_co_sum_no_result_image_float(c_loc(a), nelem=size(a,kind=c_size_t))
+         type is(complex(c_double))
+           call c_co_sum_no_result_image_double(c_loc(a), nelem=size(a,kind=c_size_t))
          class default
            error stop "caf_co_sum: unsupported type"
        end select
@@ -182,6 +218,10 @@ contains
          type is(real(c_float))
            call c_co_sum_no_result_image_float(c_loc(a), nelem=size(a,kind=c_size_t))
          type is(real(c_double))
+           call c_co_sum_no_result_image_double(c_loc(a), nelem=size(a,kind=c_size_t))
+         type is(complex(c_float))
+           call c_co_sum_no_result_image_float(c_loc(a), nelem=size(a,kind=c_size_t))
+         type is(complex(c_double))
            call c_co_sum_no_result_image_double(c_loc(a), nelem=size(a,kind=c_size_t))
          class default
            error stop "caf_co_sum: unsupported type"
@@ -196,6 +236,10 @@ contains
            call c_co_sum_no_result_image_float(c_loc(a), nelem=size(a,kind=c_size_t))
          type is(real(c_double))
            call c_co_sum_no_result_image_double(c_loc(a), nelem=size(a,kind=c_size_t))
+         type is(complex(c_float))
+           call c_co_sum_no_result_image_float(c_loc(a), nelem=size(a,kind=c_size_t))
+         type is(complex(c_double))
+           call c_co_sum_no_result_image_double(c_loc(a), nelem=size(a,kind=c_size_t))
          class default
            error stop "caf_co_sum: unsupported type"
        end select
@@ -208,6 +252,10 @@ contains
          type is(real(c_float))
            call c_co_sum_no_result_image_float(c_loc(a), nelem=size(a,kind=c_size_t))
          type is(real(c_double))
+           call c_co_sum_no_result_image_double(c_loc(a), nelem=size(a,kind=c_size_t))
+         type is(complex(c_float))
+           call c_co_sum_no_result_image_float(c_loc(a), nelem=size(a,kind=c_size_t))
+         type is(complex(c_double))
            call c_co_sum_no_result_image_double(c_loc(a), nelem=size(a,kind=c_size_t))
          class default
            error stop "caf_co_sum: unsupported type"
@@ -222,6 +270,10 @@ contains
            call c_co_sum_no_result_image_float(c_loc(a), nelem=size(a,kind=c_size_t))
          type is(real(c_double))
            call c_co_sum_no_result_image_double(c_loc(a), nelem=size(a,kind=c_size_t))
+         type is(complex(c_float))
+           call c_co_sum_no_result_image_float(c_loc(a), nelem=size(a,kind=c_size_t))
+         type is(complex(c_double))
+           call c_co_sum_no_result_image_double(c_loc(a), nelem=size(a,kind=c_size_t))
          class default
            error stop "caf_co_sum: unsupported type"
        end select
@@ -235,6 +287,10 @@ contains
            call c_co_sum_no_result_image_float(c_loc(a), nelem=size(a,kind=c_size_t))
          type is(real(c_double))
            call c_co_sum_no_result_image_double(c_loc(a), nelem=size(a,kind=c_size_t))
+         type is(complex(c_float))
+           call c_co_sum_no_result_image_float(c_loc(a), nelem=size(a,kind=c_size_t))
+         type is(complex(c_double))
+           call c_co_sum_no_result_image_double(c_loc(a), nelem=size(a,kind=c_size_t))
          class default
            error stop "caf_co_sum: unsupported type"
        end select
@@ -247,6 +303,10 @@ contains
          type is(real(c_float))
            call c_co_sum_no_result_image_float(c_loc(a), nelem=size(a,kind=c_size_t))
          type is(real(c_double))
+           call c_co_sum_no_result_image_double(c_loc(a), nelem=size(a,kind=c_size_t))
+         type is(complex(c_float))
+           call c_co_sum_no_result_image_float(c_loc(a), nelem=size(a,kind=c_size_t))
+         type is(complex(c_double))
            call c_co_sum_no_result_image_double(c_loc(a), nelem=size(a,kind=c_size_t))
          class default
            error stop "caf_co_sum: unsupported type"
