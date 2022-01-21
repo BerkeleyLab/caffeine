@@ -60,9 +60,24 @@ void c_co_sum_no_result_image_int32(void* c_loc_a, size_t Nelem)
         = gex_Coll_ReduceToAllNB(myteam, c_loc_a, c_loc_a, GEX_DT_I32, sizeof(int32_t), Nelem, GEX_OP_ADD, NULL, NULL, 0);
       gex_Event_Wait(ev);  
 }
+
 void c_co_sum_no_result_image_int64(void* c_loc_a, size_t Nelem)
 {
       gex_Event_t ev
-        = gex_Coll_ReduceToAllNB(myteam, c_loc_a, c_loc_a, GEX_DT_I32, sizeof(int32_t), Nelem, GEX_OP_ADD, NULL, NULL, 0);
+        = gex_Coll_ReduceToAllNB(myteam, c_loc_a, c_loc_a, GEX_DT_I64, sizeof(int64_t), Nelem, GEX_OP_ADD, NULL, NULL, 0);
+      gex_Event_Wait(ev);  
+}
+
+void c_co_sum_no_result_image_float(void* c_loc_a, size_t Nelem)
+{
+      gex_Event_t ev
+        = gex_Coll_ReduceToAllNB(myteam, c_loc_a, c_loc_a, GEX_DT_FLT, sizeof(float), Nelem, GEX_OP_ADD, NULL, NULL, 0);
+      gex_Event_Wait(ev);  
+}
+
+void c_co_sum_no_result_image_double(void* c_loc_a, size_t Nelem)
+{
+      gex_Event_t ev
+        = gex_Coll_ReduceToAllNB(myteam, c_loc_a, c_loc_a, GEX_DT_DBL, sizeof(double), Nelem, GEX_OP_ADD, NULL, NULL, 0);
       gex_Event_Wait(ev);  
 }
