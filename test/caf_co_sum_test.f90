@@ -18,6 +18,7 @@ contains
            ,it("sums default integer 15D arrays with result_image not present", sum_default_integer_15D_array) &
            ,it("sums default real scalars with result_image not present", sum_default_real_scalars) &
            ,it("sums double precision 2D arrays with result_image not present", sum_double_precision_2D_array) &
+           ,it("sums default complex scalars with result_image not present", sum_default_complex_scalars) &
         ])
     end function
 
@@ -67,11 +68,10 @@ contains
         type(result_t) result_
         real scalar
         real, parameter :: e = 2.7182818459045
-        integer, parameter :: dp = kind(1.D0)
 
         scalar = e
         call caf_co_sum(scalar)
-        result_ = assert_equals(real(caf_num_images()*e, dp), real(scalar, dp) )
+        result_ = assert_equals(dble(caf_num_images()*e), dble(scalar) )
     end function
 
     function sum_double_precision_2D_array() result(result_)
@@ -82,6 +82,17 @@ contains
         array = input
         call caf_co_sum(array)
         result_ = assert_equals(product(caf_num_images()*input), product(array))
+    end function
+
+    function sum_default_complex_scalars() result(result_)
+        type(result_t) result_
+        real scalar
+        complex z
+        complex, parameter :: i=(0.,1)
+
+        z = i
+        call caf_co_sum(z)
+        result_ = assert_equals(dble(abs(i*caf_num_images())), dble(abs(z)) )
     end function
 
 end module caf_co_sum_test
