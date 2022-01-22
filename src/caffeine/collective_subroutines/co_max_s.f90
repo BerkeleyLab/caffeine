@@ -75,6 +75,216 @@ contains
          class default
            error stop "caf_co_max: unsupported type"
        end select
+     rank(2) 
+       select type(a)
+         type is(integer(c_int32_t))
+           call c_co_max_no_result_image_int32(c_loc(a), nelem=size(a,kind=c_size_t))
+         type is(integer(c_int64_t))
+           call c_co_max_no_result_image_int64(c_loc(a), nelem=size(a,kind=c_size_t))
+         type is(real(c_float))
+           call c_co_max_no_result_image_float(c_loc(a), nelem=size(a,kind=c_size_t))
+         type is(real(c_double))
+           call c_co_max_no_result_image_double(c_loc(a), nelem=size(a,kind=c_size_t))
+        !type is(character(len=*,kind=c_char)(c_float))
+        !  call c_co_max_no_result_image_char(c_loc(a), nelem=size(a,kind=c_size_t))
+         class default
+           error stop "caf_co_max: unsupported type"
+       end select
+     rank(3) 
+       select type(a)
+         type is(integer(c_int32_t))
+           call c_co_max_no_result_image_int32(c_loc(a), nelem=size(a,kind=c_size_t))
+         type is(integer(c_int64_t))
+           call c_co_max_no_result_image_int64(c_loc(a), nelem=size(a,kind=c_size_t))
+         type is(real(c_float))
+           call c_co_max_no_result_image_float(c_loc(a), nelem=size(a,kind=c_size_t))
+         type is(real(c_double))
+           call c_co_max_no_result_image_double(c_loc(a), nelem=size(a,kind=c_size_t))
+        !type is(character(len=*,kind=c_char)(c_float))
+        !  call c_co_max_no_result_image_char(c_loc(a), nelem=size(a,kind=c_size_t))
+         class default
+           error stop "caf_co_max: unsupported type"
+       end select
+     rank(4) 
+       select type(a)
+         type is(integer(c_int32_t))
+           call c_co_max_no_result_image_int32(c_loc(a), nelem=size(a,kind=c_size_t))
+         type is(integer(c_int64_t))
+           call c_co_max_no_result_image_int64(c_loc(a), nelem=size(a,kind=c_size_t))
+         type is(real(c_float))
+           call c_co_max_no_result_image_float(c_loc(a), nelem=size(a,kind=c_size_t))
+         type is(real(c_double))
+           call c_co_max_no_result_image_double(c_loc(a), nelem=size(a,kind=c_size_t))
+        !type is(character(len=*,kind=c_char)(c_float))
+        !  call c_co_max_no_result_image_char(c_loc(a), nelem=size(a,kind=c_size_t))
+         class default
+           error stop "caf_co_max: unsupported type"
+       end select
+     rank(5) 
+       select type(a)
+         type is(integer(c_int32_t))
+           call c_co_max_no_result_image_int32(c_loc(a), nelem=size(a,kind=c_size_t))
+         type is(integer(c_int64_t))
+           call c_co_max_no_result_image_int64(c_loc(a), nelem=size(a,kind=c_size_t))
+         type is(real(c_float))
+           call c_co_max_no_result_image_float(c_loc(a), nelem=size(a,kind=c_size_t))
+         type is(real(c_double))
+           call c_co_max_no_result_image_double(c_loc(a), nelem=size(a,kind=c_size_t))
+        !type is(character(len=*,kind=c_char)(c_float))
+        !  call c_co_max_no_result_image_char(c_loc(a), nelem=size(a,kind=c_size_t))
+         class default
+           error stop "caf_co_max: unsupported type"
+       end select
+     rank(6) 
+       select type(a)
+         type is(integer(c_int32_t))
+           call c_co_max_no_result_image_int32(c_loc(a), nelem=size(a,kind=c_size_t))
+         type is(integer(c_int64_t))
+           call c_co_max_no_result_image_int64(c_loc(a), nelem=size(a,kind=c_size_t))
+         type is(real(c_float))
+           call c_co_max_no_result_image_float(c_loc(a), nelem=size(a,kind=c_size_t))
+         type is(real(c_double))
+           call c_co_max_no_result_image_double(c_loc(a), nelem=size(a,kind=c_size_t))
+        !type is(character(len=*,kind=c_char)(c_float))
+        !  call c_co_max_no_result_image_char(c_loc(a), nelem=size(a,kind=c_size_t))
+         class default
+           error stop "caf_co_max: unsupported type"
+       end select
+     rank(7) 
+       select type(a)
+         type is(integer(c_int32_t))
+           call c_co_max_no_result_image_int32(c_loc(a), nelem=size(a,kind=c_size_t))
+         type is(integer(c_int64_t))
+           call c_co_max_no_result_image_int64(c_loc(a), nelem=size(a,kind=c_size_t))
+         type is(real(c_float))
+           call c_co_max_no_result_image_float(c_loc(a), nelem=size(a,kind=c_size_t))
+         type is(real(c_double))
+           call c_co_max_no_result_image_double(c_loc(a), nelem=size(a,kind=c_size_t))
+        !type is(character(len=*,kind=c_char)(c_float))
+        !  call c_co_max_no_result_image_char(c_loc(a), nelem=size(a,kind=c_size_t))
+         class default
+           error stop "caf_co_max: unsupported type"
+       end select
+     rank(8) 
+       select type(a)
+         type is(integer(c_int32_t))
+           call c_co_max_no_result_image_int32(c_loc(a), nelem=size(a,kind=c_size_t))
+         type is(integer(c_int64_t))
+           call c_co_max_no_result_image_int64(c_loc(a), nelem=size(a,kind=c_size_t))
+         type is(real(c_float))
+           call c_co_max_no_result_image_float(c_loc(a), nelem=size(a,kind=c_size_t))
+         type is(real(c_double))
+           call c_co_max_no_result_image_double(c_loc(a), nelem=size(a,kind=c_size_t))
+        !type is(character(len=*,kind=c_char)(c_float))
+        !  call c_co_max_no_result_image_char(c_loc(a), nelem=size(a,kind=c_size_t))
+         class default
+           error stop "caf_co_max: unsupported type"
+       end select
+     rank(9) 
+       select type(a)
+         type is(integer(c_int32_t))
+           call c_co_max_no_result_image_int32(c_loc(a), nelem=size(a,kind=c_size_t))
+         type is(integer(c_int64_t))
+           call c_co_max_no_result_image_int64(c_loc(a), nelem=size(a,kind=c_size_t))
+         type is(real(c_float))
+           call c_co_max_no_result_image_float(c_loc(a), nelem=size(a,kind=c_size_t))
+         type is(real(c_double))
+           call c_co_max_no_result_image_double(c_loc(a), nelem=size(a,kind=c_size_t))
+        !type is(character(len=*,kind=c_char)(c_float))
+        !  call c_co_max_no_result_image_char(c_loc(a), nelem=size(a,kind=c_size_t))
+         class default
+           error stop "caf_co_max: unsupported type"
+       end select
+     rank(10) 
+       select type(a)
+         type is(integer(c_int32_t))
+           call c_co_max_no_result_image_int32(c_loc(a), nelem=size(a,kind=c_size_t))
+         type is(integer(c_int64_t))
+           call c_co_max_no_result_image_int64(c_loc(a), nelem=size(a,kind=c_size_t))
+         type is(real(c_float))
+           call c_co_max_no_result_image_float(c_loc(a), nelem=size(a,kind=c_size_t))
+         type is(real(c_double))
+           call c_co_max_no_result_image_double(c_loc(a), nelem=size(a,kind=c_size_t))
+        !type is(character(len=*,kind=c_char)(c_float))
+        !  call c_co_max_no_result_image_char(c_loc(a), nelem=size(a,kind=c_size_t))
+         class default
+           error stop "caf_co_max: unsupported type"
+       end select
+     rank(11) 
+       select type(a)
+         type is(integer(c_int32_t))
+           call c_co_max_no_result_image_int32(c_loc(a), nelem=size(a,kind=c_size_t))
+         type is(integer(c_int64_t))
+           call c_co_max_no_result_image_int64(c_loc(a), nelem=size(a,kind=c_size_t))
+         type is(real(c_float))
+           call c_co_max_no_result_image_float(c_loc(a), nelem=size(a,kind=c_size_t))
+         type is(real(c_double))
+           call c_co_max_no_result_image_double(c_loc(a), nelem=size(a,kind=c_size_t))
+        !type is(character(len=*,kind=c_char)(c_float))
+        !  call c_co_max_no_result_image_char(c_loc(a), nelem=size(a,kind=c_size_t))
+         class default
+           error stop "caf_co_max: unsupported type"
+       end select
+     rank(12) 
+       select type(a)
+         type is(integer(c_int32_t))
+           call c_co_max_no_result_image_int32(c_loc(a), nelem=size(a,kind=c_size_t))
+         type is(integer(c_int64_t))
+           call c_co_max_no_result_image_int64(c_loc(a), nelem=size(a,kind=c_size_t))
+         type is(real(c_float))
+           call c_co_max_no_result_image_float(c_loc(a), nelem=size(a,kind=c_size_t))
+         type is(real(c_double))
+           call c_co_max_no_result_image_double(c_loc(a), nelem=size(a,kind=c_size_t))
+        !type is(character(len=*,kind=c_char)(c_float))
+        !  call c_co_max_no_result_image_char(c_loc(a), nelem=size(a,kind=c_size_t))
+         class default
+           error stop "caf_co_max: unsupported type"
+       end select
+     rank(13) 
+       select type(a)
+         type is(integer(c_int32_t))
+           call c_co_max_no_result_image_int32(c_loc(a), nelem=size(a,kind=c_size_t))
+         type is(integer(c_int64_t))
+           call c_co_max_no_result_image_int64(c_loc(a), nelem=size(a,kind=c_size_t))
+         type is(real(c_float))
+           call c_co_max_no_result_image_float(c_loc(a), nelem=size(a,kind=c_size_t))
+         type is(real(c_double))
+           call c_co_max_no_result_image_double(c_loc(a), nelem=size(a,kind=c_size_t))
+        !type is(character(len=*,kind=c_char)(c_float))
+        !  call c_co_max_no_result_image_char(c_loc(a), nelem=size(a,kind=c_size_t))
+         class default
+           error stop "caf_co_max: unsupported type"
+       end select
+     rank(14) 
+       select type(a)
+         type is(integer(c_int32_t))
+           call c_co_max_no_result_image_int32(c_loc(a), nelem=size(a,kind=c_size_t))
+         type is(integer(c_int64_t))
+           call c_co_max_no_result_image_int64(c_loc(a), nelem=size(a,kind=c_size_t))
+         type is(real(c_float))
+           call c_co_max_no_result_image_float(c_loc(a), nelem=size(a,kind=c_size_t))
+         type is(real(c_double))
+           call c_co_max_no_result_image_double(c_loc(a), nelem=size(a,kind=c_size_t))
+        !type is(character(len=*,kind=c_char)(c_float))
+        !  call c_co_max_no_result_image_char(c_loc(a), nelem=size(a,kind=c_size_t))
+         class default
+           error stop "caf_co_max: unsupported type"
+       end select
+     rank(15) 
+       select type(a)
+         type is(integer(c_int32_t))
+           call c_co_max_no_result_image_int32(c_loc(a), nelem=size(a,kind=c_size_t))
+         type is(integer(c_int64_t))
+           call c_co_max_no_result_image_int64(c_loc(a), nelem=size(a,kind=c_size_t))
+         type is(real(c_float))
+           call c_co_max_no_result_image_float(c_loc(a), nelem=size(a,kind=c_size_t))
+         type is(real(c_double))
+           call c_co_max_no_result_image_double(c_loc(a), nelem=size(a,kind=c_size_t))
+        !type is(character(len=*,kind=c_char)(c_float))
+        !  call c_co_max_no_result_image_char(c_loc(a), nelem=size(a,kind=c_size_t))
+         class default
+           error stop "caf_co_max: unsupported type"
+       end select
    end select
 
   end procedure
