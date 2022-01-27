@@ -28,6 +28,7 @@ contains
         type(result_t) result_
         integer i, status_
  
+        status_ = -1
         i = -caf_this_image()
         call caf_co_max(i, stat=status_)
         result_ = assert_equals(-1, i) .and. assert_equals(0, status_)
@@ -61,6 +62,7 @@ contains
         type(result_t) result_
         integer array(2,1,1, 1,1,1, 2), status_
  
+        status_ = -1
         array = 3 + caf_this_image()
         call caf_co_max(array, stat=status_)
         result_ = assert_that(all(array == 3+caf_num_images())) .and. assert_equals(0, status_)
@@ -72,6 +74,7 @@ contains
         real, parameter :: pi = 3.141592654
         integer status_
 
+        status_ = -1
         scalar = -pi*caf_this_image()
         call caf_co_max(scalar, stat=status_)
         result_ = assert_equals(-dble(pi), dble(scalar) ) .and. assert_equals(0, status_)
