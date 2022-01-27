@@ -13,24 +13,24 @@ contains
     
         tests = describe( &
           "The caf_co_max subroutine computes the maximum", &
-          [ it("default integer scalar without result_image present", max_default_integer_scalars) &
-           ,it("integer(c_int64_t) scalar without result_image present", max_c_int64_scalars) &
-           ,it("default integer 1D array elements without result_image present", max_default_integer_1D_array) &
-           ,it("default integer 7D array elements without result_image present", max_default_integer_7D_array) &
-           ,it("default real scalars without result_image present", max_default_real_scalars) &
-           ,it("double precision 2D array elements (no result_image)", max_double_precision_2D_array) &
-          !,it("character scalar (no result_image)", max_double_precision_2D_array) &
-          !,it("character 2D array elements (no result_image)", max_double_precision_2D_array) &
+          [ it("default integer scalar stat argument present", max_default_integer_scalars) &
+           ,it("integer(c_int64_t) scalar no optional arguments present", max_c_int64_scalars) &
+           ,it("default integer 1D array elements no optional arguments present", max_default_integer_1D_array) &
+           ,it("default integer 7D array elements stat argument present", max_default_integer_7D_array) &
+           ,it("default real scalars stat argument present", max_default_real_scalars) &
+           ,it("double precision 2D array elements with no optional arguments present", max_double_precision_2D_array) &
+          !,it("character scalar", max_double_precision_2D_array) &
+          !,it("character 2D array elements", max_double_precision_2D_array) &
         ])
     end function
 
     function max_default_integer_scalars() result(result_)
         type(result_t) result_
-        integer i
+        integer i, status_
  
         i = -caf_this_image()
-        call caf_co_max(i)
-        result_ = assert_equals(-1, i)
+        call caf_co_max(i, stat=status_)
+        result_ = assert_equals(-1, i) .and. assert_equals(0, status_)
     end function
 
     function max_c_int64_scalars() result(result_)
@@ -59,21 +59,22 @@ contains
 
     function max_default_integer_7D_array() result(result_)
         type(result_t) result_
-        integer array(2,1,1, 1,1,1, 2)
+        integer array(2,1,1, 1,1,1, 2), status_
  
         array = 3 + caf_this_image()
-        call caf_co_max(array)
-        result_ = assert_that(all(array == 3+caf_num_images()))
+        call caf_co_max(array, stat=status_)
+        result_ = assert_that(all(array == 3+caf_num_images())) .and. assert_equals(0, status_)
     end function
 
     function max_default_real_scalars() result(result_)
         type(result_t) result_
         real scalar
         real, parameter :: pi = 3.141592654
+        integer status_
 
         scalar = -pi*caf_this_image()
-        call caf_co_max(scalar)
-        result_ = assert_equals(-dble(pi), dble(scalar) )
+        call caf_co_max(scalar, stat=status_)
+        result_ = assert_equals(-dble(pi), dble(scalar) ) .and. assert_equals(0, status_)
     end function
 
     function max_double_precision_2D_array() result(result_)
