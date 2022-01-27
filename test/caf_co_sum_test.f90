@@ -37,7 +37,8 @@ contains
         type(result_t) result_
         integer(c_int64_t) i
         integer i_default_kind, status_
- 
+
+        status_ = -1
         i = 2_c_int64_t
         call caf_co_sum(i, stat=status_)
         i_default_kind = i
@@ -61,6 +62,7 @@ contains
         integer array(2,1,1, 1,1,1, 1,1,1, 1,1,1, 1,2,1)
         integer status_
  
+        status_ = -1
         array = 3
         call caf_co_sum(array, stat=status_)
         result_ = assert_that(all(3*caf_num_images() == array)) .and.  assert_equals(0, status_)
@@ -93,6 +95,7 @@ contains
         complex, parameter :: i=(0.,1)
         integer status_
 
+        status_ = -1
         z = i
         call caf_co_sum(z, stat=status_)
         result_ = assert_equals(dble(abs(i*caf_num_images())), dble(abs(z)) ) .and. assert_equals(0, status_)

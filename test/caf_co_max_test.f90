@@ -13,11 +13,11 @@ contains
     
         tests = describe( &
           "The caf_co_max subroutine computes the maximum", &
-          [ it("default integer scalar stat argument present", max_default_integer_scalars) &
-           ,it("integer(c_int64_t) scalar no optional arguments present", max_c_int64_scalars) &
-           ,it("default integer 1D array elements no optional arguments present", max_default_integer_1D_array) &
-           ,it("default integer 7D array elements stat argument present", max_default_integer_7D_array) &
-           ,it("default real scalars stat argument present", max_default_real_scalars) &
+          [ it("default integer scalar with stat argument present", max_default_integer_scalars) &
+           ,it("integer(c_int64_t) scalar with no optional arguments present", max_c_int64_scalars) &
+           ,it("default integer 1D array elements with no optional arguments present", max_default_integer_1D_array) &
+           ,it("default integer 7D array elements with stat argument present", max_default_integer_7D_array) &
+           ,it("default real scalars with stat argument present", max_default_real_scalars) &
            ,it("double precision 2D array elements with no optional arguments present", max_double_precision_2D_array) &
           !,it("character scalar", max_double_precision_2D_array) &
           !,it("character 2D array elements", max_double_precision_2D_array) &
