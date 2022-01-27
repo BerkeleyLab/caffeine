@@ -12,14 +12,14 @@ contains
     
         tests = describe( &
           "The caf_co_sum subroutine", &
-          [ it("sums default integer scalars with result_image not present", sum_default_integer_scalars) &
-           ,it("sums integer(c_int64_t) scalars with result_image not present", sum_c_int64_scalars) &
-           ,it("sums default integer 1D arrays with result_image not present", sum_default_integer_1D_array) &
-           ,it("sums default integer 15D arrays with result_image not present", sum_default_integer_15D_array) &
-           ,it("sums default real scalars with result_image not present", sum_default_real_scalars) &
-           ,it("sums double precision 2D arrays with result_image not present", sum_double_precision_2D_array) &
-           ,it("sums default complex scalars with result_image not present", sum_default_complex_scalars) &
-           ,it("sums double precision 3D complex arrays with result_image not present", sum_double_precision_complex_3D_arrays) &
+          [ it("sums default integer scalars with no optional arguments present", sum_default_integer_scalars) &
+           ,it("sums integer(c_int64_t) scalars with stat argument present", sum_c_int64_scalars) &
+           ,it("sums default integer 1D arrays with no optional arguments present", sum_default_integer_1D_array) &
+           ,it("sums default integer 15D arrays with stat argument present", sum_default_integer_15D_array) &
+           ,it("sums default real scalars with no optional arguments present", sum_default_real_scalars) &
+           ,it("sums double precision 2D arrays with no optional arguments present", sum_double_precision_2D_array) &
+           ,it("sums default complex scalars with stat argument present", sum_default_complex_scalars) &
+           ,it("sums double precision 3D complex arrays with no optional arguments present", sum_dble_complex_3D_arrays) &
         ])
     end function
 
@@ -36,12 +36,13 @@ contains
         use iso_c_binding, only : c_int64_t 
         type(result_t) result_
         integer(c_int64_t) i
-        integer i_default_kind
- 
+        integer i_default_kind, status_
+
+        status_ = -1
         i = 2_c_int64_t
-        call caf_co_sum(i)
+        call caf_co_sum(i, stat=status_)
         i_default_kind = i
-        result_ = assert_equals(2*caf_num_images(), int(i))
+        result_ = assert_equals(2*caf_num_images(), int(i)) .and. assert_equals(0, status_)
     end function
 
     function sum_default_integer_1D_array() result(result_)
@@ -59,10 +60,12 @@ contains
     function sum_default_integer_15D_array() result(result_)
         type(result_t) result_
         integer array(2,1,1, 1,1,1, 1,1,1, 1,1,1, 1,2,1)
+        integer status_
  
+        status_ = -1
         array = 3
-        call caf_co_sum(array)
-        result_ = assert_that(all(3*caf_num_images() == array))
+        call caf_co_sum(array, stat=status_)
+        result_ = assert_that(all(3*caf_num_images() == array)) .and.  assert_equals(0, status_)
     end function
 
     function sum_default_real_scalars() result(result_)
@@ -90,13 +93,15 @@ contains
         real scalar
         complex z
         complex, parameter :: i=(0.,1)
+        integer status_
 
+        status_ = -1
         z = i
-        call caf_co_sum(z)
-        result_ = assert_equals(dble(abs(i*caf_num_images())), dble(abs(z)) )
+        call caf_co_sum(z, stat=status_)
+        result_ = assert_equals(dble(abs(i*caf_num_images())), dble(abs(z)) ) .and. assert_equals(0, status_)
     end function
              
-    function sum_double_precision_complex_3D_arrays() result(result_)
+    function sum_dble_complex_3D_arrays() result(result_)
         type(result_t) result_
         integer, parameter :: dp = kind(1.D0)
         complex(dp), allocatable :: array(:,:,:)
