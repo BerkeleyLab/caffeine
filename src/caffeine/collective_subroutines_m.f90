@@ -32,7 +32,7 @@ module collective_subroutines_m
        implicit none
        class(*), intent(inout), contiguous, target :: a(..)
        integer, optional, intent(in) :: result_image
-       integer, optional, intent(out) :: stat
+       integer, optional, intent(out), target :: stat
        character(len=*), intent(inout), optional :: errmsg
      end subroutine
 
@@ -40,7 +40,7 @@ module collective_subroutines_m
        implicit none
        class(*), intent(inout), contiguous, target :: a(..)
        integer, optional, intent(in) :: result_image
-       integer, optional, intent(out) :: stat
+       integer, optional, intent(out), target :: stat
        character(len=*), intent(inout), optional :: errmsg
      end subroutine
 
@@ -48,7 +48,7 @@ module collective_subroutines_m
        implicit none
        class(*), intent(inout), contiguous, target :: a(..)
        integer, optional, intent(in) :: source_image
-       integer, optional, intent(out) :: stat
+       integer, optional, intent(out), target :: stat
        character(len=*), intent(inout), optional :: errmsg
      end subroutine
 
