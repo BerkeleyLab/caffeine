@@ -15,9 +15,9 @@ module collective_subroutines_m
      module subroutine caf_co_sum(a, result_image, stat, errmsg)
        implicit none
        class(*), intent(inout), contiguous, target :: a(..)
-       integer, optional, intent(in) :: result_image
-       integer, optional, intent(out), target :: stat
-       character(len=*), intent(inout), optional :: errmsg
+       integer, intent(in), target, optional :: result_image
+       integer, intent(out), target, optional :: stat
+       character(len=*), intent(inout), target, optional :: errmsg
      end subroutine
 
      module subroutine caf_co_max(a, result_image, stat, errmsg)

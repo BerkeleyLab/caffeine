@@ -53,11 +53,16 @@ void c_sync_all()
   gasnet_barrier_notify(0,GASNET_BARRIERFLAG_ANONYMOUS);
   gasnet_barrier_wait(0,GASNET_BARRIERFLAG_ANONYMOUS);
 }
-void c_co_sum_no_result_image_int32(void* c_loc_a, size_t Nelem, int* stat)
+void c_co_sum_int32(void* c_loc_a, size_t Nelem, int* stat, int* result_image)
 {
-      gex_Event_t ev
-        = gex_Coll_ReduceToAllNB(myteam, c_loc_a, c_loc_a, GEX_DT_I32, sizeof(int32_t), Nelem, GEX_OP_ADD, NULL, NULL, 0);
-      gex_Event_Wait(ev);  
+     gex_Event_t ev;
+
+     if (result_image == NULL) {
+       ev = gex_Coll_ReduceToAllNB(myteam, c_loc_a, c_loc_a, GEX_DT_I32, sizeof(int32_t), Nelem, GEX_OP_ADD, NULL, NULL, 0);
+     } else {
+       ev = gex_Coll_ReduceToOneNB(myteam, (*result_image)-1, c_loc_a, c_loc_a, GEX_DT_I32, sizeof(int32_t), Nelem, GEX_OP_ADD, NULL, NULL, 0);
+     }
+     gex_Event_Wait(ev);  
 
      if (stat != NULL) *stat = 0;
 }
@@ -71,13 +76,18 @@ void c_co_sum_no_result_image_int64(void* c_loc_a, size_t Nelem, int* stat)
      if (stat != NULL) *stat = 0;
 }
 
-void c_co_sum_no_result_image_float(void* c_loc_a, size_t Nelem, int* stat)
+void c_co_sum_float(void* c_loc_a, size_t Nelem, int* stat, int* result_image)
 {
-      gex_Event_t ev
-        = gex_Coll_ReduceToAllNB(myteam, c_loc_a, c_loc_a, GEX_DT_FLT, sizeof(float), Nelem, GEX_OP_ADD, NULL, NULL, 0);
-      gex_Event_Wait(ev);  
+     gex_Event_t ev;
 
-      if (stat != NULL) *stat = 0;
+     if (result_image == NULL) {
+       ev = gex_Coll_ReduceToAllNB(myteam, c_loc_a, c_loc_a, GEX_DT_FLT, sizeof(float), Nelem, GEX_OP_ADD, NULL, NULL, 0);
+     } else {
+       ev = gex_Coll_ReduceToOneNB(myteam, (*result_image)-1, c_loc_a, c_loc_a, GEX_DT_FLT, sizeof(float), Nelem, GEX_OP_ADD, NULL, NULL, 0);
+     }
+     gex_Event_Wait(ev);  
+
+     if (stat != NULL) *stat = 0;
 }
 
 void c_co_sum_no_result_image_double(void* c_loc_a, size_t Nelem, int* stat)
