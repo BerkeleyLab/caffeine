@@ -11,28 +11,27 @@ contains
 
    interface
 
-     !! void c_co_min_int32(void* c_loc_a, int Nelem)
-     subroutine c_co_min_int32(c_loc_a, Nelem, c_loc_stat) bind(C)
+     subroutine c_co_min_int32(c_loc_a, Nelem, c_loc_stat, c_loc_result_image) bind(C)
        import c_ptr, c_size_t
-       type(c_ptr), value :: c_loc_a, c_loc_stat
+       type(c_ptr), value :: c_loc_a, c_loc_stat, c_loc_result_image
        integer(c_size_t), value :: Nelem
      end subroutine
 
-     subroutine c_co_min_int64(c_loc_a, Nelem, c_loc_stat) bind(C)
+     subroutine c_co_min_int64(c_loc_a, Nelem, c_loc_stat, c_loc_result_image) bind(C)
        import c_ptr, c_size_t
-       type(c_ptr), value :: c_loc_a, c_loc_stat
+       type(c_ptr), value :: c_loc_a, c_loc_stat, c_loc_result_image
        integer(c_size_t), value :: Nelem
      end subroutine
 
-     subroutine c_co_min_float(c_loc_a, Nelem, c_loc_stat) bind(C)
+     subroutine c_co_min_float(c_loc_a, Nelem, c_loc_stat, c_loc_result_image) bind(C)
        import c_ptr, c_size_t
-       type(c_ptr), value :: c_loc_a, c_loc_stat
+       type(c_ptr), value :: c_loc_a, c_loc_stat, c_loc_result_image
        integer(c_size_t), value :: Nelem
      end subroutine
 
-     subroutine c_co_min_double(c_loc_a, Nelem, c_loc_stat) bind(C)
+     subroutine c_co_min_double(c_loc_a, Nelem, c_loc_stat, c_loc_result_image) bind(C)
        import c_ptr, c_size_t
-       type(c_ptr), value :: c_loc_a, c_loc_stat
+       type(c_ptr), value :: c_loc_a, c_loc_stat, c_loc_result_image
        integer(c_size_t), value :: Nelem
      end subroutine
 
@@ -44,7 +43,7 @@ contains
 
    end interface
 
-   type(c_ptr) stat_ptr
+   type(c_ptr) stat_ptr, result_image_ptr
 
    if (present(stat)) then
      stat_ptr = c_loc(stat)
@@ -52,17 +51,23 @@ contains
      stat_ptr = c_null_ptr
    end if
 
+   if (present(result_image)) then
+     result_image_ptr = c_loc(result_image)
+   else
+     result_image_ptr = c_null_ptr
+   end if
+
    select rank(a)
      rank(0)
        select type(a)
          type is(integer(c_int32_t))
-           call c_co_min_int32(c_loc(a),  nelem=1_c_size_t, c_loc_stat=stat_ptr)
+           call c_co_min_int32(c_loc(a),  nelem=1_c_size_t, c_loc_stat=stat_ptr, c_loc_result_image=result_image_ptr)
          type is(integer(c_int64_t))
-           call c_co_min_int64(c_loc(a),  nelem=1_c_size_t, c_loc_stat=stat_ptr)
+           call c_co_min_int64(c_loc(a),  nelem=1_c_size_t, c_loc_stat=stat_ptr, c_loc_result_image=result_image_ptr)
          type is(real(c_float))
-           call c_co_min_float(c_loc(a),  nelem=1_c_size_t, c_loc_stat=stat_ptr)
+           call c_co_min_float(c_loc(a),  nelem=1_c_size_t, c_loc_stat=stat_ptr, c_loc_result_image=result_image_ptr)
          type is(real(c_double))
-           call c_co_min_double(c_loc(a), nelem=1_c_size_t, c_loc_stat=stat_ptr)
+           call c_co_min_double(c_loc(a), nelem=1_c_size_t, c_loc_stat=stat_ptr, c_loc_result_image=result_image_ptr)
          type is(character(len=*,kind=c_char))
            error stop  "caf_co_min: character type not yet supported"
         !  call c_co_min_char(c_loc(a), nelem=2_c_size_t, c_loc_stat=stat_ptr)
@@ -74,13 +79,13 @@ contains
      rank(1)
        select type(a)
          type is(integer(c_int32_t))
-           call c_co_min_int32(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
+           call c_co_min_int32(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr, c_loc_result_image=result_image_ptr)
          type is(integer(c_int64_t))
-           call c_co_min_int64(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
+           call c_co_min_int64(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr, c_loc_result_image=result_image_ptr)
          type is(real(c_float))
-           call c_co_min_float(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
+           call c_co_min_float(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr, c_loc_result_image=result_image_ptr)
          type is(real(c_double))
-           call c_co_min_double(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
+           call c_co_min_double(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr, c_loc_result_image=result_image_ptr)
          type is(character(len=*,kind=c_char))
            error stop "caf_co_min: character type not yet supported"
         !  call c_co_min_char(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
@@ -92,13 +97,13 @@ contains
      rank(2)
        select type(a)
          type is(integer(c_int32_t))
-           call c_co_min_int32(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
+           call c_co_min_int32(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr, c_loc_result_image=result_image_ptr)
          type is(integer(c_int64_t))
-           call c_co_min_int64(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
+           call c_co_min_int64(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr, c_loc_result_image=result_image_ptr)
          type is(real(c_float))
-           call c_co_min_float(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
+           call c_co_min_float(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr, c_loc_result_image=result_image_ptr)
          type is(real(c_double))
-           call c_co_min_double(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
+           call c_co_min_double(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr, c_loc_result_image=result_image_ptr)
          type is(character(len=*,kind=c_char))
            error stop "caf_co_min: character type not yet supported"
         !  call c_co_min_char(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
@@ -110,13 +115,13 @@ contains
      rank(3)
        select type(a)
          type is(integer(c_int32_t))
-           call c_co_min_int32(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
+           call c_co_min_int32(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr, c_loc_result_image=result_image_ptr)
          type is(integer(c_int64_t))
-           call c_co_min_int64(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
+           call c_co_min_int64(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr, c_loc_result_image=result_image_ptr)
          type is(real(c_float))
-           call c_co_min_float(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
+           call c_co_min_float(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr, c_loc_result_image=result_image_ptr)
          type is(real(c_double))
-           call c_co_min_double(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
+           call c_co_min_double(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr, c_loc_result_image=result_image_ptr)
          type is(character(len=*,kind=c_char))
            error stop "caf_co_min: character type not yet supported"
         !  call c_co_min_char(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
@@ -128,13 +133,13 @@ contains
      rank(4)
        select type(a)
          type is(integer(c_int32_t))
-           call c_co_min_int32(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
+           call c_co_min_int32(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr, c_loc_result_image=result_image_ptr)
          type is(integer(c_int64_t))
-           call c_co_min_int64(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
+           call c_co_min_int64(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr, c_loc_result_image=result_image_ptr)
          type is(real(c_float))
-           call c_co_min_float(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
+           call c_co_min_float(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr, c_loc_result_image=result_image_ptr)
          type is(real(c_double))
-           call c_co_min_double(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
+           call c_co_min_double(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr, c_loc_result_image=result_image_ptr)
          type is(character(len=*,kind=c_char))
            error stop "caf_co_min: character type not yet supported"
         !  call c_co_min_char(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
@@ -146,13 +151,13 @@ contains
      rank(5)
        select type(a)
          type is(integer(c_int32_t))
-           call c_co_min_int32(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
+           call c_co_min_int32(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr, c_loc_result_image=result_image_ptr)
          type is(integer(c_int64_t))
-           call c_co_min_int64(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
+           call c_co_min_int64(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr, c_loc_result_image=result_image_ptr)
          type is(real(c_float))
-           call c_co_min_float(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
+           call c_co_min_float(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr, c_loc_result_image=result_image_ptr)
          type is(real(c_double))
-           call c_co_min_double(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
+           call c_co_min_double(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr, c_loc_result_image=result_image_ptr)
          type is(character(len=*,kind=c_char))
            error stop "caf_co_min: character type not yet supported"
         !  call c_co_min_char(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
@@ -164,13 +169,13 @@ contains
      rank(6)
        select type(a)
          type is(integer(c_int32_t))
-           call c_co_min_int32(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
+           call c_co_min_int32(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr, c_loc_result_image=result_image_ptr)
          type is(integer(c_int64_t))
-           call c_co_min_int64(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
+           call c_co_min_int64(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr, c_loc_result_image=result_image_ptr)
          type is(real(c_float))
-           call c_co_min_float(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
+           call c_co_min_float(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr, c_loc_result_image=result_image_ptr)
          type is(real(c_double))
-           call c_co_min_double(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
+           call c_co_min_double(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr, c_loc_result_image=result_image_ptr)
          type is(character(len=*,kind=c_char))
            error stop "caf_co_min: character type not yet supported"
         !  call c_co_min_char(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
@@ -182,13 +187,13 @@ contains
      rank(7)
        select type(a)
          type is(integer(c_int32_t))
-           call c_co_min_int32(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
+           call c_co_min_int32(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr, c_loc_result_image=result_image_ptr)
          type is(integer(c_int64_t))
-           call c_co_min_int64(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
+           call c_co_min_int64(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr, c_loc_result_image=result_image_ptr)
          type is(real(c_float))
-           call c_co_min_float(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
+           call c_co_min_float(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr, c_loc_result_image=result_image_ptr)
          type is(real(c_double))
-           call c_co_min_double(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
+           call c_co_min_double(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr, c_loc_result_image=result_image_ptr)
          type is(character(len=*,kind=c_char))
            error stop "caf_co_min: character type not yet supported"
         !  call c_co_min_char(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
@@ -200,13 +205,13 @@ contains
      rank(8)
        select type(a)
          type is(integer(c_int32_t))
-           call c_co_min_int32(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
+           call c_co_min_int32(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr, c_loc_result_image=result_image_ptr)
          type is(integer(c_int64_t))
-           call c_co_min_int64(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
+           call c_co_min_int64(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr, c_loc_result_image=result_image_ptr)
          type is(real(c_float))
-           call c_co_min_float(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
+           call c_co_min_float(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr, c_loc_result_image=result_image_ptr)
          type is(real(c_double))
-           call c_co_min_double(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
+           call c_co_min_double(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr, c_loc_result_image=result_image_ptr)
          type is(character(len=*,kind=c_char))
            error stop "caf_co_min: character type not yet supported"
         !  call c_co_min_char(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
@@ -218,13 +223,13 @@ contains
      rank(9)
        select type(a)
          type is(integer(c_int32_t))
-           call c_co_min_int32(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
+           call c_co_min_int32(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr, c_loc_result_image=result_image_ptr)
          type is(integer(c_int64_t))
-           call c_co_min_int64(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
+           call c_co_min_int64(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr, c_loc_result_image=result_image_ptr)
          type is(real(c_float))
-           call c_co_min_float(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
+           call c_co_min_float(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr, c_loc_result_image=result_image_ptr)
          type is(real(c_double))
-           call c_co_min_double(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
+           call c_co_min_double(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr, c_loc_result_image=result_image_ptr)
          type is(character(len=*,kind=c_char))
            error stop "caf_co_min: character type not yet supported"
         !  call c_co_min_char(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
@@ -236,13 +241,13 @@ contains
      rank(10)
        select type(a)
          type is(integer(c_int32_t))
-           call c_co_min_int32(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
+           call c_co_min_int32(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr, c_loc_result_image=result_image_ptr)
          type is(integer(c_int64_t))
-           call c_co_min_int64(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
+           call c_co_min_int64(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr, c_loc_result_image=result_image_ptr)
          type is(real(c_float))
-           call c_co_min_float(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
+           call c_co_min_float(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr, c_loc_result_image=result_image_ptr)
          type is(real(c_double))
-           call c_co_min_double(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
+           call c_co_min_double(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr, c_loc_result_image=result_image_ptr)
          type is(character(len=*,kind=c_char))
            error stop "caf_co_min: character type not yet supported"
         !  call c_co_min_char(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
@@ -254,13 +259,13 @@ contains
      rank(11)
        select type(a)
          type is(integer(c_int32_t))
-           call c_co_min_int32(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
+           call c_co_min_int32(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr, c_loc_result_image=result_image_ptr)
          type is(integer(c_int64_t))
-           call c_co_min_int64(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
+           call c_co_min_int64(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr, c_loc_result_image=result_image_ptr)
          type is(real(c_float))
-           call c_co_min_float(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
+           call c_co_min_float(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr, c_loc_result_image=result_image_ptr)
          type is(real(c_double))
-           call c_co_min_double(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
+           call c_co_min_double(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr, c_loc_result_image=result_image_ptr)
          type is(character(len=*,kind=c_char))
            error stop "caf_co_min: character type not yet supported"
         !  call c_co_min_char(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
@@ -272,13 +277,13 @@ contains
      rank(12)
        select type(a)
          type is(integer(c_int32_t))
-           call c_co_min_int32(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
+           call c_co_min_int32(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr, c_loc_result_image=result_image_ptr)
          type is(integer(c_int64_t))
-           call c_co_min_int64(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
+           call c_co_min_int64(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr, c_loc_result_image=result_image_ptr)
          type is(real(c_float))
-           call c_co_min_float(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
+           call c_co_min_float(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr, c_loc_result_image=result_image_ptr)
          type is(real(c_double))
-           call c_co_min_double(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
+           call c_co_min_double(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr, c_loc_result_image=result_image_ptr)
          type is(character(len=*,kind=c_char))
            error stop "caf_co_min: character type not yet supported"
         !  call c_co_min_char(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
@@ -290,13 +295,13 @@ contains
      rank(13)
        select type(a)
          type is(integer(c_int32_t))
-           call c_co_min_int32(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
+           call c_co_min_int32(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr, c_loc_result_image=result_image_ptr)
          type is(integer(c_int64_t))
-           call c_co_min_int64(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
+           call c_co_min_int64(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr, c_loc_result_image=result_image_ptr)
          type is(real(c_float))
-           call c_co_min_float(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
+           call c_co_min_float(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr, c_loc_result_image=result_image_ptr)
          type is(real(c_double))
-           call c_co_min_double(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
+           call c_co_min_double(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr, c_loc_result_image=result_image_ptr)
          type is(character(len=*,kind=c_char))
            error stop "caf_co_min: character type not yet supported"
         !  call c_co_min_char(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
@@ -308,13 +313,13 @@ contains
      rank(14)
        select type(a)
          type is(integer(c_int32_t))
-           call c_co_min_int32(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
+           call c_co_min_int32(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr, c_loc_result_image=result_image_ptr)
          type is(integer(c_int64_t))
-           call c_co_min_int64(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
+           call c_co_min_int64(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr, c_loc_result_image=result_image_ptr)
          type is(real(c_float))
-           call c_co_min_float(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
+           call c_co_min_float(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr, c_loc_result_image=result_image_ptr)
          type is(real(c_double))
-           call c_co_min_double(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
+           call c_co_min_double(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr, c_loc_result_image=result_image_ptr)
          type is(character(len=*,kind=c_char))
            error stop "caf_co_min: character type not yet supported"
         !  call c_co_min_char(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
@@ -326,13 +331,13 @@ contains
      rank(15)
        select type(a)
          type is(integer(c_int32_t))
-           call c_co_min_int32(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
+           call c_co_min_int32(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr, c_loc_result_image=result_image_ptr)
          type is(integer(c_int64_t))
-           call c_co_min_int64(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
+           call c_co_min_int64(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr, c_loc_result_image=result_image_ptr)
          type is(real(c_float))
-           call c_co_min_float(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
+           call c_co_min_float(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr, c_loc_result_image=result_image_ptr)
          type is(real(c_double))
-           call c_co_min_double(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
+           call c_co_min_double(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr, c_loc_result_image=result_image_ptr)
          type is(character(len=*,kind=c_char))
            error stop "caf_co_min: character type not yet supported"
         !  call c_co_min_char(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
