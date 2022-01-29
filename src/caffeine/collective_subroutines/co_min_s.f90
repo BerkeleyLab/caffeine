@@ -11,32 +11,32 @@ contains
 
    interface
 
-     !! void c_co_min_no_result_image_int32(void* c_loc_a, int Nelem)
-     subroutine c_co_min_no_result_image_int32(c_loc_a, Nelem, c_loc_stat) bind(C)
+     !! void c_co_min_int32(void* c_loc_a, int Nelem)
+     subroutine c_co_min_int32(c_loc_a, Nelem, c_loc_stat) bind(C)
        import c_ptr, c_size_t
        type(c_ptr), value :: c_loc_a, c_loc_stat
        integer(c_size_t), value :: Nelem
      end subroutine
 
-     subroutine c_co_min_no_result_image_int64(c_loc_a, Nelem, c_loc_stat) bind(C)
+     subroutine c_co_min_int64(c_loc_a, Nelem, c_loc_stat) bind(C)
        import c_ptr, c_size_t
        type(c_ptr), value :: c_loc_a, c_loc_stat
        integer(c_size_t), value :: Nelem
      end subroutine
 
-     subroutine c_co_min_no_result_image_float(c_loc_a, Nelem, c_loc_stat) bind(C)
+     subroutine c_co_min_float(c_loc_a, Nelem, c_loc_stat) bind(C)
        import c_ptr, c_size_t
        type(c_ptr), value :: c_loc_a, c_loc_stat
        integer(c_size_t), value :: Nelem
      end subroutine
 
-     subroutine c_co_min_no_result_image_double(c_loc_a, Nelem, c_loc_stat) bind(C)
+     subroutine c_co_min_double(c_loc_a, Nelem, c_loc_stat) bind(C)
        import c_ptr, c_size_t
        type(c_ptr), value :: c_loc_a, c_loc_stat
        integer(c_size_t), value :: Nelem
      end subroutine
 
-    !subroutine c_co_min_no_result_image_char(c_loc_a, Nelem, c_loc_stat) bind(C)
+    !subroutine c_co_min_char(c_loc_a, Nelem, c_loc_stat) bind(C)
     !  import c_ptr, c_size_t
     !  type(c_ptr), value :: c_loc_a, c_loc_stat
     !  integer(c_size_t), value :: Nelem
@@ -56,16 +56,16 @@ contains
      rank(0)
        select type(a)
          type is(integer(c_int32_t))
-           call c_co_min_no_result_image_int32(c_loc(a),  nelem=1_c_size_t, c_loc_stat=stat_ptr)
+           call c_co_min_int32(c_loc(a),  nelem=1_c_size_t, c_loc_stat=stat_ptr)
          type is(integer(c_int64_t))
-           call c_co_min_no_result_image_int64(c_loc(a),  nelem=1_c_size_t, c_loc_stat=stat_ptr)
+           call c_co_min_int64(c_loc(a),  nelem=1_c_size_t, c_loc_stat=stat_ptr)
          type is(real(c_float))
-           call c_co_min_no_result_image_float(c_loc(a),  nelem=1_c_size_t, c_loc_stat=stat_ptr)
+           call c_co_min_float(c_loc(a),  nelem=1_c_size_t, c_loc_stat=stat_ptr)
          type is(real(c_double))
-           call c_co_min_no_result_image_double(c_loc(a), nelem=1_c_size_t, c_loc_stat=stat_ptr)
+           call c_co_min_double(c_loc(a), nelem=1_c_size_t, c_loc_stat=stat_ptr)
          type is(character(len=*,kind=c_char))
            error stop  "caf_co_min: character type not yet supported"
-        !  call c_co_min_no_result_image_char(c_loc(a), nelem=2_c_size_t, c_loc_stat=stat_ptr)
+        !  call c_co_min_char(c_loc(a), nelem=2_c_size_t, c_loc_stat=stat_ptr)
          class default
            error stop         "caf_co_min: co_min argument 'A' must be of type integer, real, or character." // &
              new_line('a') // "Caffeine supports c_int_32_t & c_int_64_t integers; c_float & c_double reals;" // &
@@ -74,16 +74,16 @@ contains
      rank(1)
        select type(a)
          type is(integer(c_int32_t))
-           call c_co_min_no_result_image_int32(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
+           call c_co_min_int32(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
          type is(integer(c_int64_t))
-           call c_co_min_no_result_image_int64(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
+           call c_co_min_int64(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
          type is(real(c_float))
-           call c_co_min_no_result_image_float(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
+           call c_co_min_float(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
          type is(real(c_double))
-           call c_co_min_no_result_image_double(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
+           call c_co_min_double(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
          type is(character(len=*,kind=c_char))
            error stop "caf_co_min: character type not yet supported"
-        !  call c_co_min_no_result_image_char(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
+        !  call c_co_min_char(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
          class default
            error stop         "caf_co_min: co_min argument 'A' must be of type integer, real, or character." // &
              new_line('a') // "Caffeine supports c_int_32_t & c_int_64_t integers; c_float & c_double reals;" // &
@@ -92,16 +92,16 @@ contains
      rank(2)
        select type(a)
          type is(integer(c_int32_t))
-           call c_co_min_no_result_image_int32(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
+           call c_co_min_int32(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
          type is(integer(c_int64_t))
-           call c_co_min_no_result_image_int64(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
+           call c_co_min_int64(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
          type is(real(c_float))
-           call c_co_min_no_result_image_float(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
+           call c_co_min_float(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
          type is(real(c_double))
-           call c_co_min_no_result_image_double(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
+           call c_co_min_double(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
          type is(character(len=*,kind=c_char))
            error stop "caf_co_min: character type not yet supported"
-        !  call c_co_min_no_result_image_char(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
+        !  call c_co_min_char(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
          class default
            error stop         "caf_co_min: co_min argument 'A' must be of type integer, real, or character." // &
              new_line('a') // "Caffeine supports c_int_32_t & c_int_64_t integers; c_float & c_double reals;" // &
@@ -110,16 +110,16 @@ contains
      rank(3)
        select type(a)
          type is(integer(c_int32_t))
-           call c_co_min_no_result_image_int32(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
+           call c_co_min_int32(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
          type is(integer(c_int64_t))
-           call c_co_min_no_result_image_int64(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
+           call c_co_min_int64(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
          type is(real(c_float))
-           call c_co_min_no_result_image_float(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
+           call c_co_min_float(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
          type is(real(c_double))
-           call c_co_min_no_result_image_double(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
+           call c_co_min_double(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
          type is(character(len=*,kind=c_char))
            error stop "caf_co_min: character type not yet supported"
-        !  call c_co_min_no_result_image_char(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
+        !  call c_co_min_char(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
          class default
            error stop         "caf_co_min: co_min argument 'A' must be of type integer, real, or character." // &
              new_line('a') // "Caffeine supports c_int_32_t & c_int_64_t integers; c_float & c_double reals;" // &
@@ -128,16 +128,16 @@ contains
      rank(4)
        select type(a)
          type is(integer(c_int32_t))
-           call c_co_min_no_result_image_int32(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
+           call c_co_min_int32(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
          type is(integer(c_int64_t))
-           call c_co_min_no_result_image_int64(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
+           call c_co_min_int64(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
          type is(real(c_float))
-           call c_co_min_no_result_image_float(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
+           call c_co_min_float(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
          type is(real(c_double))
-           call c_co_min_no_result_image_double(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
+           call c_co_min_double(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
          type is(character(len=*,kind=c_char))
            error stop "caf_co_min: character type not yet supported"
-        !  call c_co_min_no_result_image_char(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
+        !  call c_co_min_char(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
          class default
            error stop         "caf_co_min: co_min argument 'A' must be of type integer, real, or character." // &
              new_line('a') // "Caffeine supports c_int_32_t & c_int_64_t integers; c_float & c_double reals;" // &
@@ -146,16 +146,16 @@ contains
      rank(5)
        select type(a)
          type is(integer(c_int32_t))
-           call c_co_min_no_result_image_int32(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
+           call c_co_min_int32(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
          type is(integer(c_int64_t))
-           call c_co_min_no_result_image_int64(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
+           call c_co_min_int64(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
          type is(real(c_float))
-           call c_co_min_no_result_image_float(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
+           call c_co_min_float(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
          type is(real(c_double))
-           call c_co_min_no_result_image_double(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
+           call c_co_min_double(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
          type is(character(len=*,kind=c_char))
            error stop "caf_co_min: character type not yet supported"
-        !  call c_co_min_no_result_image_char(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
+        !  call c_co_min_char(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
          class default
            error stop         "caf_co_min: co_min argument 'A' must be of type integer, real, or character." // &
              new_line('a') // "Caffeine supports c_int_32_t & c_int_64_t integers; c_float & c_double reals;" // &
@@ -164,16 +164,16 @@ contains
      rank(6)
        select type(a)
          type is(integer(c_int32_t))
-           call c_co_min_no_result_image_int32(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
+           call c_co_min_int32(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
          type is(integer(c_int64_t))
-           call c_co_min_no_result_image_int64(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
+           call c_co_min_int64(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
          type is(real(c_float))
-           call c_co_min_no_result_image_float(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
+           call c_co_min_float(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
          type is(real(c_double))
-           call c_co_min_no_result_image_double(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
+           call c_co_min_double(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
          type is(character(len=*,kind=c_char))
            error stop "caf_co_min: character type not yet supported"
-        !  call c_co_min_no_result_image_char(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
+        !  call c_co_min_char(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
          class default
            error stop         "caf_co_min: co_min argument 'A' must be of type integer, real, or character." // &
              new_line('a') // "Caffeine supports c_int_32_t & c_int_64_t integers; c_float & c_double reals;" // &
@@ -182,16 +182,16 @@ contains
      rank(7)
        select type(a)
          type is(integer(c_int32_t))
-           call c_co_min_no_result_image_int32(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
+           call c_co_min_int32(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
          type is(integer(c_int64_t))
-           call c_co_min_no_result_image_int64(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
+           call c_co_min_int64(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
          type is(real(c_float))
-           call c_co_min_no_result_image_float(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
+           call c_co_min_float(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
          type is(real(c_double))
-           call c_co_min_no_result_image_double(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
+           call c_co_min_double(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
          type is(character(len=*,kind=c_char))
            error stop "caf_co_min: character type not yet supported"
-        !  call c_co_min_no_result_image_char(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
+        !  call c_co_min_char(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
          class default
            error stop         "caf_co_min: co_min argument 'A' must be of type integer, real, or character." // &
              new_line('a') // "Caffeine supports c_int_32_t & c_int_64_t integers; c_float & c_double reals;" // &
@@ -200,16 +200,16 @@ contains
      rank(8)
        select type(a)
          type is(integer(c_int32_t))
-           call c_co_min_no_result_image_int32(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
+           call c_co_min_int32(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
          type is(integer(c_int64_t))
-           call c_co_min_no_result_image_int64(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
+           call c_co_min_int64(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
          type is(real(c_float))
-           call c_co_min_no_result_image_float(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
+           call c_co_min_float(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
          type is(real(c_double))
-           call c_co_min_no_result_image_double(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
+           call c_co_min_double(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
          type is(character(len=*,kind=c_char))
            error stop "caf_co_min: character type not yet supported"
-        !  call c_co_min_no_result_image_char(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
+        !  call c_co_min_char(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
          class default
            error stop         "caf_co_min: co_min argument 'A' must be of type integer, real, or character." // &
              new_line('a') // "Caffeine supports c_int_32_t & c_int_64_t integers; c_float & c_double reals;" // &
@@ -218,16 +218,16 @@ contains
      rank(9)
        select type(a)
          type is(integer(c_int32_t))
-           call c_co_min_no_result_image_int32(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
+           call c_co_min_int32(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
          type is(integer(c_int64_t))
-           call c_co_min_no_result_image_int64(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
+           call c_co_min_int64(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
          type is(real(c_float))
-           call c_co_min_no_result_image_float(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
+           call c_co_min_float(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
          type is(real(c_double))
-           call c_co_min_no_result_image_double(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
+           call c_co_min_double(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
          type is(character(len=*,kind=c_char))
            error stop "caf_co_min: character type not yet supported"
-        !  call c_co_min_no_result_image_char(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
+        !  call c_co_min_char(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
          class default
            error stop         "caf_co_min: co_min argument 'A' must be of type integer, real, or character." // &
              new_line('a') // "Caffeine supports c_int_32_t & c_int_64_t integers; c_float & c_double reals;" // &
@@ -236,16 +236,16 @@ contains
      rank(10)
        select type(a)
          type is(integer(c_int32_t))
-           call c_co_min_no_result_image_int32(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
+           call c_co_min_int32(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
          type is(integer(c_int64_t))
-           call c_co_min_no_result_image_int64(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
+           call c_co_min_int64(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
          type is(real(c_float))
-           call c_co_min_no_result_image_float(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
+           call c_co_min_float(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
          type is(real(c_double))
-           call c_co_min_no_result_image_double(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
+           call c_co_min_double(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
          type is(character(len=*,kind=c_char))
            error stop "caf_co_min: character type not yet supported"
-        !  call c_co_min_no_result_image_char(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
+        !  call c_co_min_char(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
          class default
            error stop         "caf_co_min: co_min argument 'A' must be of type integer, real, or character." // &
              new_line('a') // "Caffeine supports c_int_32_t & c_int_64_t integers; c_float & c_double reals;" // &
@@ -254,16 +254,16 @@ contains
      rank(11)
        select type(a)
          type is(integer(c_int32_t))
-           call c_co_min_no_result_image_int32(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
+           call c_co_min_int32(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
          type is(integer(c_int64_t))
-           call c_co_min_no_result_image_int64(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
+           call c_co_min_int64(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
          type is(real(c_float))
-           call c_co_min_no_result_image_float(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
+           call c_co_min_float(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
          type is(real(c_double))
-           call c_co_min_no_result_image_double(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
+           call c_co_min_double(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
          type is(character(len=*,kind=c_char))
            error stop "caf_co_min: character type not yet supported"
-        !  call c_co_min_no_result_image_char(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
+        !  call c_co_min_char(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
          class default
            error stop         "caf_co_min: co_min argument 'A' must be of type integer, real, or character." // &
              new_line('a') // "Caffeine supports c_int_32_t & c_int_64_t integers; c_float & c_double reals;" // &
@@ -272,16 +272,16 @@ contains
      rank(12)
        select type(a)
          type is(integer(c_int32_t))
-           call c_co_min_no_result_image_int32(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
+           call c_co_min_int32(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
          type is(integer(c_int64_t))
-           call c_co_min_no_result_image_int64(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
+           call c_co_min_int64(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
          type is(real(c_float))
-           call c_co_min_no_result_image_float(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
+           call c_co_min_float(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
          type is(real(c_double))
-           call c_co_min_no_result_image_double(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
+           call c_co_min_double(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
          type is(character(len=*,kind=c_char))
            error stop "caf_co_min: character type not yet supported"
-        !  call c_co_min_no_result_image_char(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
+        !  call c_co_min_char(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
          class default
            error stop         "caf_co_min: co_min argument 'A' must be of type integer, real, or character." // &
              new_line('a') // "Caffeine supports c_int_32_t & c_int_64_t integers; c_float & c_double reals;" // &
@@ -290,16 +290,16 @@ contains
      rank(13)
        select type(a)
          type is(integer(c_int32_t))
-           call c_co_min_no_result_image_int32(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
+           call c_co_min_int32(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
          type is(integer(c_int64_t))
-           call c_co_min_no_result_image_int64(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
+           call c_co_min_int64(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
          type is(real(c_float))
-           call c_co_min_no_result_image_float(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
+           call c_co_min_float(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
          type is(real(c_double))
-           call c_co_min_no_result_image_double(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
+           call c_co_min_double(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
          type is(character(len=*,kind=c_char))
            error stop "caf_co_min: character type not yet supported"
-        !  call c_co_min_no_result_image_char(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
+        !  call c_co_min_char(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
          class default
            error stop         "caf_co_min: co_min argument 'A' must be of type integer, real, or character." // &
              new_line('a') // "Caffeine supports c_int_32_t & c_int_64_t integers; c_float & c_double reals;" // &
@@ -308,16 +308,16 @@ contains
      rank(14)
        select type(a)
          type is(integer(c_int32_t))
-           call c_co_min_no_result_image_int32(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
+           call c_co_min_int32(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
          type is(integer(c_int64_t))
-           call c_co_min_no_result_image_int64(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
+           call c_co_min_int64(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
          type is(real(c_float))
-           call c_co_min_no_result_image_float(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
+           call c_co_min_float(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
          type is(real(c_double))
-           call c_co_min_no_result_image_double(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
+           call c_co_min_double(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
          type is(character(len=*,kind=c_char))
            error stop "caf_co_min: character type not yet supported"
-        !  call c_co_min_no_result_image_char(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
+        !  call c_co_min_char(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
          class default
            error stop         "caf_co_min: co_min argument 'A' must be of type integer, real, or character." // &
              new_line('a') // "Caffeine supports c_int_32_t & c_int_64_t integers; c_float & c_double reals;" // &
@@ -326,16 +326,16 @@ contains
      rank(15)
        select type(a)
          type is(integer(c_int32_t))
-           call c_co_min_no_result_image_int32(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
+           call c_co_min_int32(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
          type is(integer(c_int64_t))
-           call c_co_min_no_result_image_int64(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
+           call c_co_min_int64(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
          type is(real(c_float))
-           call c_co_min_no_result_image_float(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
+           call c_co_min_float(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
          type is(real(c_double))
-           call c_co_min_no_result_image_double(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
+           call c_co_min_double(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
          type is(character(len=*,kind=c_char))
            error stop "caf_co_min: character type not yet supported"
-        !  call c_co_min_no_result_image_char(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
+        !  call c_co_min_char(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
          class default
            error stop         "caf_co_min: co_min argument 'A' must be of type integer, real, or character." // &
              new_line('a') // "Caffeine supports c_int_32_t & c_int_64_t integers; c_float & c_double reals;" // &

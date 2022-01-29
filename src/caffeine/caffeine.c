@@ -67,7 +67,7 @@ void c_co_sum_int32(void* c_loc_a, size_t Nelem, int* stat, int* result_image)
      if (stat != NULL) *stat = 0;
 }
 
-void c_co_sum_no_result_image_int64(void* c_loc_a, size_t Nelem, int* stat)
+void c_co_sum_int64(void* c_loc_a, size_t Nelem, int* stat)
 {
       gex_Event_t ev
         = gex_Coll_ReduceToAllNB(myteam, c_loc_a, c_loc_a, GEX_DT_I64, sizeof(int64_t), Nelem, GEX_OP_ADD, NULL, NULL, 0);
@@ -90,7 +90,7 @@ void c_co_sum_float(void* c_loc_a, size_t Nelem, int* stat, int* result_image)
      if (stat != NULL) *stat = 0;
 }
 
-void c_co_sum_no_result_image_double(void* c_loc_a, size_t Nelem, int* stat)
+void c_co_sum_double(void* c_loc_a, size_t Nelem, int* stat)
 {
       gex_Event_t ev
         = gex_Coll_ReduceToAllNB(myteam, c_loc_a, c_loc_a, GEX_DT_DBL, sizeof(double), Nelem, GEX_OP_ADD, NULL, NULL, 0);
@@ -99,7 +99,7 @@ void c_co_sum_no_result_image_double(void* c_loc_a, size_t Nelem, int* stat)
       if (stat != NULL) *stat = 0;
 }
 
-void c_co_min_no_result_image_int32(void* c_loc_a, size_t Nelem, int* stat)
+void c_co_min_int32(void* c_loc_a, size_t Nelem, int* stat)
 {
       gex_Event_t ev
         = gex_Coll_ReduceToAllNB(myteam, c_loc_a, c_loc_a, GEX_DT_I32, sizeof(int32_t), Nelem, GEX_OP_MIN, NULL, NULL, 0);
@@ -108,7 +108,7 @@ void c_co_min_no_result_image_int32(void* c_loc_a, size_t Nelem, int* stat)
       if (stat != NULL) *stat = 0;
 }
 
-void c_co_min_no_result_image_int64(void* c_loc_a, size_t Nelem, int* stat)
+void c_co_min_int64(void* c_loc_a, size_t Nelem, int* stat)
 {
       gex_Event_t ev
         = gex_Coll_ReduceToAllNB(myteam, c_loc_a, c_loc_a, GEX_DT_I64, sizeof(int64_t), Nelem, GEX_OP_MIN, NULL, NULL, 0);
@@ -117,7 +117,7 @@ void c_co_min_no_result_image_int64(void* c_loc_a, size_t Nelem, int* stat)
       if (stat != NULL) *stat = 0;
 }
 
-void c_co_min_no_result_image_float(void* c_loc_a, size_t Nelem, int* stat)
+void c_co_min_float(void* c_loc_a, size_t Nelem, int* stat)
 {
       gex_Event_t ev
         = gex_Coll_ReduceToAllNB(myteam, c_loc_a, c_loc_a, GEX_DT_FLT, sizeof(float), Nelem, GEX_OP_MIN, NULL, NULL, 0);
@@ -126,7 +126,7 @@ void c_co_min_no_result_image_float(void* c_loc_a, size_t Nelem, int* stat)
       if (stat != NULL) *stat = 0;
 }
 
-void c_co_min_no_result_image_double(void* c_loc_a, size_t Nelem, int* stat)
+void c_co_min_double(void* c_loc_a, size_t Nelem, int* stat)
 {
       gex_Event_t ev
         = gex_Coll_ReduceToAllNB(myteam, c_loc_a, c_loc_a, GEX_DT_DBL, sizeof(double), Nelem, GEX_OP_MIN, NULL, NULL, 0);
@@ -135,7 +135,7 @@ void c_co_min_no_result_image_double(void* c_loc_a, size_t Nelem, int* stat)
       if (stat != NULL) *stat = 0;
 }
 
-void c_co_max_no_result_image_int32(void* c_loc_a, size_t Nelem, int* stat)
+void c_co_max_int32(void* c_loc_a, size_t Nelem, int* stat)
 {
       gex_Event_t ev
         = gex_Coll_ReduceToAllNB(myteam, c_loc_a, c_loc_a, GEX_DT_I32, sizeof(int32_t), Nelem, GEX_OP_MAX, NULL, NULL, 0);
@@ -144,7 +144,7 @@ void c_co_max_no_result_image_int32(void* c_loc_a, size_t Nelem, int* stat)
       if (stat != NULL) *stat = 0;
 }
 
-void c_co_max_no_result_image_int64(void* c_loc_a, size_t Nelem, int* stat)
+void c_co_max_int64(void* c_loc_a, size_t Nelem, int* stat)
 {
       gex_Event_t ev
         = gex_Coll_ReduceToAllNB(myteam, c_loc_a, c_loc_a, GEX_DT_I64, sizeof(int64_t), Nelem, GEX_OP_MAX, NULL, NULL, 0);
@@ -153,7 +153,7 @@ void c_co_max_no_result_image_int64(void* c_loc_a, size_t Nelem, int* stat)
       if (stat != NULL) *stat = 0;
 }
 
-void c_co_max_no_result_image_float(void* c_loc_a, size_t Nelem, int* stat)
+void c_co_max_float(void* c_loc_a, size_t Nelem, int* stat)
 {
       gex_Event_t ev
         = gex_Coll_ReduceToAllNB(myteam, c_loc_a, c_loc_a, GEX_DT_FLT, sizeof(float), Nelem, GEX_OP_MAX, NULL, NULL, 0);
@@ -162,7 +162,7 @@ void c_co_max_no_result_image_float(void* c_loc_a, size_t Nelem, int* stat)
       if (stat != NULL) *stat = 0;
 }
 
-void c_co_max_no_result_image_double(void* c_loc_a, size_t Nelem, int* stat)
+void c_co_max_double(void* c_loc_a, size_t Nelem, int* stat)
 {
       gex_Event_t ev
         = gex_Coll_ReduceToAllNB(myteam, c_loc_a, c_loc_a, GEX_DT_DBL, sizeof(double), Nelem, GEX_OP_MAX, NULL, NULL, 0);
