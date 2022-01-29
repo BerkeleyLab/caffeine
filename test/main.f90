@@ -11,6 +11,8 @@ contains
                 caf_co_max_caf_co_max => test_caf_co_max
         use caf_co_min_test, only: &
                 caf_co_min_caf_co_min => test_caf_co_min
+        use caf_co_reduce_test, only: &
+                caf_co_reduce_caf_co_reduce => test_caf_co_reduce
         use caf_co_sum_test, only: &
                 caf_co_sum_caf_co_sum => test_caf_co_sum
         use caf_error_stop_test, only: &
@@ -24,16 +26,17 @@ contains
         use vegetables, only: test_item_t, test_that, run_tests
 
         type(test_item_t) :: tests
-        type(test_item_t) :: individual_tests(8)
+        type(test_item_t) :: individual_tests(9)
 
         individual_tests(1) = a00_caffeinate_caffeinate()
         individual_tests(2) = caf_co_max_caf_co_max()
         individual_tests(3) = caf_co_min_caf_co_min()
-        individual_tests(4) = caf_co_sum_caf_co_sum()
-        individual_tests(5) = caf_error_stop_caf_this_image()
-        individual_tests(6) = caf_num_images_caf_num_images()
-        individual_tests(7) = caf_this_image_caf_this_image()
-        individual_tests(8) = zzz_decaffeinate_decaffeinate()
+        individual_tests(4) = caf_co_reduce_caf_co_reduce()
+        individual_tests(5) = caf_co_sum_caf_co_sum()
+        individual_tests(6) = caf_error_stop_caf_this_image()
+        individual_tests(7) = caf_num_images_caf_num_images()
+        individual_tests(8) = caf_this_image_caf_this_image()
+        individual_tests(9) = zzz_decaffeinate_decaffeinate()
         tests = test_that(individual_tests)
 
         call run_tests(tests)

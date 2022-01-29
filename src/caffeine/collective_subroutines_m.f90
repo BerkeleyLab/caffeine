@@ -1,6 +1,7 @@
 ! Copyright (c), The Regents of the University of California
 ! Terms of use are as specified in LICENSE.txt
 module collective_subroutines_m 
+  use iso_c_binding, only : c_int32_t
   implicit none
 
   private
@@ -9,6 +10,8 @@ module collective_subroutines_m
   public :: caf_co_min
   public :: caf_co_reduce
   public :: caf_co_broadcast
+
+  public :: c_int32_t_operation
 
   interface
  
@@ -36,13 +39,6 @@ module collective_subroutines_m
        character(len=*), intent(inout), optional, target :: errmsg
      end subroutine
 
-     module subroutine caf_co_reduce(a, result_image, stat, errmsg)
-       implicit none
-       class(*), intent(inout), contiguous, target :: a(..)
-       integer, intent(in), optional :: result_image
-       integer, intent(out), optional, target :: stat
-       character(len=*), intent(inout), optional, target :: errmsg
-     end subroutine
 
      module subroutine caf_co_broadcast(a, source_image, stat, errmsg)
        implicit none
@@ -53,5 +49,28 @@ module collective_subroutines_m
      end subroutine
 
   end interface
+
+  abstract interface 
+
+    pure function c_int32_t_operation(lhs, rhs) result(lhs_op_rhs)
+      import c_int32_t
+      integer(c_int32_t), intent(in) :: lhs, rhs
+      integer(c_int32_t) lhs_op_rhs
+    end function
+
+  end interface
+
+  interface caf_co_reduce
+
+     module subroutine caf_co_reduce_c_int32_t(a, operation, result_image, stat, errmsg)
+       implicit none
+       integer(c_int32_t), intent(inout), contiguous, target :: a(..)
+       procedure(c_int32_t_operation), pointer, intent(in) :: operation
+       integer, intent(in), optional, target :: result_image
+       integer, intent(out), optional, target :: stat
+       character(len=*), intent(inout), optional, target :: errmsg
+     end subroutine
+
+   end interface
 
 end module
