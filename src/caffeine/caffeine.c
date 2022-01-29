@@ -108,38 +108,22 @@ void c_co_min_double(void* c_loc_a, size_t Nelem, int* stat, int* result_image)
      c_co_reduce_universal(c_loc_a, Nelem, stat, result_image, GEX_DT_DBL, sizeof(double), GEX_OP_MIN);
 }
 
-void c_co_max_int32(void* c_loc_a, size_t Nelem, int* stat)
+void c_co_max_int32(void* c_loc_a, size_t Nelem, int* stat, int* result_image)
 {
-      gex_Event_t ev
-        = gex_Coll_ReduceToAllNB(myteam, c_loc_a, c_loc_a, GEX_DT_I32, sizeof(int32_t), Nelem, GEX_OP_MAX, NULL, NULL, 0);
-      gex_Event_Wait(ev);  
-
-      if (stat != NULL) *stat = 0;
+     c_co_reduce_universal(c_loc_a, Nelem, stat, result_image, GEX_DT_I32, sizeof(int32_t), GEX_OP_MAX);
 }
 
-void c_co_max_int64(void* c_loc_a, size_t Nelem, int* stat)
+void c_co_max_int64(void* c_loc_a, size_t Nelem, int* stat, int* result_image)
 {
-      gex_Event_t ev
-        = gex_Coll_ReduceToAllNB(myteam, c_loc_a, c_loc_a, GEX_DT_I64, sizeof(int64_t), Nelem, GEX_OP_MAX, NULL, NULL, 0);
-      gex_Event_Wait(ev);  
-
-      if (stat != NULL) *stat = 0;
+     c_co_reduce_universal(c_loc_a, Nelem, stat, result_image, GEX_DT_I64, sizeof(int64_t), GEX_OP_MAX);
 }
 
-void c_co_max_float(void* c_loc_a, size_t Nelem, int* stat)
+void c_co_max_float(void* c_loc_a, size_t Nelem, int* stat, int* result_image)
 {
-      gex_Event_t ev
-        = gex_Coll_ReduceToAllNB(myteam, c_loc_a, c_loc_a, GEX_DT_FLT, sizeof(float), Nelem, GEX_OP_MAX, NULL, NULL, 0);
-      gex_Event_Wait(ev);  
-
-      if (stat != NULL) *stat = 0;
+     c_co_reduce_universal(c_loc_a, Nelem, stat, result_image, GEX_DT_FLT, sizeof(float), GEX_OP_MAX);
 }
 
-void c_co_max_double(void* c_loc_a, size_t Nelem, int* stat)
+void c_co_max_double(void* c_loc_a, size_t Nelem, int* stat, int* result_image)
 {
-      gex_Event_t ev
-        = gex_Coll_ReduceToAllNB(myteam, c_loc_a, c_loc_a, GEX_DT_DBL, sizeof(double), Nelem, GEX_OP_MAX, NULL, NULL, 0);
-      gex_Event_Wait(ev);  
-
-      if (stat != NULL) *stat = 0;
+     c_co_reduce_universal(c_loc_a, Nelem, stat, result_image, GEX_DT_DBL, sizeof(double), GEX_OP_MAX);
 }
