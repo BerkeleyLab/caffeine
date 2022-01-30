@@ -12,37 +12,37 @@ submodule(collective_subroutines_m) co_reduce_s
 
 contains
 
-  subroutine gex_Coll_ReduceSub(arg1, arg2_and_out, count, cdata) bind(C)
+  subroutine Coll_ReduceSub(arg1, arg2_and_out, count, cdata) bind(C)
     type(c_ptr), value :: arg1         !! "Left" operands
     type(c_ptr), value :: arg2_and_out !! "Right" operands and result
     integer(c_size_t), value :: count  !! Operand count
     type(c_ptr), value ::  cdata       !! Client data
     integer(c_int32_t), pointer :: lhs, rhs_and_result
     
-    call assert(all([c_associated(arg1), c_associated(arg2_and_out)]), "gex_Coll_ReduceSub: operands associated")
+    call assert(all([c_associated(arg1), c_associated(arg2_and_out)]), "Coll_ReduceSub: operands associated")
 
     call c_f_pointer(arg1, lhs)
     call c_f_pointer(arg2_and_out, rhs_and_result)
 
-    call assert(all([associated(lhs), associated(rhs_and_result)]), "gex_Coll_ReduceSub: operands associated")
+    call assert(all([associated(lhs), associated(rhs_and_result)]), "Coll_ReduceSub: operands associated")
   
     rhs_and_result = c_int32_t_op_ptr(lhs, rhs_and_result)
     
   end subroutine
 
-  subroutine gex_Coll_ReduceSub_c_float(arg1, arg2_and_out, count, cdata) bind(C)
+  subroutine Coll_ReduceSub_c_float(arg1, arg2_and_out, count, cdata) bind(C)
     type(c_ptr), value :: arg1         !! "Left" operands
     type(c_ptr), value :: arg2_and_out !! "Right" operands and result
     integer(c_size_t), value :: count  !! Operand count
     type(c_ptr), value ::  cdata       !! Client data
     real(c_float), pointer :: lhs, rhs_and_result
     
-    call assert(all([c_associated(arg1), c_associated(arg2_and_out)]), "gex_Coll_ReduceSub: operands associated")
+    call assert(all([c_associated(arg1), c_associated(arg2_and_out)]), "Coll_ReduceSub: operands associated")
 
     call c_f_pointer(arg1, lhs)
     call c_f_pointer(arg2_and_out, rhs_and_result)
 
-    call assert(all([associated(lhs), associated(rhs_and_result)]), "gex_Coll_ReduceSub: operands associated")
+    call assert(all([associated(lhs), associated(rhs_and_result)]), "Coll_ReduceSub: operands associated")
   
     rhs_and_result = c_float_op_ptr(lhs, rhs_and_result)
     
@@ -52,11 +52,11 @@ contains
 
     interface
 
-      subroutine c_co_reduce_int32(c_loc_a, Nelem, c_loc_stat, c_loc_result_image, gex_Coll_ReduceSub) bind(C)
+      subroutine c_co_reduce_int32(c_loc_a, Nelem, c_loc_stat, c_loc_result_image, Coll_ReduceSub) bind(C)
         import c_ptr, c_size_t, c_funptr
         type(c_ptr), value :: c_loc_a, c_loc_stat, c_loc_result_image
         integer(c_size_t), value :: Nelem
-        type(c_funptr), value :: gex_Coll_ReduceSub
+        type(c_funptr), value :: Coll_ReduceSub
       end subroutine
 
     end interface
@@ -81,7 +81,7 @@ contains
 
     select rank(a)
       rank(0)
-         call c_co_reduce_int32(c_loc(a), 1_c_size_t, stat_ptr, result_image_ptr, c_funloc(gex_Coll_ReduceSub))
+         call c_co_reduce_int32(c_loc(a), 1_c_size_t, stat_ptr, result_image_ptr, c_funloc(Coll_ReduceSub))
       rank default
          error stop "unsupported rank"
     end select
@@ -92,11 +92,11 @@ contains
 
     interface
 
-      subroutine c_co_reduce_float(c_loc_a, Nelem, c_loc_stat, c_loc_result_image, gex_Coll_ReduceSub) bind(C)
+      subroutine c_co_reduce_float(c_loc_a, Nelem, c_loc_stat, c_loc_result_image, Coll_ReduceSub) bind(C)
         import c_ptr, c_size_t, c_funptr
         type(c_ptr), value :: c_loc_a, c_loc_stat, c_loc_result_image
         integer(c_size_t), value :: Nelem
-        type(c_funptr), value :: gex_Coll_ReduceSub
+        type(c_funptr), value :: Coll_ReduceSub
       end subroutine
 
     end interface
@@ -121,7 +121,7 @@ contains
 
     select rank(a)
       rank(0)
-         call c_co_reduce_float(c_loc(a), 1_c_size_t, stat_ptr, result_image_ptr, c_funloc(gex_Coll_ReduceSub_c_float))
+         call c_co_reduce_float(c_loc(a), 1_c_size_t, stat_ptr, result_image_ptr, c_funloc(Coll_ReduceSub_c_float))
       rank default
          error stop "unsupported rank"
     end select
