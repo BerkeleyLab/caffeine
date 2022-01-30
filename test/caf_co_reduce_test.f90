@@ -15,7 +15,7 @@ contains
     
         tests = describe( &
           "The caf_co_reduce subroutine", &
-          [ it("sums integer(c_int32_t) scalars with no optional arguments present", sum_default_integer_scalars) &
+          [ it("sums default integer scalars with no optional arguments present", sum_default_integer_scalars) &
         ])
     end function
 
