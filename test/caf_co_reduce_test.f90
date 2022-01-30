@@ -1,7 +1,8 @@
 module caf_co_reduce_test
   use caffeine_m, only : caf_co_reduce, caf_num_images, caf_this_image
   use vegetables, only : result_t, test_item_t, assert_equals, describe, it, assert_that, assert_equals
-  use collective_subroutines_m, only : c_int32_t_operation, c_float_operation
+  use collective_subroutines_m, only : c_int32_t_operation, c_float_operation, c_char_operation
+  use assert_m, only : assert
 
   implicit none
   private
@@ -16,7 +17,36 @@ contains
       "The caf_co_reduce subroutine", &
       [ it("sums default integer scalars with no optional arguments present", sum_default_integer_scalars) &
        ,it("multiplies default real scalars with all optional arguments present", multiply_default_real_scalars) &
+       ,it("alphabetizes length-5 default character scalars with result_image present", alphabetize_default_character_scalars) &
     ])
+  end function
+
+  function alphabetize_default_character_scalars() result(result_)
+    type(result_t) result_
+    procedure(c_char_operation), pointer :: alphabetize_operation
+    character(len=*), parameter :: names(*) = ["larry","harry","carey","betty","tommy","billy"]
+    character(len=:), allocatable :: my_name
+
+    alphabetize_operation => alphabetize
+
+    associate(me => caf_this_image())
+      associate(periodic_index => 1 + mod(me-1,size(names)))
+        my_name = names(periodic_index)
+        call caf_co_reduce(my_name, alphabetize_operation)
+      end associate
+    end associate
+
+    result_ = assert_equals(minval(names), my_name)
+
+  contains
+
+    pure function alphabetize(lhs, rhs) result(first)
+      character(len=*), intent(in) :: lhs, rhs
+      character(len=:), allocatable :: first
+      call assert(len(lhs)==len(rhs), "co_reduce_s alphabetize: LHS/RHS length match", lhs//" , "//rhs)
+      first = merge(lhs, rhs, lhs < rhs)
+    end function
+
   end function
 
   function sum_default_integer_scalars() result(result_)

@@ -1,7 +1,7 @@
 ! Copyright (c), The Regents of the University of California
 ! Terms of use are as specified in LICENSE.txt
 module collective_subroutines_m 
-  use iso_c_binding, only : c_int32_t, c_float
+  use iso_c_binding, only : c_int32_t, c_float, c_char
   implicit none
 
   private
@@ -13,6 +13,7 @@ module collective_subroutines_m
 
   public :: c_int32_t_operation
   public :: c_float_operation
+  public :: c_char_operation
 
   interface
  
@@ -65,6 +66,12 @@ module collective_subroutines_m
       real(c_float) lhs_op_rhs
     end function
 
+    pure function c_char_operation(lhs, rhs) result(lhs_op_rhs)
+      import c_char
+      character(kind=c_char,len=*), intent(in) :: lhs, rhs
+      character(kind=c_char,len=:), allocatable :: lhs_op_rhs
+    end function
+
   end interface
 
   interface caf_co_reduce
@@ -82,6 +89,15 @@ module collective_subroutines_m
        implicit none
        real(c_float), intent(inout), contiguous, target :: a(..)
        procedure(c_float_operation), pointer, intent(in) :: operation
+       integer, intent(in), optional, target :: result_image
+       integer, intent(out), optional, target :: stat
+       character(len=*), intent(inout), optional, target :: errmsg
+     end subroutine
+
+     module subroutine caf_co_reduce_c_char(a, operation, result_image, stat, errmsg)
+       implicit none
+       character(kind=c_char, len=*), intent(inout), contiguous, target :: a(..)
+       procedure(c_char_operation), pointer, intent(in) :: operation
        integer, intent(in), optional, target :: result_image
        integer, intent(out), optional, target :: stat
        character(len=*), intent(inout), optional, target :: errmsg

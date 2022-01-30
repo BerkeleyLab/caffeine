@@ -1,7 +1,7 @@
 ! Copyright (c), The Regents of the University of California
 ! Terms of use are as specified in LICENSE.txt
 submodule(collective_subroutines_m) co_min_s
-  use iso_c_binding, only : c_int64_t, c_ptr, c_size_t, c_loc, c_double, c_char, c_null_ptr
+  use iso_c_binding, only : c_int64_t, c_ptr, c_size_t, c_loc, c_double, c_null_ptr
 
   implicit none
 
