@@ -47,6 +47,16 @@ contains
     rhs_and_result = c_float_op_ptr(lhs, rhs_and_result)
     
   end subroutine
+ 
+  pure function get_c_ptr(stat) result(ptr)
+    integer, intent(in), optional, target :: stat
+    type(c_ptr) ptr
+    if (present(stat)) then
+      ptr = c_loc(stat)
+    else
+      ptr = c_null_ptr
+    end if
+  end function
 
   module procedure caf_co_reduce_c_int32_t
 
@@ -67,17 +77,8 @@ contains
 
     c_int32_t_op_ptr => operation
 
-    if (present(stat)) then
-      stat_ptr = c_loc(stat)
-    else
-      stat_ptr = c_null_ptr
-    end if
-
-    if (present(result_image)) then
-      result_image_ptr = c_loc(result_image)
-    else
-      result_image_ptr = c_null_ptr
-    end if
+    stat_ptr = get_c_ptr(stat)
+    result_image_ptr = get_c_ptr(result_image)
 
     select rank(a)
       rank(0)
@@ -107,11 +108,7 @@ contains
 
     c_float_op_ptr => operation
 
-    if (present(stat)) then
-      stat_ptr = c_loc(stat)
-    else
-      stat_ptr = c_null_ptr
-    end if
+    stat_ptr = get_c_ptr(stat)
 
     if (present(result_image)) then
       result_image_ptr = c_loc(result_image)
