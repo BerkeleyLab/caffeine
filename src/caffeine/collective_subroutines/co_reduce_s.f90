@@ -5,6 +5,7 @@ submodule(collective_subroutines_m) co_reduce_s
     c_int64_t, c_ptr, c_size_t, c_loc, c_double, c_null_ptr, c_funptr, c_funloc, c_associated, c_f_pointer, c_int
   use assert_m, only : assert
   use intrinsic_array_m, only : intrinsic_array_t
+  use utilities_m, only : get_c_ptr, optional_value
   implicit none
 
   procedure(c_int32_t_operation), pointer :: c_int32_t_op_ptr => null()
@@ -13,36 +14,26 @@ submodule(collective_subroutines_m) co_reduce_s
 
 contains
  
-  pure function get_c_ptr(stat) result(ptr)
-    integer, intent(in), optional, target :: stat
-    type(c_ptr) ptr
-    if (present(stat)) then
-      ptr = c_loc(stat)
-    else
-      ptr = c_null_ptr
-    end if
-  end function
-
   module procedure caf_co_reduce_c_char
 
     interface
 
-      subroutine c_co_reduce_char(c_loc_a, Nelem, c_loc_stat, c_loc_result_image, Coll_ReduceSub_c_char, client_data) bind(C)
-        import c_ptr, c_size_t, c_funptr
-        type(c_ptr), value :: c_loc_a, c_loc_stat, c_loc_result_image, Coll_ReduceSub_c_char, client_data
+      subroutine c_co_reduce_char(c_loc_a, Nelem, c_loc_stat, result_image, Coll_ReduceSub_c_char, client_data) bind(C)
+        import c_ptr, c_size_t, c_funptr, c_int
+        type(c_ptr), value :: c_loc_a, c_loc_stat, Coll_ReduceSub_c_char, client_data
         integer(c_size_t), value :: Nelem
+        integer(c_int), value :: result_image
       end subroutine
 
     end interface
 
-    type(c_ptr) stat_ptr, result_image_ptr
+    type(c_ptr) stat_ptr
 
     call assert(associated(operation), "caf_co_reduce_c_char: operation associated")
 
     c_char_op_ptr => operation
 
     stat_ptr = get_c_ptr(stat)
-    result_image_ptr = get_c_ptr(result_image)
 
     select rank(a)
       rank(0)
@@ -50,10 +41,10 @@ contains
           integer(c_size_t), target :: len_a
           len_a = int(len(a), c_size_t)
           call c_co_reduce_char( &
-            c_loc(a), len_a, stat_ptr, result_image_ptr, c_funloc(Coll_ReduceSub_c_char), c_loc(len_a))
+            c_loc(a), len_a, stat_ptr, optional_value(result_image), c_funloc(Coll_ReduceSub_c_char), c_loc(len_a))
         end block
       rank default
-         error stop "unsupported rank"
+         error stop "caf_co_reduce_c_char: unsupported rank"
     end select
 
   contains
@@ -91,29 +82,29 @@ contains
 
     interface
 
-      subroutine c_co_reduce_int32(c_loc_a, Nelem, c_loc_stat, c_loc_result_image, Coll_ReduceSub_c_int32_t) bind(C)
-        import c_ptr, c_size_t, c_funptr
-        type(c_ptr), value :: c_loc_a, c_loc_stat, c_loc_result_image
+      subroutine c_co_reduce_int32(c_loc_a, Nelem, c_loc_stat, result_image, Coll_ReduceSub_c_int32_t) bind(C)
+        import c_ptr, c_size_t, c_funptr, c_int
+        type(c_ptr), value :: c_loc_a, c_loc_stat
         integer(c_size_t), value :: Nelem
+        integer(c_int), value :: result_image
         type(c_funptr), value :: Coll_ReduceSub_c_int32_t
       end subroutine
 
     end interface
 
-    type(c_ptr) stat_ptr ,result_image_ptr
+    type(c_ptr) stat_ptr
 
     call assert(associated(operation), "caf_co_reduce_c_int32_t: operation associated")
 
     c_int32_t_op_ptr => operation
 
     stat_ptr = get_c_ptr(stat)
-    result_image_ptr = get_c_ptr(result_image)
 
     select rank(a)
       rank(0)
-         call c_co_reduce_int32(c_loc(a), 1_c_size_t, stat_ptr, result_image_ptr, c_funloc(Coll_ReduceSub_c_int32_t))
+         call c_co_reduce_int32(c_loc(a), 1_c_size_t, stat_ptr, optional_value(result_image), c_funloc(Coll_ReduceSub_c_int32_t))
       rank default
-         error stop "unsupported rank"
+         error stop "caf_co_reduce_c_int32_t: unsupported rank"
     end select
 
   contains
@@ -138,16 +129,17 @@ contains
 
     interface
 
-      subroutine c_co_reduce_float(c_loc_a, Nelem, c_loc_stat, c_loc_result_image, Coll_ReduceSub_c_float) bind(C)
-        import c_ptr, c_size_t, c_funptr
-        type(c_ptr), value :: c_loc_a, c_loc_stat, c_loc_result_image
+      subroutine c_co_reduce_float(c_loc_a, Nelem, c_loc_stat, result_image, Coll_ReduceSub_c_float) bind(C)
+        import c_ptr, c_size_t, c_funptr, c_int
+        type(c_ptr), value :: c_loc_a, c_loc_stat
         integer(c_size_t), value :: Nelem
+        integer(c_int), value :: result_image
         type(c_funptr), value :: Coll_ReduceSub_c_float
       end subroutine
 
     end interface
 
-    type(c_ptr) stat_ptr ,result_image_ptr
+    type(c_ptr) stat_ptr
 
     call assert(associated(operation), "caf_co_reduce_c_float: operation associated")
 
@@ -155,17 +147,11 @@ contains
 
     stat_ptr = get_c_ptr(stat)
 
-    if (present(result_image)) then
-      result_image_ptr = c_loc(result_image)
-    else
-      result_image_ptr = c_null_ptr
-    end if
-
     select rank(a)
       rank(0)
-         call c_co_reduce_float(c_loc(a), 1_c_size_t, stat_ptr, result_image_ptr, c_funloc(Coll_ReduceSub_c_float))
+         call c_co_reduce_float(c_loc(a), 1_c_size_t, stat_ptr, optional_value(result_image), c_funloc(Coll_ReduceSub_c_float))
       rank default
-         error stop "unsupported rank"
+         error stop "caf_co_reduce_c_float: unsupported rank"
     end select
 
   contains 
