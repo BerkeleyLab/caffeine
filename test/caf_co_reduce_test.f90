@@ -19,12 +19,6 @@ contains
     ])
   end function
 
-  pure function add(lhs, rhs) result(total)
-    integer, intent(in) :: lhs, rhs
-    integer total
-    total = lhs + rhs 
-  end function
-
   function sum_default_integer_scalars() result(result_)
     type(result_t) result_
     integer i
@@ -34,12 +28,15 @@ contains
     i = 1
     call caf_co_reduce(i, add_operation)
     result_ = assert_equals(caf_num_images(), i)
-  end function
 
-  pure function multiply(lhs, rhs) result(product_)
-    real, intent(in) :: lhs, rhs
-    real product_
-    product_ = lhs * rhs 
+  contains
+
+    pure function add(lhs, rhs) result(total)
+      integer, intent(in) :: lhs, rhs
+      integer total
+      total = lhs + rhs 
+    end function
+
   end function
 
   function multiply_default_real_scalars() result(result_)
@@ -61,6 +58,15 @@ contains
           assert_equals("unused", error_message)
       end associate
     end associate
+
+  contains
+
+    pure function multiply(lhs, rhs) result(product_)
+      real, intent(in) :: lhs, rhs
+      real product_
+      product_ = lhs * rhs 
+    end function
+
   end function
 
 end module caf_co_reduce_test
