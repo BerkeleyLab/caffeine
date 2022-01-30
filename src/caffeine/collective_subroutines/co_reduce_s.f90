@@ -11,42 +11,6 @@ submodule(collective_subroutines_m) co_reduce_s
   procedure(c_float_operation), pointer :: c_float_op_ptr => null()
 
 contains
-
-  subroutine Coll_ReduceSub_c_int32_t(arg1, arg2_and_out, count, cdata) bind(C)
-    type(c_ptr), value :: arg1         !! "Left" operands
-    type(c_ptr), value :: arg2_and_out !! "Right" operands and result
-    integer(c_size_t), value :: count  !! Operand count
-    type(c_ptr), value ::  cdata       !! Client data
-    integer(c_int32_t), pointer :: lhs, rhs_and_result
-    
-    call assert(all([c_associated(arg1), c_associated(arg2_and_out)]), "Coll_ReduceSub_c_int32t: operands associated")
-
-    call c_f_pointer(arg1, lhs)
-    call c_f_pointer(arg2_and_out, rhs_and_result)
-
-    call assert(all([associated(lhs), associated(rhs_and_result)]), "Coll_ReduceSub_c_int32t: operands associated")
-  
-    rhs_and_result = c_int32_t_op_ptr(lhs, rhs_and_result)
-    
-  end subroutine
-
-  subroutine Coll_ReduceSub_c_float(arg1, arg2_and_out, count, cdata) bind(C)
-    type(c_ptr), value :: arg1         !! "Left" operands
-    type(c_ptr), value :: arg2_and_out !! "Right" operands and result
-    integer(c_size_t), value :: count  !! Operand count
-    type(c_ptr), value ::  cdata       !! Client data
-    real(c_float), pointer :: lhs, rhs_and_result
-    
-    call assert(all([c_associated(arg1), c_associated(arg2_and_out)]), "Coll_ReduceSub_c_float: operands associated")
-
-    call c_f_pointer(arg1, lhs)
-    call c_f_pointer(arg2_and_out, rhs_and_result)
-
-    call assert(all([associated(lhs), associated(rhs_and_result)]), "Coll_ReduceSub_c_float: operands associated")
-  
-    rhs_and_result = c_float_op_ptr(lhs, rhs_and_result)
-    
-  end subroutine
  
   pure function get_c_ptr(stat) result(ptr)
     integer, intent(in), optional, target :: stat
@@ -87,6 +51,22 @@ contains
          error stop "unsupported rank"
     end select
 
+  contains
+
+    subroutine Coll_ReduceSub_c_int32_t(arg1, arg2_and_out, count, cdata) bind(C)
+      type(c_ptr), value :: arg1         !! "Left" operands
+      type(c_ptr), value :: arg2_and_out !! "Right" operands and result
+      integer(c_size_t), value :: count  !! Operand count
+      type(c_ptr), value ::  cdata       !! Client data
+      integer(c_int32_t), pointer :: lhs, rhs_and_result
+      
+      call assert(all([c_associated(arg1), c_associated(arg2_and_out)]), "Coll_ReduceSub_c_int32t: operands associated")
+      call c_f_pointer(arg1, lhs)
+      call c_f_pointer(arg2_and_out, rhs_and_result)
+      call assert(all([associated(lhs), associated(rhs_and_result)]), "Coll_ReduceSub_c_int32t: operands associated")
+      rhs_and_result = c_int32_t_op_ptr(lhs, rhs_and_result)
+    end subroutine
+
   end procedure
 
   module procedure caf_co_reduce_c_float
@@ -122,6 +102,22 @@ contains
       rank default
          error stop "unsupported rank"
     end select
+
+  contains 
+
+    subroutine Coll_ReduceSub_c_float(arg1, arg2_and_out, count, cdata) bind(C)
+      type(c_ptr), value :: arg1         !! "Left" operands
+      type(c_ptr), value :: arg2_and_out !! "Right" operands and result
+      integer(c_size_t), value :: count  !! Operand count
+      type(c_ptr), value ::  cdata       !! Client data
+      real(c_float), pointer :: lhs, rhs_and_result
+      
+      call assert(all([c_associated(arg1), c_associated(arg2_and_out)]), "Coll_ReduceSub_c_float: operands associated")
+      call c_f_pointer(arg1, lhs)
+      call c_f_pointer(arg2_and_out, rhs_and_result)
+      call assert(all([associated(lhs), associated(rhs_and_result)]), "Coll_ReduceSub_c_float: operands associated")
+      rhs_and_result = c_float_op_ptr(lhs, rhs_and_result)
+    end subroutine
 
   end procedure
 
