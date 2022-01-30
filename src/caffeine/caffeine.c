@@ -132,3 +132,8 @@ void c_co_reduce_int32(void* c_loc_a, size_t Nelem, int* stat, int* result_image
 {
      c_co_reduce_universal(c_loc_a, Nelem, stat, result_image, GEX_DT_I32, sizeof(int32_t), GEX_OP_USER, operation );
 }
+
+void c_co_reduce_float(void* c_loc_a, size_t Nelem, int* stat, int* result_image, gex_Coll_ReduceFn_t* operation)
+{
+     c_co_reduce_universal(c_loc_a, Nelem, stat, result_image, GEX_DT_FLT, sizeof(float), GEX_OP_USER, operation );
+}
