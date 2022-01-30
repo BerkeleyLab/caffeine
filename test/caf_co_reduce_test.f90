@@ -1,7 +1,6 @@
 module caf_co_reduce_test
     use caffeine_m, only : caf_co_reduce, caf_num_images, caf_this_image
     use vegetables, only : result_t, test_item_t, assert_equals, describe, it, assert_that, assert_equals
-    use iso_c_binding, only : c_int32_t
     use collective_subroutines_m, only : c_int32_t_operation
 
     implicit none
@@ -20,8 +19,8 @@ contains
     end function
 
     pure function add(lhs, rhs) result(total)
-      integer(c_int32_t), intent(in) :: lhs, rhs
-      integer(c_int32_t) total
+      integer, intent(in) :: lhs, rhs
+      integer total
       total = lhs + rhs 
     end function
 
