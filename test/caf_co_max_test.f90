@@ -19,7 +19,8 @@ contains
            ,it("default integer 7D array elements with stat argument present", max_default_integer_7D_array) &
            ,it("default real scalars with stat argument present", max_default_real_scalars) &
            ,it("double precision 2D array elements with no optional arguments present", max_double_precision_2D_array) &
-          !,it("character scalar", max_double_precision_2D_array) &
+           ,it("reverse-alphabetizes length-5 default character scalars with no optional arguments", &
+               reverse_alphabetize_default_character_scalars) &
           !,it("character 2D array elements", max_double_precision_2D_array) &
         ])
     end function
@@ -90,27 +91,19 @@ contains
         result_ = assert_that(all(array==tent))
     end function
 
-   ! function max_default_character_scalars() result(result_)
-   !     type(result_t) result_
-   !     real scalar
-   !     character z
-   !     character, parameter :: i=(0.,1)
+    function reverse_alphabetize_default_character_scalars() result(result_)
+      type(result_t) result_
+      character(len=*), parameter :: words(*) = [character(len=len("loddy")):: "loddy","doddy","we","like","to","party"]
+      character(len=:), allocatable :: my_word
 
-   !     z = i
-   !     call caf_co_max(z)
-   !     result_ = assert_equals(dble(abs(i*caf_num_images())), dble(abs(z)) )
-   ! end function
-   !          
-   ! function max_double_precision_character_3D_arrays() result(result_)
-   !     type(result_t) result_
-   !     integer, parameter :: dp = kind(1.D0)
-   !     character(dp), allocatable :: array(:,:,:)
-   !     character(dp), parameter :: &
-   !       input(*,*,*) = reshape( [(-1.,0.) , (0.0,1.0), (1.0,0.0), (0.0,-1.0), (0.0,0.0), (0.0,1.0)], [3,1,2])
- 
-   !     array = input
-   !     call caf_co_max(array)
-   !     result_ = assert_equals(dble(product(abs(input))*caf_num_images()), dble(product(abs(array))))
-   ! end function
+      associate(me => caf_this_image())
+        associate(periodic_index => 1 + mod(me-1,size(words)))
+          my_word = words(periodic_index)
+          call caf_co_max(my_word)
+        end associate
+      end associate
+
+      result_ = assert_equals(maxval(words), my_word)
+    end function
 
 end module caf_co_max_test

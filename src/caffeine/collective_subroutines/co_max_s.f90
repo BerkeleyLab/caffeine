@@ -1,10 +1,15 @@
 ! Copyright (c), The Regents of the University of California
 ! Terms of use are as specified in LICENSE.txt
 submodule(collective_subroutines_m) co_max_s
-  use iso_c_binding, only : c_int64_t, c_ptr, c_size_t, c_loc, c_double, c_null_ptr, c_int
+  use iso_c_binding, only : &
+    c_int64_t, c_ptr, c_size_t, c_loc, c_double, c_null_ptr, c_int, c_funptr, c_associated, c_funloc, c_f_pointer
   use utilities_m, only : get_c_ptr, optional_value
+  use assert_m, only : assert
+  use intrinsic_array_m, only : intrinsic_array_t
 
   implicit none
+
+  procedure(c_char_operation), pointer :: op=>null()
 
 contains
 
@@ -12,7 +17,6 @@ contains
 
    interface
 
-     !! void c_co_max_int32(void* c_loc_a, int Nelem)
      subroutine c_co_max_int32(c_loc_a, Nelem, c_loc_stat, result_image) bind(C)
        import c_ptr, c_size_t, c_int
        implicit none
@@ -45,16 +49,10 @@ contains
        integer(c_int), value :: result_image
      end subroutine
 
-    !subroutine c_co_max_char(c_loc_a, Nelem, c_loc_stat) bind(C)
-    !  import c_ptr, c_size_t
-    !  implicit none
-    !  type(c_ptr), value :: c_loc_a, c_loc_stat
-    !  integer(c_size_t), value :: Nelem
-    !end subroutine
-
    end interface
 
    type(c_ptr) stat_ptr
+
    stat_ptr = get_c_ptr(stat)
 
    select rank(a)
@@ -69,8 +67,8 @@ contains
          type is(real(c_double))
            call c_co_max_double(c_loc(a), 1_c_size_t, stat_ptr, optional_value(result_image))
          type is(character(len=*,kind=c_char))
-           error stop  "caf_co_max: character type not yet supported"
-        !  call c_co_max_char(c_loc(a), nelem=2_c_size_t, c_loc_stat=stat_ptr)
+           op => reverse_alphabetize
+           call caf_co_reduce(a, op, result_image, stat, errmsg)
          class default
            error stop         "caf_co_max: co_max argument 'A' must be of type integer, real, or character." // &
              new_line('a') // "Caffeine supports c_int_32_t & c_int_64_t integers; c_float & c_double reals;" // &
@@ -85,10 +83,10 @@ contains
          type is(real(c_float))
            call c_co_max_float(c_loc(a), size(a,kind=c_size_t), stat_ptr, optional_value(result_image))
          type is(real(c_double))
-           call c_co_max_double(c_loc(a),size(a,kind=c_size_t), stat_ptr, optional_value(result_image))
+           call c_co_max_double(c_loc(a), size(a,kind=c_size_t),stat_ptr, optional_value(result_image))
          type is(character(len=*,kind=c_char))
-           error stop "caf_co_max: character type not yet supported"
-        !  call c_co_max_char(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
+           op => reverse_alphabetize
+           call caf_co_reduce(a, op, result_image, stat, errmsg)
          class default
            error stop         "caf_co_max: co_max argument 'A' must be of type integer, real, or character." // &
              new_line('a') // "Caffeine supports c_int_32_t & c_int_64_t integers; c_float & c_double reals;" // &
@@ -103,10 +101,10 @@ contains
          type is(real(c_float))
            call c_co_max_float(c_loc(a), size(a,kind=c_size_t), stat_ptr, optional_value(result_image))
          type is(real(c_double))
-           call c_co_max_double(c_loc(a),size(a,kind=c_size_t), stat_ptr, optional_value(result_image))
+           call c_co_max_double(c_loc(a), size(a,kind=c_size_t),stat_ptr, optional_value(result_image))
          type is(character(len=*,kind=c_char))
-           error stop "caf_co_max: character type not yet supported"
-        !  call c_co_max_char(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
+           op => reverse_alphabetize
+           call caf_co_reduce(a, op, result_image, stat, errmsg)
          class default
            error stop         "caf_co_max: co_max argument 'A' must be of type integer, real, or character." // &
              new_line('a') // "Caffeine supports c_int_32_t & c_int_64_t integers; c_float & c_double reals;" // &
@@ -121,10 +119,10 @@ contains
          type is(real(c_float))
            call c_co_max_float(c_loc(a), size(a,kind=c_size_t), stat_ptr, optional_value(result_image))
          type is(real(c_double))
-           call c_co_max_double(c_loc(a),size(a,kind=c_size_t), stat_ptr, optional_value(result_image))
+           call c_co_max_double(c_loc(a), size(a,kind=c_size_t),stat_ptr, optional_value(result_image))
          type is(character(len=*,kind=c_char))
-           error stop "caf_co_max: character type not yet supported"
-        !  call c_co_max_char(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
+           op => reverse_alphabetize
+           call caf_co_reduce(a, op, result_image, stat, errmsg)
          class default
            error stop         "caf_co_max: co_max argument 'A' must be of type integer, real, or character." // &
              new_line('a') // "Caffeine supports c_int_32_t & c_int_64_t integers; c_float & c_double reals;" // &
@@ -139,10 +137,10 @@ contains
          type is(real(c_float))
            call c_co_max_float(c_loc(a), size(a,kind=c_size_t), stat_ptr, optional_value(result_image))
          type is(real(c_double))
-           call c_co_max_double(c_loc(a),size(a,kind=c_size_t), stat_ptr, optional_value(result_image))
+           call c_co_max_double(c_loc(a), size(a,kind=c_size_t),stat_ptr, optional_value(result_image))
          type is(character(len=*,kind=c_char))
-           error stop "caf_co_max: character type not yet supported"
-        !  call c_co_max_char(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
+           op => reverse_alphabetize
+           call caf_co_reduce(a, op, result_image, stat, errmsg)
          class default
            error stop         "caf_co_max: co_max argument 'A' must be of type integer, real, or character." // &
              new_line('a') // "Caffeine supports c_int_32_t & c_int_64_t integers; c_float & c_double reals;" // &
@@ -157,10 +155,10 @@ contains
          type is(real(c_float))
            call c_co_max_float(c_loc(a), size(a,kind=c_size_t), stat_ptr, optional_value(result_image))
          type is(real(c_double))
-           call c_co_max_double(c_loc(a),size(a,kind=c_size_t), stat_ptr, optional_value(result_image))
+           call c_co_max_double(c_loc(a), size(a,kind=c_size_t),stat_ptr, optional_value(result_image))
          type is(character(len=*,kind=c_char))
-           error stop "caf_co_max: character type not yet supported"
-        !  call c_co_max_char(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
+           op => reverse_alphabetize
+           call caf_co_reduce(a, op, result_image, stat, errmsg)
          class default
            error stop         "caf_co_max: co_max argument 'A' must be of type integer, real, or character." // &
              new_line('a') // "Caffeine supports c_int_32_t & c_int_64_t integers; c_float & c_double reals;" // &
@@ -175,10 +173,10 @@ contains
          type is(real(c_float))
            call c_co_max_float(c_loc(a), size(a,kind=c_size_t), stat_ptr, optional_value(result_image))
          type is(real(c_double))
-           call c_co_max_double(c_loc(a),size(a,kind=c_size_t), stat_ptr, optional_value(result_image))
+           call c_co_max_double(c_loc(a), size(a,kind=c_size_t),stat_ptr, optional_value(result_image))
          type is(character(len=*,kind=c_char))
-           error stop "caf_co_max: character type not yet supported"
-        !  call c_co_max_char(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
+           op => reverse_alphabetize
+           call caf_co_reduce(a, op, result_image, stat, errmsg)
          class default
            error stop         "caf_co_max: co_max argument 'A' must be of type integer, real, or character." // &
              new_line('a') // "Caffeine supports c_int_32_t & c_int_64_t integers; c_float & c_double reals;" // &
@@ -193,10 +191,10 @@ contains
          type is(real(c_float))
            call c_co_max_float(c_loc(a), size(a,kind=c_size_t), stat_ptr, optional_value(result_image))
          type is(real(c_double))
-           call c_co_max_double(c_loc(a),size(a,kind=c_size_t), stat_ptr, optional_value(result_image))
+           call c_co_max_double(c_loc(a), size(a,kind=c_size_t),stat_ptr, optional_value(result_image))
          type is(character(len=*,kind=c_char))
-           error stop "caf_co_max: character type not yet supported"
-        !  call c_co_max_char(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
+           op => reverse_alphabetize
+           call caf_co_reduce(a, op, result_image, stat, errmsg)
          class default
            error stop         "caf_co_max: co_max argument 'A' must be of type integer, real, or character." // &
              new_line('a') // "Caffeine supports c_int_32_t & c_int_64_t integers; c_float & c_double reals;" // &
@@ -211,10 +209,10 @@ contains
          type is(real(c_float))
            call c_co_max_float(c_loc(a), size(a,kind=c_size_t), stat_ptr, optional_value(result_image))
          type is(real(c_double))
-           call c_co_max_double(c_loc(a),size(a,kind=c_size_t), stat_ptr, optional_value(result_image))
+           call c_co_max_double(c_loc(a), size(a,kind=c_size_t),stat_ptr, optional_value(result_image))
          type is(character(len=*,kind=c_char))
-           error stop "caf_co_max: character type not yet supported"
-        !  call c_co_max_char(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
+           op => reverse_alphabetize
+           call caf_co_reduce(a, op, result_image, stat, errmsg)
          class default
            error stop         "caf_co_max: co_max argument 'A' must be of type integer, real, or character." // &
              new_line('a') // "Caffeine supports c_int_32_t & c_int_64_t integers; c_float & c_double reals;" // &
@@ -229,10 +227,10 @@ contains
          type is(real(c_float))
            call c_co_max_float(c_loc(a), size(a,kind=c_size_t), stat_ptr, optional_value(result_image))
          type is(real(c_double))
-           call c_co_max_double(c_loc(a),size(a,kind=c_size_t), stat_ptr, optional_value(result_image))
+           call c_co_max_double(c_loc(a), size(a,kind=c_size_t),stat_ptr, optional_value(result_image))
          type is(character(len=*,kind=c_char))
-           error stop "caf_co_max: character type not yet supported"
-        !  call c_co_max_char(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
+           op => reverse_alphabetize
+           call caf_co_reduce(a, op, result_image, stat, errmsg)
          class default
            error stop         "caf_co_max: co_max argument 'A' must be of type integer, real, or character." // &
              new_line('a') // "Caffeine supports c_int_32_t & c_int_64_t integers; c_float & c_double reals;" // &
@@ -247,10 +245,10 @@ contains
          type is(real(c_float))
            call c_co_max_float(c_loc(a), size(a,kind=c_size_t), stat_ptr, optional_value(result_image))
          type is(real(c_double))
-           call c_co_max_double(c_loc(a),size(a,kind=c_size_t), stat_ptr, optional_value(result_image))
+           call c_co_max_double(c_loc(a), size(a,kind=c_size_t),stat_ptr, optional_value(result_image))
          type is(character(len=*,kind=c_char))
-           error stop "caf_co_max: character type not yet supported"
-        !  call c_co_max_char(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
+           op => reverse_alphabetize
+           call caf_co_reduce(a, op, result_image, stat, errmsg)
          class default
            error stop         "caf_co_max: co_max argument 'A' must be of type integer, real, or character." // &
              new_line('a') // "Caffeine supports c_int_32_t & c_int_64_t integers; c_float & c_double reals;" // &
@@ -265,10 +263,10 @@ contains
          type is(real(c_float))
            call c_co_max_float(c_loc(a), size(a,kind=c_size_t), stat_ptr, optional_value(result_image))
          type is(real(c_double))
-           call c_co_max_double(c_loc(a),size(a,kind=c_size_t), stat_ptr, optional_value(result_image))
+           call c_co_max_double(c_loc(a), size(a,kind=c_size_t),stat_ptr, optional_value(result_image))
          type is(character(len=*,kind=c_char))
-           error stop "caf_co_max: character type not yet supported"
-        !  call c_co_max_char(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
+           op => reverse_alphabetize
+           call caf_co_reduce(a, op, result_image, stat, errmsg)
          class default
            error stop         "caf_co_max: co_max argument 'A' must be of type integer, real, or character." // &
              new_line('a') // "Caffeine supports c_int_32_t & c_int_64_t integers; c_float & c_double reals;" // &
@@ -283,10 +281,10 @@ contains
          type is(real(c_float))
            call c_co_max_float(c_loc(a), size(a,kind=c_size_t), stat_ptr, optional_value(result_image))
          type is(real(c_double))
-           call c_co_max_double(c_loc(a),size(a,kind=c_size_t), stat_ptr, optional_value(result_image))
+           call c_co_max_double(c_loc(a), size(a,kind=c_size_t),stat_ptr, optional_value(result_image))
          type is(character(len=*,kind=c_char))
-           error stop "caf_co_max: character type not yet supported"
-        !  call c_co_max_char(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
+           op => reverse_alphabetize
+           call caf_co_reduce(a, op, result_image, stat, errmsg)
          class default
            error stop         "caf_co_max: co_max argument 'A' must be of type integer, real, or character." // &
              new_line('a') // "Caffeine supports c_int_32_t & c_int_64_t integers; c_float & c_double reals;" // &
@@ -301,10 +299,10 @@ contains
          type is(real(c_float))
            call c_co_max_float(c_loc(a), size(a,kind=c_size_t), stat_ptr, optional_value(result_image))
          type is(real(c_double))
-           call c_co_max_double(c_loc(a),size(a,kind=c_size_t), stat_ptr, optional_value(result_image))
+           call c_co_max_double(c_loc(a), size(a,kind=c_size_t),stat_ptr, optional_value(result_image))
          type is(character(len=*,kind=c_char))
-           error stop "caf_co_max: character type not yet supported"
-        !  call c_co_max_char(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
+           op => reverse_alphabetize
+           call caf_co_reduce(a, op, result_image, stat, errmsg)
          class default
            error stop         "caf_co_max: co_max argument 'A' must be of type integer, real, or character." // &
              new_line('a') // "Caffeine supports c_int_32_t & c_int_64_t integers; c_float & c_double reals;" // &
@@ -319,10 +317,10 @@ contains
          type is(real(c_float))
            call c_co_max_float(c_loc(a), size(a,kind=c_size_t), stat_ptr, optional_value(result_image))
          type is(real(c_double))
-           call c_co_max_double(c_loc(a),size(a,kind=c_size_t), stat_ptr, optional_value(result_image))
+           call c_co_max_double(c_loc(a), size(a,kind=c_size_t),stat_ptr, optional_value(result_image))
          type is(character(len=*,kind=c_char))
-           error stop "caf_co_max: character type not yet supported"
-        !  call c_co_max_char(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
+           op => reverse_alphabetize
+           call caf_co_reduce(a, op, result_image, stat, errmsg)
          class default
            error stop         "caf_co_max: co_max argument 'A' must be of type integer, real, or character." // &
              new_line('a') // "Caffeine supports c_int_32_t & c_int_64_t integers; c_float & c_double reals;" // &
@@ -337,16 +335,25 @@ contains
          type is(real(c_float))
            call c_co_max_float(c_loc(a), size(a,kind=c_size_t), stat_ptr, optional_value(result_image))
          type is(real(c_double))
-           call c_co_max_double(c_loc(a),size(a,kind=c_size_t), stat_ptr, optional_value(result_image))
+           call c_co_max_double(c_loc(a), size(a,kind=c_size_t),stat_ptr, optional_value(result_image))
          type is(character(len=*,kind=c_char))
-           error stop "caf_co_max: character type not yet supported"
-        !  call c_co_max_char(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
+           op => reverse_alphabetize
+           call caf_co_reduce(a, op, result_image, stat, errmsg)
          class default
            error stop         "caf_co_max: co_max argument 'A' must be of type integer, real, or character." // &
              new_line('a') // "Caffeine supports c_int_32_t & c_int_64_t integers; c_float & c_double reals;" // &
              new_line('a') // "and plans to support c_char characters."
        end select
    end select
+
+   contains
+
+    pure function reverse_alphabetize(lhs, rhs) result(last_alphabetically)
+      character(len=*), intent(in) :: lhs, rhs 
+      character(len=:), allocatable :: last_alphabetically
+      call assert(len(lhs)==len(rhs), "co_reduce_s alphabetize: LHS/RHS length match", lhs//" , "//rhs)
+      last_alphabetically = max(lhs,rhs)
+    end function
 
   end procedure
 
