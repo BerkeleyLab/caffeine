@@ -56,18 +56,21 @@ module collective_subroutines_m
 
     pure function c_int32_t_operation(lhs, rhs) result(lhs_op_rhs)
       import c_int32_t
+      implicit none
       integer(c_int32_t), intent(in) :: lhs, rhs
       integer(c_int32_t) lhs_op_rhs
     end function
 
     pure function c_float_operation(lhs, rhs) result(lhs_op_rhs)
       import c_float
+      implicit none
       real(c_float), intent(in) :: lhs, rhs
       real(c_float) lhs_op_rhs
     end function
 
     pure function c_char_operation(lhs, rhs) result(lhs_op_rhs)
       import c_char
+      implicit none
       character(kind=c_char,len=*), intent(in) :: lhs, rhs
       character(kind=c_char,len=:), allocatable :: lhs_op_rhs
     end function

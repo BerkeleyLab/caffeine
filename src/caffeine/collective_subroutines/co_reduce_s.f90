@@ -20,6 +20,7 @@ contains
 
       subroutine c_co_reduce_char(c_loc_a, Nelem, c_loc_stat, result_image, Coll_ReduceSub_c_char, client_data) bind(C)
         import c_ptr, c_size_t, c_funptr, c_int
+        implicit none
         type(c_ptr), value :: c_loc_a, c_loc_stat, Coll_ReduceSub_c_char, client_data
         integer(c_size_t), value :: Nelem
         integer(c_int), value :: result_image
@@ -84,6 +85,7 @@ contains
 
       subroutine c_co_reduce_int32(c_loc_a, Nelem, c_loc_stat, result_image, Coll_ReduceSub_c_int32_t) bind(C)
         import c_ptr, c_size_t, c_funptr, c_int
+        implicit none
         type(c_ptr), value :: c_loc_a, c_loc_stat
         integer(c_size_t), value :: Nelem
         integer(c_int), value :: result_image
@@ -131,6 +133,7 @@ contains
 
       subroutine c_co_reduce_float(c_loc_a, Nelem, c_loc_stat, result_image, Coll_ReduceSub_c_float) bind(C)
         import c_ptr, c_size_t, c_funptr, c_int
+        implicit none
         type(c_ptr), value :: c_loc_a, c_loc_stat
         integer(c_size_t), value :: Nelem
         integer(c_int), value :: result_image

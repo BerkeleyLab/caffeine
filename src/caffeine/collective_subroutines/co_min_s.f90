@@ -14,6 +14,7 @@ contains
 
      subroutine c_co_min_int32(c_loc_a, Nelem, c_loc_stat, result_image) bind(C)
        import c_ptr, c_size_t, c_int
+       implicit none
        type(c_ptr), value :: c_loc_a, c_loc_stat
        integer(c_size_t), value :: Nelem
        integer(c_int), value :: result_image
@@ -21,6 +22,7 @@ contains
 
      subroutine c_co_min_int64(c_loc_a, Nelem, c_loc_stat, result_image) bind(C)
        import c_ptr, c_size_t, c_int
+       implicit none
        type(c_ptr), value :: c_loc_a, c_loc_stat
        integer(c_size_t), value :: Nelem
        integer(c_int), value :: result_image
@@ -28,6 +30,7 @@ contains
 
      subroutine c_co_min_float(c_loc_a, Nelem, c_loc_stat, result_image) bind(C)
        import c_ptr, c_size_t, c_int
+       implicit none
        type(c_ptr), value :: c_loc_a, c_loc_stat
        integer(c_size_t), value :: Nelem
        integer(c_int), value :: result_image
@@ -35,6 +38,7 @@ contains
 
      subroutine c_co_min_double(c_loc_a, Nelem, c_loc_stat, result_image) bind(C)
        import c_ptr, c_size_t, c_int
+       implicit none
        type(c_ptr), value :: c_loc_a, c_loc_stat
        integer(c_size_t), value :: Nelem
        integer(c_int), value :: result_image
@@ -42,6 +46,7 @@ contains
 
     !subroutine c_co_min_char(c_loc_a, Nelem, c_loc_stat) bind(C)
     !  import c_ptr, c_size_t
+    !  implicit none
     !  type(c_ptr), value :: c_loc_a, c_loc_stat
     !  integer(c_size_t), value :: Nelem
     !end subroutine
