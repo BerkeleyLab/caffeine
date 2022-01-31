@@ -1,8 +1,9 @@
 module caf_co_reduce_test
   use caffeine_m, only : caf_co_reduce, caf_num_images, caf_this_image
   use vegetables, only : result_t, test_item_t, assert_equals, describe, it, assert_that, assert_equals
-  use collective_subroutines_m, only : c_int32_t_operation, c_float_operation, c_char_operation
+  use collective_subroutines_m, only : c_int32_t_operation, c_float_operation, c_char_operation, c_bool_operation
   use assert_m, only : assert
+  use iso_c_binding, only : c_bool
 
   implicit none
   private
@@ -18,6 +19,7 @@ contains
       [ it("sums default integer scalars with no optional arguments present", sum_default_integer_scalars) &
        ,it("multiplies default real scalars with all optional arguments present", multiply_default_real_scalars) &
        ,it("alphabetizes length-5 default character scalars with result_image present", alphabetize_default_character_scalars) &
+       ,it("reports whether there is consensus across logical scalars", reports_on_consensus) &
     ])
   end function
 
@@ -65,6 +67,35 @@ contains
       integer, intent(in) :: lhs, rhs
       integer total
       total = lhs + rhs 
+    end function
+
+  end function
+
+  function reports_on_consensus() result(result_)
+    type(result_t) result_
+    logical(c_bool) one_false, one_true, all_true
+    procedure(c_bool_operation), pointer :: boolean_operation
+
+    boolean_operation => logical_and
+
+    one_false = merge(.false., .true., caf_this_image()==1)
+    call caf_co_reduce(one_false, boolean_operation)
+
+    one_true = merge(.true., .false., caf_this_image()==1)
+    call caf_co_reduce(one_true, boolean_operation)
+ 
+    all_true = .true.
+    call caf_co_reduce(all_true, boolean_operation)
+
+    result_ = assert_that(one_false .eqv. .false.) .and. &
+              assert_that(one_true .eqv. merge(.true.,.false.,caf_num_images()==1)) .and. &
+              assert_that(all_true .eqv. .true.)
+  contains
+
+    pure function logical_and(lhs, rhs) result(lhs_and_rhs)
+      logical(c_bool), intent(in) :: lhs, rhs
+      logical(c_bool) lhs_and_rhs
+      lhs_and_rhs = lhs .and. rhs 
     end function
 
   end function

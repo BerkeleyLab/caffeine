@@ -6,6 +6,7 @@
 #include <gasnet_coll.h>
 #include <stdio.h>
 #include "gasnet_safe.h"
+#include <stdbool.h> 
 
 static gex_Client_t myclient;
 static gex_EP_t myep;
@@ -142,4 +143,9 @@ void c_co_reduce_float(void* c_loc_a, size_t Nelem, int* stat, int result_image,
 void c_co_reduce_char(void* c_loc_a, size_t Nelem, int* stat, int result_image, gex_Coll_ReduceFn_t* operation, void* client_data)
 {
      c_co_reduce_universal(c_loc_a, Nelem, stat, result_image, GEX_DT_USER, sizeof(char), GEX_OP_USER, operation, client_data);
+}
+
+void c_co_reduce_bool(void* c_loc_a, size_t Nelem, int* stat, int result_image, gex_Coll_ReduceFn_t* operation)
+{
+     c_co_reduce_universal(c_loc_a, Nelem, stat, result_image, GEX_DT_I32, sizeof(bool), GEX_OP_USER, operation, NULL);
 }

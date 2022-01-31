@@ -11,6 +11,7 @@ submodule(collective_subroutines_m) co_reduce_s
   procedure(c_int32_t_operation), pointer :: c_int32_t_op_ptr => null()
   procedure(c_float_operation), pointer :: c_float_op_ptr => null()
   procedure(c_char_operation), pointer :: c_char_op_ptr => null()
+  procedure(c_bool_operation), pointer :: c_bool_op_ptr => null()
 
 contains
  
@@ -171,6 +172,54 @@ contains
       call c_f_pointer(arg2_and_out, rhs_and_result)
       call assert(all([associated(lhs), associated(rhs_and_result)]), "Coll_ReduceSub_c_float: operands associated")
       rhs_and_result = c_float_op_ptr(lhs, rhs_and_result)
+    end subroutine
+
+  end procedure
+
+  module procedure caf_co_reduce_c_bool
+
+    interface
+
+      subroutine c_co_reduce_bool(c_loc_a, Nelem, c_loc_stat, result_image, Coll_ReduceSub_c_bool) bind(C)
+        import c_ptr, c_size_t, c_funptr, c_int
+        implicit none
+        type(c_ptr), value :: c_loc_a, c_loc_stat
+        integer(c_size_t), value :: Nelem
+        integer(c_int), value :: result_image
+        type(c_funptr), value :: Coll_ReduceSub_c_bool
+      end subroutine
+
+    end interface
+
+    type(c_ptr) stat_ptr
+
+    call assert(associated(operation), "caf_co_reduce_c_bool: operation associated")
+
+    c_bool_op_ptr => operation
+
+    stat_ptr = get_c_ptr(stat)
+
+    select rank(a)
+      rank(0)
+         call c_co_reduce_bool(c_loc(a), 1_c_size_t, stat_ptr, optional_value(result_image), c_funloc(Coll_ReduceSub_c_bool))
+      rank default
+         error stop "caf_co_reduce_c_bool: unsupported rank"
+    end select
+
+  contains 
+
+    subroutine Coll_ReduceSub_c_bool(arg1, arg2_and_out, count, cdata) bind(C)
+      type(c_ptr), value :: arg1         !! "Left" operands
+      type(c_ptr), value :: arg2_and_out !! "Right" operands and result
+      integer(c_size_t), value :: count  !! Operand count
+      type(c_ptr), value ::  cdata       !! Client data
+      logical(c_bool), pointer :: lhs, rhs_and_result
+      
+      call assert(all([c_associated(arg1), c_associated(arg2_and_out)]), "Coll_ReduceSub_c_bool: operands associated")
+      call c_f_pointer(arg1, lhs)
+      call c_f_pointer(arg2_and_out, rhs_and_result)
+      call assert(all([associated(lhs), associated(rhs_and_result)]), "Coll_ReduceSub_c_bool: operands associated")
+      rhs_and_result = c_bool_op_ptr(lhs, rhs_and_result)
     end subroutine
 
   end procedure
