@@ -312,7 +312,7 @@ exit_if_pkg_config_pc_file_missing "caffeine"
 RUN_FPM_SH="build/run-fpm.sh"
 echo "#!/bin/sh"                                                              >  $RUN_FPM_SH
 echo "#-- DO NOT EDIT -- created by caffeine/install.sh"                      >> $RUN_FPM_SH
-echo "\"${FPM}\" \"\$@\" \\"                                                      >> $RUN_FPM_SH
+echo "\"${FPM}\" \"\$@\" \\"                                                  >> $RUN_FPM_SH
 echo "--compiler \"`$PKG_CONFIG caffeine --variable=CAFFEINE_FPM_FC`\"   \\"  >> $RUN_FPM_SH
 echo "--c-compiler \"`$PKG_CONFIG caffeine --variable=CAFFEINE_FPM_CC`\" \\"  >> $RUN_FPM_SH
 echo "--c-flag \"`$PKG_CONFIG caffeine --variable=CAFFEINE_FPM_CFLAGS`\" \\"  >> $RUN_FPM_SH
