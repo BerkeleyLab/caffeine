@@ -1,10 +1,15 @@
 ! Copyright (c), The Regents of the University of California
 ! Terms of use are as specified in LICENSE.txt
 submodule(collective_subroutines_m) co_min_s
-  use iso_c_binding, only : c_int64_t, c_ptr, c_size_t, c_loc, c_double, c_null_ptr, c_int
+  use iso_c_binding, only : &
+    c_int64_t, c_ptr, c_size_t, c_loc, c_double, c_null_ptr, c_int, c_funptr, c_associated, c_funloc, c_f_pointer
   use utilities_m, only : get_c_ptr, optional_value
+  use assert_m, only : assert
+  use intrinsic_array_m, only : intrinsic_array_t
 
   implicit none
+
+  procedure(c_char_operation), pointer :: op=>null()
 
 contains
 
@@ -44,13 +49,6 @@ contains
        integer(c_int), value :: result_image
      end subroutine
 
-    !subroutine c_co_min_char(c_loc_a, Nelem, c_loc_stat) bind(C)
-    !  import c_ptr, c_size_t
-    !  implicit none
-    !  type(c_ptr), value :: c_loc_a, c_loc_stat
-    !  integer(c_size_t), value :: Nelem
-    !end subroutine
-
    end interface
 
    type(c_ptr) stat_ptr
@@ -69,8 +67,8 @@ contains
          type is(real(c_double))
            call c_co_min_double(c_loc(a), 1_c_size_t, stat_ptr, optional_value(result_image))
          type is(character(len=*,kind=c_char))
-           error stop  "caf_co_min: character type not yet supported"
-        !  call c_co_min_char(c_loc(a), nelem=2_c_size_t, c_loc_stat=stat_ptr)
+           op => alphabetize
+           call caf_co_reduce(a, op, result_image, stat, errmsg)
          class default
            error stop         "caf_co_min: co_min argument 'A' must be of type integer, real, or character." // &
              new_line('a') // "Caffeine supports c_int_32_t & c_int_64_t integers; c_float & c_double reals;" // &
@@ -87,8 +85,8 @@ contains
          type is(real(c_double))
            call c_co_min_double(c_loc(a), size(a,kind=c_size_t),stat_ptr, optional_value(result_image))
          type is(character(len=*,kind=c_char))
-           error stop "caf_co_min: character type not yet supported"
-        !  call c_co_min_char(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
+           op => alphabetize
+           call caf_co_reduce(a, op, result_image, stat, errmsg)
          class default
            error stop         "caf_co_min: co_min argument 'A' must be of type integer, real, or character." // &
              new_line('a') // "Caffeine supports c_int_32_t & c_int_64_t integers; c_float & c_double reals;" // &
@@ -105,8 +103,8 @@ contains
          type is(real(c_double))
            call c_co_min_double(c_loc(a), size(a,kind=c_size_t),stat_ptr, optional_value(result_image))
          type is(character(len=*,kind=c_char))
-           error stop "caf_co_min: character type not yet supported"
-        !  call c_co_min_char(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
+           op => alphabetize
+           call caf_co_reduce(a, op, result_image, stat, errmsg)
          class default
            error stop         "caf_co_min: co_min argument 'A' must be of type integer, real, or character." // &
              new_line('a') // "Caffeine supports c_int_32_t & c_int_64_t integers; c_float & c_double reals;" // &
@@ -123,8 +121,8 @@ contains
          type is(real(c_double))
            call c_co_min_double(c_loc(a), size(a,kind=c_size_t),stat_ptr, optional_value(result_image))
          type is(character(len=*,kind=c_char))
-           error stop "caf_co_min: character type not yet supported"
-        !  call c_co_min_char(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
+           op => alphabetize
+           call caf_co_reduce(a, op, result_image, stat, errmsg)
          class default
            error stop         "caf_co_min: co_min argument 'A' must be of type integer, real, or character." // &
              new_line('a') // "Caffeine supports c_int_32_t & c_int_64_t integers; c_float & c_double reals;" // &
@@ -141,8 +139,8 @@ contains
          type is(real(c_double))
            call c_co_min_double(c_loc(a), size(a,kind=c_size_t),stat_ptr, optional_value(result_image))
          type is(character(len=*,kind=c_char))
-           error stop "caf_co_min: character type not yet supported"
-        !  call c_co_min_char(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
+           op => alphabetize
+           call caf_co_reduce(a, op, result_image, stat, errmsg)
          class default
            error stop         "caf_co_min: co_min argument 'A' must be of type integer, real, or character." // &
              new_line('a') // "Caffeine supports c_int_32_t & c_int_64_t integers; c_float & c_double reals;" // &
@@ -159,8 +157,8 @@ contains
          type is(real(c_double))
            call c_co_min_double(c_loc(a), size(a,kind=c_size_t),stat_ptr, optional_value(result_image))
          type is(character(len=*,kind=c_char))
-           error stop "caf_co_min: character type not yet supported"
-        !  call c_co_min_char(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
+           op => alphabetize
+           call caf_co_reduce(a, op, result_image, stat, errmsg)
          class default
            error stop         "caf_co_min: co_min argument 'A' must be of type integer, real, or character." // &
              new_line('a') // "Caffeine supports c_int_32_t & c_int_64_t integers; c_float & c_double reals;" // &
@@ -177,8 +175,8 @@ contains
          type is(real(c_double))
            call c_co_min_double(c_loc(a), size(a,kind=c_size_t),stat_ptr, optional_value(result_image))
          type is(character(len=*,kind=c_char))
-           error stop "caf_co_min: character type not yet supported"
-        !  call c_co_min_char(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
+           op => alphabetize
+           call caf_co_reduce(a, op, result_image, stat, errmsg)
          class default
            error stop         "caf_co_min: co_min argument 'A' must be of type integer, real, or character." // &
              new_line('a') // "Caffeine supports c_int_32_t & c_int_64_t integers; c_float & c_double reals;" // &
@@ -195,8 +193,8 @@ contains
          type is(real(c_double))
            call c_co_min_double(c_loc(a), size(a,kind=c_size_t),stat_ptr, optional_value(result_image))
          type is(character(len=*,kind=c_char))
-           error stop "caf_co_min: character type not yet supported"
-        !  call c_co_min_char(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
+           op => alphabetize
+           call caf_co_reduce(a, op, result_image, stat, errmsg)
          class default
            error stop         "caf_co_min: co_min argument 'A' must be of type integer, real, or character." // &
              new_line('a') // "Caffeine supports c_int_32_t & c_int_64_t integers; c_float & c_double reals;" // &
@@ -213,8 +211,8 @@ contains
          type is(real(c_double))
            call c_co_min_double(c_loc(a), size(a,kind=c_size_t),stat_ptr, optional_value(result_image))
          type is(character(len=*,kind=c_char))
-           error stop "caf_co_min: character type not yet supported"
-        !  call c_co_min_char(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
+           op => alphabetize
+           call caf_co_reduce(a, op, result_image, stat, errmsg)
          class default
            error stop         "caf_co_min: co_min argument 'A' must be of type integer, real, or character." // &
              new_line('a') // "Caffeine supports c_int_32_t & c_int_64_t integers; c_float & c_double reals;" // &
@@ -231,8 +229,8 @@ contains
          type is(real(c_double))
            call c_co_min_double(c_loc(a), size(a,kind=c_size_t),stat_ptr, optional_value(result_image))
          type is(character(len=*,kind=c_char))
-           error stop "caf_co_min: character type not yet supported"
-        !  call c_co_min_char(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
+           op => alphabetize
+           call caf_co_reduce(a, op, result_image, stat, errmsg)
          class default
            error stop         "caf_co_min: co_min argument 'A' must be of type integer, real, or character." // &
              new_line('a') // "Caffeine supports c_int_32_t & c_int_64_t integers; c_float & c_double reals;" // &
@@ -249,8 +247,8 @@ contains
          type is(real(c_double))
            call c_co_min_double(c_loc(a), size(a,kind=c_size_t),stat_ptr, optional_value(result_image))
          type is(character(len=*,kind=c_char))
-           error stop "caf_co_min: character type not yet supported"
-        !  call c_co_min_char(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
+           op => alphabetize
+           call caf_co_reduce(a, op, result_image, stat, errmsg)
          class default
            error stop         "caf_co_min: co_min argument 'A' must be of type integer, real, or character." // &
              new_line('a') // "Caffeine supports c_int_32_t & c_int_64_t integers; c_float & c_double reals;" // &
@@ -267,8 +265,8 @@ contains
          type is(real(c_double))
            call c_co_min_double(c_loc(a), size(a,kind=c_size_t),stat_ptr, optional_value(result_image))
          type is(character(len=*,kind=c_char))
-           error stop "caf_co_min: character type not yet supported"
-        !  call c_co_min_char(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
+           op => alphabetize
+           call caf_co_reduce(a, op, result_image, stat, errmsg)
          class default
            error stop         "caf_co_min: co_min argument 'A' must be of type integer, real, or character." // &
              new_line('a') // "Caffeine supports c_int_32_t & c_int_64_t integers; c_float & c_double reals;" // &
@@ -285,8 +283,8 @@ contains
          type is(real(c_double))
            call c_co_min_double(c_loc(a), size(a,kind=c_size_t),stat_ptr, optional_value(result_image))
          type is(character(len=*,kind=c_char))
-           error stop "caf_co_min: character type not yet supported"
-        !  call c_co_min_char(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
+           op => alphabetize
+           call caf_co_reduce(a, op, result_image, stat, errmsg)
          class default
            error stop         "caf_co_min: co_min argument 'A' must be of type integer, real, or character." // &
              new_line('a') // "Caffeine supports c_int_32_t & c_int_64_t integers; c_float & c_double reals;" // &
@@ -303,8 +301,8 @@ contains
          type is(real(c_double))
            call c_co_min_double(c_loc(a), size(a,kind=c_size_t),stat_ptr, optional_value(result_image))
          type is(character(len=*,kind=c_char))
-           error stop "caf_co_min: character type not yet supported"
-        !  call c_co_min_char(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
+           op => alphabetize
+           call caf_co_reduce(a, op, result_image, stat, errmsg)
          class default
            error stop         "caf_co_min: co_min argument 'A' must be of type integer, real, or character." // &
              new_line('a') // "Caffeine supports c_int_32_t & c_int_64_t integers; c_float & c_double reals;" // &
@@ -321,8 +319,8 @@ contains
          type is(real(c_double))
            call c_co_min_double(c_loc(a), size(a,kind=c_size_t),stat_ptr, optional_value(result_image))
          type is(character(len=*,kind=c_char))
-           error stop "caf_co_min: character type not yet supported"
-        !  call c_co_min_char(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
+           op => alphabetize
+           call caf_co_reduce(a, op, result_image, stat, errmsg)
          class default
            error stop         "caf_co_min: co_min argument 'A' must be of type integer, real, or character." // &
              new_line('a') // "Caffeine supports c_int_32_t & c_int_64_t integers; c_float & c_double reals;" // &
@@ -339,14 +337,23 @@ contains
          type is(real(c_double))
            call c_co_min_double(c_loc(a), size(a,kind=c_size_t),stat_ptr, optional_value(result_image))
          type is(character(len=*,kind=c_char))
-           error stop "caf_co_min: character type not yet supported"
-        !  call c_co_min_char(c_loc(a), nelem=size(a,kind=c_size_t), c_loc_stat=stat_ptr)
+           op => alphabetize
+           call caf_co_reduce(a, op, result_image, stat, errmsg)
          class default
            error stop         "caf_co_min: co_min argument 'A' must be of type integer, real, or character." // &
              new_line('a') // "Caffeine supports c_int_32_t & c_int_64_t integers; c_float & c_double reals;" // &
              new_line('a') // "and plans to support c_char characters."
        end select
    end select
+
+   contains
+
+    pure function alphabetize(lhs, rhs) result(first_alphabetically)
+      character(len=*), intent(in) :: lhs, rhs 
+      character(len=:), allocatable :: first_alphabetically
+      call assert(len(lhs)==len(rhs), "co_reduce_s alphabetize: LHS/RHS length match", lhs//" , "//rhs)
+      first_alphabetically = min(lhs,rhs)
+    end function
 
   end procedure
 

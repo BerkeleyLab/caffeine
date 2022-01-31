@@ -19,8 +19,8 @@ contains
            ,it("default integer 7D array elements with stat argument present", min_default_integer_7D_array) &
            ,it("default real scalars with no optional arguments present", min_default_real_scalars) &
            ,it("double precision 2D array elements with no optional arguments present)", min_double_precision_2D_array) &
-          !,it("character scalar (no result_image)", min_double_precision_2D_array) &
-          !,it("character 2D array elements (no result_image)", min_double_precision_2D_array) &
+           ,it("alphabetizes length-3 default character scalars with no optional arguments", alphabetize_default_character_scalars)&
+          !,it("character 2D array elements (no result_image)", alphabetize_across_1D_arrays) &
         ])
     end function
 
@@ -31,6 +31,21 @@ contains
         i = caf_this_image()
         call caf_co_min(i)
         result_ = assert_equals(1, i)
+    end function
+
+    function alphabetize_default_character_scalars() result(result_)
+      type(result_t) result_
+      character(len=*), parameter :: names(*) = [character(len=len("cat")):: "the","cat","in ","a","top","hat"]
+      character(len=:), allocatable :: my_name
+
+      associate(me => caf_this_image())
+        associate(periodic_index => 1 + mod(me-1,size(names)))
+          my_name = names(periodic_index)
+          call caf_co_min(my_name)
+        end associate
+      end associate
+
+      result_ = assert_equals(minval(names), my_name)
     end function
 
     function min_c_int64_scalars() result(result_)
