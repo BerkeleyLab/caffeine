@@ -149,3 +149,12 @@ void c_co_reduce_bool(void* c_loc_a, size_t Nelem, int* stat, int result_image, 
 {
      c_co_reduce_universal(c_loc_a, Nelem, stat, result_image, GEX_DT_I32, sizeof(bool), GEX_OP_USER, operation, NULL);
 }
+
+void c_co_broadcast(void* c_loc_a, int source_image, int* stat, size_t nbytes)
+{
+     gex_Event_t ev
+       = gex_Coll_BroadcastNB(myteam, source_image-1, c_loc_a, c_loc_a, nbytes, 0);
+     gex_Event_Wait(ev);  
+
+     if (stat != NULL) *stat = 0;
+}
