@@ -40,11 +40,11 @@ contains
 
   contains
 
-    pure function alphabetize(lhs, rhs) result(first)
+    pure function alphabetize(lhs, rhs) result(first_alphabetically)
       character(len=*), intent(in) :: lhs, rhs
-      character(len=:), allocatable :: first
+      character(len=:), allocatable :: first_alphabetically
       call assert(len(lhs)==len(rhs), "co_reduce_s alphabetize: LHS/RHS length match", lhs//" , "//rhs)
-      first = merge(lhs, rhs, lhs < rhs)
+      first_alphabetically = min(lhs,rhs)
     end function
 
   end function
