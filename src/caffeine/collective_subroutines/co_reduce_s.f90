@@ -8,11 +8,6 @@ submodule(collective_subroutines_m) co_reduce_s
   use utilities_m, only : get_c_ptr, optional_value
   implicit none
 
-  procedure(c_int32_t_operation), pointer :: c_int32_t_op_ptr => null()
-  procedure(c_float_operation), pointer :: c_float_op_ptr => null()
-  procedure(c_char_operation), pointer :: c_char_op_ptr => null()
-  procedure(c_bool_operation), pointer :: c_bool_op_ptr => null()
-
 contains
  
   module procedure caf_co_reduce_c_char
@@ -30,6 +25,7 @@ contains
     end interface
 
     type(c_ptr) stat_ptr
+    procedure(c_char_operation), pointer :: c_char_op_ptr
 
     call assert(associated(operation), "caf_co_reduce_c_char: operation associated")
 
@@ -96,6 +92,7 @@ contains
     end interface
 
     type(c_ptr) stat_ptr
+    procedure(c_int32_t_operation), pointer :: c_int32_t_op_ptr
 
     call assert(associated(operation), "caf_co_reduce_c_int32_t: operation associated")
 
@@ -144,6 +141,7 @@ contains
     end interface
 
     type(c_ptr) stat_ptr
+    procedure(c_float_operation), pointer :: c_float_op_ptr
 
     call assert(associated(operation), "caf_co_reduce_c_float: operation associated")
 
@@ -192,6 +190,7 @@ contains
     end interface
 
     type(c_ptr) stat_ptr
+    procedure(c_bool_operation), pointer :: c_bool_op_ptr
 
     call assert(associated(operation), "caf_co_reduce_c_bool: operation associated")
 
