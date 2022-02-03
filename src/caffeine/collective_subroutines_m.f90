@@ -45,7 +45,7 @@ module collective_subroutines_m
 
      module subroutine caf_co_broadcast(a, source_image, stat, errmsg)
        implicit none
-       class(*), intent(inout), contiguous, target :: a(..)
+       type(*), intent(inout), contiguous, target :: a(..)
        integer, optional, intent(in) :: source_image
        integer, optional, intent(out), target :: stat
        character(len=*), intent(inout), optional, target :: errmsg

@@ -5,8 +5,9 @@
 #include <gasnetex.h>
 #include <gasnet_coll.h>
 #include <stdio.h>
-#include "gasnet_safe.h"
 #include <stdbool.h> 
+#include <ISO_Fortran_binding.h>
+#include "gasnet_safe.h"
 
 static gex_Client_t myclient;
 static gex_EP_t myep;
@@ -150,8 +151,12 @@ void c_co_reduce_bool(void* c_loc_a, size_t Nelem, int* stat, int result_image, 
      c_co_reduce_universal(c_loc_a, Nelem, stat, result_image, GEX_DT_I32, sizeof(bool), GEX_OP_USER, operation, NULL);
 }
 
-void c_co_broadcast(void* c_loc_a, int source_image, int* stat, size_t nbytes)
+void c_co_broadcast(CFI_cdesc_t * a_desc, int source_image, int* stat, int num_elements)
 {
+     char* c_loc_a = (char*) a_desc->base_addr;
+     size_t c_sizeof_a = a_desc->elem_len;
+     int nbytes = num_elements * c_sizeof_a;
+  
      gex_Event_t ev
        = gex_Coll_BroadcastNB(myteam, source_image-1, c_loc_a, c_loc_a, nbytes, 0);
      gex_Event_Wait(ev);  
