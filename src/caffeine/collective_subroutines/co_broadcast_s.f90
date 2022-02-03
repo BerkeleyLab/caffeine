@@ -9,13 +9,12 @@ contains
 
     interface
 
-      subroutine c_co_broadcast(a, source_image, stat, c_sizeof_a) bind(C)
+      subroutine c_co_broadcast(a, source_image, stat, Nelem) bind(C)
         import c_int, c_ptr, c_size_t
         implicit none
         type(*) a(..)
         type(c_ptr), value :: stat
-        integer(c_int), value :: source_image
-        integer(c_size_t), value :: c_sizeof_a
+        integer(c_int), value :: source_image, Nelem
       end subroutine
 
     end interface
@@ -24,7 +23,7 @@ contains
 
     stat_ptr = get_c_ptr(stat)
 
-    call c_co_broadcast(a, source_image, stat_ptr, int(product(shape(a)),c_size_t))  
+    call c_co_broadcast(a, source_image, stat_ptr, product(shape(a)))  
       ! With a compliant Fortran 2018 compiler, pass in c_sizeof(a) as the final argument 
       ! and eliminate the calculation of num_elements*sizeof(a) in caffeine.c.
 
