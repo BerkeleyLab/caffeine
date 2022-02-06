@@ -148,7 +148,7 @@ void c_co_broadcast(CFI_cdesc_t * a_desc, int source_image, int* stat, int num_e
 
 void c_co_sum(CFI_cdesc_t* a_desc, int result_image, int* stat, char* errmsg, size_t num_elements)
 {
-  int a_type = a_desc->type;
+  CFI_type_t a_type = a_desc->type;
   size_t c_sizeof_a;
 
   switch (a_type)
