@@ -20,7 +20,7 @@ module collective_subroutines_m
  
      module subroutine caf_co_sum(a, result_image, stat, errmsg)
        implicit none
-       class(*), intent(inout), contiguous, target :: a(..)
+       type(*), intent(inout), contiguous, target :: a(..)
        integer, intent(in), target, optional :: result_image
        integer, intent(out), target, optional :: stat
        character(len=*), intent(inout), target, optional :: errmsg

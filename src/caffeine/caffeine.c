@@ -71,26 +71,6 @@ void c_co_reduce_universal(void* c_loc_a, size_t Nelem, int* stat, int result_im
      if (stat != NULL) *stat = 0;
 }
 
-void c_co_sum_int32(void* c_loc_a, size_t Nelem, int* stat, int* result_image)
-{
-     c_co_reduce_universal(c_loc_a, Nelem, stat, result_image, GEX_DT_I32, sizeof(int32_t), GEX_OP_ADD, NULL, NULL);
-}
-
-void c_co_sum_int64(void* c_loc_a, size_t Nelem, int* stat, int* result_image)
-{
-     c_co_reduce_universal(c_loc_a, Nelem, stat, result_image, GEX_DT_I64, sizeof(int64_t), GEX_OP_ADD, NULL, NULL);
-}
-
-void c_co_sum_float(void* c_loc_a, size_t Nelem, int* stat, int* result_image)
-{
-     c_co_reduce_universal(c_loc_a, Nelem, stat, result_image, GEX_DT_FLT, sizeof(float), GEX_OP_ADD, NULL, NULL);
-}
-
-void c_co_sum_double(void* c_loc_a, size_t Nelem, int* stat, int* result_image)
-{
-     c_co_reduce_universal(c_loc_a, Nelem, stat, result_image, GEX_DT_DBL, sizeof(double), GEX_OP_ADD, NULL, NULL);
-}
-
 void c_co_min_int32(void* c_loc_a, size_t Nelem, int* stat, int result_image)
 {
      c_co_reduce_universal(c_loc_a, Nelem, stat, result_image, GEX_DT_I32, sizeof(int32_t), GEX_OP_MIN, NULL, NULL);
@@ -157,9 +137,61 @@ void c_co_broadcast(CFI_cdesc_t * a_desc, int source_image, int* stat, int num_e
      size_t c_sizeof_a = a_desc->elem_len;
      int nbytes = num_elements * c_sizeof_a;
   
-     gex_Event_t ev
-       = gex_Coll_BroadcastNB(myteam, source_image-1, c_loc_a, c_loc_a, nbytes, 0);
-     gex_Event_Wait(ev);  
+  int data_type = a_desc->type;
 
-     if (stat != NULL) *stat = 0;
+  gex_Event_t ev
+    = gex_Coll_BroadcastNB(myteam, source_image-1, c_loc_a, c_loc_a, nbytes, 0);
+  gex_Event_Wait(ev);  
+
+  if (stat != NULL) *stat = 0;
+}
+
+void c_co_sum(CFI_cdesc_t* a_desc, int result_image, int* stat, char* errmsg, size_t num_elements)
+{
+  int a_type = a_desc->type;
+  size_t c_sizeof_a;
+
+  switch (a_type)
+  {
+    case CFI_type_int32_t:        a_type = GEX_DT_I32; break;
+    case CFI_type_int64_t:        a_type = GEX_DT_I64; break;
+    case CFI_type_float:          a_type = GEX_DT_FLT; break;
+    case CFI_type_double:         a_type = GEX_DT_DBL; break;
+#if __GNUC__ >= 12
+    case CFI_type_float_Complex:  a_type = GEX_DT_FLT; num_elements *= 2; break;
+    case CFI_type_double_Complex: a_type = GEX_DT_DBL; num_elements *= 2; break;
+#else
+    case 2052:                    a_type = GEX_DT_FLT; num_elements *= 2; break;
+    case 4100:                    a_type = GEX_DT_DBL; num_elements *= 2; break;
+#endif
+    default:
+      if (stat == NULL && errmsg == NULL) {
+        printf("caffeine.c: unrecognized type %d\n", a_type);
+        abort();
+      }
+      if (stat != NULL) *stat = 1;
+      // if (errmsg != NULL) errmsg = "";
+  }
+  char* a_address = (char*) a_desc->base_addr;
+#if __GNUC__ >= 12
+  if (a_type == CFI_type_float_Complex || a_type == CFI_type_double_Complex) 
+#else
+  if (a_type == 2052 || a_type == 4100)
+#endif
+  {
+    c_sizeof_a = a_desc->elem_len/2;
+  } else {
+    c_sizeof_a = a_desc->elem_len;
+  }
+
+  gex_Event_t ev;
+
+  if (result_image) {
+    ev = gex_Coll_ReduceToOneNB(myteam, result_image-1, a_address, a_address, a_type, c_sizeof_a, num_elements, GEX_OP_ADD, NULL, NULL, 0);
+  } else {
+    ev = gex_Coll_ReduceToAllNB(myteam,                 a_address, a_address, a_type, c_sizeof_a, num_elements, GEX_OP_ADD, NULL, NULL, 0);
+  }
+  gex_Event_Wait(ev);  
+
+  if (stat != NULL) *stat = 0;
 }
