@@ -14,6 +14,11 @@ static gex_EP_t myep;
 static gex_TM_t myteam;
 static gex_Rank_t rank, size;
 
+enum {
+  UNRECOGNIZED_TYPE, 
+  ERRMSG_TOO_SHORT
+};
+
 void c_caffeinate(int argc, char *argv[])
 {
   GASNET_SAFE(gex_Client_Init(&myclient, &myep, &myteam, "caffeine", &argc, &argv, 0));
@@ -146,6 +151,27 @@ void c_co_broadcast(CFI_cdesc_t * a_desc, int source_image, int* stat, int num_e
   if (stat != NULL) *stat = 0;
 }
 
+void set_stat_errmsg_or_abort(int* stat, char* errmsg, const int return_stat, const char return_message[])
+{
+  if (stat == NULL && errmsg == NULL) {
+    printf("%s\n", *return_message);
+    abort();
+  }
+
+  if (stat != NULL) *stat = return_stat;
+
+  if (errmsg != NULL) {
+    if (strlen(errmsg) >= strlen(return_message)) {
+      // TODO: Figure out how/whether to handle repositioning of the null terminator.
+      *errmsg = return_message; 
+    } else {
+      // TODO: Figure out how to replace this with an assignment of a truncated error message.
+      printf("caffeine.c: strlen(errmsg)=%d too short\n", strlen(errmsg));
+      abort();  
+    }
+  }
+}
+
 void c_co_sum(CFI_cdesc_t* a_desc, int result_image, int* stat, char* errmsg, size_t num_elements)
 {
   CFI_type_t a_type = a_desc->type;
@@ -165,14 +191,11 @@ void c_co_sum(CFI_cdesc_t* a_desc, int result_image, int* stat, char* errmsg, si
     case 4100:                    a_type = GEX_DT_DBL; num_elements *= 2; break;
 #endif
     default:
-      if (stat == NULL && errmsg == NULL) {
-        printf("caffeine.c: unrecognized type %d\n", a_type);
-        abort();
-      }
-      if (stat != NULL) *stat = 1;
-      // if (errmsg != NULL) errmsg = "";
+      set_stat_errmsg_or_abort(stat, errmsg, UNRECOGNIZED_TYPE, "");
   }
+
   char* a_address = (char*) a_desc->base_addr;
+
 #if __GNUC__ >= 12
   if (a_type == CFI_type_float_Complex || a_type == CFI_type_double_Complex) 
 #else

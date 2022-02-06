@@ -13,6 +13,7 @@ contains
         tests = describe( &
           "The caf_co_sum subroutine", &
           [ it("sums default integer scalars with no optional arguments present", sum_default_integer_scalars) &
+           ,it("sums default integer scalars with all arguments present", sum_integers_all_arguments) &
            ,it("sums integer(c_int64_t) scalars with stat argument present", sum_c_int64_scalars) &
            ,it("sums default integer 1D arrays with no optional arguments present", sum_default_integer_1D_array) &
            ,it("sums default integer 15D arrays with stat argument present", sum_default_integer_15D_array) &
@@ -31,6 +32,23 @@ contains
         i = 1
         call caf_co_sum(i)
         result_ = assert_equals(caf_num_images(), i)
+    end function
+
+    function sum_integers_all_arguments() result(result_)
+        type(result_t) result_
+        integer i, status_, result_image_
+        character(len=*), parameter :: whitespace = repeat(" ", ncopies=29)
+        character(len=:), allocatable :: error_message
+
+        i = 1
+        result_image_ = 1
+        status_ = -1
+        error_message = whitespace
+
+        associate(expected_i => merge(caf_num_images()*i, i, caf_this_image()==result_image_))
+          call caf_co_sum(i, result_image_, status_, error_message)
+          result_ = assert_equals(expected_i, i) .and. assert_equals(0, status_) .and. assert_equals(whitespace, error_message)
+        end associate
     end function
 
     function sum_c_int64_scalars() result(result_)
