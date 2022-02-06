@@ -1,23 +1,14 @@
 // Copyright (c), The Regents of the University of California
 // Terms of use are as specified in LICENSE.txt
 
+#ifndef CAFFEINE_H
+#include "caffeine.h"
+#endif
+
 #include <stdint.h>
-#include <gasnetex.h>
-#include <gasnet_coll.h>
 #include <stdio.h>
 #include <stdbool.h> 
-#include <ISO_Fortran_binding.h>
 #include "gasnet_safe.h"
-
-static gex_Client_t myclient;
-static gex_EP_t myep;
-static gex_TM_t myteam;
-static gex_Rank_t rank, size;
-
-enum {
-  UNRECOGNIZED_TYPE, 
-  ERRMSG_TOO_SHORT
-};
 
 void c_caffeinate(int argc, char *argv[])
 {
