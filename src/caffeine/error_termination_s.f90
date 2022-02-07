@@ -2,14 +2,15 @@
 ! Terms of use are as specified in LICENSE.txt
 submodule(error_termination_m) error_termination_s
   use iso_fortran_env, only : error_unit
-  use iso_c_binding, only : c_char, c_int
+  use iso_c_binding, only : c_int
+  use caffeine_h_m, only : c_decaffeinate
   implicit none
-
-  integer(c_int), parameter :: error_occured = 1
 
 contains
 
   module procedure caf_error_stop_character
+
+    integer(c_int), parameter :: error_occured = 1
 
     write(error_unit, *) stop_code
     flush error_unit
@@ -20,15 +21,6 @@ contains
 
   module procedure caf_error_stop_integer
  
-    interface
-
-      subroutine c_decaffeinate(exit_code) bind(C)
-        import c_int
-        integer(c_int), value :: exit_code
-      end subroutine
-
-    end interface
-
     integer exit_code
     
     if (.not. present(stop_code)) then

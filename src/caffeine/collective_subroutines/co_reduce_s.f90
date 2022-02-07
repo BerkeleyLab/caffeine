@@ -6,23 +6,12 @@ submodule(collective_subroutines_m) co_reduce_s
   use assert_m, only : assert
   use intrinsic_array_m, only : intrinsic_array_t
   use utilities_m, only : get_c_ptr, optional_value
+  use caffeine_h_m, only : c_co_reduce_char, c_co_reduce_int32, c_co_reduce_bool, c_co_reduce_float
   implicit none
 
 contains
  
   module procedure caf_co_reduce_c_char
-
-    interface
-
-      subroutine c_co_reduce_char(c_loc_a, Nelem, c_loc_stat, result_image, Coll_ReduceSub_c_char, client_data) bind(C)
-        import c_ptr, c_size_t, c_funptr, c_int
-        implicit none
-        type(c_ptr), value :: c_loc_a, c_loc_stat, Coll_ReduceSub_c_char, client_data
-        integer(c_size_t), value :: Nelem
-        integer(c_int), value :: result_image
-      end subroutine
-
-    end interface
 
     type(c_ptr) stat_ptr
     procedure(c_char_operation), pointer :: c_char_op_ptr
@@ -78,19 +67,6 @@ contains
 
   module procedure caf_co_reduce_c_int32_t
 
-    interface
-
-      subroutine c_co_reduce_int32(c_loc_a, Nelem, c_loc_stat, result_image, Coll_ReduceSub_c_int32_t) bind(C)
-        import c_ptr, c_size_t, c_funptr, c_int
-        implicit none
-        type(c_ptr), value :: c_loc_a, c_loc_stat
-        integer(c_size_t), value :: Nelem
-        integer(c_int), value :: result_image
-        type(c_funptr), value :: Coll_ReduceSub_c_int32_t
-      end subroutine
-
-    end interface
-
     type(c_ptr) stat_ptr
     procedure(c_int32_t_operation), pointer :: c_int32_t_op_ptr
 
@@ -127,19 +103,6 @@ contains
 
   module procedure caf_co_reduce_c_float
 
-    interface
-
-      subroutine c_co_reduce_float(c_loc_a, Nelem, c_loc_stat, result_image, Coll_ReduceSub_c_float) bind(C)
-        import c_ptr, c_size_t, c_funptr, c_int
-        implicit none
-        type(c_ptr), value :: c_loc_a, c_loc_stat
-        integer(c_size_t), value :: Nelem
-        integer(c_int), value :: result_image
-        type(c_funptr), value :: Coll_ReduceSub_c_float
-      end subroutine
-
-    end interface
-
     type(c_ptr) stat_ptr
     procedure(c_float_operation), pointer :: c_float_op_ptr
 
@@ -175,19 +138,6 @@ contains
   end procedure
 
   module procedure caf_co_reduce_c_bool
-
-    interface
-
-      subroutine c_co_reduce_bool(c_loc_a, Nelem, c_loc_stat, result_image, Coll_ReduceSub_c_bool) bind(C)
-        import c_ptr, c_size_t, c_funptr, c_int
-        implicit none
-        type(c_ptr), value :: c_loc_a, c_loc_stat
-        integer(c_size_t), value :: Nelem
-        integer(c_int), value :: result_image
-        type(c_funptr), value :: Coll_ReduceSub_c_bool
-      end subroutine
-
-    end interface
 
     type(c_ptr) stat_ptr
     procedure(c_bool_operation), pointer :: c_bool_op_ptr

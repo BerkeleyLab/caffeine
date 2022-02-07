@@ -6,50 +6,16 @@ submodule(collective_subroutines_m) co_max_s
   use utilities_m, only : get_c_ptr, optional_value
   use assert_m, only : assert
   use intrinsic_array_m, only : intrinsic_array_t
+  use caffeine_h_m, only : c_co_max_int32, c_co_max_int64, c_co_max_float,  c_co_max_double
 
   implicit none
 
-  procedure(c_char_operation), pointer :: op=>null()
 
 contains
 
   module procedure caf_co_max
 
-   interface
-
-     subroutine c_co_max_int32(c_loc_a, Nelem, c_loc_stat, result_image) bind(C)
-       import c_ptr, c_size_t, c_int
-       implicit none
-       type(c_ptr), value :: c_loc_a, c_loc_stat
-       integer(c_size_t), value :: Nelem
-       integer(c_int), value :: result_image
-     end subroutine
-
-     subroutine c_co_max_int64(c_loc_a, Nelem, c_loc_stat, result_image) bind(C)
-       import c_ptr, c_size_t, c_int
-       implicit none
-       type(c_ptr), value :: c_loc_a, c_loc_stat
-       integer(c_size_t), value :: Nelem
-       integer(c_int), value :: result_image
-     end subroutine
-
-     subroutine c_co_max_float(c_loc_a, Nelem, c_loc_stat, result_image) bind(C)
-       import c_ptr, c_size_t, c_int
-       implicit none
-       type(c_ptr), value :: c_loc_a, c_loc_stat
-       integer(c_size_t), value :: Nelem
-       integer(c_int), value :: result_image
-     end subroutine
-
-     subroutine c_co_max_double(c_loc_a, Nelem, c_loc_stat, result_image) bind(C)
-       import c_ptr, c_size_t, c_int
-       implicit none
-       type(c_ptr), value :: c_loc_a, c_loc_stat
-       integer(c_size_t), value :: Nelem
-       integer(c_int), value :: result_image
-     end subroutine
-
-   end interface
+    procedure(c_char_operation), pointer :: op=>null()
 
    type(c_ptr) stat_ptr
 
