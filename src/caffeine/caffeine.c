@@ -10,6 +10,14 @@
 #include <stdbool.h> 
 #include "gasnet_safe.h"
 
+#if __GNUC__ >= 12
+  const int float_Complex_workaround = CFI_type_float_Complex;
+  const int double_Complex_workaround = CFI_type_double_Complex;
+#else
+  const int float_Complex_workaround = 2052;
+  const int double_Complex_workaround = 4011;
+#endif
+
 void c_caffeinate(int argc, char *argv[])
 {
   GASNET_SAFE(gex_Client_Init(&myclient, &myep, &myteam, "caffeine", &argc, &argv, 0));
@@ -142,7 +150,7 @@ void c_co_broadcast(CFI_cdesc_t * a_desc, int source_image, int* stat, int num_e
   if (stat != NULL) *stat = 0;
 }
 
-void set_stat_errmsg_or_abort(int* stat, char* errmsg, const int return_stat, const char return_message[])
+void set_stat_errmsg_or_abort(int* stat, char* errmsg, const int return_stat, const char const return_message[])
 {
   if (stat == NULL && errmsg == NULL) {
     printf("%s\n", *return_message);
@@ -154,7 +162,7 @@ void set_stat_errmsg_or_abort(int* stat, char* errmsg, const int return_stat, co
   if (errmsg != NULL) {
     if (strlen(errmsg) >= strlen(return_message)) {
       // TODO: Figure out how/whether to handle repositioning of the null terminator.
-      *errmsg = return_message; 
+      errmsg = return_message; 
     } else {
       // TODO: Figure out how to replace this with an assignment of a truncated error message.
       printf("caffeine.c: strlen(errmsg)=%d too short\n", strlen(errmsg));
@@ -166,7 +174,6 @@ void set_stat_errmsg_or_abort(int* stat, char* errmsg, const int return_stat, co
 void c_co_sum(CFI_cdesc_t* a_desc, int result_image, int* stat, char* errmsg, size_t num_elements)
 {
   CFI_type_t a_type = a_desc->type;
-  size_t c_sizeof_a;
 
   switch (a_type)
   {
@@ -174,29 +181,17 @@ void c_co_sum(CFI_cdesc_t* a_desc, int result_image, int* stat, char* errmsg, si
     case CFI_type_int64_t:        a_type = GEX_DT_I64; break;
     case CFI_type_float:          a_type = GEX_DT_FLT; break;
     case CFI_type_double:         a_type = GEX_DT_DBL; break;
-#if __GNUC__ >= 12
-    case CFI_type_float_Complex:  a_type = GEX_DT_FLT; num_elements *= 2; break;
-    case CFI_type_double_Complex: a_type = GEX_DT_DBL; num_elements *= 2; break;
-#else
-    case 2052:                    a_type = GEX_DT_FLT; num_elements *= 2; break;
-    case 4100:                    a_type = GEX_DT_DBL; num_elements *= 2; break;
-#endif
+    case float_Complex_workaround:  a_type = GEX_DT_FLT; num_elements *= 2; break;
+    case double_Complex_workaround: a_type = GEX_DT_DBL; num_elements *= 2; break;
     default:
       set_stat_errmsg_or_abort(stat, errmsg, UNRECOGNIZED_TYPE, "");
   }
 
   char* a_address = (char*) a_desc->base_addr;
 
-#if __GNUC__ >= 12
-  if (a_type == CFI_type_float_Complex || a_type == CFI_type_double_Complex) 
-#else
-  if (a_type == 2052 || a_type == 4100)
-#endif
-  {
-    c_sizeof_a = a_desc->elem_len/2;
-  } else {
-    c_sizeof_a = a_desc->elem_len;
-  }
+  size_t c_sizeof_a = a_desc->elem_len;
+
+  if (a_type == float_Complex_workaround || a_type == double_Complex_workaround) c_sizeof_a /= 2;
 
   gex_Event_t ev;
 
