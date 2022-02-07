@@ -1,6 +1,6 @@
 module caf_co_sum_test
     use caffeine_m, only : caf_co_sum, caf_num_images, caf_this_image
-    use vegetables, only: result_t, test_item_t, assert_equals, describe, it, assert_that, assert_equals
+    use vegetables, only: result_t, test_item_t, assert_equals, describe, it, assert_that, assert_equals, succeed
 
     implicit none
     private
@@ -19,7 +19,8 @@ contains
            ,it("sums default real scalars with result_image argument present", sum_default_real_scalars) &
            ,it("sums double precision 2D arrays with no optional arguments present", sum_double_precision_2D_array) &
            ,it("sums default complex scalars with stat argument present", sum_default_complex_scalars) &
-          !,it("sums double precision 1D complex arrays with no optional arguments present", sum_dble_complex_1D_arrays) &
+           ! This test yields the correct result and then the code crashes:
+           !,it("sums double precision 1D complex arrays with no optional arguments present", sum_dble_complex_1D_arrays) &
         ])
     end function
 
@@ -111,11 +112,11 @@ contains
         type(result_t) result_
         integer, parameter :: dp = kind(1.D0)
         complex(dp), allocatable :: array(:)
-        complex(dp), parameter :: input(*) = [(0.D0,1.0D0)]
+        complex(dp), parameter :: input(*) = [(1.D0,1.0D0)]
  
-        array = input
+        array = [(1.D0,1.D0)]
         call caf_co_sum(array)
-        result_ = assert_equals(dble(product(abs(input))*caf_num_images()), dble(product(abs(array))))
+        result_ = assert_that(all([input*caf_num_images()] == array))
     end function
 
 end module caf_co_sum_test
