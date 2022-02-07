@@ -19,7 +19,7 @@ contains
            ,it("sums default real scalars with result_image argument present", sum_default_real_scalars) &
            ,it("sums double precision 2D arrays with no optional arguments present", sum_double_precision_2D_array) &
            ,it("sums default complex scalars with stat argument present", sum_default_complex_scalars) &
-           !,it("sums double precision 3D complex arrays with no optional arguments present", sum_dble_complex_3D_arrays) &
+          !,it("sums double precision 1D complex arrays with no optional arguments present", sum_dble_complex_1D_arrays) &
         ])
     end function
 
@@ -107,12 +107,11 @@ contains
         result_ = assert_equals(dble(abs(i*caf_num_images())), dble(abs(z)) ) .and. assert_equals(0, status_)
     end function
              
-    function sum_dble_complex_3D_arrays() result(result_)
+    function sum_dble_complex_1D_arrays() result(result_)
         type(result_t) result_
         integer, parameter :: dp = kind(1.D0)
-        complex(dp), allocatable :: array(:,:,:)
-        complex(dp), parameter :: &
-          input(*,*,*) = reshape( [(-1.,0.) , (0.0,1.0), (1.0,0.0), (0.0,-1.0), (0.0,0.0), (0.0,1.0)], [3,1,2])
+        complex(dp), allocatable :: array(:)
+        complex(dp), parameter :: input(*) = [(0.D0,1.0D0)]
  
         array = input
         call caf_co_sum(array)
