@@ -103,7 +103,9 @@ contains
         end associate
       end associate
 
-      result_ = assert_equals(maxval(words), my_word)
+      associate(expected_word => maxval(words(1:min(caf_num_images(), size(words)))))
+        result_ = assert_equals(expected_word, my_word)
+      end associate
     end function
 
 end module caf_co_max_test

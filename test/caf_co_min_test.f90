@@ -45,7 +45,9 @@ contains
         end associate
       end associate
 
-      result_ = assert_equals(minval(names), my_name)
+      associate(expected_name => minval(names(1:min(caf_num_images(), size(names)))))
+         result_ = assert_equals(expected_name, my_name)
+      end associate
     end function
 
     function min_c_int64_scalars() result(result_)
