@@ -42,8 +42,8 @@ contains
       integer(c_size_t), value :: count  !! Operand count
       type(c_ptr), value ::  cdata       !! Client data
 
-      character(kind=c_char, len=:), pointer :: lhs, rhs_and_result
-      character(kind=c_char, len=:), allocatable, target :: prototype
+      character(kind=c_char, len=:), pointer :: lhs(:), rhs_and_result(:)
+      character(kind=c_char, len=:), allocatable, target :: prototype(:)
       integer(c_int), pointer :: arglen
     
       associate(c_associated_args => [c_associated(arg1), c_associated(arg2_and_out), c_associated(cdata)])
@@ -51,16 +51,23 @@ contains
       end associate
 
       call c_f_pointer(cdata, arglen)
-      allocate(character(kind=c_char, len=arglen) :: prototype)
+      allocate(character(kind=c_char, len=arglen) :: prototype(count))
       lhs => prototype ! set string length
       rhs_and_result => prototype ! set string length
 
-      call c_f_pointer(arg1, lhs)
-      call c_f_pointer(arg2_and_out, rhs_and_result)
+      call c_f_pointer(arg1, lhs, [count])
+      call c_f_pointer(arg2_and_out, rhs_and_result, [count])
 
       call assert(all([associated(lhs), associated(rhs_and_result)]), "Coll_ReduceSub_c_char: associated lhs & rhs_and_result")
     
-      rhs_and_result = c_char_op_ptr(lhs, rhs_and_result)
+      block 
+        integer i
+
+        do i=1, count
+          rhs_and_result(i) = c_char_op_ptr(lhs(i), rhs_and_result(i))
+        end do
+      end block
+
     end subroutine
 
   end procedure
@@ -90,13 +97,16 @@ contains
       type(c_ptr), value :: arg2_and_out !! "Right" operands and result
       integer(c_size_t), value :: count  !! Operand count
       type(c_ptr), value ::  cdata       !! Client data
-      integer(c_int32_t), pointer :: lhs, rhs_and_result
-      
+      integer(c_int32_t), pointer :: lhs(:), rhs_and_result(:)
+      integer i
+
       call assert(all([c_associated(arg1), c_associated(arg2_and_out)]), "Coll_ReduceSub_c_int32t: operands associated")
-      call c_f_pointer(arg1, lhs)
-      call c_f_pointer(arg2_and_out, rhs_and_result)
+      call c_f_pointer(arg1, lhs, [count])
+      call c_f_pointer(arg2_and_out, rhs_and_result, [count])
       call assert(all([associated(lhs), associated(rhs_and_result)]), "Coll_ReduceSub_c_int32t: operands associated")
-      rhs_and_result = c_int32_t_op_ptr(lhs, rhs_and_result)
+      do i=1, count
+        rhs_and_result(i) = c_int32_t_op_ptr(lhs(i), rhs_and_result(i))
+      end do
     end subroutine
 
   end procedure
