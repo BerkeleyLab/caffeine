@@ -8,7 +8,7 @@ submodule(caffeinate_decaffeinate_m) caffeinate_decaffeinate_s
 
 contains
 
-  module procedure caffeinate
+  module procedure caf_caffeinate
 
     integer i
     integer, parameter :: max_arg_len = 1024
@@ -44,7 +44,7 @@ contains
   
   end procedure
 
-  module procedure decaffeinate
+  module procedure caf_decaffeinate
 
     integer(c_int), parameter :: normal_termination=0
     
