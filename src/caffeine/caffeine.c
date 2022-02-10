@@ -7,6 +7,11 @@
 #include <stdbool.h> 
 #include "gasnet_safe.h"
 
+static gex_Client_t myclient;
+static gex_EP_t myep;
+static gex_TM_t myteam;
+static gex_Rank_t rank, size;
+
 #if __GNUC__ >= 12
   const int float_Complex_workaround = CFI_type_float_Complex;
   const int double_Complex_workaround = CFI_type_double_Complex;

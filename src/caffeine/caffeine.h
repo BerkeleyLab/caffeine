@@ -8,11 +8,6 @@
 #include <gasnet_coll.h>
 #include <ISO_Fortran_binding.h>
 
-static gex_Client_t myclient;
-static gex_EP_t myep;
-static gex_TM_t myteam;
-static gex_Rank_t rank, size;
-
 enum {
   UNRECOGNIZED_TYPE, 
   ERRMSG_TOO_SHORT
