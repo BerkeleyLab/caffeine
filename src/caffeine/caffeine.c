@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include <stdbool.h> 
 #include "gasnet_safe.h"
+#include <gasnet_tools.h>
 
 static gex_Client_t myclient;
 static gex_EP_t myep;
@@ -154,10 +155,7 @@ void c_co_broadcast(CFI_cdesc_t * a_desc, int source_image, int* stat, int num_e
 
 void set_stat_errmsg_or_abort(int* stat, char* errmsg, const int return_stat, const char const return_message[])
 {
-  if (stat == NULL && errmsg == NULL) {
-    printf("%s\n", *return_message);
-    abort();
-  }
+  if (stat == NULL && errmsg == NULL) gasnett_fatalerror("%s", return_message);
 
   if (stat != NULL) *stat = return_stat;
 
@@ -167,8 +165,7 @@ void set_stat_errmsg_or_abort(int* stat, char* errmsg, const int return_stat, co
       errmsg = return_message; 
     } else {
       // TODO: Figure out how to replace this with an assignment of a truncated error message.
-      printf("caffeine.c: strlen(errmsg)=%d too short\n", strlen(errmsg));
-      abort();  
+      gasnett_fatalerror("%s", "caffeine.c: strlen(errmsg) too small");
     }
   }
 }
