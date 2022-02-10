@@ -176,10 +176,10 @@ void caf_c_co_sum(CFI_cdesc_t* a_desc, int result_image, int* stat, char* errmsg
 
   switch (a_desc->type)
   {
-    case CFI_type_int32_t:        a_type = GEX_DT_I32; break;
-    case CFI_type_int64_t:        a_type = GEX_DT_I64; break;
-    case CFI_type_float:          a_type = GEX_DT_FLT; break;
-    case CFI_type_double:         a_type = GEX_DT_DBL; break;
+    case CFI_type_int32_t:          a_type = GEX_DT_I32; break;
+    case CFI_type_int64_t:          a_type = GEX_DT_I64; break;
+    case CFI_type_float:            a_type = GEX_DT_FLT; break;
+    case CFI_type_double:           a_type = GEX_DT_DBL; break;
     case float_Complex_workaround:  a_type = GEX_DT_FLT; num_elements *= 2; break;
     case double_Complex_workaround: a_type = GEX_DT_DBL; num_elements *= 2; break;
     default:
