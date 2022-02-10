@@ -153,7 +153,7 @@ void caf_c_co_broadcast(CFI_cdesc_t * a_desc, int source_image, int* stat, int n
   if (stat != NULL) *stat = 0;
 }
 
-void set_stat_errmsg_or_abort(int* stat, char* errmsg, const int return_stat, const char const return_message[])
+void set_stat_errmsg_or_abort(int* stat, char* errmsg, const int return_stat, const char* return_message)
 {
   if (stat == NULL && errmsg == NULL) gasnett_fatalerror("%s", return_message);
 
