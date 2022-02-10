@@ -6,7 +6,7 @@ submodule(collective_subroutines_m) co_reduce_s
   use assert_m, only : assert
   use intrinsic_array_m, only : intrinsic_array_t
   use utilities_m, only : get_c_ptr, optional_value
-  use caffeine_h_m, only : c_co_reduce_char, c_co_reduce_int32, c_co_reduce_bool, c_co_reduce_float
+  use caffeine_h_m, only : caf_c_co_reduce_char, caf_c_co_reduce_int32, caf_c_co_reduce_bool, caf_c_co_reduce_float
   implicit none
 
 contains
@@ -27,7 +27,7 @@ contains
         block
           integer(c_size_t), target :: len_a
           len_a = int(len(a), c_size_t)
-          call c_co_reduce_char( &
+          call caf_c_co_reduce_char( &
             c_loc(a), len_a, stat_ptr, optional_value(result_image), c_funloc(Coll_ReduceSub_c_char), c_loc(len_a))
         end block
       rank default
@@ -85,9 +85,9 @@ contains
 
     select rank(a)
       rank(0)
-         call c_co_reduce_int32(c_loc(a), 1_c_size_t, stat_ptr, optional_value(result_image), c_funloc(Coll_ReduceSub_c_int32_t))
+        call caf_c_co_reduce_int32(c_loc(a), 1_c_size_t, stat_ptr, optional_value(result_image), c_funloc(Coll_ReduceSub_c_int32_t))
       rank default
-         error stop "caf_co_reduce_c_int32_t: unsupported rank"
+        error stop "caf_co_reduce_c_int32_t: unsupported rank"
     end select
 
   contains
@@ -124,7 +124,7 @@ contains
 
     select rank(a)
       rank(0)
-         call c_co_reduce_float(c_loc(a), 1_c_size_t, stat_ptr, optional_value(result_image), c_funloc(Coll_ReduceSub_c_float))
+         call caf_c_co_reduce_float(c_loc(a), 1_c_size_t, stat_ptr, optional_value(result_image), c_funloc(Coll_ReduceSub_c_float))
       rank default
          error stop "caf_co_reduce_c_float: unsupported rank"
     end select
@@ -160,7 +160,7 @@ contains
 
     select rank(a)
       rank(0)
-         call c_co_reduce_bool(c_loc(a), 1_c_size_t, stat_ptr, optional_value(result_image), c_funloc(Coll_ReduceSub_c_bool))
+         call caf_c_co_reduce_bool(c_loc(a), 1_c_size_t, stat_ptr, optional_value(result_image), c_funloc(Coll_ReduceSub_c_bool))
       rank default
          error stop "caf_co_reduce_c_bool: unsupported rank"
     end select

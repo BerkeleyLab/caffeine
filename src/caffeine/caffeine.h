@@ -14,37 +14,37 @@ enum {
 };
 
 // Program launch and finalization
-void c_caffeinate(int argc, char *argv[]);
-void c_decaffeinate(int exit_code);
+void caf_c_caffeinate(int argc, char *argv[]);
+void caf_c_decaffeinate(int exit_code);
 
 // Image enumeration
-int c_this_image();
-int c_num_images();
+int caf_c_this_image();
+int caf_c_num_images();
 
 // Synchronization 
-void c_sync_all();
+void caf_c_sync_all();
 
 // _______ Collective Subroutines _______ 
 
-void c_co_min_int32(void* c_loc_a, size_t Nelem, int* stat, int result_image);
-void c_co_min_int64(void* c_loc_a, size_t Nelem, int* stat, int result_image);
-void c_co_min_float(void* c_loc_a, size_t Nelem, int* stat, int result_image);
-void c_co_min_double(void* c_loc_a, size_t Nelem, int* stat, int result_image);
+void caf_c_co_min_int32(void* c_loc_a, size_t Nelem, int* stat, int result_image);
+void caf_c_co_min_int64(void* c_loc_a, size_t Nelem, int* stat, int result_image);
+void caf_c_co_min_float(void* c_loc_a, size_t Nelem, int* stat, int result_image);
+void caf_c_co_min_double(void* c_loc_a, size_t Nelem, int* stat, int result_image);
 
-void c_co_max_int32(void* c_loc_a, size_t Nelem, int* stat, int result_image);
-void c_co_max_int64(void* c_loc_a, size_t Nelem, int* stat, int result_image);
-void c_co_max_float(void* c_loc_a, size_t Nelem, int* stat, int result_image);
-void c_co_max_double(void* c_loc_a, size_t Nelem, int* stat, int result_image);
+void caf_c_co_max_int32(void* c_loc_a, size_t Nelem, int* stat, int result_image);
+void caf_c_co_max_int64(void* c_loc_a, size_t Nelem, int* stat, int result_image);
+void caf_c_co_max_float(void* c_loc_a, size_t Nelem, int* stat, int result_image);
+void caf_c_co_max_double(void* c_loc_a, size_t Nelem, int* stat, int result_image);
 
-void c_co_reduce_int32(void* c_loc_a, size_t Nelem, int* stat, int result_image, gex_Coll_ReduceFn_t* operation);
-void c_co_reduce_float(void* c_loc_a, size_t Nelem, int* stat, int result_image, gex_Coll_ReduceFn_t* operation);
-void c_co_reduce_char(void* c_loc_a, size_t Nelem, int* stat, int result_image, gex_Coll_ReduceFn_t* operation, void* client_data);
-void c_co_reduce_bool(void* c_loc_a, size_t Nelem, int* stat, int result_image, gex_Coll_ReduceFn_t* operation);
+void caf_c_co_reduce_int32(void* c_loc_a, size_t Nelem, int* stat, int result_image, gex_Coll_ReduceFn_t* operation);
+void caf_c_co_reduce_float(void* c_loc_a, size_t Nelem, int* stat, int result_image, gex_Coll_ReduceFn_t* operation);
+void caf_c_co_reduce_char(void* c_loc_a, size_t Nelem, int* stat, int result_image, gex_Coll_ReduceFn_t* operation, void* client_data);
+void caf_c_co_reduce_bool(void* c_loc_a, size_t Nelem, int* stat, int result_image, gex_Coll_ReduceFn_t* operation);
 
 // co_broadcast
-void c_co_broadcast(CFI_cdesc_t * a_desc, int source_image, int* stat, int num_elements);
+void caf_c_co_broadcast(CFI_cdesc_t * a_desc, int source_image, int* stat, int num_elements);
 
 // co_sum
-void c_co_sum(CFI_cdesc_t* a_desc, int result_image, int* stat, char* errmsg, size_t num_elements);
+void caf_c_co_sum(CFI_cdesc_t* a_desc, int result_image, int* stat, char* errmsg, size_t num_elements);
 
 #endif // CAFFEINE_H

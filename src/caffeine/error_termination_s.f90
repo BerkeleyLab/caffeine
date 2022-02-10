@@ -3,7 +3,7 @@
 submodule(error_termination_m) error_termination_s
   use iso_fortran_env, only : error_unit
   use iso_c_binding, only : c_int
-  use caffeine_h_m, only : c_decaffeinate
+  use caffeine_h_m, only : caf_c_decaffeinate
   implicit none
 
 contains
@@ -25,7 +25,7 @@ contains
     
     if (.not. present(stop_code)) then
 
-      call c_decaffeinate(exit_code=1)
+      call caf_c_decaffeinate(exit_code=1)
 
     else if (stop_code==0) then
 
@@ -36,7 +36,7 @@ contains
       exit_code = stop_code
     end if
 
-    call c_decaffeinate(exit_code)
+    call caf_c_decaffeinate(exit_code)
 
   end procedure 
 

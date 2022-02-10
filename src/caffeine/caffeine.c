@@ -21,7 +21,7 @@ static gex_Rank_t rank, size;
   const int double_Complex_workaround = 4011;
 #endif
 
-void c_caffeinate(int argc, char *argv[])
+void caf_c_caffeinate(int argc, char *argv[])
 {
   GASNET_SAFE(gex_Client_Init(&myclient, &myep, &myteam, "caffeine", &argc, &argv, 0));
   
@@ -42,22 +42,22 @@ void c_caffeinate(int argc, char *argv[])
   GASNET_SAFE(gex_Segment_Attach(&mysegment, myteam, segsz));
 }
 
-void c_decaffeinate(int exit_code)
+void caf_c_decaffeinate(int exit_code)
 {
   gasnet_exit(exit_code);
 }
 
-int c_this_image()
+int caf_c_this_image()
 {
   return gex_TM_QueryRank(myteam) + 1;
 }
 
-int c_num_images()
+int caf_c_num_images()
 {
   return gex_TM_QuerySize(myteam);
 }
 
-void c_sync_all()
+void caf_c_sync_all()
 {
   gasnet_barrier_notify(0,GASNET_BARRIERFLAG_ANONYMOUS);
   gasnet_barrier_wait(0,GASNET_BARRIERFLAG_ANONYMOUS);
@@ -78,67 +78,67 @@ void c_co_reduce_universal(void* c_loc_a, size_t Nelem, int* stat, int result_im
      if (stat != NULL) *stat = 0;
 }
 
-void c_co_min_int32(void* c_loc_a, size_t Nelem, int* stat, int result_image)
+void caf_c_co_min_int32(void* c_loc_a, size_t Nelem, int* stat, int result_image)
 {
      c_co_reduce_universal(c_loc_a, Nelem, stat, result_image, GEX_DT_I32, sizeof(int32_t), GEX_OP_MIN, NULL, NULL);
 }
 
-void c_co_min_int64(void* c_loc_a, size_t Nelem, int* stat, int result_image)
+void caf_c_co_min_int64(void* c_loc_a, size_t Nelem, int* stat, int result_image)
 {
      c_co_reduce_universal(c_loc_a, Nelem, stat, result_image, GEX_DT_I64, sizeof(int64_t), GEX_OP_MIN, NULL, NULL);
 }
 
-void c_co_min_float(void* c_loc_a, size_t Nelem, int* stat, int result_image)
+void caf_c_co_min_float(void* c_loc_a, size_t Nelem, int* stat, int result_image)
 {
      c_co_reduce_universal(c_loc_a, Nelem, stat, result_image, GEX_DT_FLT, sizeof(float), GEX_OP_MIN, NULL, NULL);
 }
 
-void c_co_min_double(void* c_loc_a, size_t Nelem, int* stat, int result_image)
+void caf_c_co_min_double(void* c_loc_a, size_t Nelem, int* stat, int result_image)
 {
      c_co_reduce_universal(c_loc_a, Nelem, stat, result_image, GEX_DT_DBL, sizeof(double), GEX_OP_MIN, NULL, NULL);
 }
 
-void c_co_max_int32(void* c_loc_a, size_t Nelem, int* stat, int result_image)
+void caf_c_co_max_int32(void* c_loc_a, size_t Nelem, int* stat, int result_image)
 {
      c_co_reduce_universal(c_loc_a, Nelem, stat, result_image, GEX_DT_I32, sizeof(int32_t), GEX_OP_MAX, NULL, NULL);
 }
 
-void c_co_max_int64(void* c_loc_a, size_t Nelem, int* stat, int result_image)
+void caf_c_co_max_int64(void* c_loc_a, size_t Nelem, int* stat, int result_image)
 {
      c_co_reduce_universal(c_loc_a, Nelem, stat, result_image, GEX_DT_I64, sizeof(int64_t), GEX_OP_MAX, NULL, NULL);
 }
 
-void c_co_max_float(void* c_loc_a, size_t Nelem, int* stat, int result_image)
+void caf_c_co_max_float(void* c_loc_a, size_t Nelem, int* stat, int result_image)
 {
      c_co_reduce_universal(c_loc_a, Nelem, stat, result_image, GEX_DT_FLT, sizeof(float), GEX_OP_MAX, NULL, NULL);
 }
 
-void c_co_max_double(void* c_loc_a, size_t Nelem, int* stat, int result_image)
+void caf_c_co_max_double(void* c_loc_a, size_t Nelem, int* stat, int result_image)
 {
      c_co_reduce_universal(c_loc_a, Nelem, stat, result_image, GEX_DT_DBL, sizeof(double), GEX_OP_MAX, NULL, NULL);
 }
 
-void c_co_reduce_int32(void* c_loc_a, size_t Nelem, int* stat, int result_image, gex_Coll_ReduceFn_t* operation)
+void caf_c_co_reduce_int32(void* c_loc_a, size_t Nelem, int* stat, int result_image, gex_Coll_ReduceFn_t* operation)
 {
      c_co_reduce_universal(c_loc_a, Nelem, stat, result_image, GEX_DT_I32, sizeof(int32_t), GEX_OP_USER, operation, NULL);
 }
 
-void c_co_reduce_float(void* c_loc_a, size_t Nelem, int* stat, int result_image, gex_Coll_ReduceFn_t* operation)
+void caf_c_co_reduce_float(void* c_loc_a, size_t Nelem, int* stat, int result_image, gex_Coll_ReduceFn_t* operation)
 {
      c_co_reduce_universal(c_loc_a, Nelem, stat, result_image, GEX_DT_FLT, sizeof(float), GEX_OP_USER, operation, NULL);
 }
 
-void c_co_reduce_char(void* c_loc_a, size_t Nelem, int* stat, int result_image, gex_Coll_ReduceFn_t* operation, void* client_data)
+void caf_c_co_reduce_char(void* c_loc_a, size_t Nelem, int* stat, int result_image, gex_Coll_ReduceFn_t* operation, void* client_data)
 {
      c_co_reduce_universal(c_loc_a, Nelem, stat, result_image, GEX_DT_USER, sizeof(char), GEX_OP_USER, operation, client_data);
 }
 
-void c_co_reduce_bool(void* c_loc_a, size_t Nelem, int* stat, int result_image, gex_Coll_ReduceFn_t* operation)
+void caf_c_co_reduce_bool(void* c_loc_a, size_t Nelem, int* stat, int result_image, gex_Coll_ReduceFn_t* operation)
 {
      c_co_reduce_universal(c_loc_a, Nelem, stat, result_image, GEX_DT_I32, sizeof(bool), GEX_OP_USER, operation, NULL);
 }
 
-void c_co_broadcast(CFI_cdesc_t * a_desc, int source_image, int* stat, int num_elements)
+void caf_c_co_broadcast(CFI_cdesc_t * a_desc, int source_image, int* stat, int num_elements)
 {
      char* c_loc_a = (char*) a_desc->base_addr;
      size_t c_sizeof_a = a_desc->elem_len;
@@ -170,7 +170,7 @@ void set_stat_errmsg_or_abort(int* stat, char* errmsg, const int return_stat, co
   }
 }
 
-void c_co_sum(CFI_cdesc_t* a_desc, int result_image, int* stat, char* errmsg, size_t num_elements)
+void caf_c_co_sum(CFI_cdesc_t* a_desc, int result_image, int* stat, char* errmsg, size_t num_elements)
 {
   CFI_type_t a_type = a_desc->type;
 

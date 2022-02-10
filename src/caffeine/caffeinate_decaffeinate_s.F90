@@ -3,7 +3,7 @@
 submodule(caffeinate_decaffeinate_m) caffeinate_decaffeinate_s
   use iso_c_binding, only : c_int, c_loc, c_char, c_null_char
   use synchronization_m, only : caf_sync_all
-  use caffeine_h_m, only : c_caffeinate, c_decaffeinate
+  use caffeine_h_m, only : caf_c_caffeinate, caf_c_decaffeinate
   implicit none
 
 contains
@@ -15,7 +15,7 @@ contains
 
     associate(argc => int(command_argument_count(),c_int))
       associate(argv => [(c_loc(c_interop_arg(i)), i=0,argc)])
-        call c_caffeinate(argc, argv)
+        call caf_c_caffeinate(argc, argv)
       end associate
     end associate
 
@@ -50,7 +50,7 @@ contains
     
     call caf_sync_all
 
-    call c_decaffeinate(normal_termination) 
+    call caf_c_decaffeinate(normal_termination) 
   end procedure
 
 end submodule caffeinate_decaffeinate_s
