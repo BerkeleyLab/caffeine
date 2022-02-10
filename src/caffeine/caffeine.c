@@ -1,10 +1,7 @@
 // Copyright (c), The Regents of the University of California
 // Terms of use are as specified in LICENSE.txt
 
-#ifndef CAFFEINE_H
 #include "caffeine.h"
-#endif
-
 #include <stdint.h>
 #include <stdio.h>
 #include <stdbool.h> 
