@@ -172,9 +172,9 @@ void set_stat_errmsg_or_abort(int* stat, char* errmsg, const int return_stat, co
 
 void caf_c_co_sum(CFI_cdesc_t* a_desc, int result_image, int* stat, char* errmsg, size_t num_elements)
 {
-  CFI_type_t a_type = a_desc->type;
+  gex_DT_t a_type;
 
-  switch (a_type)
+  switch (a_desc->type)
   {
     case CFI_type_int32_t:        a_type = GEX_DT_I32; break;
     case CFI_type_int64_t:        a_type = GEX_DT_I64; break;
