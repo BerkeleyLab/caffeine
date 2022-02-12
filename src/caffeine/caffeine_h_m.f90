@@ -9,8 +9,7 @@ module caffeine_h_m
   public :: caf_c_caffeinate, caf_c_decaffeinate
   public :: caf_c_num_images, caf_c_this_image
   public :: caf_c_sync_all
-  public :: caf_c_co_broadcast, caf_c_co_sum, caf_c_co_min
-  public :: caf_c_co_max_int32, caf_c_co_max_int64, caf_c_co_max_float, caf_c_co_max_double
+  public :: caf_c_co_broadcast, caf_c_co_sum, caf_c_co_min, caf_c_co_max
   public :: caf_c_co_reduce_char, caf_c_co_reduce_int32, caf_c_co_reduce_bool, caf_c_co_reduce_float
   public :: caf_c_is_character
 
@@ -88,40 +87,14 @@ module caffeine_h_m
        integer(c_size_t), value :: num_elements
      end subroutine
 
-     subroutine caf_c_co_max_int32(c_loc_a, Nelem, c_loc_stat, result_image) bind(C)
-       !! void caf_c_co_max_int32(void* c_loc_a, size_t Nelem, int* stat, int result_image);
-       import c_ptr, c_size_t, c_int
-       implicit none
-       type(c_ptr), value :: c_loc_a, c_loc_stat
-       integer(c_size_t), value :: Nelem
+     subroutine caf_c_co_max(a, result_image, c_loc_stat, c_loc_errmsg, num_elements) bind(C)
+       !! void c_co_max(CFI_cdesc_t* a_desc, int result_image, int* stat, char* errmsg, size_t num_elements);
+       import c_int, c_ptr, c_size_t
+       implicit none 
+       type(*) :: a(..)
        integer(c_int), value :: result_image
-     end subroutine 
-       
-     subroutine caf_c_co_max_int64(c_loc_a, Nelem, c_loc_stat, result_image) bind(C)
-       !! void caf_c_co_max_int64(void* c_loc_a, size_t Nelem, int* stat, int result_image);
-       import c_ptr, c_size_t, c_int
-       implicit none
-       type(c_ptr), value :: c_loc_a, c_loc_stat
-       integer(c_size_t), value :: Nelem
-       integer(c_int), value :: result_image
-     end subroutine 
-       
-     subroutine caf_c_co_max_float(c_loc_a, Nelem, c_loc_stat, result_image) bind(C)
-       !! void caf_c_co_max_float(void* c_loc_a, size_t Nelem, int* stat, int result_image);
-       import c_ptr, c_size_t, c_int
-       implicit none
-       type(c_ptr), value :: c_loc_a, c_loc_stat
-       integer(c_size_t), value :: Nelem
-       integer(c_int), value :: result_image
-     end subroutine 
-       
-     subroutine caf_c_co_max_double(c_loc_a, Nelem, c_loc_stat, result_image) bind(C)
-       !! void caf_c_co_max_double(void* c_loc_a, size_t Nelem, int* stat, int result_image);
-       import c_ptr, c_size_t, c_int
-       implicit none
-       type(c_ptr), value :: c_loc_a, c_loc_stat
-       integer(c_size_t), value :: Nelem
-       integer(c_int), value :: result_image
+       type(c_ptr), value :: c_loc_stat, c_loc_errmsg
+       integer(c_size_t), value :: num_elements
      end subroutine
 
      subroutine caf_c_co_reduce_char(c_loc_a, Nelem, c_loc_stat, result_image, Coll_ReduceSub_c_char, client_data) bind(C)

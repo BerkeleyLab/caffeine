@@ -27,11 +27,6 @@ void caf_c_sync_all();
 
 // _______ Collective Subroutines _______ 
 
-void caf_c_co_max_int32(void* c_loc_a, size_t Nelem, int* stat, int result_image);
-void caf_c_co_max_int64(void* c_loc_a, size_t Nelem, int* stat, int result_image);
-void caf_c_co_max_float(void* c_loc_a, size_t Nelem, int* stat, int result_image);
-void caf_c_co_max_double(void* c_loc_a, size_t Nelem, int* stat, int result_image);
-
 void caf_c_co_reduce_int32(void* c_loc_a, size_t Nelem, int* stat, int result_image, gex_Coll_ReduceFn_t* operation);
 void caf_c_co_reduce_float(void* c_loc_a, size_t Nelem, int* stat, int result_image, gex_Coll_ReduceFn_t* operation);
 void caf_c_co_reduce_char(void* c_loc_a, size_t Nelem, int* stat, int result_image, gex_Coll_ReduceFn_t* operation, void* client_data);
@@ -45,6 +40,9 @@ void caf_c_co_sum(CFI_cdesc_t* a_desc, int result_image, int* stat, char* errmsg
 
 // co_min
 void caf_c_co_min(CFI_cdesc_t* a_desc, int result_image, int* stat, char* errmsg, size_t num_elements);
+
+// co_max
+void caf_c_co_max(CFI_cdesc_t* a_desc, int result_image, int* stat, char* errmsg, size_t num_elements);
 
 // ____________ Utilties ____________ 
 bool caf_c_is_character(CFI_cdesc_t* a_desc);

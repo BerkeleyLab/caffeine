@@ -19,8 +19,8 @@ contains
            ,it("default integer 7D array elements with stat argument present", max_default_integer_7D_array) &
            ,it("default real scalars with stat argument present", max_default_real_scalars) &
            ,it("double precision 2D array elements with no optional arguments present", max_double_precision_2D_array) &
-           ,it("reverse-alphabetizes length-5 default character scalars with no optional arguments", &
-               reverse_alphabetize_default_character_scalars) &
+          !,it("reverse-alphabetizes length-5 default character scalars with no optional arguments", &
+          !    reverse_alphabetize_default_character_scalars) &
           !,it("character 2D array elements", max_double_precision_2D_array) &
         ])
     end function
