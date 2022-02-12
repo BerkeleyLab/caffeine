@@ -36,7 +36,7 @@ module collective_subroutines_m
 
      module subroutine caf_co_min(a, result_image, stat, errmsg)
        implicit none
-       class(*), intent(inout), contiguous, target :: a(..)
+       type(*), intent(inout), contiguous, target :: a(..)
        integer, intent(in), optional, target :: result_image
        integer, intent(out), optional, target :: stat
        character(len=*), intent(inout), optional, target :: errmsg

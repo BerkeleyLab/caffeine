@@ -79,26 +79,6 @@ void c_co_reduce_universal(void* c_loc_a, size_t Nelem, int* stat, int result_im
      if (stat != NULL) *stat = 0;
 }
 
-void caf_c_co_min_int32(void* c_loc_a, size_t Nelem, int* stat, int result_image)
-{
-     c_co_reduce_universal(c_loc_a, Nelem, stat, result_image, GEX_DT_I32, sizeof(int32_t), GEX_OP_MIN, NULL, NULL);
-}
-
-void caf_c_co_min_int64(void* c_loc_a, size_t Nelem, int* stat, int result_image)
-{
-     c_co_reduce_universal(c_loc_a, Nelem, stat, result_image, GEX_DT_I64, sizeof(int64_t), GEX_OP_MIN, NULL, NULL);
-}
-
-void caf_c_co_min_float(void* c_loc_a, size_t Nelem, int* stat, int result_image)
-{
-     c_co_reduce_universal(c_loc_a, Nelem, stat, result_image, GEX_DT_FLT, sizeof(float), GEX_OP_MIN, NULL, NULL);
-}
-
-void caf_c_co_min_double(void* c_loc_a, size_t Nelem, int* stat, int result_image)
-{
-     c_co_reduce_universal(c_loc_a, Nelem, stat, result_image, GEX_DT_DBL, sizeof(double), GEX_OP_MIN, NULL, NULL);
-}
-
 void caf_c_co_max_int32(void* c_loc_a, size_t Nelem, int* stat, int result_image)
 {
      c_co_reduce_universal(c_loc_a, Nelem, stat, result_image, GEX_DT_I32, sizeof(int32_t), GEX_OP_MAX, NULL, NULL);
@@ -171,6 +151,36 @@ void set_stat_errmsg_or_abort(int* stat, char* errmsg, const int return_stat, co
   }
 }
 
+void caf_c_co_min(CFI_cdesc_t* a_desc, int result_image, int* stat, char* errmsg, size_t num_elements)
+{
+  gex_DT_t a_type;
+
+  switch (a_desc->type)
+  {
+    case CFI_type_int32_t:          a_type = GEX_DT_I32; break;
+    case CFI_type_int64_t:          a_type = GEX_DT_I64; break;
+    case CFI_type_float:            a_type = GEX_DT_FLT; break;
+    case CFI_type_double:           a_type = GEX_DT_DBL; break;
+    default:
+      set_stat_errmsg_or_abort(stat, errmsg, UNRECOGNIZED_TYPE, "");
+  }
+
+  char* a_address = (char*) a_desc->base_addr;
+
+  size_t c_sizeof_a = a_desc->elem_len;
+
+  gex_Event_t ev;
+
+  if (result_image) {
+    ev = gex_Coll_ReduceToOneNB(myteam, result_image-1, a_address, a_address, a_type, c_sizeof_a, num_elements, GEX_OP_MIN, NULL, NULL, 0);
+  } else {
+    ev = gex_Coll_ReduceToAllNB(myteam,                 a_address, a_address, a_type, c_sizeof_a, num_elements, GEX_OP_MIN, NULL, NULL, 0);
+  }
+  gex_Event_Wait(ev);  
+
+  if (stat != NULL) *stat = 0;
+}
+
 void caf_c_co_sum(CFI_cdesc_t* a_desc, int result_image, int* stat, char* errmsg, size_t num_elements)
 {
   gex_DT_t a_type;
@@ -203,4 +213,10 @@ void caf_c_co_sum(CFI_cdesc_t* a_desc, int result_image, int* stat, char* errmsg
   gex_Event_Wait(ev);  
 
   if (stat != NULL) *stat = 0;
+}
+
+bool caf_c_is_character(CFI_cdesc_t* a_desc)
+{
+  if (a_desc->type == CFI_type_char) return true;
+  return false;
 }

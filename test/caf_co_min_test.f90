@@ -19,7 +19,7 @@ contains
            ,it("default integer 7D array elements with stat argument present", min_default_integer_7D_array) &
            ,it("default real scalars with no optional arguments present", min_default_real_scalars) &
            ,it("double precision 2D array elements with no optional arguments present)", min_double_precision_2D_array) &
-           ,it("alphabetizes length-3 default character scalars with no optional arguments", alphabetize_default_character_scalars)&
+          !,it("alphabetizes length-3 default character scalars with no optional arguments", alphabetize_default_character_scalars)&
           !,it("character 2D array elements (no result_image)", alphabetize_across_1D_arrays) &
         ])
     end function

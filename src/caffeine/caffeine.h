@@ -4,6 +4,7 @@
 #ifndef CAFFEINE_H
 #define CAFFEINE_H
 
+#include <stdbool.h>
 #include <gasnetex.h>
 #include <gasnet_coll.h>
 #include <ISO_Fortran_binding.h>
@@ -26,11 +27,6 @@ void caf_c_sync_all();
 
 // _______ Collective Subroutines _______ 
 
-void caf_c_co_min_int32(void* c_loc_a, size_t Nelem, int* stat, int result_image);
-void caf_c_co_min_int64(void* c_loc_a, size_t Nelem, int* stat, int result_image);
-void caf_c_co_min_float(void* c_loc_a, size_t Nelem, int* stat, int result_image);
-void caf_c_co_min_double(void* c_loc_a, size_t Nelem, int* stat, int result_image);
-
 void caf_c_co_max_int32(void* c_loc_a, size_t Nelem, int* stat, int result_image);
 void caf_c_co_max_int64(void* c_loc_a, size_t Nelem, int* stat, int result_image);
 void caf_c_co_max_float(void* c_loc_a, size_t Nelem, int* stat, int result_image);
@@ -46,5 +42,11 @@ void caf_c_co_broadcast(CFI_cdesc_t * a_desc, int source_image, int* stat, int n
 
 // co_sum
 void caf_c_co_sum(CFI_cdesc_t* a_desc, int result_image, int* stat, char* errmsg, size_t num_elements);
+
+// co_min
+void caf_c_co_min(CFI_cdesc_t* a_desc, int result_image, int* stat, char* errmsg, size_t num_elements);
+
+// ____________ Utilties ____________ 
+bool caf_c_is_character(CFI_cdesc_t* a_desc);
 
 #endif // CAFFEINE_H
