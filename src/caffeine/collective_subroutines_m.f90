@@ -1,7 +1,7 @@
 ! Copyright (c), The Regents of the University of California
 ! Terms of use are as specified in LICENSE.txt
 module collective_subroutines_m 
-  use iso_c_binding, only : c_int32_t, c_float, c_char, c_bool
+  use iso_c_binding, only : c_int32_t, c_float, c_char, c_bool, c_funptr
   implicit none
 
   private
@@ -10,48 +10,10 @@ module collective_subroutines_m
   public :: caf_co_min
   public :: caf_co_reduce
   public :: caf_co_broadcast
-
   public :: c_int32_t_operation
   public :: c_float_operation
-  public :: c_char_operation
   public :: c_bool_operation
-
-  interface
- 
-     module subroutine caf_co_sum(a, result_image, stat, errmsg)
-       implicit none
-       type(*), intent(inout), contiguous, target :: a(..)
-       integer, intent(in), target, optional :: result_image
-       integer, intent(out), target, optional :: stat
-       character(len=*), intent(inout), target, optional :: errmsg
-     end subroutine
-
-     module subroutine caf_co_max(a, result_image, stat, errmsg)
-       implicit none
-       type(*), intent(inout), contiguous, target :: a(..)
-       integer, intent(in), optional, target :: result_image
-       integer, intent(out), optional, target :: stat
-       character(len=*), intent(inout), optional, target :: errmsg
-     end subroutine
-
-     module subroutine caf_co_min(a, result_image, stat, errmsg)
-       implicit none
-       type(*), intent(inout), contiguous, target :: a(..)
-       integer, intent(in), optional, target :: result_image
-       integer, intent(out), optional, target :: stat
-       character(len=*), intent(inout), optional, target :: errmsg
-     end subroutine
-
-
-     module subroutine caf_co_broadcast(a, source_image, stat, errmsg)
-       implicit none
-       type(*), intent(inout), contiguous, target :: a(..)
-       integer, optional, intent(in) :: source_image
-       integer, optional, intent(out), target :: stat
-       character(len=*), intent(inout), optional, target :: errmsg
-     end subroutine
-
-  end interface
+  public :: c_char_operation
 
   abstract interface 
 
@@ -85,44 +47,49 @@ module collective_subroutines_m
 
   end interface
 
-  interface caf_co_reduce
-
-     module subroutine caf_co_reduce_c_int32_t(a, operation, result_image, stat, errmsg)
+  interface
+ 
+     module subroutine caf_co_sum(a, result_image, stat, errmsg)
        implicit none
-       integer(c_int32_t), intent(inout), contiguous, target :: a(..)
-       procedure(c_int32_t_operation), pointer, intent(in) :: operation
+       type(*), intent(inout), contiguous, target :: a(..)
+       integer, intent(in), target, optional :: result_image
+       integer, intent(out), target, optional :: stat
+       character(len=*), intent(inout), target, optional :: errmsg
+     end subroutine
+
+     module subroutine caf_co_max(a, result_image, stat, errmsg)
+       implicit none
+       type(*), intent(inout), contiguous, target :: a(..)
        integer, intent(in), optional, target :: result_image
        integer, intent(out), optional, target :: stat
        character(len=*), intent(inout), optional, target :: errmsg
      end subroutine
 
-     module subroutine caf_co_reduce_c_float(a, operation, result_image, stat, errmsg)
+     module subroutine caf_co_min(a, result_image, stat, errmsg)
        implicit none
-       real(c_float), intent(inout), contiguous, target :: a(..)
-       procedure(c_float_operation), pointer, intent(in) :: operation
+       type(*), intent(inout), contiguous, target :: a(..)
        integer, intent(in), optional, target :: result_image
        integer, intent(out), optional, target :: stat
        character(len=*), intent(inout), optional, target :: errmsg
      end subroutine
 
-     module subroutine caf_co_reduce_c_char(a, operation, result_image, stat, errmsg)
+     module subroutine caf_co_reduce(a, operation, result_image, stat, errmsg)
        implicit none
-       character(kind=c_char, len=*), intent(inout), contiguous, target :: a(..)
-       procedure(c_char_operation), pointer, intent(in) :: operation
+       type(*), intent(inout), contiguous, target :: a(..)
+       type(c_funptr), value :: operation
        integer, intent(in), optional, target :: result_image
        integer, intent(out), optional, target :: stat
        character(len=*), intent(inout), optional, target :: errmsg
      end subroutine
 
-     module subroutine caf_co_reduce_c_bool(a, operation, result_image, stat, errmsg)
+     module subroutine caf_co_broadcast(a, source_image, stat, errmsg)
        implicit none
-       logical(c_bool), intent(inout), contiguous, target :: a(..)
-       procedure(c_bool_operation), pointer, intent(in) :: operation
-       integer, intent(in), optional, target :: result_image
-       integer, intent(out), optional, target :: stat
+       type(*), intent(inout), contiguous, target :: a(..)
+       integer, optional, intent(in) :: source_image
+       integer, optional, intent(out), target :: stat
        character(len=*), intent(inout), optional, target :: errmsg
      end subroutine
 
-   end interface
+  end interface
 
 end module

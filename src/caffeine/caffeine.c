@@ -63,47 +63,34 @@ void caf_c_sync_all()
   gasnet_barrier_wait(0,GASNET_BARRIERFLAG_ANONYMOUS);
 }
 
-GASNETT_INLINE(c_co_reduce_universal)
-void c_co_reduce_universal(void* c_loc_a, size_t Nelem, int* stat, int result_image, int dt, size_t sizeof_type, int op, gex_Coll_ReduceFn_t* user_op, void* client_data)
+// GASNETT_INLINE(caf_c_co_reduce)
+void caf_c_co_reduce(
+  CFI_cdesc_t* a_desc, int result_image, int* stat, char* errmsg, int num_elements, gex_Coll_ReduceFn_t* user_op, void* client_data
+)
 {
-     gex_Event_t ev;
-     const int not_present=0;
+  char* a_address = (char*) a_desc->base_addr;
+  size_t c_sizeof_a = a_desc->elem_len;
+  gex_Event_t ev;
 
-     if (result_image == not_present) {
-       ev = gex_Coll_ReduceToAllNB(myteam, c_loc_a, c_loc_a, dt, sizeof_type, Nelem, op, user_op, client_data, 0);
-     } else {
-       ev = gex_Coll_ReduceToOneNB(myteam, result_image-1, c_loc_a, c_loc_a, dt, sizeof_type, Nelem, op, user_op, client_data, 0);
-     }
-     gex_Event_Wait(ev);  
+  if (result_image) {
+    ev = gex_Coll_ReduceToOneNB(
+      myteam, result_image-1, a_address, a_address, GEX_DT_USER, c_sizeof_a, num_elements, GEX_OP_USER, user_op, &c_sizeof_a, 0
+    );
+  } else {
+    ev = gex_Coll_ReduceToAllNB(
+      myteam,                 a_address, a_address, GEX_DT_USER, c_sizeof_a, num_elements, GEX_OP_USER, user_op, &c_sizeof_a, 0
+    );
+  }
+  gex_Event_Wait(ev);  
 
-     if (stat != NULL) *stat = 0;
-}
-
-void caf_c_co_reduce_int32(void* c_loc_a, size_t Nelem, int* stat, int result_image, gex_Coll_ReduceFn_t* operation)
-{
-     c_co_reduce_universal(c_loc_a, Nelem, stat, result_image, GEX_DT_I32, sizeof(int32_t), GEX_OP_USER, operation, NULL);
-}
-
-void caf_c_co_reduce_float(void* c_loc_a, size_t Nelem, int* stat, int result_image, gex_Coll_ReduceFn_t* operation)
-{
-     c_co_reduce_universal(c_loc_a, Nelem, stat, result_image, GEX_DT_FLT, sizeof(float), GEX_OP_USER, operation, NULL);
-}
-
-void caf_c_co_reduce_char(void* c_loc_a, size_t Nelem, int* stat, int result_image, gex_Coll_ReduceFn_t* operation, void* client_data)
-{
-     c_co_reduce_universal(c_loc_a, Nelem, stat, result_image, GEX_DT_USER, sizeof(char), GEX_OP_USER, operation, client_data);
-}
-
-void caf_c_co_reduce_bool(void* c_loc_a, size_t Nelem, int* stat, int result_image, gex_Coll_ReduceFn_t* operation)
-{
-     c_co_reduce_universal(c_loc_a, Nelem, stat, result_image, GEX_DT_I32, sizeof(bool), GEX_OP_USER, operation, NULL);
+  if (stat != NULL) *stat = 0;
 }
 
 void caf_c_co_broadcast(CFI_cdesc_t * a_desc, int source_image, int* stat, int num_elements)
 {
-     char* c_loc_a = (char*) a_desc->base_addr;
-     size_t c_sizeof_a = a_desc->elem_len;
-     int nbytes = num_elements * c_sizeof_a;
+  char* c_loc_a = (char*) a_desc->base_addr;
+  size_t c_sizeof_a = a_desc->elem_len;
+  int nbytes = num_elements * c_sizeof_a;
   
   int data_type = a_desc->type;
 
@@ -225,8 +212,27 @@ void caf_c_co_sum(CFI_cdesc_t* a_desc, int result_image, int* stat, char* errmsg
   if (stat != NULL) *stat = 0;
 }
 
-bool caf_c_is_character(CFI_cdesc_t* a_desc)
+bool caf_c_same_cfi_type(CFI_cdesc_t* a_desc, CFI_cdesc_t* b_desc)
 {
-  if (a_desc->type == CFI_type_char) return true;
+  if (a_desc->type == b_desc->type) return true;
   return false;
+}
+
+size_t caf_c_elem_len(CFI_cdesc_t* a_desc)
+{
+  return a_desc->elem_len;
+}
+
+bool caf_c_numeric_type(CFI_cdesc_t* a_desc)
+{
+  switch (a_desc->type)
+  {
+    case CFI_type_int32_t:          return true;
+    case CFI_type_int64_t:          return true;
+    case CFI_type_float:            return true;
+    case CFI_type_double:           return true;
+    case float_Complex_workaround:  return true;
+    case double_Complex_workaround: return true;
+    default:                        return false;
+  }
 }

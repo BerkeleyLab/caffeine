@@ -9,9 +9,8 @@ module caffeine_h_m
   public :: caf_c_caffeinate, caf_c_decaffeinate
   public :: caf_c_num_images, caf_c_this_image
   public :: caf_c_sync_all
-  public :: caf_c_co_broadcast, caf_c_co_sum, caf_c_co_min, caf_c_co_max
-  public :: caf_c_co_reduce_char, caf_c_co_reduce_int32, caf_c_co_reduce_bool, caf_c_co_reduce_float
-  public :: caf_c_is_character
+  public :: caf_c_co_broadcast, caf_c_co_sum, caf_c_co_min, caf_c_co_max, caf_c_co_reduce
+  public :: caf_c_same_cfi_type, caf_c_elem_len, caf_c_numeric_type
 
   interface
 
@@ -67,11 +66,22 @@ module caffeine_h_m
        integer(c_int), value :: source_image, Nelem
      end subroutine
 
+     subroutine caf_c_co_reduce(a, result_image, c_loc_stat, c_loc_errmsg, num_elements, Coll_ReduceSub, client_data ) bind(C)
+       !! void caf_c_co_reduce(CFI_cdesc_t* a_desc, int result_image, int* stat, char* errmsg, int num_elements, gex_Coll_ReduceFn_t* user_op, void* client_data)
+       import c_int, c_ptr, c_size_t, c_funptr
+       implicit none 
+       type(*) a(..)
+       integer(c_int), value :: result_image
+       type(c_ptr), value :: c_loc_stat, c_loc_errmsg, client_data
+       type(c_funptr), value :: Coll_ReduceSub
+       integer(c_size_t), value :: num_elements
+     end subroutine
+
      subroutine caf_c_co_sum(a, result_image, c_loc_stat, c_loc_errmsg, num_elements) bind(C)
        !! void c_co_sum(CFI_cdesc_t* a_desc, int result_image, int* stat, char* errmsg, size_t num_elements);
        import c_int, c_ptr, c_size_t
        implicit none 
-       type(*) :: a(..)
+       type(*) a(..)
        integer(c_int), value :: result_image
        type(c_ptr), value :: c_loc_stat, c_loc_errmsg
        integer(c_size_t), value :: num_elements
@@ -81,7 +91,7 @@ module caffeine_h_m
        !! void c_co_min(CFI_cdesc_t* a_desc, int result_image, int* stat, char* errmsg, size_t num_elements);
        import c_int, c_ptr, c_size_t
        implicit none 
-       type(*) :: a(..)
+       type(*) a(..)
        integer(c_int), value :: result_image
        type(c_ptr), value :: c_loc_stat, c_loc_errmsg
        integer(c_size_t), value :: num_elements
@@ -91,55 +101,29 @@ module caffeine_h_m
        !! void c_co_max(CFI_cdesc_t* a_desc, int result_image, int* stat, char* errmsg, size_t num_elements);
        import c_int, c_ptr, c_size_t
        implicit none 
-       type(*) :: a(..)
+       type(*) a(..)
        integer(c_int), value :: result_image
        type(c_ptr), value :: c_loc_stat, c_loc_errmsg
        integer(c_size_t), value :: num_elements
      end subroutine
 
-     subroutine caf_c_co_reduce_char(c_loc_a, Nelem, c_loc_stat, result_image, Coll_ReduceSub_c_char, client_data) bind(C)
-       !! void caf_c_co_reduce_char(void* c_loc_a, size_t Nelem, int* stat, int result_image, gex_Coll_ReduceFn_t* operation, void* client_data);
-       import c_ptr, c_size_t, c_funptr, c_int
-       implicit none
-       type(c_ptr), value :: c_loc_a, c_loc_stat, Coll_ReduceSub_c_char, client_data
-       integer(c_size_t), value :: Nelem
-       integer(c_int), value :: result_image
-     end subroutine
-
-     subroutine caf_c_co_reduce_int32(c_loc_a, Nelem, c_loc_stat, result_image, Coll_ReduceSub_c_int32_t) bind(C)
-       !! void caf_c_co_reduce_int32(void* c_loc_a, size_t Nelem, int* stat, int result_image, gex_Coll_ReduceFn_t* operation);
-       import c_ptr, c_size_t, c_funptr, c_int
-       implicit none
-       type(c_ptr), value :: c_loc_a, c_loc_stat
-       integer(c_size_t), value :: Nelem
-       integer(c_int), value :: result_image
-       type(c_funptr), value :: Coll_ReduceSub_c_int32_t
-     end subroutine
-
-     subroutine caf_c_co_reduce_bool(c_loc_a, Nelem, c_loc_stat, result_image, Coll_ReduceSub_c_bool) bind(C)
-       !! void caf_c_co_reduce_bool(void* c_loc_a, size_t Nelem, int* stat, int result_image, gex_Coll_ReduceFn_t* operation);
-       import c_ptr, c_size_t, c_funptr, c_int
-       implicit none
-       type(c_ptr), value :: c_loc_a, c_loc_stat
-       integer(c_size_t), value :: Nelem
-       integer(c_int), value :: result_image
-       type(c_funptr), value :: Coll_ReduceSub_c_bool
-     end subroutine
-
-     subroutine caf_c_co_reduce_float(c_loc_a, Nelem, c_loc_stat, result_image, Coll_ReduceSub_c_float) bind(C)
-       !! void caf_c_co_reduce_float(void* c_loc_a, size_t Nelem, int* stat, int result_image, gex_Coll_ReduceFn_t* operation);
-       import c_ptr, c_size_t, c_funptr, c_int
-       implicit none
-       type(c_ptr), value :: c_loc_a, c_loc_stat
-       integer(c_size_t), value :: Nelem
-       integer(c_int), value :: result_image
-       type(c_funptr), value :: Coll_ReduceSub_c_float
-     end subroutine
-
-     logical(c_bool) pure function caf_c_is_character(a) bind(C)
-       ! bool caf_c_is_character(CFI_cdesc_t* a_desc)
+     logical(c_bool) pure function caf_c_same_cfi_type(a, b) bind(C)
+       ! bool caf_c_same_cfi_type(CFI_cdesc_t* a_desc, CFI_cdesc_t* a_desc)
+       import c_bool
+       type(*), intent(in) :: a(..), b(..)
+     end function
+  
+     logical(c_bool) pure function caf_c_numeric_type(a) bind(C)
+       ! bool caf_c_numeric_type(CFI_cdesc_t* a_desc)
        import c_bool
        type(*), intent(in) :: a(..)
+     end function
+  
+     pure function caf_c_elem_len(a) result(a_elem_len) bind(C)
+       ! size_t caf_c_elem_len(CFI_cdesc_t* a_desc)
+       import c_size_t
+       type(*), intent(in) :: a(..)
+       integer(c_size_t), target :: a_elem_len
      end function
   
   end interface
