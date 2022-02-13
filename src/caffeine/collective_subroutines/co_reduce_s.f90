@@ -63,7 +63,7 @@ contains
       call c_f_pointer(arg1, lhs, [count])
       call c_f_pointer(arg2_and_out, rhs_and_result, [count])
 
-      do i=1, count
+      do concurrent(i=1:count)
         rhs_and_result(i) = int32_op(lhs(i), rhs_and_result(i))
       end do
     end subroutine
@@ -81,7 +81,7 @@ contains
       call c_f_pointer(arg1, lhs, [count])
       call c_f_pointer(arg2_and_out, rhs_and_result, [count])
 
-      do i=1, count
+      do concurrent(i=1:count)
         rhs_and_result(i) = float_op(lhs(i), rhs_and_result(i))
       end do
     end subroutine
@@ -99,7 +99,7 @@ contains
       call c_f_pointer(arg1, lhs, [count])
       call c_f_pointer(arg2_and_out, rhs_and_result, [count])
 
-      do i=1, count
+      do concurrent(i=1:count)
         rhs_and_result(i) = bool_op(lhs(i), rhs_and_result(i))
       end do
     end subroutine
@@ -129,7 +129,7 @@ contains
       block 
         integer(c_size_t) i
 
-        do i=1, count
+        do concurrent(i=1:count)
           rhs_and_result(i) = char_op(lhs(i), rhs_and_result(i))
         end do
       end block
