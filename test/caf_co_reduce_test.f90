@@ -1,7 +1,8 @@
 module caf_co_reduce_test
   use caffeine_m, only : caf_co_reduce, caf_num_images, caf_this_image
   use vegetables, only : result_t, test_item_t, assert_equals, describe, it, assert_that, assert_equals
-  use collective_subroutines_m, only : c_int32_t_operation, c_float_operation, c_char_operation, c_bool_operation
+  use collective_subroutines_m, only : &
+    c_int32_t_operation, c_float_operation, c_char_operation, c_bool_operation, c_float_complex_operation
   use assert_m, only : assert
   use iso_c_binding, only : c_bool, c_funloc, c_char
 
@@ -20,6 +21,7 @@ contains
        ,it("sums default integer scalars with no optional arguments present", sum_default_integer_scalars) &
        ,it("multiplies default real scalars with all optional arguments present", multiply_default_real_scalars) &
        ,it("performs a collective .and. operation across logical scalars", reports_on_consensus) &
+       ,it("sums default complex scalars with a stat-variable present", sum_default_complex_scalars) &
     ])
   end function
 
@@ -49,6 +51,28 @@ contains
       character(len=:), allocatable :: first_alphabetically
       call assert(len(lhs)==len(rhs), "co_reduce_s alphabetize: LHS/RHS length match", lhs//" , "//rhs)
       first_alphabetically = min(lhs,rhs)
+    end function
+
+  end function
+
+  function sum_default_complex_scalars() result(result_)
+    type(result_t) result_
+    integer status_
+    complex z
+    procedure(c_float_complex_operation), pointer :: add_operation
+    complex, parameter :: z_input=(1.,1.)
+
+    add_operation => add_complex
+    z = z_input
+    call caf_co_reduce(z, c_funloc(add_operation), stat=status_)
+    result_ = assert_equals(dble(caf_num_images()*z_input), dble(z)) .and. assert_equals(0, status_)
+
+  contains
+
+    pure function add_complex(lhs, rhs) result(total)
+      complex, intent(in) :: lhs, rhs
+      complex total
+      total = lhs + rhs 
     end function
 
   end function

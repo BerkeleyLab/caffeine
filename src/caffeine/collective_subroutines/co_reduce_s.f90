@@ -20,6 +20,7 @@ contains
     procedure(c_float_operation), pointer :: float_op => null()
     procedure(c_bool_operation), pointer :: bool_op => null()
     procedure(c_char_operation), pointer :: char_op => null()
+    procedure(c_float_complex_operation), pointer :: float_complex_op => null()
 
     call assert(c_associated(operation), "caf_co_reduce: c_associated(operation)")
 
@@ -46,6 +47,10 @@ contains
         call caf_c_co_reduce(a, optional_value(result_image), stat_ptr, errmsg_ptr, &
           int(product(shape(a)), c_size_t), c_funloc(Coll_ReduceSub_c_char), c_loc(len_a))
       end block
+    else if (caf_c_same_cfi_type(a, (0._c_float, 0._c_float))) then
+      call c_f_procpointer(operation, float_complex_op)
+      call caf_c_co_reduce(a, optional_value(result_image), stat_ptr, errmsg_ptr, &
+        int(product(shape(a)), c_size_t), c_funloc(Coll_ReduceSub_c_float_complex), c_null_ptr)
     else
       error stop "caf_co_reduce: unsupported type"
     end if
@@ -85,6 +90,24 @@ contains
 
       do concurrent(i=1:count)
         rhs_and_result(i) = float_op(lhs(i), rhs_and_result(i))
+      end do
+    end subroutine
+
+    subroutine Coll_ReduceSub_c_float_complex(arg1, arg2_and_out, count, cdata) bind(C)
+      type(c_ptr), value :: arg1         !! "Left" operands
+      type(c_ptr), value :: arg2_and_out !! "Right" operands and result
+      integer(c_size_t), value :: count  !! Operand count
+      type(c_ptr), value ::  cdata       !! Client data
+      complex(c_float), pointer :: lhs(:)=>null(), rhs_and_result(:)=>null()
+      integer(c_size_t) i
+
+      call assert(all([c_associated(arg1), c_associated(arg2_and_out)]), "Coll_ReduceSub_c_float_complex: operands associated")
+
+      call c_f_pointer(arg1, lhs, [count])
+      call c_f_pointer(arg2_and_out, rhs_and_result, [count])
+
+      do concurrent(i=1:count)
+        rhs_and_result(i) = float_complex_op(lhs(i), rhs_and_result(i))
       end do
     end subroutine
 
