@@ -236,3 +236,15 @@ bool caf_c_numeric_type(CFI_cdesc_t* a_desc)
     default:                        return false;
   }
 }
+
+#ifdef __GNUC__
+bool caf_c_is_f_string(CFI_cdesc_t* a_desc){
+  if ( (a_desc->type - 5) % 256 == 0) return true;
+  return false;
+}
+#else // The code beow is untested but believed to conform with the Fortran 2018 standard.
+bool caf_c_is_f_string(CFI_cdesc_t* a_desc){
+  if ( (a_desc->type == CFI_type_char) return true;
+  return false;
+}
+#endif

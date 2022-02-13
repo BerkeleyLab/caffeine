@@ -10,7 +10,7 @@ module caffeine_h_m
   public :: caf_c_num_images, caf_c_this_image
   public :: caf_c_sync_all
   public :: caf_c_co_broadcast, caf_c_co_sum, caf_c_co_min, caf_c_co_max, caf_c_co_reduce
-  public :: caf_c_same_cfi_type, caf_c_elem_len, caf_c_numeric_type
+  public :: caf_c_same_cfi_type, caf_c_elem_len, caf_c_numeric_type, caf_c_is_f_string
 
   interface
 
@@ -108,19 +108,25 @@ module caffeine_h_m
      end subroutine
 
      logical(c_bool) pure function caf_c_same_cfi_type(a, b) bind(C)
-       ! bool caf_c_same_cfi_type(CFI_cdesc_t* a_desc, CFI_cdesc_t* a_desc)
+       !! bool caf_c_same_cfi_type(CFI_cdesc_t* a_desc, CFI_cdesc_t* a_desc);
        import c_bool
        type(*), intent(in) :: a(..), b(..)
      end function
   
      logical(c_bool) pure function caf_c_numeric_type(a) bind(C)
-       ! bool caf_c_numeric_type(CFI_cdesc_t* a_desc)
+       !! bool caf_c_numeric_type(CFI_cdesc_t* a_desc);
        import c_bool
        type(*), intent(in) :: a(..)
      end function
   
+     logical(c_bool) pure function caf_c_is_f_string(a) bind(C)
+       !! bool caf_c_is_f_string(CFI_cdesc_t* a_desc);
+       import c_bool
+       type(*), intent(in) :: a(..)
+     end function
+
      pure function caf_c_elem_len(a) result(a_elem_len) bind(C)
-       ! size_t caf_c_elem_len(CFI_cdesc_t* a_desc)
+       !! size_t caf_c_elem_len(CFI_cdesc_t* a_desc);
        import c_size_t
        type(*), intent(in) :: a(..)
        integer(c_size_t), target :: a_elem_len

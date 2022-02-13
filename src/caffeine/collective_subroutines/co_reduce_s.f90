@@ -6,7 +6,7 @@ submodule(collective_subroutines_m) co_reduce_s
   use assert_m, only : assert
   use intrinsic_array_m, only : intrinsic_array_t
   use utilities_m, only : get_c_ptr, get_c_ptr_character, optional_value
-  use caffeine_h_m, only : caf_c_co_reduce, caf_c_same_cfi_type, caf_c_elem_len
+  use caffeine_h_m, only : caf_c_co_reduce, caf_c_same_cfi_type, caf_c_elem_len, caf_c_is_f_string
   implicit none
 
   character(kind=c_char,len=5), parameter :: dummy = "     "
@@ -38,7 +38,7 @@ contains
       call c_f_procpointer(operation, bool_op)
       call caf_c_co_reduce(a, optional_value(result_image), stat_ptr, errmsg_ptr, &
         int(product(shape(a)), c_size_t), c_funloc(Coll_ReduceSub_c_bool), c_null_ptr)
-    else 
+    else if (caf_c_is_f_string(a)) then
       block
         integer(c_size_t), target :: len_a
         len_a = caf_c_elem_len(a)
@@ -46,6 +46,8 @@ contains
         call caf_c_co_reduce(a, optional_value(result_image), stat_ptr, errmsg_ptr, &
           int(product(shape(a)), c_size_t), c_funloc(Coll_ReduceSub_c_char), c_loc(len_a))
       end block
+    else
+      error stop "caf_co_reduce: unsupported type"
     end if
 
   contains

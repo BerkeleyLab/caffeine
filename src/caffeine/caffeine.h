@@ -56,6 +56,8 @@ bool caf_c_same_cfi_type(CFI_cdesc_t* a_desc, CFI_cdesc_t* b_desc);
 
 bool caf_c_numeric_type(CFI_cdesc_t* a_desc);
 
+bool caf_c_is_f_string(CFI_cdesc_t* a_desc);
+
 size_t caf_c_elem_len(CFI_cdesc_t* a_desc);
 
 #endif // CAFFEINE_H
