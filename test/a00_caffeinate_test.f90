@@ -1,5 +1,5 @@
 module a00_caffeinate_test
-    use caffeinate_decaffeinate_m, only : caffeinate
+    use caffeinate_decaffeinate_m, only : caf_caffeinate
     use vegetables, only: test_item_t, describe, result_t, it, assert_that
 
     implicit none
@@ -22,7 +22,7 @@ contains
 
         integer, parameter :: successful_initiation = 0
 
-        result_ = assert_that(caffeinate() == successful_initiation)
+        result_ = assert_that(caf_caffeinate() == successful_initiation)
     end function
 
 end module a00_caffeinate_test

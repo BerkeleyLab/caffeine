@@ -1,5 +1,5 @@
 module zzz_decaffeinate_test
-    use caffeinate_decaffeinate_m, only : decaffeinate
+    use caffeinate_decaffeinate_m, only : caf_decaffeinate
     use vegetables, only: test_item_t, describe, result_t, it, assert_that
 
     implicit none

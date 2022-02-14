@@ -19,8 +19,9 @@ contains
            ,it("default integer 7D array elements with stat argument present", max_default_integer_7D_array) &
            ,it("default real scalars with stat argument present", max_default_real_scalars) &
            ,it("double precision 2D array elements with no optional arguments present", max_double_precision_2D_array) &
-          !,it("character scalar", max_double_precision_2D_array) &
-          !,it("character 2D array elements", max_double_precision_2D_array) &
+           ,it("reverse-alphabetizes length-5 default character scalars with no optional arguments", &
+               reverse_alphabetize_default_character_scalars) &
+           ,it("elements across images with 2D arrays of strings", max_elements_in_2D_string_arrays) &
         ])
     end function
 
@@ -90,27 +91,55 @@ contains
         result_ = assert_that(all(array==tent))
     end function
 
-   ! function max_default_character_scalars() result(result_)
-   !     type(result_t) result_
-   !     real scalar
-   !     character z
-   !     character, parameter :: i=(0.,1)
+    function max_elements_in_2D_string_arrays() result(result_)
+      type(result_t) result_
+      character(len=*), parameter :: script(*) = ["To be ","or not","to    ","be.   "]
+      character(len=len(script)), dimension(2,2) :: scramlet, co_max_scramlet
+      integer i, cyclic_permutation(size(script))
+    
+      associate(me => this_image())
+        associate(cyclic_permutation => [(1 + mod(i-1,size(script)), i=me, me+size(script) )]) 
+          scramlet = reshape(script(cyclic_permutation), [2,2])
+        end associate
+      end associate
 
-   !     z = i
-   !     call caf_co_max(z)
-   !     result_ = assert_equals(dble(abs(i*caf_num_images())), dble(abs(z)) )
-   ! end function
-   !          
-   ! function max_double_precision_character_3D_arrays() result(result_)
-   !     type(result_t) result_
-   !     integer, parameter :: dp = kind(1.D0)
-   !     character(dp), allocatable :: array(:,:,:)
-   !     character(dp), parameter :: &
-   !       input(*,*,*) = reshape( [(-1.,0.) , (0.0,1.0), (1.0,0.0), (0.0,-1.0), (0.0,0.0), (0.0,1.0)], [3,1,2])
- 
-   !     array = input
-   !     call caf_co_max(array)
-   !     result_ = assert_equals(dble(product(abs(input))*caf_num_images()), dble(product(abs(array))))
-   ! end function
+      co_max_scramlet = scramlet
+      call caf_co_max(co_max_scramlet, result_image=1)
+
+      block 
+        integer j, delta_j
+        character(len=len(script)) expected_script(size(script)), expected_scramlet(size(scramlet,1),size(scramlet,2))
+
+        do j=1, size(script)
+          expected_script(j) = script(j)
+          do delta_j = 1, max(caf_num_images()-1, size(script))
+            associate(periodic_index => 1 + mod(j+delta_j-1, size(script)))
+              expected_script(j) = max(expected_script(j), script(periodic_index))
+            end associate
+          end do
+        end do
+        expected_scramlet = reshape(expected_script, shape(scramlet))
+
+        result_ =  assert_that(all(scramlet == co_max_scramlet),"all(scramlet == co_max_scramlet)")
+      end block
+    
+    end function
+
+    function reverse_alphabetize_default_character_scalars() result(result_)
+      type(result_t) result_
+      character(len=*), parameter :: words(*) = [character(len=len("loddy")):: "loddy","doddy","we","like","to","party"]
+      character(len=:), allocatable :: my_word
+
+      associate(me => caf_this_image())
+        associate(periodic_index => 1 + mod(me-1,size(words)))
+          my_word = words(periodic_index)
+          call caf_co_max(my_word)
+        end associate
+      end associate
+
+      associate(expected_word => maxval(words(1:min(caf_num_images(), size(words)))))
+        result_ = assert_equals(expected_word, my_word)
+      end associate
+    end function
 
 end module caf_co_max_test

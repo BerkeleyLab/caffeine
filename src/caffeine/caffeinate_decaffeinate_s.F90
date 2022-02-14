@@ -1,40 +1,29 @@
 ! Copyright (c), The Regents of the University of California
 ! Terms of use are as specified in LICENSE.txt
 submodule(caffeinate_decaffeinate_m) caffeinate_decaffeinate_s
-  use iso_c_binding, only : c_int, c_ptr, c_loc, c_char, c_null_char
+  use iso_c_binding, only : c_int, c_loc, c_char, c_null_char
   use synchronization_m, only : caf_sync_all
+  use caffeine_h_m, only : caf_c_caffeinate, caf_c_decaffeinate
   implicit none
 
 contains
 
-  module procedure caffeinate
+  module procedure caf_caffeinate
 
-    interface
+    integer i
+    integer, parameter :: max_arg_len = 1024
 
-      subroutine c_caffeinate(argc, argv) bind(C)
-        !! C function prototype: int testhello(int argc, char **argv)
-        import c_int, c_ptr
-        integer(c_int), value :: argc
-        integer(c_int) :: exit_code
-        type(c_ptr) argv(*)
-      end subroutine
-
-    end interface
-
-  integer i
-  integer, parameter :: max_arg_len = 1024
-
-  associate(argc => int(command_argument_count(),c_int))
-    associate(argv => [(c_loc(c_interop_arg(i)), i=0,argc)])
-      call c_caffeinate(argc, argv)
+    associate(argc => int(command_argument_count(),c_int))
+      associate(argv => [(c_loc(c_interop_arg(i)), i=0,argc)])
+        call caf_c_caffeinate(argc, argv)
+      end associate
     end associate
-  end associate
 
-  ! TODO: establish non-allocatable coarrays
+    ! TODO: establish non-allocatable coarrays
 
-  call caf_sync_all
-  
-  exit_code = 0
+    call caf_sync_all
+    
+    exit_code = 0
 
   contains
  
@@ -55,25 +44,13 @@ contains
   
   end procedure
 
-  module procedure decaffeinate
-
-    interface
-
-      subroutine c_decaffeinate(exit_code) bind(C)
-        import c_int 
-        integer(c_int), value :: exit_code
-      end subroutine
-      
-      subroutine c_sync_all() bind(C)
-      end subroutine
-
-    end interface
+  module procedure caf_decaffeinate
 
     integer(c_int), parameter :: normal_termination=0
     
-    call c_sync_all
+    call caf_sync_all
 
-    call c_decaffeinate(normal_termination) 
+    call caf_c_decaffeinate(normal_termination) 
   end procedure
 
 end submodule caffeinate_decaffeinate_s
