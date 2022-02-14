@@ -73,8 +73,8 @@ void caf_c_co_reduce(
   gex_Event_t ev;
 
   switch (a_desc->type) {
-    case float_Complex_workaround:  num_elements *= 2; break;
-    case double_Complex_workaround: num_elements *= 2; break;
+    case float_Complex_workaround:  c_sizeof_a *= 2; break;
+    case double_Complex_workaround: c_sizeof_a *= 2; break;
   }
 
   if (result_image) {
