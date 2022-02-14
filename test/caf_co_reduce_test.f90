@@ -22,6 +22,7 @@ contains
        ,it("multiplies default real scalars with all optional arguments present", multiply_default_real_scalars) &
        ,it("performs a collective .and. operation across logical scalars", reports_on_consensus) &
        ,it("sums default complex scalars with a stat-variable present", sum_default_complex_scalars) &
+       ,it("sums default integer elements of a 2D array across images", sum_integer_array_elements) &
     ])
   end function
 
@@ -51,6 +52,29 @@ contains
       character(len=:), allocatable :: first_alphabetically
       call assert(len(lhs)==len(rhs), "co_reduce_s alphabetize: LHS/RHS length match", lhs//" , "//rhs)
       first_alphabetically = min(lhs,rhs)
+    end function
+
+  end function
+
+  function sum_integer_array_elements() result(result_)
+    type(result_t) result_
+    integer status_
+    integer, parameter :: input_array(*,*) = reshape([1, 2, 3, 4], [2, 2])
+    integer array(2,2)
+    procedure(c_int32_t_operation), pointer :: add_operation=>null()
+    complex, parameter :: array_input=1
+
+    add_operation => add_integers
+    array = input_array
+    call caf_co_reduce(array, c_funloc(add_operation))
+    result_ = assert_that(all(caf_num_images()*input_array==array))
+
+  contains
+
+    pure function add_integers(lhs, rhs) result(total)
+      integer, intent(in) :: lhs, rhs
+      integer total
+      total = lhs + rhs 
     end function
 
   end function
