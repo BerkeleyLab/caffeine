@@ -21,7 +21,7 @@ contains
            ,it("double precision 2D array elements with no optional arguments present", max_double_precision_2D_array) &
            ,it("reverse-alphabetizes length-5 default character scalars with no optional arguments", &
                reverse_alphabetize_default_character_scalars) &
-          !,it("character 2D array elements", max_double_precision_2D_array) &
+           ,it("elements across images with 2D arrays of strings", max_elements_in_2D_string_arrays) &
         ])
     end function
 
@@ -89,6 +89,40 @@ contains
         array = tent*dble(caf_this_image())
         call caf_co_max(array)
         result_ = assert_that(all(array==tent))
+    end function
+
+    function max_elements_in_2D_string_arrays() result(result_)
+      type(result_t) result_
+      character(len=*), parameter :: script(*) = ["To be ","or not","to    ","be.   "]
+      character(len=len(script)), dimension(2,2) :: scramlet, co_max_scramlet
+      integer i, cyclic_permutation(size(script))
+    
+      associate(me => this_image())
+        associate(cyclic_permutation => [(1 + mod(i-1,size(script)), i=me, me+size(script) )]) 
+          scramlet = reshape(script(cyclic_permutation), [2,2])
+        end associate
+      end associate
+
+      co_max_scramlet = scramlet
+      call caf_co_max(co_max_scramlet, result_image=1)
+
+      block 
+        integer j, delta_j
+        character(len=len(script)) expected_script(size(script)), expected_scramlet(size(scramlet,1),size(scramlet,2))
+
+        do j=1, size(script)
+          expected_script(j) = script(j)
+          do delta_j = 1, max(caf_num_images()-1, size(script))
+            associate(periodic_index => 1 + mod(j+delta_j-1, size(script)))
+              expected_script(j) = max(expected_script(j), script(periodic_index))
+            end associate
+          end do
+        end do
+        expected_scramlet = reshape(expected_script, shape(scramlet))
+
+        result_ =  assert_that(all(scramlet == co_max_scramlet),"all(scramlet == co_max_scramlet)")
+      end block
+    
     end function
 
     function reverse_alphabetize_default_character_scalars() result(result_)
