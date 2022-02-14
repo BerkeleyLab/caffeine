@@ -19,8 +19,8 @@ contains
            ,it("default integer 7D array elements with stat argument present", min_default_integer_7D_array) &
            ,it("default real scalars with stat argument present", min_default_real_scalars) &
            ,it("double precision 2D array elements with no optional arguments present", min_double_precision_2D_array) &
-          !,it("alphabetizes length-5 default character scalars with no optional arguments", &
-          !    alphabetize_default_character_scalars) &
+           ,it("alphabetizes length-5 default character scalars with no optional arguments", &
+               alphabetize_default_character_scalars) &
           !,it("character 2D array elements", min_double_precision_2D_array) &
         ])
     end function
@@ -88,7 +88,7 @@ contains
  
         array = tent*dble(caf_this_image())
         call caf_co_min(array)
-        result_ = assert_that(all(array==tent))
+        result_ = assert_that(all(array==tent*caf_num_images()))
     end function
 
     function alphabetize_default_character_scalars() result(result_)
