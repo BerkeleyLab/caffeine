@@ -1,6 +1,6 @@
 module caf_co_min_test
     use caffeine_m, only : caf_co_min, caf_num_images
-    use vegetables, only: result_t, test_item_t, assert_equals, describe, it, assert_that, assert_equals
+    use vegetables, only: result_t, test_item_t, assert_equals, describe, it, assert_that, assert_equals, succeed
     use image_enumeration_m, only : caf_this_image, caf_num_images
 
     implicit none
@@ -21,7 +21,7 @@ contains
            ,it("double precision 2D array elements with no optional arguments present", min_double_precision_2D_array) &
            ,it("length-5 string with no optional arguments", &
                alphabetically_1st_scalar_string) &
-          !,it("character 2D array elements", min_double_precision_2D_array) &
+           ,it("elements across images with 2D arrays of strings", min_elements_in_2D_string_arrays) &
         ])
     end function
 
@@ -89,6 +89,40 @@ contains
         array = tent*dble(caf_this_image())
         call caf_co_min(array)
         result_ = assert_that(all(array==tent*caf_num_images()))
+    end function
+
+    function min_elements_in_2D_string_arrays() result(result_)
+      type(result_t) result_
+      character(len=*), parameter :: script(*) = ["To be ","or not","to    ","be.   "]
+      character(len=len(script)), dimension(2,2) :: scramlet, co_min_scramlet
+      integer i, cyclic_permutation(size(script))
+      
+      associate(me => this_image())
+        associate(cyclic_permutation => [(1 + mod(i-1,size(script)), i=me, me+size(script) )])
+          scramlet = reshape(script(cyclic_permutation), [2,2])
+        end associate
+      end associate
+
+      co_min_scramlet = scramlet
+      call caf_co_min(co_min_scramlet, result_image=1)
+
+      block 
+        integer j, delta_j
+        character(len=len(script)) expected_script(size(script)), expected_scramlet(size(scramlet,1),size(scramlet,2))
+
+        do j=1, size(script)
+          expected_script(j) = script(j)
+          do delta_j = 1, min(caf_num_images()-1, size(script))
+            associate(periodic_index => 1 + mod(j+delta_j-1, size(script)))
+              expected_script(j) = min(expected_script(j), script(periodic_index))
+            end associate
+          end do
+        end do
+        expected_scramlet = reshape(expected_script, shape(scramlet))
+
+        result_ =  assert_that(all(scramlet == co_min_scramlet),"all(scramlet == co_min_scramlet)")
+      end block
+      
     end function
 
     function alphabetically_1st_scalar_string() result(result_)
