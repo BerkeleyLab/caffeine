@@ -19,8 +19,8 @@ contains
            ,it("default integer 7D array elements with stat argument present", min_default_integer_7D_array) &
            ,it("default real scalars with stat argument present", min_default_real_scalars) &
            ,it("double precision 2D array elements with no optional arguments present", min_double_precision_2D_array) &
-           ,it("alphabetizes length-5 default character scalars with no optional arguments", &
-               alphabetize_default_character_scalars) &
+           ,it("length-5 string with no optional arguments", &
+               alphabetically_1st_scalar_string) &
           !,it("character 2D array elements", min_double_precision_2D_array) &
         ])
     end function
@@ -91,7 +91,7 @@ contains
         result_ = assert_that(all(array==tent*caf_num_images()))
     end function
 
-    function alphabetize_default_character_scalars() result(result_)
+    function alphabetically_1st_scalar_string() result(result_)
       type(result_t) result_
       character(len=*), parameter :: words(*) = [character(len=len("loddy")):: "loddy","doddy","we","like","to","party"]
       character(len=:), allocatable :: my_word

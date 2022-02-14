@@ -17,7 +17,7 @@ contains
   
     tests = describe( &
       "The caf_co_reduce subroutine", &
-      [ it("alphabetizes length-5 default character scalars with result_image present", alphabetize_default_character_scalars) & 
+      [ it("finds the alphabetically first length-5 string with result_image present", alphabetically_1st_scalar_string) & 
        ,it("sums default integer scalars with no optional arguments present", sum_default_integer_scalars) &
        ,it("multiplies default real scalars with all optional arguments present", multiply_default_real_scalars) &
        ,it("performs a collective .and. operation across logical scalars", reports_on_consensus) &
@@ -25,7 +25,7 @@ contains
     ])
   end function
 
-  function alphabetize_default_character_scalars() result(result_)
+  function alphabetically_1st_scalar_string() result(result_)
     type(result_t) result_
     procedure(c_char_operation), pointer :: alphabetize_operation
     character(len=*, kind=c_char), parameter :: names(*) = ["larry","harry","carey","betty","tommy","billy"]
