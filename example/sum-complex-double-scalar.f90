@@ -1,14 +1,12 @@
-program double
+program sum_double_complex_scalar
   use caffeine_m, only : caf_co_sum, caf_num_images, caf_caffeinate, caf_decaffeinate
-  use assert_m, only : assert
-
   implicit none
 
   integer, parameter :: dp = kind(1.D0)
-  complex(dp), allocatable :: scalar
   complex(dp), parameter :: input = (1.D0,1.0D0)
+  complex(dp) scalar
 
-  call assert(caf_caffeinate()==0,"caf_caffeinate()==0")
+  if (caf_caffeinate()/=0) error stop "caf_caffeinate() returned a non-zero exit code"
 
   scalar = input
   call caf_co_sum(scalar)

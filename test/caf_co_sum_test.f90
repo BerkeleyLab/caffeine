@@ -20,8 +20,7 @@ contains
            ,it("sums default real scalars with result_image argument present", sum_default_real_scalars) &
            ,it("sums double precision 2D arrays with no optional arguments present", sum_double_precision_2D_array) &
            ,it("sums default complex scalars with stat argument present", sum_default_complex_scalars) &
-           ! This test yields the correct result and then the code crashes:
-           !,it("sums double precision 1D complex arrays with no optional arguments present", sum_dble_complex_1D_arrays) &
+           ,it("sums double precision 1D complex arrays with no optional arguments present", sum_dble_complex_1D_arrays) &
         ])
     end function
 

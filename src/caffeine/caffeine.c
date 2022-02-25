@@ -18,7 +18,7 @@ static gex_Rank_t rank, size;
   const int double_Complex_workaround = CFI_type_double_Complex;
 #else
   const int float_Complex_workaround = 2052;
-  const int double_Complex_workaround = 4011;
+  const int double_Complex_workaround = 4100;
 #endif
 
 void caf_c_caffeinate(int argc, char *argv[])
