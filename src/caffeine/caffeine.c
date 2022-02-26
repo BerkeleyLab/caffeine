@@ -63,7 +63,6 @@ void caf_c_sync_all()
   gasnet_barrier_wait(0,GASNET_BARRIERFLAG_ANONYMOUS);
 }
 
-// GASNETT_INLINE(caf_c_co_reduce)
 void caf_c_co_reduce(
   CFI_cdesc_t* a_desc, int result_image, int* stat, char* errmsg, int num_elements, gex_Coll_ReduceFn_t* user_op, void* client_data
 )
