@@ -18,7 +18,7 @@ static gex_Rank_t rank, size;
   const int double_Complex_workaround = CFI_type_double_Complex;
 #else
   const int float_Complex_workaround = 2052;
-  const int double_Complex_workaround = 4100;
+  const int double_Complex_workaround =4100;
 #endif
 
 void caf_c_caffeinate(int argc, char *argv[])
@@ -187,23 +187,21 @@ void caf_c_co_sum(CFI_cdesc_t* a_desc, int result_image, int* stat, char* errmsg
 {
   gex_DT_t a_type;
 
+  size_t c_sizeof_a = a_desc->elem_len;
+
   switch (a_desc->type)
   {
     case CFI_type_int32_t:          a_type = GEX_DT_I32; break;
     case CFI_type_int64_t:          a_type = GEX_DT_I64; break;
     case CFI_type_float:            a_type = GEX_DT_FLT; break;
     case CFI_type_double:           a_type = GEX_DT_DBL; break;
-    case float_Complex_workaround:  a_type = GEX_DT_FLT; num_elements *= 2; break;
-    case double_Complex_workaround: a_type = GEX_DT_DBL; num_elements *= 2; break;
+    case float_Complex_workaround:  a_type = GEX_DT_FLT; num_elements *= 2; c_sizeof_a /= 2; break;
+    case double_Complex_workaround: a_type = GEX_DT_DBL; num_elements *= 2; c_sizeof_a /= 2; break;
     default:
       set_stat_errmsg_or_abort(stat, errmsg, UNRECOGNIZED_TYPE, "");
   }
 
   char* a_address = (char*) a_desc->base_addr;
-
-  size_t c_sizeof_a = a_desc->elem_len;
-
-  if (a_type == float_Complex_workaround || a_type == double_Complex_workaround) c_sizeof_a /= 2;
 
   gex_Event_t ev;
 
