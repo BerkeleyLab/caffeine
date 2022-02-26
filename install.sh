@@ -289,6 +289,11 @@ GASNET_CC="`$PKG_CONFIG $pkg --variable=GASNET_CC`"
 GASNET_CFLAGS="`$PKG_CONFIG $pkg --variable=GASNET_CFLAGS`"
 GASNET_CPPFLAGS="`$PKG_CONFIG $pkg --variable=GASNET_CPPFLAGS`"
 
+if [ "$GASNET_CC" != "$FPM_CC" ]; then 
+  echo "GASNET_CC=$GASNET_CC" and  "FPM_CC=$FPM_CC don't match"
+  exit 1;
+fi
+
 echo "# DO NOT EDIT OR COMMIT -- Created by caffeine/install.sh" > build/fpm.toml
 cp manifest/fpm.toml.template build/fpm.toml
 GASNET_LIB_LOCATIONS=`echo $GASNET_LIBS | awk '{locs=""; for(i = 1; i <= NF; i++) if ($i ~ /^-L/) {locs=(locs " " $i);}; print locs; }'`
