@@ -17,7 +17,7 @@ contains
   
     tests = describe( &
       "The caf_co_reduce subroutine", &
-      [ it("finds the alphabetically first length-5 string with result_image present", alphabetically_1st_scalar_string) & 
+      [ it("finds the alphabetically first length-5 string with result_image present", alphabetically_1st_size1_string_array) & 
        ,it("sums default integer scalars with no optional arguments present", sum_default_integer_scalars) &
        ,it("multiplies default real scalars with all optional arguments present", multiply_default_real_scalars) &
        ,it("performs a collective .and. operation across logical scalars", reports_on_consensus) &
@@ -26,23 +26,23 @@ contains
     ])
   end function
 
-  function alphabetically_1st_scalar_string() result(result_)
+  function alphabetically_1st_size1_string_array() result(result_)
     type(result_t) result_
     procedure(c_char_operation), pointer :: alphabetize_operation
     character(len=*, kind=c_char), parameter :: names(*) = ["larry","harry","carey","betty","tommy","billy"]
-    character(len=:, kind=c_char), allocatable :: my_name
+    character(len=:, kind=c_char), allocatable :: my_name(:)
 
     alphabetize_operation => alphabetize
 
     associate(me => caf_this_image())
       associate(periodic_index => 1 + mod(me-1,size(names)))
-        my_name = names(periodic_index)
+        my_name = [names(periodic_index)]
         call caf_co_reduce(my_name, c_funloc(alphabetize_operation))
       end associate
     end associate
 
     associate(expected_name => minval(names(1:min(caf_num_images(), size(names)))))
-      result_ = assert_equals(expected_name, my_name)
+      result_ = assert_that(all(expected_name == my_name))
     end associate
 
   contains
