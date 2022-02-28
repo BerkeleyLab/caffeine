@@ -1,6 +1,6 @@
 module caf_co_broadcast_test
   use caffeine_m, only : caf_co_broadcast, caf_num_images, caf_this_image
-  use vegetables, only : result_t, test_item_t, assert_equals, describe, it, assert_equals, assert_that
+  use vegetables, only : result_t, test_item_t, describe, it, assert_equals, assert_that
 
   implicit none
   private
