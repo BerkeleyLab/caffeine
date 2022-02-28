@@ -2,9 +2,9 @@ module caf_co_reduce_test
   use caffeine_m, only : caf_co_reduce, caf_num_images, caf_this_image
   use vegetables, only : result_t, test_item_t, assert_equals, describe, it, assert_that, assert_equals
   use collective_subroutines_m, only : &
-    c_int32_t_operation, c_float_operation, c_char_operation, c_bool_operation, c_float_complex_operation
+    c_int32_t_operation, c_float_operation, c_char_operation, c_bool_operation, c_float_complex_operation, c_double_operation
   use assert_m, only : assert
-  use iso_c_binding, only : c_bool, c_funloc, c_char
+  use iso_c_binding, only : c_bool, c_funloc, c_char, c_double
 
   implicit none
   private
@@ -20,6 +20,7 @@ contains
       [ it("finds the alphabetically first length-5 string with result_image present", alphabetically_1st_size1_string_array) & 
        ,it("sums default integer scalars with no optional arguments present", sum_default_integer_scalars) &
        ,it("multiplies default real scalars with all optional arguments present", multiply_default_real_scalars) &
+       ,it("multiplies real(c_double) scalars with all optional arguments present", multiply_c_double_scalars) &
        ,it("performs a collective .and. operation across logical scalars", reports_on_consensus) &
        ,it("sums default complex scalars with a stat-variable present", sum_default_complex_scalars) &
        ,it("sums default integer elements of a 2D array across images", sum_integer_array_elements) &
@@ -150,6 +151,36 @@ contains
 
   end function
 
+  function multiply_c_double_scalars() result(result_)
+    type(result_t) result_
+    real(c_double) p
+    integer j, status_
+    character(len=:), allocatable :: error_message
+    procedure(c_double_operation), pointer :: multiply_operation
+
+    error_message = "unused"
+    multiply_operation => multiply_doubles
+    associate(me => caf_this_image())
+      p = real(me,c_double)
+      call caf_co_reduce(p, c_funloc(multiply_operation), result_image=1, stat=status_, errmsg=error_message)
+      associate(expected_result => merge( product([(real(j,c_double), j = 1, caf_num_images())]), real(me,c_double), me==1 ))
+        result_ = &
+          assert_equals(expected_result, real(p,c_double)) .and. &
+          assert_equals(0, status_) .and. &
+          assert_equals("unused", error_message)
+      end associate
+    end associate
+
+  contains
+
+    pure function multiply_doubles(lhs, rhs) result(product_)
+      real(c_double), intent(in) :: lhs, rhs
+      real(c_double) product_
+      product_ = lhs * rhs 
+    end function
+
+  end function
+
   function multiply_default_real_scalars() result(result_)
     type(result_t) result_
     real p
@@ -179,5 +210,4 @@ contains
     end function
 
   end function
-
 end module caf_co_reduce_test

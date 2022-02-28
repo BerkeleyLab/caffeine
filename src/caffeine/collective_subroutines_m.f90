@@ -1,7 +1,7 @@
 ! Copyright (c), The Regents of the University of California
 ! Terms of use are as specified in LICENSE.txt
 module collective_subroutines_m 
-  use iso_c_binding, only : c_int32_t, c_float, c_char, c_bool, c_funptr
+  use iso_c_binding, only : c_int32_t, c_float, c_char, c_bool, c_funptr, c_double
   implicit none
 
   private
@@ -10,8 +10,10 @@ module collective_subroutines_m
   public :: caf_co_min
   public :: caf_co_reduce
   public :: caf_co_broadcast
+
   public :: c_int32_t_operation
   public :: c_float_operation
+  public :: c_double_operation
   public :: c_bool_operation
   public :: c_char_operation
   public :: c_float_complex_operation
@@ -30,6 +32,13 @@ module collective_subroutines_m
       implicit none
       real(c_float), intent(in) :: lhs, rhs
       real(c_float) lhs_op_rhs
+    end function
+
+    pure function c_double_operation(lhs, rhs) result(lhs_op_rhs)
+      import c_double
+      implicit none
+      real(c_double), intent(in) :: lhs, rhs
+      real(c_double) lhs_op_rhs
     end function
 
     pure function c_bool_operation(lhs, rhs) result(lhs_op_rhs)
