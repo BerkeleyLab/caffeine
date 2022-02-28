@@ -2,7 +2,8 @@ module caf_co_reduce_test
   use caffeine_m, only : caf_co_reduce, caf_num_images, caf_this_image
   use vegetables, only : result_t, test_item_t, assert_equals, describe, it, assert_that, assert_equals
   use collective_subroutines_m, only : &
-    c_int32_t_operation, c_float_operation, c_char_operation, c_bool_operation, c_float_complex_operation, c_double_operation
+    c_int32_t_operation, c_float_operation, c_char_operation, c_bool_operation, c_float_complex_operation, c_double_operation &
+   ,c_double_complex_operation
   use assert_m, only : assert
   use iso_c_binding, only : c_bool, c_funloc, c_char, c_double
 
@@ -23,6 +24,7 @@ contains
        ,it("multiplies real(c_double) scalars with all optional arguments present", multiply_c_double_scalars) &
        ,it("performs a collective .and. operation across logical scalars", reports_on_consensus) &
        ,it("sums default complex scalars with a stat-variable present", sum_default_complex_scalars) &
+       ,it("sums complex(c_double) scalars with a stat-variable present", sum_complex_c_double_scalars) &
        ,it("sums default integer elements of a 2D array across images", sum_integer_array_elements) &
     ])
   end function
@@ -74,6 +76,28 @@ contains
     pure function add_integers(lhs, rhs) result(total)
       integer, intent(in) :: lhs, rhs
       integer total
+      total = lhs + rhs 
+    end function
+
+  end function
+
+  function sum_complex_c_double_scalars() result(result_)
+    type(result_t) result_
+    integer status_
+    complex(c_double) z
+    procedure(c_double_complex_operation), pointer :: add_operation
+    complex(c_double), parameter :: z_input=(1._c_double, 1._c_double)
+
+    add_operation => add_complex
+    z = z_input
+    call caf_co_reduce(z, c_funloc(add_operation), stat=status_)
+    result_ = assert_equals(real(caf_num_images()*z_input, c_double), real(z, c_double)) .and. assert_equals(0, status_)
+
+  contains
+
+    pure function add_complex(lhs, rhs) result(total)
+      complex(c_double), intent(in) :: lhs, rhs
+      complex(c_double) total
       total = lhs + rhs 
     end function
 

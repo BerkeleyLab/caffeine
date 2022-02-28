@@ -17,6 +17,7 @@ module collective_subroutines_m
   public :: c_bool_operation
   public :: c_char_operation
   public :: c_float_complex_operation
+  public :: c_double_complex_operation
 
   abstract interface 
 
@@ -60,6 +61,13 @@ module collective_subroutines_m
       implicit none
       complex(c_float), intent(in) :: lhs, rhs
       complex(c_float) lhs_op_rhs
+    end function
+
+    pure function c_double_complex_operation(lhs, rhs) result(lhs_op_rhs)
+      import c_double
+      implicit none
+      complex(c_double), intent(in) :: lhs, rhs
+      complex(c_double) lhs_op_rhs
     end function
 
   end interface
