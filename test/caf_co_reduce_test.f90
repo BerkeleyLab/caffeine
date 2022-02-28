@@ -2,10 +2,10 @@ module caf_co_reduce_test
   use caffeine_m, only : caf_co_reduce, caf_num_images, caf_this_image
   use vegetables, only : result_t, test_item_t, assert_equals, describe, it, assert_that, assert_equals
   use collective_subroutines_m, only : &
-    c_int32_t_operation, c_float_operation, c_char_operation, c_bool_operation, c_float_complex_operation, c_double_operation &
-   ,c_double_complex_operation
+     c_int32_t_operation, c_int64_t_operation, c_float_operation, c_double_operation, c_char_operation, c_bool_operation &
+    ,c_float_complex_operation, c_double_complex_operation
   use assert_m, only : assert
-  use iso_c_binding, only : c_bool, c_funloc, c_char, c_double
+  use iso_c_binding, only : c_bool, c_funloc, c_char, c_double, c_int64_t
 
   implicit none
   private
@@ -20,6 +20,7 @@ contains
       "The caf_co_reduce subroutine", &
       [ it("finds the alphabetically first length-5 string with result_image present", alphabetically_1st_size1_string_array) & 
        ,it("sums default integer scalars with no optional arguments present", sum_default_integer_scalars) &
+       ,it("sums integer(c_int64_t) scalars with no optional arguments present", sum_c_int64_t_scalars) &
        ,it("multiplies default real scalars with all optional arguments present", multiply_default_real_scalars) &
        ,it("multiplies real(c_double) scalars with all optional arguments present", multiply_c_double_scalars) &
        ,it("performs a collective .and. operation across logical scalars", reports_on_consensus) &
@@ -140,6 +141,26 @@ contains
     pure function add(lhs, rhs) result(total)
       integer, intent(in) :: lhs, rhs
       integer total
+      total = lhs + rhs 
+    end function
+
+  end function
+
+  function sum_c_int64_t_scalars() result(result_)
+    type(result_t) result_
+    integer(c_int64_t) i
+    procedure(c_int64_t_operation), pointer :: add_operation
+
+    add_operation => add
+    i = 1_c_int64_t
+    call caf_co_reduce(i, c_funloc(add_operation))
+    result_ = assert_that(int(caf_num_images(), c_int64_t)==i)
+
+  contains
+
+    pure function add(lhs, rhs) result(total)
+      integer(c_int64_t), intent(in) :: lhs, rhs
+      integer(c_int64_t) total
       total = lhs + rhs 
     end function
 
