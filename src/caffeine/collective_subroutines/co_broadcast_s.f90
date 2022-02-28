@@ -1,5 +1,5 @@
 submodule(collective_subroutines_m)  co_broadcast_s
-  use iso_c_binding, only : c_int, c_size_t, c_ptr, c_loc, c_sizeof, c_int64_t, c_double
+  use iso_c_binding, only : c_ptr
   use utilities_m, only : get_c_ptr
   use caffeine_h_m, only : caf_c_co_broadcast
   implicit none

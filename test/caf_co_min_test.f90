@@ -93,13 +93,14 @@ contains
 
     function min_elements_in_2D_string_arrays() result(result_)
       type(result_t) result_
-      character(len=*), parameter :: script(*) = ["To be ","or not","to    ","be.   "]
-      character(len=len(script)), dimension(2,2) :: scramlet, co_min_scramlet
+      character(len=*), parameter :: script(*) = &
+        [character(len=len("the question.")) :: "To be ","or not"," to ","be.","  That is ","the question."]
+      character(len=len(script)), dimension(3,2) :: scramlet, co_min_scramlet
       integer i, cyclic_permutation(size(script))
       
       associate(me => this_image())
         associate(cyclic_permutation => [(1 + mod(i-1,size(script)), i=me, me+size(script) )])
-          scramlet = reshape(script(cyclic_permutation), [2,2])
+          scramlet = reshape(script(cyclic_permutation), shape(scramlet))
         end associate
       end associate
 
@@ -127,7 +128,7 @@ contains
 
     function alphabetically_1st_scalar_string() result(result_)
       type(result_t) result_
-      character(len=*), parameter :: words(*) = [character(len=len("loddy")):: "loddy","doddy","we","like","to","party"]
+      character(len=*), parameter :: words(*) = [character(len=len("to party!")):: "Loddy","doddy","we","like","to party!"]
       character(len=:), allocatable :: my_word
 
       associate(me => caf_this_image())
