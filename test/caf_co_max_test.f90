@@ -21,7 +21,7 @@ contains
            ,it("double precision 2D array elements with no optional arguments present", max_double_precision_2D_array) &
            ,it("reverse-alphabetizes length-5 default character scalars with no optional arguments", &
                reverse_alphabetize_default_character_scalars) &
-           ,it("elements across images with 2D arrays of strings", max_elements_in_2D_string_arrays) &
+           ,it("elements across images with 3D arrays of strings", max_elements_in_3D_string_arrays) &
         ])
     end function
 
@@ -91,15 +91,15 @@ contains
         result_ = assert_that(all(array==tent))
     end function
 
-    function max_elements_in_2D_string_arrays() result(result_)
+    function max_elements_in_3D_string_arrays() result(result_)
       type(result_t) result_
       character(len=*), parameter :: script(*) = ["To be ","or not","to    ","be.   "]
-      character(len=len(script)), dimension(2,2) :: scramlet, co_max_scramlet
+      character(len=len(script)), dimension(2,1,2) :: scramlet, co_max_scramlet
       integer i, cyclic_permutation(size(script))
     
       associate(me => this_image())
         associate(cyclic_permutation => [(1 + mod(i-1,size(script)), i=me, me+size(script) )]) 
-          scramlet = reshape(script(cyclic_permutation), [2,2])
+          scramlet = reshape(script(cyclic_permutation), shape(scramlet))
         end associate
       end associate
 
@@ -118,7 +118,7 @@ contains
             end associate
           end do
         end do
-        expected_scramlet = reshape(expected_script, shape(scramlet))
+        expected_scramlet = reshape(expected_script, shape(expected_scramlet))
 
         result_ =  assert_that(all(scramlet == co_max_scramlet),"all(scramlet == co_max_scramlet)")
       end block
