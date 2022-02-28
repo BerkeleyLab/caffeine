@@ -63,7 +63,6 @@ contains
     integer, parameter :: input_array(*,*) = reshape([1, 2, 3, 4], [2, 2])
     integer array(2,2)
     procedure(c_int32_t_operation), pointer :: add_operation=>null()
-    complex, parameter :: array_input=1
 
     add_operation => add_integers
     array = input_array
