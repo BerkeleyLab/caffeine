@@ -45,12 +45,7 @@ contains
   end procedure
 
   module procedure caf_decaffeinate
-
-    integer(c_int), parameter :: normal_termination=0
-    
-    call caf_sync_all
-
-    call caf_c_decaffeinate(normal_termination) 
+    call caf_c_decaffeinate(exit_code) 
   end procedure
 
 end submodule caffeinate_decaffeinate_s
