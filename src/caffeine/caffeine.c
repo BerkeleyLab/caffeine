@@ -71,11 +71,6 @@ void caf_c_co_reduce(
   size_t c_sizeof_a = a_desc->elem_len;
   gex_Event_t ev;
 
-  switch (a_desc->type) {
-    case float_Complex_workaround:  c_sizeof_a *= 2; break;
-    case double_Complex_workaround: c_sizeof_a *= 2; break;
-  }
-
   if (result_image) {
     ev = gex_Coll_ReduceToOneNB(
       myteam, result_image-1, a_address, a_address, GEX_DT_USER, c_sizeof_a, num_elements, GEX_OP_USER, user_op, &c_sizeof_a, 0
