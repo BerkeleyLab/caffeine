@@ -6,7 +6,6 @@ Caffeine
 Caffeine is a parallel runtime library that aims to support Fortran compilers with a programming-model-agnostic application binary interface (ABI) to various communication libraries.  Current work is on supporting the ABI with the [GASNet-EX] exascale-ready networking middleware.  Future plans include support for an alternative Message Passing Interface ([MPI]) back end.
 
 ```
-
                     .
                         `:.
                           `:.
@@ -28,10 +27,9 @@ Caffeine is a parallel runtime library that aims to support Fortran compilers wi
 ```
 (Art from [ascii.co.uk].)
 
-
 Prerequisites
 -------------
-Caffeine leverages the following non-parallel features of Fortran to simplify the writing of a portable, compact runtime-library that supports the parallel features of Fortran:
+Caffeine leverages the following non-parallel features of Fortran to simplify the writing of a portable, compact runtime-library that supports Fortran's parallel features:
 
 | Feature                                   | Introduced in |
 |-------------------------------------------|---------------|
@@ -43,7 +41,8 @@ Caffeine leverages the following non-parallel features of Fortran to simplify th
 | Assumed-rank dummy arguments: `array(..)`,| Fortran 2018  |
 
 [1] This requirement simplifies development but might be removed in a future release.
-[2] This feature is used only to support `co_reduce` and might be made optional in a future release.
+
+[2] This feature is used to support only `co_reduce` and might become optional in a future release.
 
 Download, build, and run an example
 -----------------------------------
