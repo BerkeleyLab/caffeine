@@ -63,7 +63,7 @@ Run tests
 
 Generate documentation
 ----------------------
-Generate HTML documentation for Caffeine using [ford]:
+Generate HTML documentation for Caffeine using [ford] as follows:
 ```
 ford doc-generator.md
 ```
