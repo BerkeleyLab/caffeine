@@ -1,0 +1,43 @@
+name: Build and Deploy Documentation
+
+on: [push, pull_request]
+
+jobs:
+  Build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Install Dependencies Ubuntu
+      run: |
+        sudo apt-get update
+        sudo apt install -y python-dev python build-essential graphviz
+        sudo pip install ford
+
+    - name: Build Developer Documenation
+      run: |
+        ford doc-generator.md
+
+    - name: Upload Documentation
+      uses: actions/upload-artifact@v2
+      with:
+        name: documentation
+        path: doc/html
+        if-no-files-found: error
+
+    - name: Broken Link Check
+      if: ${{ github.ref == 'refs/heads/main'}}
+      uses: technote-space/broken-link-checker-action@v1
+      with:
+        TARGET: file://${{ github.workspace }}/doc/html/index.html
+        RECURSIVE: true
+        ASSIGNEES: ${{ github.actor }}
+
+    - name: Deploy API Documentation
+      uses: JamesIves/github-pages-deploy-action@4.1.0
+      if: ${{ github.event_name == 'push'  &&  github.ref == 'refs/heads/main' }}
+      with:
+        branch: gh-pages
+        folder: doc/html
