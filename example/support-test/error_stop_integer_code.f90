@@ -1,5 +1,5 @@
 program error_stop_integer_code
-  use caffeine_m, only : caf_caffeinate, caf_decaffeinate, caf_error_stop 
+  use caffeine_m, only : caf_caffeinate, caf_error_stop 
   implicit none
 
   if (caf_caffeinate() /= 0) error stop "caffeinate returned a non-zero exit_code"
