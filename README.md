@@ -25,7 +25,7 @@ Caffeine is a parallel runtime library that aims to support Fortran compilers wi
      `"--.__                   __.--"'
             `""-------------""'
 ```
-(Art from [ascii.co.uk].)
+Art from [ascii.co.uk].
 
 Prerequisites
 -------------
@@ -36,12 +36,11 @@ Caffeine leverages the following non-parallel features of Fortran to simplify th
 | The `iso_c_binding` module                | Fortran 2003  |
 | The `contiguous` attribute [1]            | Fortran 2008  |
 | `do concurrent` [2]                       | Fortran 2008  |
-| The ISO_Fortran_binding.h C header file   | Fortran 2018  |
+| The `ISO_Fortran_binding.h` C header file | Fortran 2018  |
 | Assumed-type dummy arguments: `type(*)`,  | Fortran 2018  |
 | Assumed-rank dummy arguments: `array(..)`,| Fortran 2018  |
 
 [1] This requirement simplifies development but might be removed in a future release.
-
 [2] This feature is used to support only `co_reduce` and might become optional in a future release.
 
 Download, build, and run an example
@@ -60,16 +59,17 @@ Run tests
 ./build/run-fpm.sh test
 ```
 
-Generate documentation
-----------------------
-Generate HTML documentation for Caffeine using [ford] as follows:
+Documentation
+-------------
+One of our continous integration (CI) scripts generates up-to-date Caffeine documentation using [ford].  The Ci script also deploys the generated documentation to [our GitHub Pages site].
+Alternatively, generate HTML documentation locally using [ford] as follows:
 ```
 ford doc-generator.md
 ```
 Open `doc/html/index.htmtl` in a web browser.
 
-Support and Development
------------------------
+Funding
+-------
 The Computer Languages and Systems Software ([CLaSS]) Group at [Berkeley Lab] leads Caffeine development under funding from the Exascale Computing Project ([ECP]).
 
 License
@@ -83,3 +83,4 @@ See [LICENSE.txt](LICENSE.txt) for usage terms and conditions.
 [ford]: https://github.com/Fortran-FOSS-Programmers/ford
 [MPI]: https://www.mpi-forum.org
 [ascii.co.uk]: https://ascii.co.uk/art/cup
+[site]: https://berkeleylab.github.io/caffeine
