@@ -41,6 +41,7 @@ Caffeine leverages the following non-parallel features of Fortran to simplify th
 | Assumed-rank dummy arguments: `array(..)`,| Fortran 2018  |
 
 [1] This requirement simplifies development but might be removed in a future release.
+
 [2] This feature is used to support only `co_reduce` and might become optional in a future release.
 
 Download, build, and run an example
@@ -61,7 +62,7 @@ Run tests
 
 Documentation
 -------------
-One of our continous integration (CI) scripts generates up-to-date Caffeine documentation using [ford].  The Ci script also deploys the generated documentation to [our GitHub Pages site].
+One of our continous integration (CI) scripts generates up-to-date Caffeine documentation using [ford].  The CI script also deploys the generated documentation to the our GitHub Pages [site].
 Alternatively, generate HTML documentation locally using [ford] as follows:
 ```
 ford doc-generator.md
