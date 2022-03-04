@@ -47,7 +47,7 @@ Caffeine leverages the following non-parallel features of Fortran to simplify th
 Download, build, and run an example
 -----------------------------------
 ```
-git clone https://gitlab.lbl.gov/BerkeleyLab/caffeine
+git clone https://github.com/BerkeleyLab/caffeine.git
 cd caffeine
 ./install.sh
 export GASNET_PSHM_NODES=8
