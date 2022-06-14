@@ -289,6 +289,9 @@ GASNET_CC="`$PKG_CONFIG $pkg --variable=GASNET_CC`"
 GASNET_CFLAGS="`$PKG_CONFIG $pkg --variable=GASNET_CFLAGS`"
 GASNET_CPPFLAGS="`$PKG_CONFIG $pkg --variable=GASNET_CPPFLAGS`"
 
+# Strip compiler flags
+GASNET_CC="$(echo $GASNET_CC | awk '{print $1};')"
+
 if [ "$GASNET_CC" != "$FPM_CC" ]; then 
   echo "GASNET_CC=$GASNET_CC" and  "FPM_CC=$FPM_CC don't match"
   exit 1;
