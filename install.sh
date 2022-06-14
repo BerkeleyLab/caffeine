@@ -237,8 +237,8 @@ else
 fi
 echo "PKG_CONFIG_PATH=$PKG_CONFIG_PATH"
 
-FPM_FC="$FC"
-FPM_CC="$CC"
+FPM_FC="$($REALPATH $(command -v $FC))"
+FPM_CC="$($REALPATH $(command -v $CC))"
 
 ask_package_permission()
 {
