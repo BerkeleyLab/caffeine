@@ -289,11 +289,8 @@ GASNET_CC="`$PKG_CONFIG $pkg --variable=GASNET_CC`"
 GASNET_CFLAGS="`$PKG_CONFIG $pkg --variable=GASNET_CFLAGS`"
 GASNET_CPPFLAGS="`$PKG_CONFIG $pkg --variable=GASNET_CPPFLAGS`"
 
-# Strip compiler flags
-# Warning: This assumes the full path doesn't contain any spaces!
-GASNET_CC_STRIPPED="$(echo $GASNET_CC | awk '{print $1};')"
-
 # Check whether GASNet was installed using Spack and print warning message
+# Note: relies on the fact that most Spack installations have "opt/spack" in the directory path
 GASNET_IS_SPACK=$(echo "$GASNET_LIBS" | grep -c -v "spack")
 if [ $GASNET_IS_SPACK ]; then
   echo "***NOTICE***: The GASNet library built by Spack is ONLY intended for"
@@ -302,6 +299,10 @@ if [ $GASNET_IS_SPACK ]; then
   echo "by the higher-level client runtime package (i.e. Caffeine), including"
   echo "system-specific configuration."
 fi
+
+# Strip compiler flags
+# Warning: This assumes the full path doesn't contain any spaces!
+GASNET_CC_STRIPPED="$(echo $GASNET_CC | awk '{print $1};')"
 
 if [ "$GASNET_CC_STRIPPED" != "$FPM_CC" ]; then 
   echo "GASNET_CC=$GASNET_CC_STRIPPED" and  "FPM_CC=$FPM_CC don't match"
