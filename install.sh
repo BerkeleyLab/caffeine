@@ -291,7 +291,7 @@ GASNET_CPPFLAGS="`$PKG_CONFIG $pkg --variable=GASNET_CPPFLAGS`"
 
 # Check whether GASNet was installed using Spack and print warning message
 # Note: relies on the fact that most Spack installations have "opt/spack" in the directory path
-GASNET_IS_SPACK=$(echo "$GASNET_LIBS" | grep -c -v "spack")
+GASNET_IS_SPACK=$(echo $GASNET_LIBS | grep -c -v spack)
 if [ $GASNET_IS_SPACK ]; then
   echo "***NOTICE***: The GASNet library built by Spack is ONLY intended for"
   echo "unit-testing purposes, and is generally UNSUITABLE FOR PRODUCTION USE."
