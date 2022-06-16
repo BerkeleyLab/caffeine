@@ -297,7 +297,8 @@ if [ $GASNET_IS_SPACK ]; then
   echo "unit-testing purposes, and is generally UNSUITABLE FOR PRODUCTION USE."
   echo "The RECOMMENDED way to build GASNet is as an embedded library as configured"
   echo "by the higher-level client runtime package (i.e. Caffeine), including"
-  echo "system-specific configuration."
+  echo "system-specific configuration. Exiting install.sh"
+  exit 1
 fi
 
 # Strip compiler flags
