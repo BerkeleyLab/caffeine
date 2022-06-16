@@ -289,7 +289,7 @@ GASNET_CC="`$PKG_CONFIG $pkg --variable=GASNET_CC`"
 GASNET_CFLAGS="`$PKG_CONFIG $pkg --variable=GASNET_CFLAGS`"
 GASNET_CPPFLAGS="`$PKG_CONFIG $pkg --variable=GASNET_CPPFLAGS`"
 
-# Check whether GASNet was installed using Spack and print warning message
+# Check whether GASNet was installed using Spack. If yes, bail out.
 # Note: relies on the fact that most Spack installations have "opt/spack" in the directory path
 GASNET_IS_SPACK=$(echo $GASNET_LIBS | grep -c -v spack)
 if [ $GASNET_IS_SPACK ]; then
