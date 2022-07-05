@@ -91,7 +91,7 @@ if command -v make > /dev/null 2>&1; then
 fi
 
 if command -v fpm > /dev/null 2>&1; then
-  FPM=`which fpm`
+  FPM=`$which fpm`
 fi
 
 ask_permission_to_use_homebrew()
@@ -304,8 +304,9 @@ fi
 # Strip compiler flags
 # Warning: This assumes the full path doesn't contain any spaces!
 GASNET_CC_STRIPPED="$(echo $GASNET_CC | awk '{print $1};')"
+GASNET_CC_REAL="$REALPATH $GASNET_CC_STRIPPED"
 
-if [ "$GASNET_CC_STRIPPED" != "$FPM_CC" ]; then 
+if [ "$GASNET_CC_REAL" != "$FPM_CC" ]; then 
   echo "GASNET_CC=$GASNET_CC_STRIPPED" and  "FPM_CC=$FPM_CC don't match"
   exit 1;
 fi
