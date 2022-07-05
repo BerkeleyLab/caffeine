@@ -304,7 +304,7 @@ fi
 # Strip compiler flags
 # Warning: This assumes the full path doesn't contain any spaces!
 GASNET_CC_STRIPPED="$(echo $GASNET_CC | awk '{print $1};')"
-GASNET_CC_REAL="$REALPATH $GASNET_CC_STRIPPED"
+GASNET_CC_REAL="$($REALPATH $GASNET_CC_STRIPPED)"
 
 if [ "$GASNET_CC_REAL" != "$FPM_CC" ]; then 
   echo "GASNET_CC=$GASNET_CC_REAL" and  "FPM_CC=$FPM_CC don't match"
