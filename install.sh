@@ -307,7 +307,7 @@ GASNET_CC_STRIPPED="$(echo $GASNET_CC | awk '{print $1};')"
 GASNET_CC_REAL="$REALPATH $GASNET_CC_STRIPPED"
 
 if [ "$GASNET_CC_REAL" != "$FPM_CC" ]; then 
-  echo "GASNET_CC=$GASNET_CC_STRIPPED" and  "FPM_CC=$FPM_CC don't match"
+  echo "GASNET_CC=$GASNET_CC_REAL" and  "FPM_CC=$FPM_CC don't match"
   exit 1;
 fi
 
