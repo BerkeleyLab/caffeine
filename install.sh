@@ -91,7 +91,7 @@ if command -v make > /dev/null 2>&1; then
 fi
 
 if command -v fpm > /dev/null 2>&1; then
-  FPM=`$which fpm`
+  FPM=`which fpm`
 fi
 
 ask_permission_to_use_homebrew()
