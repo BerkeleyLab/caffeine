@@ -67,7 +67,7 @@ Alternatively, generate HTML documentation locally using [ford] as follows:
 ```
 ford doc-generator.md
 ```
-Open `doc/html/index.htmtl` in a web browser.
+Open `doc/html/index.html` in a web browser.
 
 Funding
 -------
