@@ -237,8 +237,8 @@ else
 fi
 echo "PKG_CONFIG_PATH=$PKG_CONFIG_PATH"
 
-FPM_FC="$FC"
-FPM_CC="$CC"
+FPM_FC=`which $FC`
+FPM_CC=`which $CC`
 
 ask_package_permission()
 {
