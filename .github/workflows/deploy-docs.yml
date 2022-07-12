@@ -4,7 +4,7 @@ on: [push, pull_request]
 
 jobs:
   Build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
 
     steps:
     - name: Checkout code
@@ -13,8 +13,8 @@ jobs:
     - name: Install Dependencies Ubuntu
       run: |
         sudo apt-get update
-        sudo apt install -y python-dev python build-essential graphviz
-        sudo pip install ford
+        sudo apt install -y python3-dev python3 build-essential graphviz
+        sudo python3 -m pip install ford
 
     - name: Build Developer Documenation
       run: |
