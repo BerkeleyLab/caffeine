@@ -294,14 +294,18 @@ GASNET_CPPFLAGS="`$PKG_CONFIG $pkg --variable=GASNET_CPPFLAGS`"
 #       in the directory path, and assumes that the first directory returned
 #       by pkg-config contains the GASNet lib directory
 GASNET_LIBDIR="$(echo $GASNET_LIBS | awk '{print $1};')"
-if [ "$(echo $GASNET_LIBDIR | grep -q spack)" ]; then
-  echo "***NOTICE***: The GASNet library built by Spack is ONLY intended for"
-  echo "unit-testing purposes, and is generally UNSUITABLE FOR PRODUCTION USE."
-  echo "The RECOMMENDED way to build GASNet is as an embedded library as configured"
-  echo "by the higher-level client runtime package (i.e. Caffeine), including"
-  echo "system-specific configuration. Exiting install.sh"
-  exit 1
-fi
+case "$GASNET_LIBDIR" in
+  *spack* )
+    echo "***NOTICE***: The GASNet library built by Spack is ONLY intended for"
+    echo "unit-testing purposes, and is generally UNSUITABLE FOR PRODUCTION USE."
+    echo "The RECOMMENDED way to build GASNet is as an embedded library as configured"
+    echo "by the higher-level client runtime package (i.e. Caffeine), including"
+    echo "system-specific configuration. Exiting install.sh"
+    exit 1
+    ;;
+  * )
+    ;; # Do nothing otherwise 
+esac
 
 # Strip compiler flags
 # Warning: This assumes the full path doesn't contain any spaces!
