@@ -293,8 +293,8 @@ GASNET_CPPFLAGS="`$PKG_CONFIG $pkg --variable=GASNET_CPPFLAGS`"
 # Note: relies on the fact that most Spack installations have "opt/spack"
 #       in the directory path, and assumes that the first directory returned
 #       by pkg-config contains the GASNet lib directory
-GASNET_IS_SPACK=$(echo $GASNET_LIBS | awk '{print $1};' | grep -c spack)
-if [ $GASNET_IS_SPACK -eq 1 ]; then
+GASNET_LIBDIR="$(echo $GASNET_LIBS | awk '{print $1};')"
+if [ "$(echo $GASNET_LIBDIR | grep -q spack)" ]; then
   echo "***NOTICE***: The GASNet library built by Spack is ONLY intended for"
   echo "unit-testing purposes, and is generally UNSUITABLE FOR PRODUCTION USE."
   echo "The RECOMMENDED way to build GASNet is as an embedded library as configured"
