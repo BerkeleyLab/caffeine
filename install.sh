@@ -237,8 +237,8 @@ else
 fi
 echo "PKG_CONFIG_PATH=$PKG_CONFIG_PATH"
 
-FPM_FC=`which $FC`
-FPM_CC=`which $CC`
+FPM_FC="$($REALPATH $(command -v $FC))"
+FPM_CC="$($REALPATH $(command -v $CC))"
 
 ask_package_permission()
 {
@@ -289,8 +289,31 @@ GASNET_CC="`$PKG_CONFIG $pkg --variable=GASNET_CC`"
 GASNET_CFLAGS="`$PKG_CONFIG $pkg --variable=GASNET_CFLAGS`"
 GASNET_CPPFLAGS="`$PKG_CONFIG $pkg --variable=GASNET_CPPFLAGS`"
 
-if [ "$GASNET_CC" != "$FPM_CC" ]; then 
-  echo "GASNET_CC=$GASNET_CC" and  "FPM_CC=$FPM_CC don't match"
+# Check whether GASNet was installed using Spack. If yes, bail out.
+# Note: relies on the fact that most Spack installations have "opt/spack"
+#       in the directory path, and assumes that the first directory returned
+#       by pkg-config contains the GASNet lib directory
+GASNET_LIBDIR="$(echo $GASNET_LIBS | awk '{print $1};')"
+case "$GASNET_LIBDIR" in
+  *spack* )
+    echo "***NOTICE***: The GASNet library built by Spack is ONLY intended for"
+    echo "unit-testing purposes, and is generally UNSUITABLE FOR PRODUCTION USE."
+    echo "The RECOMMENDED way to build GASNet is as an embedded library as configured"
+    echo "by the higher-level client runtime package (i.e. Caffeine), including"
+    echo "system-specific configuration. Exiting install.sh"
+    exit 1
+    ;;
+  * )
+    ;; # Do nothing otherwise 
+esac
+
+# Strip compiler flags
+# Warning: This assumes the full path doesn't contain any spaces!
+GASNET_CC_STRIPPED="$(echo $GASNET_CC | awk '{print $1};')"
+GASNET_CC_REAL="$($REALPATH $GASNET_CC_STRIPPED)"
+
+if [ "$GASNET_CC_REAL" != "$FPM_CC" ]; then 
+  echo "GASNET_CC=$GASNET_CC_REAL" and  "FPM_CC=$FPM_CC don't match"
   exit 1;
 fi
 
