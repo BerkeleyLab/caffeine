@@ -121,26 +121,26 @@ With a fully Caffeinated compiler, Fortran programmers can produce parallel exec
 </ul>
 <h2 id="organization">Organization</h2>
 <p>The tree below depicts a skeletal overview of Caffeine's directory structure.</p>
-<div class="codehilite"><pre><span></span>build/ - build directory created by running ./install.sh
-  |-- run-fpm.sh - shell script for rebuilding Caffeine or running examples or tests
-  |-- * - temporary build files
-example/
-  |-- hello.f90 - a Caffeinated &quot;Hello, world!&quot; program
-  |-- support-test/ - programs invoked by the test suite
-src/
-  |-- caffeine_m.f90 - the Big Kahuna: one module that exports all Caffeine functionality
-  |-- caffeine/
-        |-- *_m.f90 - modules containing procedure interface bodies
-        |-- *_s.f90 - submodules containing procedure definitions
-        |-- *.c - thin C functions wrapping networking middleware
-        |-- *.h - corresponding C header files
-        |-- *_h_m.f90 - a Fortran translation of a C header file
-        |-- collective_subroutines/
-              |-- co_*_s.f90 - submodules containing procedure definitions
-test/
-  |-- main.f90 - test suite driver created by make_vegetable_driver
-  |-- *_test.f90 - unit tests
-</pre></div>
+<div class="codehilite"><pre><span></span><code><span class="n">build</span><span class="o">/</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">build</span><span class="w"> </span><span class="n">directory</span><span class="w"> </span><span class="n">created</span><span class="w"> </span><span class="n">by</span><span class="w"> </span><span class="n">running</span><span class="w"> </span><span class="o">./</span><span class="n">install</span><span class="o">.</span><span class="n">sh</span><span class="w"></span>
+<span class="w">  </span><span class="o">|--</span><span class="w"> </span><span class="n">run</span><span class="o">-</span><span class="n">fpm</span><span class="o">.</span><span class="n">sh</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">shell</span><span class="w"> </span><span class="n">script</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">rebuilding</span><span class="w"> </span><span class="n">Caffeine</span><span class="w"> </span><span class="ow">or</span><span class="w"> </span><span class="n">running</span><span class="w"> </span><span class="n">examples</span><span class="w"> </span><span class="ow">or</span><span class="w"> </span><span class="n">tests</span><span class="w"></span>
+<span class="w">  </span><span class="o">|--</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">temporary</span><span class="w"> </span><span class="n">build</span><span class="w"> </span><span class="n">files</span><span class="w"></span>
+<span class="n">example</span><span class="o">/</span><span class="w"></span>
+<span class="w">  </span><span class="o">|--</span><span class="w"> </span><span class="n">hello</span><span class="o">.</span><span class="n">f90</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="n">Caffeinated</span><span class="w"> </span><span class="s2">&quot;Hello, world!&quot;</span><span class="w"> </span><span class="n">program</span><span class="w"></span>
+<span class="w">  </span><span class="o">|--</span><span class="w"> </span><span class="n">support</span><span class="o">-</span><span class="n">test</span><span class="o">/</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">programs</span><span class="w"> </span><span class="n">invoked</span><span class="w"> </span><span class="n">by</span><span class="w"> </span><span class="n">the</span><span class="w"> </span><span class="n">test</span><span class="w"> </span><span class="n">suite</span><span class="w"></span>
+<span class="n">src</span><span class="o">/</span><span class="w"></span>
+<span class="w">  </span><span class="o">|--</span><span class="w"> </span><span class="n">caffeine_m</span><span class="o">.</span><span class="n">f90</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">the</span><span class="w"> </span><span class="n">Big</span><span class="w"> </span><span class="n">Kahuna</span><span class="p">:</span><span class="w"> </span><span class="n">one</span><span class="w"> </span><span class="n">module</span><span class="w"> </span><span class="n">that</span><span class="w"> </span><span class="n">exports</span><span class="w"> </span><span class="n">all</span><span class="w"> </span><span class="n">Caffeine</span><span class="w"> </span><span class="n">functionality</span><span class="w"></span>
+<span class="w">  </span><span class="o">|--</span><span class="w"> </span><span class="n">caffeine</span><span class="o">/</span><span class="w"></span>
+<span class="w">        </span><span class="o">|--</span><span class="w"> </span><span class="o">*</span><span class="n">_m</span><span class="o">.</span><span class="n">f90</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">modules</span><span class="w"> </span><span class="n">containing</span><span class="w"> </span><span class="n">procedure</span><span class="w"> </span><span class="n">interface</span><span class="w"> </span><span class="n">bodies</span><span class="w"></span>
+<span class="w">        </span><span class="o">|--</span><span class="w"> </span><span class="o">*</span><span class="n">_s</span><span class="o">.</span><span class="n">f90</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">submodules</span><span class="w"> </span><span class="n">containing</span><span class="w"> </span><span class="n">procedure</span><span class="w"> </span><span class="n">definitions</span><span class="w"></span>
+<span class="w">        </span><span class="o">|--</span><span class="w"> </span><span class="o">*.</span><span class="n">c</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">thin</span><span class="w"> </span><span class="n">C</span><span class="w"> </span><span class="n">functions</span><span class="w"> </span><span class="n">wrapping</span><span class="w"> </span><span class="n">networking</span><span class="w"> </span><span class="n">middleware</span><span class="w"></span>
+<span class="w">        </span><span class="o">|--</span><span class="w"> </span><span class="o">*.</span><span class="n">h</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">corresponding</span><span class="w"> </span><span class="n">C</span><span class="w"> </span><span class="n">header</span><span class="w"> </span><span class="n">files</span><span class="w"></span>
+<span class="w">        </span><span class="o">|--</span><span class="w"> </span><span class="o">*</span><span class="n">_h_m</span><span class="o">.</span><span class="n">f90</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="n">Fortran</span><span class="w"> </span><span class="n">translation</span><span class="w"> </span><span class="n">of</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="n">C</span><span class="w"> </span><span class="n">header</span><span class="w"> </span><span class="n">file</span><span class="w"></span>
+<span class="w">        </span><span class="o">|--</span><span class="w"> </span><span class="n">collective_subroutines</span><span class="o">/</span><span class="w"></span>
+<span class="w">              </span><span class="o">|--</span><span class="w"> </span><span class="n">co_</span><span class="o">*</span><span class="n">_s</span><span class="o">.</span><span class="n">f90</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">submodules</span><span class="w"> </span><span class="n">containing</span><span class="w"> </span><span class="n">procedure</span><span class="w"> </span><span class="n">definitions</span><span class="w"></span>
+<span class="n">test</span><span class="o">/</span><span class="w"></span>
+<span class="w">  </span><span class="o">|--</span><span class="w"> </span><span class="n">main</span><span class="o">.</span><span class="n">f90</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">test</span><span class="w"> </span><span class="n">suite</span><span class="w"> </span><span class="n">driver</span><span class="w"> </span><span class="n">created</span><span class="w"> </span><span class="n">by</span><span class="w"> </span><span class="n">make_vegetable_driver</span><span class="w"></span>
+<span class="w">  </span><span class="o">|--</span><span class="w"> </span><span class="o">*</span><span class="n">_test</span><span class="o">.</span><span class="n">f90</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">unit</span><span class="w"> </span><span class="n">tests</span><span class="w"></span>
+</code></pre></div>
         </div>
         <div class="col-md-4">
 	  <div class="well">
@@ -217,7 +217,7 @@ test/
           <p class="text-right">
             Documentation generated by 
             <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
- on 2022-03-04 16:31            </p>
+ on 2022-07-13 00:06            </p>
         </div>
       </div>
       <br>

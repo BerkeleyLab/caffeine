@@ -114,17 +114,7 @@
     <div id="sidebar">
   <h3>Contents</h3>
  
-<div class="panel panel-primary">
-  <div class="panel-heading text-left"><h3 class="panel-title"><a data-toggle="collapse" href="#vars-0">Variables</a></h3></div>
-  <div id="vars-0" class="panel-collapse collapse">
-    <div class="list-group">
-      <a class="list-group-item" href="../proc/caf_co_sum.html#variable-c_string">c_string</a>
-      <a class="list-group-item" href="../proc/caf_co_sum.html#variable-errmsg_c_ptr">errmsg_c_ptr</a>
-      <a class="list-group-item" href="../proc/caf_co_sum.html#variable-errmsg_f_ptr">errmsg_f_ptr</a>
-      <a class="list-group-item" href="../proc/caf_co_sum.html#variable-stat_c_ptr">stat_c_ptr</a>
-    </div>
-  </div>
-</div>
+<em>None</em>
 
 </div>
 
@@ -141,25 +131,25 @@
 <thead><tr><th>Type</th><th>Intent</th><th>Optional</th><th>Attributes</th><th></th><th>Name</th><th></th></thead>
 <tbody>
 <tr>
-  <td><span class="anchor" id="variable-a~5"></span>type(*),</td>
+  <td><span class="anchor" id="variable-a~14"></span>type(*),</td>
 <td>intent(inout),</td>
   <td></td>  <td>contiguous, target</td><td>::</td>
   <td><strong>a</strong>(..)</td><td></td>
 </tr>
 <tr>
-  <td><span class="anchor" id="variable-result_image~4"></span>integer,</td>
+  <td><span class="anchor" id="variable-result_image~8"></span>integer,</td>
 <td>intent(in),</td>
   <td>optional</td>  <td>target</td><td>::</td>
   <td><strong>result_image</strong></td><td></td>
 </tr>
 <tr>
-  <td><span class="anchor" id="variable-stat~5"></span>integer,</td>
+  <td><span class="anchor" id="variable-stat~7"></span>integer,</td>
 <td>intent(out),</td>
   <td>optional</td>  <td>target</td><td>::</td>
   <td><strong>stat</strong></td><td></td>
 </tr>
 <tr>
-  <td><span class="anchor" id="variable-errmsg~5"></span>character(len=*),</td>
+  <td><span class="anchor" id="variable-errmsg~6"></span>character(len=*),</td>
 <td>intent(inout),</td>
   <td>optional</td>  <td>target</td><td>::</td>
   <td><strong>errmsg</strong></td><td></td>
@@ -190,63 +180,63 @@
 <polygon fill="none" stroke="black" points="75,-87 0,-87 0,-63 75,-63 75,-87"/>
 <text text-anchor="middle" x="37.5" y="-72.6" font-family="Helvetica,sans-Serif" font-size="10.50">caf_co_sum</text>
 </g>
-<!-- proc~optional_value -->
+<!-- proc~get_c_ptr -->
 <g id="proc~~caf_co_sum~~CallsGraph_node2" class="node">
+<title>proc~get_c_ptr</title>
+<g id="a_proc~~caf_co_sum~~CallsGraph_node2"><a xlink:href=".././proc/get_c_ptr.html" xlink:title="get_c_ptr">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="200.5,-150 139.5,-150 139.5,-126 200.5,-126 200.5,-150"/>
+<text text-anchor="middle" x="170" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_c_ptr</text>
+</a>
+</g>
+</g>
+<!-- proc~caf_co_sum&#45;&gt;proc~get_c_ptr -->
+<g id="proc~~caf_co_sum~~CallsGraph_edge1" class="edge">
+<title>proc~caf_co_sum&#45;&gt;proc~get_c_ptr</title>
+<path fill="none" stroke="#ff0000" d="M57.09,-87C71.45,-95.97 92.01,-108.15 111,-117 116.92,-119.76 123.32,-122.4 129.63,-124.82"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="128.79,-128.24 139.38,-128.42 131.21,-121.67 128.79,-128.24"/>
+</g>
+<!-- proc~optional_value -->
+<g id="proc~~caf_co_sum~~CallsGraph_node3" class="node">
 <title>proc~optional_value</title>
-<g id="a_proc~~caf_co_sum~~CallsGraph_node2"><a xlink:href=".././proc/optional_value.html" xlink:title="optional_value">
-<polygon fill="#d94e8f" stroke="#d94e8f" points="215.5,-150 124.5,-150 124.5,-126 215.5,-126 215.5,-150"/>
-<text text-anchor="middle" x="170" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">optional_value</text>
+<g id="a_proc~~caf_co_sum~~CallsGraph_node3"><a xlink:href=".././proc/optional_value.html" xlink:title="optional_value">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="215.5,-108 124.5,-108 124.5,-84 215.5,-84 215.5,-108"/>
+<text text-anchor="middle" x="170" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">optional_value</text>
 </a>
 </g>
 </g>
 <!-- proc~caf_co_sum&#45;&gt;proc~optional_value -->
 <g id="proc~~caf_co_sum~~CallsGraph_edge2" class="edge">
 <title>proc~caf_co_sum&#45;&gt;proc~optional_value</title>
-<path fill="none" stroke="#ff0000" d="M57.09,-87C71.45,-95.97 92.01,-108.15 111,-117 114.88,-118.81 118.95,-120.56 123.08,-122.24"/>
-<polygon fill="#ff0000" stroke="#ff0000" points="122.12,-125.62 132.71,-125.98 124.66,-119.09 122.12,-125.62"/>
-</g>
-<!-- interface~caf_c_co_sum -->
-<g id="proc~~caf_co_sum~~CallsGraph_node3" class="node">
-<title>interface~caf_c_co_sum</title>
-<g id="a_proc~~caf_co_sum~~CallsGraph_node3"><a xlink:href=".././interface/caf_c_co_sum.html" xlink:title="caf_c_co_sum">
-<polygon fill="#a7506f" stroke="#a7506f" points="213,-108 127,-108 127,-84 213,-84 213,-108"/>
-<text text-anchor="middle" x="170" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">caf_c_co_sum</text>
-</a>
-</g>
-</g>
-<!-- proc~caf_co_sum&#45;&gt;interface~caf_c_co_sum -->
-<g id="proc~~caf_co_sum~~CallsGraph_edge1" class="edge">
-<title>proc~caf_co_sum&#45;&gt;interface~caf_c_co_sum</title>
-<path fill="none" stroke="#ff0000" d="M75.2,-80.91C88.06,-82.98 102.76,-85.34 116.65,-87.58"/>
-<polygon fill="#ff0000" stroke="#ff0000" points="116.16,-91.04 126.59,-89.18 117.27,-84.13 116.16,-91.04"/>
-</g>
-<!-- proc~get_c_ptr -->
-<g id="proc~~caf_co_sum~~CallsGraph_node4" class="node">
-<title>proc~get_c_ptr</title>
-<g id="a_proc~~caf_co_sum~~CallsGraph_node4"><a xlink:href=".././proc/get_c_ptr.html" xlink:title="get_c_ptr">
-<polygon fill="#d94e8f" stroke="#d94e8f" points="200.5,-66 139.5,-66 139.5,-42 200.5,-42 200.5,-66"/>
-<text text-anchor="middle" x="170" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_c_ptr</text>
-</a>
-</g>
-</g>
-<!-- proc~caf_co_sum&#45;&gt;proc~get_c_ptr -->
-<g id="proc~~caf_co_sum~~CallsGraph_edge3" class="edge">
-<title>proc~caf_co_sum&#45;&gt;proc~get_c_ptr</title>
-<path fill="none" stroke="#ff0000" d="M75.2,-69.09C91.93,-66.4 111.78,-63.21 128.9,-60.45"/>
-<polygon fill="#ff0000" stroke="#ff0000" points="129.84,-63.85 139.16,-58.8 128.73,-56.94 129.84,-63.85"/>
+<path fill="none" stroke="#ff0000" d="M75.2,-80.91C87.33,-82.86 101.11,-85.08 114.3,-87.2"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="113.8,-90.66 124.23,-88.8 114.91,-83.75 113.8,-90.66"/>
 </g>
 <!-- proc~get_c_ptr_character -->
-<g id="proc~~caf_co_sum~~CallsGraph_node5" class="node">
+<g id="proc~~caf_co_sum~~CallsGraph_node4" class="node">
 <title>proc~get_c_ptr_character</title>
-<g id="a_proc~~caf_co_sum~~CallsGraph_node5"><a xlink:href=".././proc/get_c_ptr_character.html" xlink:title="get_c_ptr_character">
-<polygon fill="#d94e8f" stroke="#d94e8f" points="229,-24 111,-24 111,0 229,0 229,-24"/>
-<text text-anchor="middle" x="170" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_c_ptr_character</text>
+<g id="a_proc~~caf_co_sum~~CallsGraph_node4"><a xlink:href=".././proc/get_c_ptr_character.html" xlink:title="get_c_ptr_character">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="229,-66 111,-66 111,-42 229,-42 229,-66"/>
+<text text-anchor="middle" x="170" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_c_ptr_character</text>
 </a>
 </g>
 </g>
 <!-- proc~caf_co_sum&#45;&gt;proc~get_c_ptr_character -->
-<g id="proc~~caf_co_sum~~CallsGraph_edge4" class="edge">
+<g id="proc~~caf_co_sum~~CallsGraph_edge3" class="edge">
 <title>proc~caf_co_sum&#45;&gt;proc~get_c_ptr_character</title>
+<path fill="none" stroke="#ff0000" d="M75.2,-69.09C83.2,-67.81 91.91,-66.41 100.69,-64.99"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="101.29,-68.44 110.6,-63.4 100.18,-61.53 101.29,-68.44"/>
+</g>
+<!-- interface~caf_c_co_sum -->
+<g id="proc~~caf_co_sum~~CallsGraph_node5" class="node">
+<title>interface~caf_c_co_sum</title>
+<g id="a_proc~~caf_co_sum~~CallsGraph_node5"><a xlink:href=".././interface/caf_c_co_sum.html" xlink:title="caf_c_co_sum">
+<polygon fill="#a7506f" stroke="#a7506f" points="213,-24 127,-24 127,0 213,0 213,-24"/>
+<text text-anchor="middle" x="170" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">caf_c_co_sum</text>
+</a>
+</g>
+</g>
+<!-- proc~caf_co_sum&#45;&gt;interface~caf_c_co_sum -->
+<g id="proc~~caf_co_sum~~CallsGraph_edge4" class="edge">
+<title>proc~caf_co_sum&#45;&gt;interface~caf_c_co_sum</title>
 <path fill="none" stroke="#ff0000" d="M57.09,-63C71.45,-54.03 92.01,-41.85 111,-33 114.88,-31.19 118.95,-29.44 123.08,-27.76"/>
 <polygon fill="#ff0000" stroke="#ff0000" points="124.66,-30.91 132.71,-24.02 122.12,-24.38 124.66,-30.91"/>
 </g>
@@ -418,52 +408,12 @@
     <section class="visible-xs visible-sm hidden-md">
       <h3>Contents</h3>
  
-<div class="panel panel-primary">
-  <div class="panel-heading text-left"><h3 class="panel-title"><a data-toggle="collapse" href="#vars-1">Variables</a></h3></div>
-  <div id="vars-1" class="panel-collapse collapse">
-    <div class="list-group">
-      <a class="list-group-item" href="../proc/caf_co_sum.html#variable-c_string">c_string</a>
-      <a class="list-group-item" href="../proc/caf_co_sum.html#variable-errmsg_c_ptr">errmsg_c_ptr</a>
-      <a class="list-group-item" href="../proc/caf_co_sum.html#variable-errmsg_f_ptr">errmsg_f_ptr</a>
-      <a class="list-group-item" href="../proc/caf_co_sum.html#variable-stat_c_ptr">stat_c_ptr</a>
-    </div>
-  </div>
-</div>
+<em>None</em>
 
     </section>
     <br class="visible-xs visible-sm hidden-md">
 
 
-    <section>    
-      <h2>Variables</h2>
-    <table class="table table-striped varlist">
-<thead><tr><th>Type</th><th>Visibility</th><th>Attributes</th><th></th><th>Name</th><th></th><th>Initial</th><th></th></thead>
-<tbody>
-<tr>
-  <td><span class="anchor" id="variable-c_string"></span>character(len=:),</td>
-<td>private,</td>  <td>allocatable</td><td>::</td>
-  <td><strong>c_string</strong></td><td></td><td></td><td></td>
-</tr>
-<tr>
-  <td><span class="anchor" id="variable-errmsg_c_ptr"></span>type(c_ptr),</td>
-<td>private</td>  <td></td><td>::</td>
-  <td><strong>errmsg_c_ptr</strong></td><td></td><td></td><td></td>
-</tr>
-<tr>
-  <td><span class="anchor" id="variable-errmsg_f_ptr"></span>character(len=:),</td>
-<td>private,</td>  <td>pointer</td><td>::</td>
-  <td><strong>errmsg_f_ptr</strong></td><td></td><td></td><td></td>
-</tr>
-<tr>
-  <td><span class="anchor" id="variable-stat_c_ptr"></span>type(c_ptr),</td>
-<td>private</td>  <td></td><td>::</td>
-  <td><strong>stat_c_ptr</strong></td><td></td><td></td><td></td>
-</tr>
-</tbody>
-</table>
-
-    </section>
-    <br>
     
     
 
@@ -488,7 +438,7 @@
           <p class="text-right">
             Documentation generated by 
             <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
- on 2022-03-04 16:31            </p>
+ on 2022-07-13 00:06            </p>
         </div>
       </div>
       <br>
