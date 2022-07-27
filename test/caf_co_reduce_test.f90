@@ -4,7 +4,7 @@ module caf_co_reduce_test
   use collective_subroutines_m, only : &
      c_int32_t_operation, c_int64_t_operation, c_float_operation, c_double_operation, c_char_operation, c_bool_operation &
     ,c_float_complex_operation, c_double_complex_operation
-  use assert_m, only : assert
+  use caffeine_assert_m, only : assert
   use iso_c_binding, only : c_bool, c_funloc, c_char, c_double, c_int64_t
 
   implicit none
@@ -15,10 +15,10 @@ contains
 
   function test_caf_co_reduce() result(tests)
     type(test_item_t) tests
-  
+
     tests = describe( &
       "The caf_co_reduce subroutine", &
-      [ it("finds the alphabetically first length-5 string with result_image present", alphabetically_1st_size1_string_array) & 
+      [ it("finds the alphabetically first length-5 string with result_image present", alphabetically_1st_size1_string_array) &
        ,it("sums default integer scalars with no optional arguments present", sum_default_integer_scalars) &
        ,it("sums integer(c_int64_t) scalars with no optional arguments present", sum_c_int64_t_scalars) &
        ,it("multiplies default real scalars with all optional arguments present", multiply_default_real_scalars) &
@@ -77,7 +77,7 @@ contains
     pure function add_integers(lhs, rhs) result(total)
       integer, intent(in) :: lhs, rhs
       integer total
-      total = lhs + rhs 
+      total = lhs + rhs
     end function
 
   end function
@@ -99,7 +99,7 @@ contains
     pure function add_complex(lhs, rhs) result(total)
       complex(c_double), intent(in) :: lhs, rhs
       complex(c_double) total
-      total = lhs + rhs 
+      total = lhs + rhs
     end function
 
   end function
@@ -121,7 +121,7 @@ contains
     pure function add_complex(lhs, rhs) result(total)
       complex, intent(in) :: lhs, rhs
       complex total
-      total = lhs + rhs 
+      total = lhs + rhs
     end function
 
   end function
@@ -141,7 +141,7 @@ contains
     pure function add(lhs, rhs) result(total)
       integer, intent(in) :: lhs, rhs
       integer total
-      total = lhs + rhs 
+      total = lhs + rhs
     end function
 
   end function
@@ -161,7 +161,7 @@ contains
     pure function add(lhs, rhs) result(total)
       integer(c_int64_t), intent(in) :: lhs, rhs
       integer(c_int64_t) total
-      total = lhs + rhs 
+      total = lhs + rhs
     end function
 
   end function
@@ -178,7 +178,7 @@ contains
 
     one_true = merge(.true., .false., caf_this_image()==1)
     call caf_co_reduce(one_true, c_funloc(boolean_operation))
- 
+
     all_true = .true.
     call caf_co_reduce(all_true, c_funloc(boolean_operation))
 
@@ -190,7 +190,7 @@ contains
     pure function logical_and(lhs, rhs) result(lhs_and_rhs)
       logical(c_bool), intent(in) :: lhs, rhs
       logical(c_bool) lhs_and_rhs
-      lhs_and_rhs = lhs .and. rhs 
+      lhs_and_rhs = lhs .and. rhs
     end function
 
   end function
@@ -220,7 +220,7 @@ contains
     pure function multiply_doubles(lhs, rhs) result(product_)
       real(c_double), intent(in) :: lhs, rhs
       real(c_double) product_
-      product_ = lhs * rhs 
+      product_ = lhs * rhs
     end function
 
   end function
@@ -250,7 +250,7 @@ contains
     pure function multiply(lhs, rhs) result(product_)
       real, intent(in) :: lhs, rhs
       real product_
-      product_ = lhs * rhs 
+      product_ = lhs * rhs
     end function
 
   end function

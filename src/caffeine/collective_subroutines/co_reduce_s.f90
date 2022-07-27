@@ -3,8 +3,8 @@
 submodule(collective_subroutines_m) co_reduce_s
   use iso_c_binding, only : &
     c_ptr, c_size_t, c_loc, c_null_ptr, c_funloc, c_associated, c_f_pointer, c_int, c_f_procpointer
-  use assert_m, only : assert
-  use intrinsic_array_m, only : intrinsic_array_t
+  use caffeine_assert_m, only : assert
+  use caffeine_intrinsic_array_m, only : intrinsic_array_t
   use utilities_m, only : get_c_ptr, get_c_ptr_character, optional_value
   use caffeine_h_m, only : caf_c_co_reduce, caf_c_same_cfi_type, caf_c_elem_len, caf_c_is_f_string
   implicit none
@@ -12,7 +12,7 @@ submodule(collective_subroutines_m) co_reduce_s
   character(kind=c_char,len=5), parameter :: dummy = "     "
 
 contains
- 
+
   module procedure caf_co_reduce
 
     type(c_ptr) :: stat_ptr = c_null_ptr, errmsg_ptr = c_null_ptr
@@ -208,7 +208,7 @@ contains
       character(kind=c_char, len=:), allocatable, target :: prototype(:)
       character(kind=c_char, len=:), pointer :: lhs(:)=>null(), rhs_and_result(:)=>null()
       integer(c_int), pointer :: arglen=>null()
-    
+
       associate(c_associated_args => [c_associated(arg1), c_associated(arg2_and_out), c_associated(cdata)])
         call assert(all(c_associated_args), "Coll_ReduceSub_c_char: all(c_associated_args)", intrinsic_array_t(c_associated_args))
       end associate
@@ -221,7 +221,7 @@ contains
       call c_f_pointer(arg1, lhs, [count])
       call c_f_pointer(arg2_and_out, rhs_and_result, [count])
 
-      block 
+      block
         integer(c_size_t) i
 
         do concurrent(i=1:count)
