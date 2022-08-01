@@ -7,6 +7,7 @@ submodule(collective_subroutines_m) co_reduce_s
   use caffeine_intrinsic_array_m, only : intrinsic_array_t
   use utilities_m, only : get_c_ptr, get_c_ptr_character, optional_value
   use caffeine_h_m, only : caf_c_co_reduce, caf_c_same_cfi_type, caf_c_elem_len, caf_c_is_f_string
+  use program_termination_m, only: caf_error_stop
   implicit none
 
   character(kind=c_char,len=5), parameter :: dummy = "     "
@@ -68,7 +69,7 @@ contains
       call caf_c_co_reduce(a, optional_value(result_image), stat_ptr, errmsg_ptr, &
         int(product(shape(a)), c_size_t), c_funloc(Coll_ReduceSub_c_double_complex), c_null_ptr)
     else
-      error stop "caf_co_reduce: unsupported type"
+      call caf_error_stop("caf_co_reduce: unsupported type")
     end if
 
   contains

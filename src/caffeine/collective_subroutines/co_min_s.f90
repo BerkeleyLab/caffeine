@@ -5,6 +5,7 @@ submodule(collective_subroutines_m) co_min_s
   use utilities_m, only : get_c_ptr, get_c_ptr_character, optional_value
   use caffeine_h_m, only : caf_c_co_min, caf_c_same_cfi_type, caf_c_numeric_type, caf_c_is_f_string
   use caffeine_assert_m, only : assert
+  use program_termination_m, only: caf_error_stop
   implicit none
 
 contains
@@ -28,7 +29,7 @@ contains
     else if (caf_c_is_f_string(a)) then
       call caf_co_reduce(a, c_funloc(alphabetize), optional_value(result_image), stat, errmsg)
     else
-      error stop "caf_co_min: unsupported type"
+      call caf_error_stop("caf_co_min: unsupported type")
     end if
 
   contains
