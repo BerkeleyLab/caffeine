@@ -7,16 +7,16 @@ module image_enumeration_m
   private
   public :: caf_num_images
   public :: caf_this_image
- 
+
   interface caf_num_images
 
-    module function num_images_team(team) result(image_count) 
+    module function num_images_team(team) result(image_count)
       implicit none
       type(team_type), intent(in), optional :: team
       integer image_count
     end function
 
-    module function num_images_team_number(team_number) result(image_count) 
+    module function num_images_team_number(team_number) result(image_count)
       implicit none
       integer, intent(in) :: team_number
       integer image_count
@@ -26,7 +26,7 @@ module image_enumeration_m
 
   interface caf_this_image
 
-    module function this_image_team(team) result(image_number)
+    pure module function this_image_team(team) result(image_number)
       implicit none
       type(team_type), intent(in), optional :: team
       integer image_number
