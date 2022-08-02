@@ -4,7 +4,8 @@ submodule(collective_subroutines_m) co_min_s
   use iso_c_binding, only : c_ptr, c_size_t, c_null_char, c_f_pointer, c_funloc, c_null_ptr
   use utilities_m, only : get_c_ptr, get_c_ptr_character, optional_value
   use caffeine_h_m, only : caf_c_co_min, caf_c_same_cfi_type, caf_c_numeric_type, caf_c_is_f_string
-  use assert_m, only : assert
+  use caffeine_assert_m, only : assert
+  use program_termination_m, only: caf_error_stop
   implicit none
 
 contains
@@ -28,13 +29,13 @@ contains
     else if (caf_c_is_f_string(a)) then
       call caf_co_reduce(a, c_funloc(alphabetize), optional_value(result_image), stat, errmsg)
     else
-      error stop "caf_co_min: unsupported type"
+      call caf_error_stop("caf_co_min: unsupported type")
     end if
 
   contains
 
     pure function alphabetize(lhs, rhs) result(first_alphabetically)
-      character(len=*), intent(in) :: lhs, rhs 
+      character(len=*), intent(in) :: lhs, rhs
       character(len=:), allocatable :: first_alphabetically
       call assert(len(lhs)==len(rhs), "caf_co_min: LHS/RHS length match", lhs//" , "//rhs)
       first_alphabetically = min(lhs,rhs)
