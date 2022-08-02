@@ -4,7 +4,7 @@
 !     "Multi-Dimensional Physics Implementation into Fuel Analysis under Steady-state and Transients (FAST)",
 !     contract # NRC-HQ-60-17-C-0007
 !
-submodule(caffeine_assert_m) assert_s
+submodule(caffeine_assert_m) caffeine_assert_s
   implicit none
 
 contains
