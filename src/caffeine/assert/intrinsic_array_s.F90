@@ -135,4 +135,4 @@ contains
     character_self = trim(adjustl(character_self))
   end procedure
 
-end submodule intrinsic_array_s
+end submodule 
