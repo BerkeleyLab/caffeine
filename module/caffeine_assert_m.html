@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+   <meta name="description" content="Library functions and derived types implementing the parallel features of Fortran 2018.">
+    <meta name="author" content="Lawrence Berkeley National Laboratory" >
+    <link rel="icon" href="../favicon.png">
+
+    <title>caffeine_assert_m &ndash; Caffeine</title>
+
+    <link href="../css/bootstrap.min.css" rel="stylesheet">
+    <link href="../css/pygments.css" rel="stylesheet">
+    <link href="../css/font-awesome.min.css" rel="stylesheet">
+    <link href="../css/local.css" rel="stylesheet">
+    <link  href="../tipuesearch/tipuesearch.css" rel="stylesheet">
+    <link href="../css/user.css" rel="stylesheet">
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    
+    <script src="../js/jquery-2.1.3.min.js"></script>
+    <script src="../js/svg-pan-zoom.min.js"></script>
+
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="../index.html">Caffeine </a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+          <ul class="nav navbar-nav">
+            <li class="dropdown hidden-xs visible-sm visible-md hidden-lg">
+              <a href="#" class="dropdown-toggle"
+              data-toggle="dropdown" role="button"
+              aria-haspopup="true"
+     aria-expanded="false">Contents <span class="caret"></span></a>
+        <ul class="dropdown-menu">
+            <li><a href="../lists/files.html">Source Files</a></li>
+            <li><a href="../lists/modules.html">Modules</a></li>
+            <li><a href="../lists/procedures.html">Procedures</a></li>
+            <li><a href="../lists/absint.html">Abstract Interfaces</a></li>
+                   <li><a href="../lists/types.html">Derived Types</a></li>
+       
+            </ul>
+        
+            </li>
+<li class="visible-xs hidden-sm visible-lg"><a href="../lists/files.html">Source Files</a></li>
+<li class="visible-xs hidden-sm visible-lg"><a href="../lists/modules.html">Modules</a></li>
+<li class="visible-xs hidden-sm visible-lg"><a href="../lists/procedures.html">Procedures</a></li>
+<li class="visible-xs hidden-sm visible-lg"><a href="../lists/absint.html">Abstract Interfaces</a></li>
+                             <li class="visible-xs hidden-sm visible-lg"><a href="../lists/types.html">Derived Types</a></li>
+          </ul>
+        <form action="../search.html" class="navbar-form navbar-right" role="search">
+        <div class="form-group">
+          <input type="text" class="form-control" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+        </div>
+<!--
+        <button type="submit" class="btn btn-default">Submit</button>
+-->
+        </form>
+        </div><!--/.nav-collapse -->
+      </div>
+    </nav>
+
+    <div class="container">
+  <div class="row">
+    <h1>caffeine_assert_m 
+    <small>Module</small>
+    </h1>
+    <div class="row">
+  <div class="col-lg-12">
+<div class="well well-sm">
+  <ul class="list-inline" style="margin-bottom:0px;display:inline">
+     <li><i class="fa fa-list-ol"></i>
+       <a data-toggle="tooltip"
+    data-placement="bottom" data-html="true"
+    title=" 1.3% of total for modules and submodules.">14 statements</a>
+     </li> 
+    <li><i class="fa fa-code"></i><a href="../src/assert_m.F90"> Source File</a></li>
+  </ul>
+  <ol class="breadcrumb in-well text-right">
+     <li><a href='../sourcefile/assert_m.f90.html'>assert_m.F90</a></li>
+     <li class="active">caffeine_assert_m</li>
+  </ol>
+</div>
+</div>
+</div>
+<script>
+  $(function () {
+  $('[data-toggle="tooltip"]').tooltip()
+  })
+</script>
+
+  </div>
+  
+  <div class="row">
+    <div class="col-md-3 hidden-xs hidden-sm visible-md visible-lg">
+    <div id="sidebar">
+  <h3>Contents</h3>
+ 
+<div class="panel panel-primary">
+  <div class="panel-heading text-left"><h3 class="panel-title"><a data-toggle="collapse" href="#vars-0">Variables</a></h3></div>
+  <div id="vars-0" class="panel-collapse collapse">
+    <div class="list-group">
+      <a class="list-group-item" href="../module/caffeine_assert_m.html#variable-enforce_assertions">enforce_assertions</a>
+    </div>
+  </div>
+</div>
+<div class="panel panel-primary">
+  <div class="panel-heading text-left"><h3 class="panel-title"><a data-toggle="collapse" href="#inters-0">Interfaces</a></h3></div>
+  <div id="inters-0" class="panel-collapse collapse">
+    <div class="list-group">
+      <a class="list-group-item" href="../module/caffeine_assert_m.html#interface-assert">assert</a>
+    </div>
+  </div>
+</div>
+
+</div>
+
+    </div>
+    
+    <div class="col-md-9" id='text'>
+    <p>use assertions_m, only : assert
+   call assert( 2 &gt; 1, "2 &gt; 1")</p>
+<p>Turn off assertions in production code by setting USE_ASSERTIONS to .false. via the preprocessor.
+This file's capitalized .F90 extension causes most Fortran compilers to preprocess this file so
+that building as follows turns off assertion enforcement:</p>
+<p>fpm build --flag "-DUSE_ASSERTIONS=.false."</p>
+<p>Doing so may eliminate any associated runtime overhead by enabling optimizing compilers to ignore
+the assertion procedure body during a dead-code-removal phase of optimization.</p>
+<br>    
+        <div class="panel panel-default">
+      <div class="panel-heading">
+  <h3 class="panel-title">Used by</h3>
+      </div>
+      <ul class="list-group">
+  <li class="list-group-item">  
+    <ul class="list-inline">
+      <li><h5>Descendants:</h5></li>
+      <li><a href='../module/assert_s.html'>assert_s</a></li>
+    </ul>
+  </li>
+  <li class="list-group-item">
+    <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: module~~caffeine_assert_m~~UsedByGraph Pages: 1 -->
+<svg id="modulecaffeine_assert_mUsedByGraph" width="231pt" height="158pt"
+ viewBox="0.00 0.00 231.00 158.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="module~~caffeine_assert_m~~UsedByGraph" class="graph" transform="scale(1 1) rotate(0) translate(4 154)">
+<title>module~~caffeine_assert_m~~UsedByGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-154 227,-154 227,4 -4,4"/>
+<!-- module~caffeine_assert_m -->
+<g id="module~~caffeine_assert_m~~UsedByGraph_node1" class="node">
+<title>module~caffeine_assert_m</title>
+<polygon fill="none" stroke="black" points="109,-87 0,-87 0,-63 109,-63 109,-87"/>
+<text text-anchor="middle" x="54.5" y="-72.6" font-family="Helvetica,sans-Serif" font-size="10.50">caffeine_assert_m</text>
+</g>
+<!-- module~co_max_s -->
+<g id="module~~caffeine_assert_m~~UsedByGraph_node2" class="node">
+<title>module~co_max_s</title>
+<g id="a_module~~caffeine_assert_m~~UsedByGraph_node2"><a xlink:href=".././module/co_max_s.html" xlink:title="co_max_s">
+<polygon fill="#5bc0de" stroke="#5bc0de" points="216,-150 152,-150 152,-126 216,-126 216,-150"/>
+<text text-anchor="middle" x="184" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">co_max_s</text>
+</a>
+</g>
+</g>
+<!-- module~co_max_s&#45;&gt;module~caffeine_assert_m -->
+<g id="module~~caffeine_assert_m~~UsedByGraph_edge1" class="edge">
+<title>module~co_max_s&#45;&gt;module~caffeine_assert_m</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M158.42,-125.85C138.75,-116.14 110.96,-102.41 89.22,-91.66"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="90.52,-88.4 80.01,-87.11 87.42,-94.68 90.52,-88.4"/>
+</g>
+<!-- module~assert_s -->
+<g id="module~~caffeine_assert_m~~UsedByGraph_node3" class="node">
+<title>module~assert_s</title>
+<g id="a_module~~caffeine_assert_m~~UsedByGraph_node3"><a xlink:href=".././module/assert_s.html" xlink:title="assert_s">
+<polygon fill="#5bc0de" stroke="#5bc0de" points="211.5,-108 156.5,-108 156.5,-84 211.5,-84 211.5,-108"/>
+<text text-anchor="middle" x="184" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">assert_s</text>
+</a>
+</g>
+</g>
+<!-- module~assert_s&#45;&gt;module~caffeine_assert_m -->
+<g id="module~~caffeine_assert_m~~UsedByGraph_edge4" class="edge">
+<title>module~assert_s&#45;&gt;module~caffeine_assert_m</title>
+<path fill="none" stroke="#ff0000" d="M156.27,-91.6C145.39,-89.81 132.31,-87.65 119.22,-85.5"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="119.69,-82.03 109.26,-83.85 118.56,-88.93 119.69,-82.03"/>
+</g>
+<!-- module~co_min_s -->
+<g id="module~~caffeine_assert_m~~UsedByGraph_node4" class="node">
+<title>module~co_min_s</title>
+<g id="a_module~~caffeine_assert_m~~UsedByGraph_node4"><a xlink:href=".././module/co_min_s.html" xlink:title="co_min_s">
+<polygon fill="#5bc0de" stroke="#5bc0de" points="214.5,-66 153.5,-66 153.5,-42 214.5,-42 214.5,-66"/>
+<text text-anchor="middle" x="184" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">co_min_s</text>
+</a>
+</g>
+</g>
+<!-- module~co_min_s&#45;&gt;module~caffeine_assert_m -->
+<g id="module~~caffeine_assert_m~~UsedByGraph_edge2" class="edge">
+<title>module~co_min_s&#45;&gt;module~caffeine_assert_m</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M153.43,-58.87C143.14,-60.57 131.17,-62.54 119.2,-64.51"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="118.48,-61.08 109.18,-66.16 119.61,-67.99 118.48,-61.08"/>
+</g>
+<!-- module~co_reduce_s -->
+<g id="module~~caffeine_assert_m~~UsedByGraph_node5" class="node">
+<title>module~co_reduce_s</title>
+<g id="a_module~~caffeine_assert_m~~UsedByGraph_node5"><a xlink:href=".././module/co_reduce_s.html" xlink:title="co_reduce_s">
+<polygon fill="#5bc0de" stroke="#5bc0de" points="223,-24 145,-24 145,0 223,0 223,-24"/>
+<text text-anchor="middle" x="184" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">co_reduce_s</text>
+</a>
+</g>
+</g>
+<!-- module~co_reduce_s&#45;&gt;module~caffeine_assert_m -->
+<g id="module~~caffeine_assert_m~~UsedByGraph_edge3" class="edge">
+<title>module~co_reduce_s&#45;&gt;module~caffeine_assert_m</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M158.42,-24.15C138.75,-33.86 110.96,-47.59 89.22,-58.34"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="87.42,-55.32 80.01,-62.89 90.52,-61.6 87.42,-55.32"/>
+</g>
+</g>
+</svg>
+</div><div><a type="button" class="graph-help" data-toggle="modal" href="#graph-help-text">Help</a></div><div class="modal fade" id="graph-help-text" tabindex="-1" role="dialog"><div class="modal-dialog modal-lg" role="document"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button><h4 class="modal-title" id="-graph-help-label">Graph Key</h4></div><div class="modal-body">
+    <p>Nodes of different colours represent the following: </p>
+    <?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="518pt" height="32pt"
+ viewBox="0.00 0.00 517.50 32.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 513.5,-28 513.5,4 -4,4"/>
+<!-- Module -->
+<g id="node1" class="node">
+<title>Module</title>
+<polygon fill="#337ab7" stroke="#337ab7" points="54,-24 0,-24 0,0 54,0 54,-24"/>
+<text text-anchor="middle" x="27" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Module</text>
+</g>
+<!-- Submodule -->
+<g id="node2" class="node">
+<title>Submodule</title>
+<polygon fill="#5bc0de" stroke="#5bc0de" points="145.5,-24 72.5,-24 72.5,0 145.5,0 145.5,-24"/>
+<text text-anchor="middle" x="109" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Submodule</text>
+</g>
+<!-- Subroutine -->
+<g id="node3" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="234,-24 164,-24 164,0 234,0 234,-24"/>
+<text text-anchor="middle" x="199" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node4" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="310,-24 252,-24 252,0 310,0 310,-24"/>
+<text text-anchor="middle" x="281" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Program -->
+<g id="node5" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="386,-24 328,-24 328,0 386,0 386,-24"/>
+<text text-anchor="middle" x="357" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node6" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="509.5,-24 404.5,-24 404.5,0 509.5,0 509.5,-24"/>
+<text text-anchor="middle" x="457" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+    
+    <p>Solid arrows point from a submodule to the (sub)module which it is
+    descended from. Dashed arrows point from a module or program unit to 
+    modules which it uses. Where possible, edges connecting nodes are given different colours to make them easier to distinguish in large graphs.
+    </p>
+    </div></div></div></div>
+  </li>
+      </ul>
+    </div>
+
+    <br>
+
+    <section class="visible-xs visible-sm hidden-md">
+      <h3>Contents</h3>
+ 
+<div class="panel panel-primary">
+  <div class="panel-heading text-left"><h3 class="panel-title"><a data-toggle="collapse" href="#vars-1">Variables</a></h3></div>
+  <div id="vars-1" class="panel-collapse collapse">
+    <div class="list-group">
+      <a class="list-group-item" href="../module/caffeine_assert_m.html#variable-enforce_assertions">enforce_assertions</a>
+    </div>
+  </div>
+</div>
+<div class="panel panel-primary">
+  <div class="panel-heading text-left"><h3 class="panel-title"><a data-toggle="collapse" href="#inters-1">Interfaces</a></h3></div>
+  <div id="inters-1" class="panel-collapse collapse">
+    <div class="list-group">
+      <a class="list-group-item" href="../module/caffeine_assert_m.html#interface-assert">assert</a>
+    </div>
+  </div>
+</div>
+
+    </section>
+    <br class="visible-xs visible-sm hidden-md">
+
+
+    <section>
+    <h2>Variables</h2>
+    <table class="table table-striped varlist">
+<thead><tr><th>Type</th><th>Visibility</th><th>Attributes</th><th></th><th>Name</th><th></th><th>Initial</th><th></th></thead>
+<tbody>
+<tr>
+  <td><span class="anchor" id="variable-enforce_assertions"></span>logical,</td>
+<td>private,</td>  <td>parameter</td><td>::</td>
+  <td><strong>enforce_assertions</strong></td><td> =</td><td>.true.</td><td><p>Turn off assertions as follows: fpm build --flag "-DUSE_ASSERTIONS=.false."</p></td>
+</tr>
+</tbody>
+</table>
+
+    </section>
+    <br>
+    
+    
+    <section>
+   <h2>Interfaces</h2>
+     <div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="interface-assert"></span><h3>interface   </h3></div>
+  <ul class="list-group">
+    <li class="list-group-item">
+    <h3>public pure module module subroutine assert(assertion, description, diagnostic_data)   <a href='../proc/assert.html'><button type="button" class="btn btn-info depwarn">Implementation &rarr;</button></a>
+</h3><p>If assertion is .false., error-terminate with a character stop code that contains diagnostic_data if present</p>
+    
+<h4>Arguments</h4>      <table class="table table-striped varlist">
+<thead><tr><th>Type</th><th>Intent</th><th>Optional</th><th>Attributes</th><th></th><th>Name</th><th></th></thead>
+<tbody>
+<tr>
+  <td><span class="anchor" ></span>logical,</td>
+<td>intent(in)</td>
+  <td></td>  <td></td><td>::</td>
+  <td><strong>assertion</strong></td><td><p>Most assertions will be expressions such as i&gt;0</p></td>
+</tr>
+<tr>
+  <td><span class="anchor" ></span>character(len=*),</td>
+<td>intent(in)</td>
+  <td></td>  <td></td><td>::</td>
+  <td><strong>description</strong></td><td><p>A brief statement of what is being asserted such as "i&gt;0" or "positive i"</p></td>
+</tr>
+<tr>
+  <td><span class="anchor" ></span>class(*),</td>
+<td>intent(in),</td>
+  <td>optional</td>  <td></td><td>::</td>
+  <td><strong>diagnostic_data</strong></td><td><p>Data to include in an error ouptput: may be of an intrinsic type or a type that extends characterizable_t</p></td>
+</tr>
+</tbody>
+</table>
+
+
+    </li>
+  </ul>
+</div>
+
+    </section>
+  <br>
+
+    
+    
+
+    
+    </div>
+  </div>
+
+    <hr>    
+    </div> <!-- /container -->
+    <footer>
+      <div class="container">
+      <div class="row">
+        <div class="col-xs-6 col-md-6"><p>Caffeine was developed by Lawrence Berkeley National Laboratory<br>&copy; 2022 
+</p>
+        </div>
+        <div class="col-xs-6 col-md-6">
+          <p class="text-right">
+            Documentation generated by 
+            <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
+ on 2022-08-02 18:55            </p>
+        </div>
+      </div>
+      <br>
+      </div> <!-- /container -->    
+    </footer>
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+<!--
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+-->
+    <script src="../js/bootstrap.min.js"></script>
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <script src="../js/ie10-viewport-bug-workaround.js"></script>
+
+    <!-- MathJax JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } },
+        jax: ['input/TeX','input/MathML','output/HTML-CSS'],
+        extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']
+      });
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script src="../tipuesearch/tipuesearch_content.js"></script>
+    <script src="../tipuesearch/tipuesearch_set.js"></script>
+    <script src="../tipuesearch/tipuesearch.js"></script>
+    
+  </body>
+</html>
