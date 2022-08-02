@@ -1,4 +1,4 @@
-submodule(caffeine_intrinsic_array_m) intrinsic_array_s
+submodule(caffeine_intrinsic_array_m) caffeine_intrinsic_array_s
   use program_termination_m, only: caf_error_stop
   implicit none
 
