@@ -18,7 +18,7 @@ print_usage_info()
     echo "yes | ./install.sh"
 }
 
-GCC_VERSION=11
+GCC_VERSION=12
 GASNET_VERSION="2021.9.0"
 
 list_prerequisites()
