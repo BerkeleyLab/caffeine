@@ -170,21 +170,26 @@ contains
     type(result_t) result_
     logical(c_bool) one_false, one_true, all_true
     procedure(c_bool_operation), pointer :: boolean_operation
+    logical(c_bool), parameter :: c_true=.true._c_bool, c_false=.false._c_bool
+    logical ans1, ans2, ans3
 
     boolean_operation => logical_and
 
-    one_false = merge(.false., .true., caf_this_image()==1)
+    one_false = merge(c_false, c_true, caf_this_image()==1)
     call caf_co_reduce(one_false, c_funloc(boolean_operation))
 
-    one_true = merge(.true., .false., caf_this_image()==1)
+    one_true = merge(c_true, c_false, caf_this_image()==1)
     call caf_co_reduce(one_true, c_funloc(boolean_operation))
 
-    all_true = .true.
+    all_true = c_true
     call caf_co_reduce(all_true, c_funloc(boolean_operation))
 
-    result_ = assert_that(one_false .eqv. .false.) .and. &
-              assert_that(one_true .eqv. merge(.true.,.false.,caf_num_images()==1)) .and. &
-              assert_that(all_true .eqv. .true.)
+    ans1 = one_false .eqv. c_false
+    ans2 = one_true  .eqv. merge(c_true,c_false,caf_num_images()==1)
+    ans3 = all_true  .eqv. c_true
+    result_ = assert_that(ans1) .and. &
+              assert_that(ans2) .and. &
+              assert_that(ans3)
   contains
 
     pure function logical_and(lhs, rhs) result(lhs_and_rhs)
