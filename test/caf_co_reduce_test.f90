@@ -1,6 +1,6 @@
 module caf_co_reduce_test
   use caffeine_m, only : caf_co_reduce, caf_num_images, caf_this_image
-  use vegetables, only : result_t, test_item_t, assert_equals, describe, it, assert_that, assert_equals
+  use veggies, only : result_t, test_item_t, assert_equals, describe, it, assert_that, assert_equals
   use collective_subroutines_m, only : &
      c_int32_t_operation, c_int64_t_operation, c_float_operation, c_double_operation, c_char_operation, c_bool_operation &
     ,c_float_complex_operation, c_double_complex_operation

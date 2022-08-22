@@ -1,5 +1,5 @@
 module caf_stop_test
-    use vegetables, only: test_item_t, describe, result_t, it, assert_that, assert_equals
+    use veggies, only: test_item_t, describe, result_t, it, assert_that, assert_equals
 
     implicit none
     private

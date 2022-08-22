@@ -1,6 +1,6 @@
 module caf_co_sum_test
     use caffeine_m, only : caf_co_sum, caf_num_images, caf_this_image
-    use vegetables, only: result_t, test_item_t, assert_equals, describe, it, assert_that, assert_equals, succeed
+    use veggies, only: result_t, test_item_t, assert_equals, describe, it, assert_that, assert_equals, succeed
 
     implicit none
     private
