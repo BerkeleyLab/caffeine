@@ -16,11 +16,9 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v1
 
-    - name: Get Time
-      id: time
-      uses: nanzm/get-time-action@v1.0
+    - uses: fortran-lang/setup-fpm@v4
       with:
-        format: 'YYYY-MM'
+        github-token: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Install on Ubuntu
       if: contains(matrix.os, 'ubuntu')

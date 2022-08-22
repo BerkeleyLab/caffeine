@@ -1,6 +1,6 @@
 module caf_co_max_test
     use caffeine_m, only : caf_co_max, caf_num_images
-    use vegetables, only: result_t, test_item_t, assert_equals, describe, it, assert_that, assert_equals
+    use veggies, only: result_t, test_item_t, assert_equals, describe, it, assert_that, assert_equals
     use image_enumeration_m, only : caf_this_image, caf_num_images
 
     implicit none
