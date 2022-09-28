@@ -24,6 +24,7 @@ jobs:
       if: contains(matrix.os, 'ubuntu')
       run: |
         /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+        export PATH="${PATH}:/home/linuxbrew/.linuxbrew/bin"
         ./install.sh --prefix=${PREFIX}
 
     - name: Install on macOS
