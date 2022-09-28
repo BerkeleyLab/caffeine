@@ -198,6 +198,9 @@ if [ -z ${FC+x} ] || [ -z ${CC+x} ] || [ -z ${CXX+x} ] || [ -z ${PKG_CONFIG+x} ]
     ask_permission_to_install_homebrew_package "gfortran, gcc, and g++" "gcc@$GCC_VERSION" 
     exit_if_user_declines "GCC"
     "$BREW" install gcc@$GCC_VERSION
+    if [ uname == "Linux" ]; then
+      brew link --force glibc
+    fi
   fi
   CC=`which gcc-$GCC_VERSION`
   CXX=`which g++-$GCC_VERSION`
