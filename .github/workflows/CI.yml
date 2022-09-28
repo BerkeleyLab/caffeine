@@ -23,7 +23,7 @@ jobs:
     - name: Install on Ubuntu
       if: contains(matrix.os, 'ubuntu')
       run: |
-        /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+        sudo /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
         ./install.sh --prefix=${PREFIX}
 
     - name: Install on macOS
