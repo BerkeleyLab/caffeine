@@ -23,7 +23,8 @@ jobs:
     - name: Install on Ubuntu
       if: contains(matrix.os, 'ubuntu')
       run: |
-        /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+        sudo apt update
+        sudo apt install -y build-essential gfortran-12 pkg-config make
         ./install.sh --prefix=${PREFIX}
 
     - name: Install on macOS
