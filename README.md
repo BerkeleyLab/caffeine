@@ -60,6 +60,16 @@ Run tests
 ./build/run-fpm.sh test
 ```
 
+Publications
+------------
+
+Citing Caffeine? Please use the following publication:
+
+Damian Rouson, Dan Bonachea.   
+"[**Caffeine: CoArray Fortran Framework of Efficient Interfaces to Network Environments**](https://github.com/BerkeleyLab/caffeine/wiki/pubs/Caffeine_for_LLVM-2022.pdf)",     
+Proceedings of the [Eighth Annual Workshop on the LLVM Compiler Infrastructure in HPC (LLVM-HPC2022)](https://llvm-hpc-2022-workshop.github.io), November 2022.    
+<https://doi.org/10.25344/S4459B>
+
 Documentation
 -------------
 One of our continous integration (CI) scripts generates up-to-date Caffeine documentation using [ford].  The CI script also deploys the generated documentation to the our GitHub Pages [site].
