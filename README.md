@@ -68,7 +68,9 @@ Citing Caffeine? Please use the following publication:
 Damian Rouson, Dan Bonachea.   
 "[**Caffeine: CoArray Fortran Framework of Efficient Interfaces to Network Environments**](https://github.com/BerkeleyLab/caffeine/wiki/pubs/Caffeine_for_LLVM-2022.pdf)",     
 Proceedings of the [Eighth Annual Workshop on the LLVM Compiler Infrastructure in HPC (LLVM-HPC2022)](https://llvm-hpc-2022-workshop.github.io), November 2022.    
-<https://doi.org/10.25344/S4459B>
+Paper: <https://doi.org/10.25344/S4459B>     
+[Talk Slides](https://github.com/BerkeleyLab/caffeine/wiki/pubs/Caffeine_for_LLVM-2022-Slides.pdf)
+
 
 Documentation
 -------------
