@@ -5,27 +5,7 @@ Caffeine
 
 Caffeine is a parallel runtime library that aims to support Fortran compilers with a programming-model-agnostic application binary interface (ABI) to various communication libraries.  Current work is on supporting the ABI with the [GASNet-EX] exascale-ready networking middleware.  Future plans include support for an alternative Message Passing Interface ([MPI]) back end.
 
-```
-                    .
-                        `:.
-                          `:.
-                  .:'     ,::
-                 .:'      ;:'
-                 ::      ;:'
-                  :    .:'
-                   `.  :.
-          _________________________
-         : _ _ _ _ _ _ _ _ _ _ _ _ :
-     ,---:".".".".".".".".".".".".":
-    : ,'"`::.:.:.:.:.:.:.:.:.:.:.::'
-    `.`.  `:-===-===-===-===-===-:'
-      `.`-._:                   :
-        `-.__`.               ,' 
-    ,--------`"`-------------'--------.
-     `"--.__                   __.--"'
-            `""-------------""'
-```
-Art from [ascii.co.uk].
+![Caffeine system stack diagram](docs/caffeine-stack.gif)
 
 Prerequisites
 -------------
