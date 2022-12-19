@@ -46,7 +46,7 @@ Philosophy and Motivations
 --------------------------
 * Write as much of Caffeine as possible in Fortran:
     - Writing the runtime library in the language of the users increases the likelihood of community contributions.
-    - Writing the runtime library in Fortran obviates the need to directly manipulate compiler descriptors throughout much of Caffeine and allows Caffeine's underlying C layer to receive the Fortran-standard `CFI_cdesc_t` desriptor, which imwill make it easier to support multiple compilers.
+    - Writing the runtime library in Fortran obviates the need to directly manipulate compiler descriptors throughout much of Caffeine and allows Caffeine's underlying C layer to receive the Fortran-standard `CFI_cdesc_t` descriptor, which will make it easier to support multiple compilers.
     - Writing most of Caffeine in Fortran offers the potential exploiting Fortran's rich array syntax, concurrent loop iterations (`do concurrent`), `pure` procedures and related features. Currently, these play a role only in one place: C callbacks to user-provided, `pure` functions that can be invoked inside a `do concurrent` block during the execution of `co_reduce`.
 * Define an interface that remains agnostic about the back-end communication library:
     - Once multiple back ends are supported, Fortran developers would not have to rewrite or even recompile their programs in order to change back ends. Switching from GASNet-EX to MPI, for example, could become a link-time decision.

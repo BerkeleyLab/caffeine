@@ -54,7 +54,7 @@ Paper: <https://doi.org/10.25344/S4459B>
 
 Documentation
 -------------
-One of our continous integration (CI) scripts generates up-to-date Caffeine documentation using [ford].  The CI script also deploys the generated documentation to the our GitHub Pages [site].
+One of our continuous integration (CI) scripts generates up-to-date Caffeine documentation using [ford].  The CI script also deploys the generated documentation to the our GitHub Pages [site].
 Alternatively, generate HTML documentation locally using [ford] as follows:
 ```
 ford doc-generator.md
