@@ -1,13 +1,15 @@
 ! Copyright (c), The Regents of the University of California
 ! Terms of use are as specified in LICENSE.txt
 submodule(rma_m) rma_s
+  use caffeine_assert_m, only : assert
 
   implicit none
 
 contains
 
   module procedure caf_put
-    ! assert that both team and team_number are not present
+
+    call assert(.not.(present(team) .and. present(team_number)), "caf_put: both team and team_number are present")
 
     ! assert that the size of coindices array needs to match the corank of the coarray
 
