@@ -24,7 +24,7 @@ jobs:
       if: contains(matrix.os, 'ubuntu')
       run: |
         sudo apt update
-        sudo apt install -y build-essential gfortran-12 g++-12 pkg-config make
+        sudo apt install -y build-essential gfortran-13 g++-13 pkg-config make
         ./install.sh --prefix=${PREFIX}
 
     - name: Install on macOS
