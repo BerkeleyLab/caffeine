@@ -179,7 +179,7 @@ if [ -z ${FC+x} ] || [ -z ${CC+x} ] || [ -z ${CXX+x} ] || [ -z ${PKG_CONFIG+x} ]
     curl -L https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh -o $DEPENDENCIES_DIR/install-homebrew.sh --create-dirs
     chmod u+x $DEPENDENCIES_DIR/install-homebrew.sh
 
-    if [ -p /dev/stdin ]; then 
+    if [ -p /dev/stdin ] && [ $CI = false ]; then 
        echo ""
        echo "Pipe detected.  Installing Homebrew requires sudo privileges, which most likely will"
        echo "not work if you are installing non-interactively, e.g., via 'yes | ./install.sh'."
