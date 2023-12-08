@@ -131,7 +131,7 @@
 <thead><tr><th>Type</th><th>Intent</th><th>Optional</th><th>Attributes</th><th></th><th>Name</th><th></th></thead>
 <tbody>
 <tr>
-  <td><span class="anchor" id="variable-a~4"></span>type(*),</td>
+  <td><span class="anchor" id="variable-a~13"></span>type(*),</td>
 <td>intent(inout),</td>
   <td></td>  <td>contiguous, target</td><td>::</td>
   <td><strong>a</strong>(..)</td><td></td>
@@ -143,19 +143,19 @@
   <td><strong>operation</strong></td><td></td>
 </tr>
 <tr>
-  <td><span class="anchor" id="variable-result_image~3"></span>integer,</td>
+  <td><span class="anchor" id="variable-result_image~7"></span>integer,</td>
 <td>intent(in),</td>
   <td>optional</td>  <td>target</td><td>::</td>
   <td><strong>result_image</strong></td><td></td>
 </tr>
 <tr>
-  <td><span class="anchor" id="variable-stat~5"></span>integer,</td>
+  <td><span class="anchor" id="variable-stat~7"></span>integer,</td>
 <td>intent(out),</td>
   <td>optional</td>  <td>target</td><td>::</td>
   <td><strong>stat</strong></td><td></td>
 </tr>
 <tr>
-  <td><span class="anchor" id="variable-errmsg~5"></span>character(len=*),</td>
+  <td><span class="anchor" id="variable-errmsg~6"></span>character(len=*),</td>
 <td>intent(inout),</td>
   <td>optional</td>  <td>target</td><td>::</td>
   <td><strong>errmsg</strong></td><td></td>
@@ -186,80 +186,80 @@
 <polygon fill="none" stroke="black" points="89,-192 0,-192 0,-168 89,-168 89,-192"/>
 <text text-anchor="middle" x="44.5" y="-177.6" font-family="Helvetica,sans-Serif" font-size="10.50">caf_co_reduce</text>
 </g>
-<!-- interface~caf_c_same_cfi_type -->
+<!-- proc~get_c_ptr -->
 <g id="proc~~caf_co_reduce~~CallsGraph_node2" class="node">
-<title>interface~caf_c_same_cfi_type</title>
-<g id="a_proc~~caf_co_reduce~~CallsGraph_node2"><a xlink:href=".././interface/caf_c_same_cfi_type.html" xlink:title="caf_c_same_cfi_type">
-<polygon fill="#a7506f" stroke="#a7506f" points="246,-356 125,-356 125,-332 246,-332 246,-356"/>
-<text text-anchor="middle" x="185.5" y="-341.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">caf_c_same_cfi_type</text>
+<title>proc~get_c_ptr</title>
+<g id="a_proc~~caf_co_reduce~~CallsGraph_node2"><a xlink:href=".././proc/get_c_ptr.html" xlink:title="get_c_ptr">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="216,-356 155,-356 155,-332 216,-332 216,-356"/>
+<text text-anchor="middle" x="185.5" y="-341.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_c_ptr</text>
 </a>
 </g>
 </g>
-<!-- proc~caf_co_reduce&#45;&gt;interface~caf_c_same_cfi_type -->
+<!-- proc~caf_co_reduce&#45;&gt;proc~get_c_ptr -->
 <g id="proc~~caf_co_reduce~~CallsGraph_edge1" class="edge">
-<title>proc~caf_co_reduce&#45;&gt;interface~caf_c_same_cfi_type</title>
-<path fill="none" stroke="#ff0000" d="M49.47,-192.02C58.7,-218.27 84,-281.3 125,-318 128.89,-321.48 133.32,-324.55 137.97,-327.25"/>
-<polygon fill="#ff0000" stroke="#ff0000" points="136.6,-330.49 147.09,-331.99 139.82,-324.27 136.6,-330.49"/>
+<title>proc~caf_co_reduce&#45;&gt;proc~get_c_ptr</title>
+<path fill="none" stroke="#ff0000" d="M49.02,-192.27C57.49,-219.68 81.6,-286.34 125,-323 130.81,-327.91 137.85,-331.7 145.02,-334.62"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="144.18,-338.03 154.77,-338.08 146.52,-331.44 144.18,-338.03"/>
+</g>
+<!-- proc~optional_value -->
+<g id="proc~~caf_co_reduce~~CallsGraph_node3" class="node">
+<title>proc~optional_value</title>
+<g id="a_proc~~caf_co_reduce~~CallsGraph_node3"><a xlink:href=".././proc/optional_value.html" xlink:title="optional_value">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="231,-314 140,-314 140,-290 231,-290 231,-314"/>
+<text text-anchor="middle" x="185.5" y="-299.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">optional_value</text>
+</a>
+</g>
+</g>
+<!-- proc~caf_co_reduce&#45;&gt;proc~optional_value -->
+<g id="proc~~caf_co_reduce~~CallsGraph_edge2" class="edge">
+<title>proc~caf_co_reduce&#45;&gt;proc~optional_value</title>
+<path fill="none" stroke="#ff0000" d="M52.87,-192.18C65.45,-212.08 92.85,-251.78 125,-276 129.67,-279.52 134.9,-282.68 140.25,-285.48"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="138.8,-288.67 149.33,-289.86 141.84,-282.36 138.8,-288.67"/>
 </g>
 <!-- interface~caf_error_stop -->
-<g id="proc~~caf_co_reduce~~CallsGraph_node3" class="node">
+<g id="proc~~caf_co_reduce~~CallsGraph_node4" class="node">
 <title>interface~caf_error_stop</title>
-<g id="a_proc~~caf_co_reduce~~CallsGraph_node3"><a xlink:href=".././interface/caf_error_stop.html" xlink:title="caf_error_stop">
-<polygon fill="#a7506f" stroke="#a7506f" points="460,-233 372,-233 372,-209 460,-209 460,-233"/>
-<text text-anchor="middle" x="416" y="-218.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">caf_error_stop</text>
+<g id="a_proc~~caf_co_reduce~~CallsGraph_node4"><a xlink:href=".././interface/caf_error_stop.html" xlink:title="caf_error_stop">
+<polygon fill="#a7506f" stroke="#a7506f" points="460,-212 372,-212 372,-188 460,-188 460,-212"/>
+<text text-anchor="middle" x="416" y="-197.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">caf_error_stop</text>
 </a>
 </g>
 </g>
 <!-- proc~caf_co_reduce&#45;&gt;interface~caf_error_stop -->
 <g id="proc~~caf_co_reduce~~CallsGraph_edge5" class="edge">
 <title>proc~caf_co_reduce&#45;&gt;interface~caf_error_stop</title>
-<path fill="none" stroke="#ff0000" d="M50.24,-192.02C60.11,-215.14 85.28,-265.25 125,-285 214.28,-329.39 334.17,-270.19 387.47,-238.58"/>
-<polygon fill="#ff0000" stroke="#ff0000" points="389.59,-241.39 396.33,-233.21 385.96,-235.4 389.59,-241.39"/>
+<path fill="none" stroke="#ff0000" d="M55.84,-192.15C69.73,-207.44 96.06,-232.92 125,-243 212.97,-273.63 323.37,-238.49 379.17,-215.96"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="380.71,-219.11 388.62,-212.06 378.04,-212.64 380.71,-219.11"/>
 </g>
-<!-- interface~caf_c_is_f_string -->
-<g id="proc~~caf_co_reduce~~CallsGraph_node4" class="node">
-<title>interface~caf_c_is_f_string</title>
-<g id="a_proc~~caf_co_reduce~~CallsGraph_node4"><a xlink:href=".././interface/caf_c_is_f_string.html" xlink:title="caf_c_is_f_string">
-<polygon fill="#a7506f" stroke="#a7506f" points="234.5,-276 136.5,-276 136.5,-252 234.5,-252 234.5,-276"/>
-<text text-anchor="middle" x="185.5" y="-261.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">caf_c_is_f_string</text>
+<!-- interface~caf_c_same_cfi_type -->
+<g id="proc~~caf_co_reduce~~CallsGraph_node5" class="node">
+<title>interface~caf_c_same_cfi_type</title>
+<g id="a_proc~~caf_co_reduce~~CallsGraph_node5"><a xlink:href=".././interface/caf_c_same_cfi_type.html" xlink:title="caf_c_same_cfi_type">
+<polygon fill="#a7506f" stroke="#a7506f" points="246,-234 125,-234 125,-210 246,-210 246,-234"/>
+<text text-anchor="middle" x="185.5" y="-219.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">caf_c_same_cfi_type</text>
 </a>
 </g>
 </g>
-<!-- proc~caf_co_reduce&#45;&gt;interface~caf_c_is_f_string -->
+<!-- proc~caf_co_reduce&#45;&gt;interface~caf_c_same_cfi_type -->
 <g id="proc~~caf_co_reduce~~CallsGraph_edge3" class="edge">
-<title>proc~caf_co_reduce&#45;&gt;interface~caf_c_is_f_string</title>
-<path fill="none" stroke="#ff0000" d="M58.04,-192.14C72.96,-206.03 99.1,-228.69 125,-243 128.21,-244.77 131.6,-246.44 135.06,-248"/>
-<polygon fill="#ff0000" stroke="#ff0000" points="133.76,-251.25 144.34,-251.88 136.46,-244.79 133.76,-251.25"/>
+<title>proc~caf_co_reduce&#45;&gt;interface~caf_c_same_cfi_type</title>
+<path fill="none" stroke="#ff0000" d="M85.33,-192.04C100.74,-196.69 118.55,-202.07 134.79,-206.98"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="134.08,-210.42 144.66,-209.96 136.1,-203.72 134.08,-210.42"/>
 </g>
 <!-- interface~caf_c_elem_len -->
-<g id="proc~~caf_co_reduce~~CallsGraph_node5" class="node">
+<g id="proc~~caf_co_reduce~~CallsGraph_node6" class="node">
 <title>interface~caf_c_elem_len</title>
-<g id="a_proc~~caf_co_reduce~~CallsGraph_node5"><a xlink:href=".././interface/caf_c_elem_len.html" xlink:title="caf_c_elem_len">
-<polygon fill="#a7506f" stroke="#a7506f" points="232.5,-234 138.5,-234 138.5,-210 232.5,-210 232.5,-234"/>
-<text text-anchor="middle" x="185.5" y="-219.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">caf_c_elem_len</text>
+<g id="a_proc~~caf_co_reduce~~CallsGraph_node6"><a xlink:href=".././interface/caf_c_elem_len.html" xlink:title="caf_c_elem_len">
+<polygon fill="#a7506f" stroke="#a7506f" points="232.5,-192 138.5,-192 138.5,-168 232.5,-168 232.5,-192"/>
+<text text-anchor="middle" x="185.5" y="-177.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">caf_c_elem_len</text>
 </a>
 </g>
 </g>
 <!-- proc~caf_co_reduce&#45;&gt;interface~caf_c_elem_len -->
 <g id="proc~~caf_co_reduce~~CallsGraph_edge4" class="edge">
 <title>proc~caf_co_reduce&#45;&gt;interface~caf_c_elem_len</title>
-<path fill="none" stroke="#ff0000" d="M85.33,-192.04C100.74,-196.69 118.55,-202.07 134.79,-206.98"/>
-<polygon fill="#ff0000" stroke="#ff0000" points="134.08,-210.42 144.66,-209.96 136.1,-203.72 134.08,-210.42"/>
-</g>
-<!-- interface~caf_c_co_reduce -->
-<g id="proc~~caf_co_reduce~~CallsGraph_node6" class="node">
-<title>interface~caf_c_co_reduce</title>
-<g id="a_proc~~caf_co_reduce~~CallsGraph_node6"><a xlink:href=".././interface/caf_c_co_reduce.html" xlink:title="caf_c_co_reduce">
-<polygon fill="#a7506f" stroke="#a7506f" points="235.5,-192 135.5,-192 135.5,-168 235.5,-168 235.5,-192"/>
-<text text-anchor="middle" x="185.5" y="-177.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">caf_c_co_reduce</text>
-</a>
-</g>
-</g>
-<!-- proc~caf_co_reduce&#45;&gt;interface~caf_c_co_reduce -->
-<g id="proc~~caf_co_reduce~~CallsGraph_edge2" class="edge">
-<title>proc~caf_co_reduce&#45;&gt;interface~caf_c_co_reduce</title>
-<path fill="none" stroke="#ff0000" d="M89.1,-180C100.54,-180 113.08,-180 125.2,-180"/>
-<polygon fill="#ff0000" stroke="#ff0000" points="125.24,-183.5 135.24,-180 125.24,-176.5 125.24,-183.5"/>
+<path fill="none" stroke="#ff0000" d="M89.1,-180C101.41,-180 114.99,-180 127.95,-180"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="128.17,-183.5 138.17,-180 128.17,-176.5 128.17,-183.5"/>
 </g>
 <!-- interface~assert -->
 <g id="proc~~caf_co_reduce~~CallsGraph_node7" class="node">
@@ -291,56 +291,56 @@
 <path fill="none" stroke="#ff0000" d="M58.04,-167.86C72.96,-153.97 99.1,-131.31 125,-117 128.21,-115.23 131.6,-113.56 135.06,-112"/>
 <polygon fill="#ff0000" stroke="#ff0000" points="136.46,-115.21 144.34,-108.12 133.76,-108.75 136.46,-115.21"/>
 </g>
-<!-- proc~get_c_ptr -->
+<!-- interface~caf_c_co_reduce -->
 <g id="proc~~caf_co_reduce~~CallsGraph_node9" class="node">
-<title>proc~get_c_ptr</title>
-<g id="a_proc~~caf_co_reduce~~CallsGraph_node9"><a xlink:href=".././proc/get_c_ptr.html" xlink:title="get_c_ptr">
-<polygon fill="#d94e8f" stroke="#d94e8f" points="216,-66 155,-66 155,-42 216,-42 216,-66"/>
-<text text-anchor="middle" x="185.5" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_c_ptr</text>
+<title>interface~caf_c_co_reduce</title>
+<g id="a_proc~~caf_co_reduce~~CallsGraph_node9"><a xlink:href=".././interface/caf_c_co_reduce.html" xlink:title="caf_c_co_reduce">
+<polygon fill="#a7506f" stroke="#a7506f" points="235.5,-66 135.5,-66 135.5,-42 235.5,-42 235.5,-66"/>
+<text text-anchor="middle" x="185.5" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">caf_c_co_reduce</text>
 </a>
 </g>
 </g>
-<!-- proc~caf_co_reduce&#45;&gt;proc~get_c_ptr -->
+<!-- proc~caf_co_reduce&#45;&gt;interface~caf_c_co_reduce -->
 <g id="proc~~caf_co_reduce~~CallsGraph_edge8" class="edge">
-<title>proc~caf_co_reduce&#45;&gt;proc~get_c_ptr</title>
-<path fill="none" stroke="#ff0000" d="M51.63,-167.77C63.12,-146.05 89.92,-100.63 125,-75 131.08,-70.56 138.19,-66.99 145.33,-64.14"/>
-<polygon fill="#ff0000" stroke="#ff0000" points="146.75,-67.35 155,-60.69 144.4,-60.75 146.75,-67.35"/>
+<title>proc~caf_co_reduce&#45;&gt;interface~caf_c_co_reduce</title>
+<path fill="none" stroke="#ff0000" d="M51.63,-167.77C63.12,-146.05 89.92,-100.63 125,-75 127.09,-73.47 129.3,-72.05 131.59,-70.72"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="133.42,-73.72 140.75,-66.07 130.25,-67.48 133.42,-73.72"/>
 </g>
-<!-- proc~optional_value -->
+<!-- interface~caf_c_is_f_string -->
 <g id="proc~~caf_co_reduce~~CallsGraph_node10" class="node">
-<title>proc~optional_value</title>
-<g id="a_proc~~caf_co_reduce~~CallsGraph_node10"><a xlink:href=".././proc/optional_value.html" xlink:title="optional_value">
-<polygon fill="#d94e8f" stroke="#d94e8f" points="231,-24 140,-24 140,0 231,0 231,-24"/>
-<text text-anchor="middle" x="185.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">optional_value</text>
+<title>interface~caf_c_is_f_string</title>
+<g id="a_proc~~caf_co_reduce~~CallsGraph_node10"><a xlink:href=".././interface/caf_c_is_f_string.html" xlink:title="caf_c_is_f_string">
+<polygon fill="#a7506f" stroke="#a7506f" points="234.5,-24 136.5,-24 136.5,0 234.5,0 234.5,-24"/>
+<text text-anchor="middle" x="185.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">caf_c_is_f_string</text>
 </a>
 </g>
 </g>
-<!-- proc~caf_co_reduce&#45;&gt;proc~optional_value -->
+<!-- proc~caf_co_reduce&#45;&gt;interface~caf_c_is_f_string -->
 <g id="proc~~caf_co_reduce~~CallsGraph_edge9" class="edge">
-<title>proc~caf_co_reduce&#45;&gt;proc~optional_value</title>
-<path fill="none" stroke="#ff0000" d="M48.79,-167.81C56.94,-139.9 80.67,-70.89 125,-33 126.93,-31.35 129,-29.83 131.17,-28.42"/>
-<polygon fill="#ff0000" stroke="#ff0000" points="132.88,-31.47 139.92,-23.56 129.48,-25.35 132.88,-31.47"/>
+<title>proc~caf_co_reduce&#45;&gt;interface~caf_c_is_f_string</title>
+<path fill="none" stroke="#ff0000" d="M48.79,-167.81C56.94,-139.9 80.67,-70.89 125,-33 126.53,-31.69 128.15,-30.46 129.83,-29.31"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="131.82,-32.2 138.71,-24.15 128.31,-26.15 131.82,-32.2"/>
 </g>
 <!-- proc~assert -->
 <g id="proc~~caf_co_reduce~~CallsGraph_node11" class="node">
 <title>proc~assert</title>
 <g id="a_proc~~caf_co_reduce~~CallsGraph_node11"><a xlink:href=".././proc/assert.html" xlink:title="assert">
-<polygon fill="#d9534f" stroke="#d9534f" points="336,-213 282,-213 282,-189 336,-189 336,-213"/>
-<text text-anchor="middle" x="309" y="-198.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">assert</text>
+<polygon fill="#d9534f" stroke="#d9534f" points="336,-192 282,-192 282,-168 336,-168 336,-192"/>
+<text text-anchor="middle" x="309" y="-177.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">assert</text>
 </a>
 </g>
 </g>
 <!-- interface~assert&#45;&gt;proc~assert -->
 <g id="proc~~caf_co_reduce~~CallsGraph_edge10" class="edge">
 <title>interface~assert&#45;&gt;proc~assert</title>
-<path fill="none" stroke="#00a9ff" stroke-dasharray="5,2" d="M212.58,-145.6C223.2,-149.1 235.44,-153.67 246,-159 259.19,-165.66 272.88,-174.68 284.04,-182.65"/>
-<polygon fill="#00a9ff" stroke="#00a9ff" points="282.24,-185.68 292.38,-188.76 286.38,-180.03 282.24,-185.68"/>
+<path fill="none" stroke="#00a9ff" stroke-dasharray="5,2" d="M212.56,-147.01C230.02,-153.04 253.23,-161.07 272.38,-167.69"/>
+<polygon fill="#00a9ff" stroke="#00a9ff" points="271.38,-171.05 281.98,-171 273.67,-164.43 271.38,-171.05"/>
 </g>
 <!-- proc~assert&#45;&gt;interface~caf_error_stop -->
 <g id="proc~~caf_co_reduce~~CallsGraph_edge11" class="edge">
 <title>proc~assert&#45;&gt;interface~caf_error_stop</title>
-<path fill="none" stroke="#ff0000" d="M336.23,-206C344.08,-207.49 352.99,-209.19 361.93,-210.89"/>
-<polygon fill="#ff0000" stroke="#ff0000" points="361.49,-214.37 371.97,-212.8 362.8,-207.49 361.49,-214.37"/>
+<path fill="none" stroke="#ff0000" d="M336.23,-185C344.08,-186.49 352.99,-188.19 361.93,-189.89"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="361.49,-193.37 371.97,-191.8 362.8,-186.49 361.49,-193.37"/>
 </g>
 </g>
 </svg>
@@ -593,14 +593,14 @@
     <footer>
       <div class="container">
       <div class="row">
-        <div class="col-xs-6 col-md-6"><p>Caffeine was developed by Lawrence Berkeley National Laboratory<br>&copy; 2022 
+        <div class="col-xs-6 col-md-6"><p>Caffeine was developed by Lawrence Berkeley National Laboratory<br>&copy; 2023 
 </p>
         </div>
         <div class="col-xs-6 col-md-6">
           <p class="text-right">
             Documentation generated by 
             <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
- on 2022-11-18 22:08            </p>
+ on 2023-12-08 00:35            </p>
         </div>
       </div>
       <br>
