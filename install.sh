@@ -18,8 +18,8 @@ print_usage_info()
     echo "yes | ./install.sh"
 }
 
-GCC_VERSION=12
-GASNET_VERSION="2022.3.0"
+GCC_VERSION=13
+GASNET_VERSION="2023.3.0"
 
 list_prerequisites()
 {
