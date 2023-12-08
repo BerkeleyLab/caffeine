@@ -239,9 +239,9 @@ bool caf_c_is_f_string(CFI_cdesc_t* a_desc){
   if ( (a_desc->type - 5) % 256 == 0) return true;
   return false;
 }
-#else // The code beow is untested but believed to conform with the Fortran 2018 standard.
+#else // The code below is untested but believed to conform with the Fortran 2018 standard.
 bool caf_c_is_f_string(CFI_cdesc_t* a_desc){
-  if ( (a_desc->type == CFI_type_char) return true;
+  if (a_desc->type == CFI_type_char) return true;
   return false;
 }
 #endif
