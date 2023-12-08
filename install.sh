@@ -19,7 +19,7 @@ print_usage_info()
 }
 
 GCC_VERSION=13
-GASNET_VERSION="2022.3.0"
+GASNET_VERSION="2023.3.0"
 
 list_prerequisites()
 {
