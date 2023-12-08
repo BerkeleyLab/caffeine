@@ -94,11 +94,15 @@ if command -v fpm > /dev/null 2>&1; then
   FPM=`which fpm`
 fi
 
+if command -v gmkdir > /dev/null 2>&1; then
+  GMKDIR=`which gmkdir`
+fi 
+
 ask_permission_to_use_homebrew()
 {
   echo ""
   echo "Either one or more of the environment variables FC, CC, and CXX are unset or"
-  echo "one or more of the following packages are not in the PATH: pkg-config, realpath, make, fpm."
+  echo "one or more of the following packages are not in the PATH: pkg-config, realpath, make, gmkdir, fpm."
   echo "If you grant permission to install prerequisites, you will be prompted before each installation." 
   echo ""
   echo "Press 'Enter' to choose the square-bracketed default answer:"
@@ -155,7 +159,7 @@ if [ ! -d $DEPENDENCIES_DIR ]; then
   mkdir -p $DEPENDENCIES_DIR
 fi
 
-if [ -z ${FC+x} ] || [ -z ${CC+x} ] || [ -z ${CXX+x} ] || [ -z ${PKG_CONFIG+x} ] || [ -z ${REALPATH+x} ] || [ -z ${MAKE+x} ] || [ -z ${FPM+x} ] ; then
+if [ -z ${FC+x} ] || [ -z ${CC+x} ] || [ -z ${CXX+x} ] || [ -z ${PKG_CONFIG+x} ] || [ -z ${REALPATH+x} ] || [ -z ${MAKE+x} ] || [ -z ${FPM+x} ] || [ -z ${GMKDIR+x} ] ; then
 
   ask_permission_to_use_homebrew 
   exit_if_user_declines "brew"
@@ -206,6 +210,12 @@ if [ -z ${FC+x} ] || [ -z ${CC+x} ] || [ -z ${CXX+x} ] || [ -z ${PKG_CONFIG+x} ]
   CXX=`which g++-$GCC_VERSION`
   FC=`which gfortran-$GCC_VERSION`
 
+  if [ -z ${REALPATH+x} ] || [ -z ${MAKE+x} ]  || [ -z ${GMKDIR+x} ] ; then
+    ask_permission_to_install_homebrew_package "'realpath', 'make', and 'gmkdir'" "coreutils"
+    exit_if_user_declines "realpath"
+    "$BREW" install coreutils
+  fi
+  REALPATH=`which realpath`
 
   if [ -z ${PKG_CONFIG+x} ]; then
     ask_permission_to_install_homebrew_package "'pkg-config'"
@@ -214,17 +224,10 @@ if [ -z ${FC+x} ] || [ -z ${CC+x} ] || [ -z ${CXX+x} ] || [ -z ${PKG_CONFIG+x} ]
   fi
   PKG_CONFIG=`which pkg-config`
 
-  if [ -z ${REALPATH+x} ] || [ -z ${MAKE+x} ] ; then
-    ask_permission_to_install_homebrew_package "'realpath' and 'make'" "coreutils"
-    exit_if_user_declines "realpath"
-    "$BREW" install coreutils
-  fi
-  REALPATH=`which realpath`
-
   if [ -z ${FPM+x} ] ; then
     ask_permission_to_install_homebrew_package "'fpm'"
     exit_if_user_declines "fpm"
-    "$BREW" tap awvwgk/fpm
+    "$BREW" tap fortran-lang/hombrew-fortran
     "$BREW" install fpm
   fi
   FPM=`which fpm`
