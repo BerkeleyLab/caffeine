@@ -1,10 +1,10 @@
 module caf_co_broadcast_test
-  use caffeine_m, only : caf_co_broadcast, caf_num_images, caf_this_image
+  use prif_m, only : prif_co_broadcast, prif_num_images, prif_this_image
   use veggies, only : result_t, test_item_t, describe, it, assert_equals, assert_that
 
   implicit none
   private
-  public :: test_caf_co_broadcast
+  public :: test_prif_co_broadcast
 
   type object_t
     integer i
@@ -19,11 +19,11 @@ module caf_co_broadcast_test
 
 contains
 
-  function test_caf_co_broadcast() result(tests)
+  function test_prif_co_broadcast() result(tests)
     type(test_item_t) tests
   
     tests = describe( &
-      "The caf_co_broadcast subroutine", &
+      "The prif_co_broadcast subroutine", &
       [ it("broadcasts a default integer scalar with no optional arguments present", broadcast_default_integer_scalar) &
        ,it("broadcasts a derived type scalar with no allocatable components", broadcast_derived_type) &
     ])
@@ -44,8 +44,8 @@ contains
     integer iPhone
     integer, parameter :: source_value = 7779311, junk = -99
 
-    iPhone = merge(source_value, junk, caf_this_image()==1)
-    call caf_co_broadcast(iPhone, source_image=1)
+    iPhone = merge(source_value, junk, prif_this_image()==1)
+    call prif_co_broadcast(iPhone, source_image=1)
     result_ = assert_equals(source_value, iPhone)
   end function
 
@@ -54,11 +54,11 @@ contains
     type(object_t) object
 
 
-    associate(me => caf_this_image(), ni => caf_num_images())
+    associate(me => prif_this_image(), ni => prif_num_images())
 
      object = object_t(me, .false., "gooey", me*(1.,0.))
 
-      call caf_co_broadcast(object, source_image=ni)
+      call prif_co_broadcast(object, source_image=ni)
 
       associate(expected_object => object_t(ni, .false., "gooey", ni*(1.,0.)))
         result_ = assert_that(expected_object == object, "co_broadcast derived type")

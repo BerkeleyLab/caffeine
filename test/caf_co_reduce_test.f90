@@ -1,5 +1,5 @@
 module caf_co_reduce_test
-  use caffeine_m, only : caf_co_reduce, caf_num_images, caf_this_image
+  use prif_m, only : prif_co_reduce, prif_num_images, prif_this_image
   use veggies, only : result_t, test_item_t, assert_equals, describe, it, assert_that, assert_equals
   use collective_subroutines_m, only : &
      c_int32_t_operation, c_int64_t_operation, c_float_operation, c_double_operation, c_char_operation, c_bool_operation &
@@ -9,15 +9,15 @@ module caf_co_reduce_test
 
   implicit none
   private
-  public :: test_caf_co_reduce
+  public :: test_prif_co_reduce
 
 contains
 
-  function test_caf_co_reduce() result(tests)
+  function test_prif_co_reduce() result(tests)
     type(test_item_t) tests
 
     tests = describe( &
-      "The caf_co_reduce subroutine", &
+      "The prif_co_reduce subroutine", &
       [ it("finds the alphabetically first length-5 string with result_image present", alphabetically_1st_size1_string_array) &
        ,it("sums default integer scalars with no optional arguments present", sum_default_integer_scalars) &
        ,it("sums integer(c_int64_t) scalars with no optional arguments present", sum_c_int64_t_scalars) &
@@ -38,14 +38,14 @@ contains
 
     alphabetize_operation => alphabetize
 
-    associate(me => caf_this_image())
+    associate(me => prif_this_image())
       associate(periodic_index => 1 + mod(me-1,size(names)))
         my_name = [names(periodic_index)]
-        call caf_co_reduce(my_name, c_funloc(alphabetize_operation))
+        call prif_co_reduce(my_name, c_funloc(alphabetize_operation))
       end associate
     end associate
 
-    associate(expected_name => minval(names(1:min(caf_num_images(), size(names)))))
+    associate(expected_name => minval(names(1:min(prif_num_images(), size(names)))))
       result_ = assert_that(all(expected_name == my_name))
     end associate
 
@@ -69,8 +69,8 @@ contains
 
     add_operation => add_integers
     array = input_array
-    call caf_co_reduce(array, c_funloc(add_operation))
-    result_ = assert_that(all(caf_num_images()*input_array==array))
+    call prif_co_reduce(array, c_funloc(add_operation))
+    result_ = assert_that(all(prif_num_images()*input_array==array))
 
   contains
 
@@ -91,8 +91,8 @@ contains
 
     add_operation => add_complex
     z = z_input
-    call caf_co_reduce(z, c_funloc(add_operation), stat=status_)
-    result_ = assert_equals(real(caf_num_images()*z_input, c_double), real(z, c_double)) .and. assert_equals(0, status_)
+    call prif_co_reduce(z, c_funloc(add_operation), stat=status_)
+    result_ = assert_equals(real(prif_num_images()*z_input, c_double), real(z, c_double)) .and. assert_equals(0, status_)
 
   contains
 
@@ -113,8 +113,8 @@ contains
 
     add_operation => add_complex
     z = z_input
-    call caf_co_reduce(z, c_funloc(add_operation), stat=status_)
-    result_ = assert_equals(dble(caf_num_images()*z_input), dble(z)) .and. assert_equals(0, status_)
+    call prif_co_reduce(z, c_funloc(add_operation), stat=status_)
+    result_ = assert_equals(dble(prif_num_images()*z_input), dble(z)) .and. assert_equals(0, status_)
 
   contains
 
@@ -133,8 +133,8 @@ contains
 
     add_operation => add
     i = 1
-    call caf_co_reduce(i, c_funloc(add_operation))
-    result_ = assert_equals(caf_num_images(), i)
+    call prif_co_reduce(i, c_funloc(add_operation))
+    result_ = assert_equals(prif_num_images(), i)
 
   contains
 
@@ -153,8 +153,8 @@ contains
 
     add_operation => add
     i = 1_c_int64_t
-    call caf_co_reduce(i, c_funloc(add_operation))
-    result_ = assert_that(int(caf_num_images(), c_int64_t)==i)
+    call prif_co_reduce(i, c_funloc(add_operation))
+    result_ = assert_that(int(prif_num_images(), c_int64_t)==i)
 
   contains
 
@@ -175,17 +175,17 @@ contains
 
     boolean_operation => logical_and
 
-    one_false = merge(c_false, c_true, caf_this_image()==1)
-    call caf_co_reduce(one_false, c_funloc(boolean_operation))
+    one_false = merge(c_false, c_true, prif_this_image()==1)
+    call prif_co_reduce(one_false, c_funloc(boolean_operation))
 
-    one_true = merge(c_true, c_false, caf_this_image()==1)
-    call caf_co_reduce(one_true, c_funloc(boolean_operation))
+    one_true = merge(c_true, c_false, prif_this_image()==1)
+    call prif_co_reduce(one_true, c_funloc(boolean_operation))
 
     all_true = c_true
-    call caf_co_reduce(all_true, c_funloc(boolean_operation))
+    call prif_co_reduce(all_true, c_funloc(boolean_operation))
 
     ans1 = one_false .eqv. c_false
-    ans2 = one_true  .eqv. merge(c_true,c_false,caf_num_images()==1)
+    ans2 = one_true  .eqv. merge(c_true,c_false,prif_num_images()==1)
     ans3 = all_true  .eqv. c_true
     result_ = assert_that(ans1) .and. &
               assert_that(ans2) .and. &
@@ -209,10 +209,10 @@ contains
 
     error_message = "unused"
     multiply_operation => multiply_doubles
-    associate(me => caf_this_image())
+    associate(me => prif_this_image())
       p = real(me,c_double)
-      call caf_co_reduce(p, c_funloc(multiply_operation), result_image=1, stat=status_, errmsg=error_message)
-      associate(expected_result => merge( product([(real(j,c_double), j = 1, caf_num_images())]), real(me,c_double), me==1 ))
+      call prif_co_reduce(p, c_funloc(multiply_operation), result_image=1, stat=status_, errmsg=error_message)
+      associate(expected_result => merge( product([(real(j,c_double), j = 1, prif_num_images())]), real(me,c_double), me==1 ))
         result_ = &
           assert_equals(expected_result, real(p,c_double)) .and. &
           assert_equals(0, status_) .and. &
@@ -239,10 +239,10 @@ contains
 
     error_message = "unused"
     multiply_operation => multiply
-    associate(me => caf_this_image())
+    associate(me => prif_this_image())
       p = real(me)
-      call caf_co_reduce(p, c_funloc(multiply_operation), result_image=1, stat=status_, errmsg=error_message)
-      associate(expected_result => merge( product([(dble(j), j = 1, caf_num_images())]), dble(me), me==1 ))
+      call prif_co_reduce(p, c_funloc(multiply_operation), result_image=1, stat=status_, errmsg=error_message)
+      associate(expected_result => merge( product([(dble(j), j = 1, prif_num_images())]), dble(me), me==1 ))
         result_ = &
           assert_equals(expected_result, dble(p)) .and. &
           assert_equals(0, status_) .and. &

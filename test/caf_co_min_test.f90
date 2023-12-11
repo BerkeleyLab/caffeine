@@ -1,18 +1,18 @@
 module caf_co_min_test
-    use caffeine_m, only : caf_co_min, caf_num_images
+    use prif_m, only : prif_co_min, prif_num_images
     use veggies, only: result_t, test_item_t, assert_equals, describe, it, assert_that, assert_equals, succeed
-    use image_enumeration_m, only : caf_this_image, caf_num_images
+    use image_enumeration_m, only : prif_this_image, prif_num_images
 
     implicit none
     private
-    public :: test_caf_co_min
+    public :: test_prif_co_min
 
 contains
-    function test_caf_co_min() result(tests)
+    function test_prif_co_min() result(tests)
         type(test_item_t) tests
     
         tests = describe( &
-          "The caf_co_min subroutine computes the minimum", &
+          "The prif_co_min subroutine computes the minimum", &
           [ it("default integer scalar with stat argument present", min_default_integer_scalars) &
            ,it("integer(c_int64_t) scalar with no optional arguments present", min_c_int64_scalars) &
            ,it("default integer 1D array elements with no optional arguments present", min_default_integer_1D_array) &
@@ -30,9 +30,9 @@ contains
         integer i, status_
  
         status_ = -1
-        i = -caf_this_image()
-        call caf_co_min(i, stat=status_)
-        result_ = assert_equals(-caf_num_images(), i) .and. assert_equals(0, status_)
+        i = -prif_this_image()
+        call prif_co_min(i, stat=status_)
+        result_ = assert_equals(-prif_num_images(), i) .and. assert_equals(0, status_)
     end function
 
     function min_c_int64_scalars() result(result_)
@@ -40,8 +40,8 @@ contains
         type(result_t) result_
         integer(c_int64_t) i
  
-        i = caf_this_image()
-        call caf_co_min(i)
+        i = prif_this_image()
+        call prif_co_min(i)
         result_ = assert_equals(1, int(i))
     end function
 
@@ -50,10 +50,10 @@ contains
         integer i
         integer, allocatable :: array(:)
  
-        associate(sequence_ => caf_this_image()*[(i, i=1, caf_num_images())])
+        associate(sequence_ => prif_this_image()*[(i, i=1, prif_num_images())])
           array = sequence_
-          call caf_co_min(array)
-          associate(min_sequence => [(i, i=1, caf_num_images())])
+          call prif_co_min(array)
+          associate(min_sequence => [(i, i=1, prif_num_images())])
             result_ = assert_that(all(min_sequence == array))
           end associate
         end associate
@@ -64,9 +64,9 @@ contains
         integer array(2,1,1, 1,1,1, 2), status_
  
         status_ = -1
-        array = 3 - caf_this_image()
-        call caf_co_min(array, stat=status_)
-        result_ = assert_that(all(array == 3 - caf_num_images())) .and. assert_equals(0, status_)
+        array = 3 - prif_this_image()
+        call prif_co_min(array, stat=status_)
+        result_ = assert_that(all(array == 3 - prif_num_images())) .and. assert_equals(0, status_)
     end function
 
     function min_default_real_scalars() result(result_)
@@ -76,9 +76,9 @@ contains
         integer status_
 
         status_ = -1
-        scalar = -pi*caf_this_image()
-        call caf_co_min(scalar, stat=status_)
-        result_ = assert_equals(-dble(pi*caf_num_images()), dble(scalar) ) .and. assert_equals(0, status_)
+        scalar = -pi*prif_this_image()
+        call prif_co_min(scalar, stat=status_)
+        result_ = assert_equals(-dble(pi*prif_num_images()), dble(scalar) ) .and. assert_equals(0, status_)
     end function
 
     function min_double_precision_2D_array() result(result_)
@@ -86,9 +86,9 @@ contains
         double precision, allocatable :: array(:,:)
         double precision, parameter :: tent(*,*) = dble(reshape(-[0,1,2,3,2,1], [3,2]))
  
-        array = tent*dble(caf_this_image())
-        call caf_co_min(array)
-        result_ = assert_that(all(array==tent*caf_num_images()))
+        array = tent*dble(prif_this_image())
+        call prif_co_min(array)
+        result_ = assert_that(all(array==tent*prif_num_images()))
     end function
 
     function min_elements_in_2D_string_arrays() result(result_)
@@ -105,7 +105,7 @@ contains
       end associate
 
       co_min_scramlet = scramlet
-      call caf_co_min(co_min_scramlet, result_image=1)
+      call prif_co_min(co_min_scramlet, result_image=1)
 
       block 
         integer j, delta_j
@@ -113,7 +113,7 @@ contains
 
         do j=1, size(script)
           expected_script(j) = script(j)
-          do delta_j = 1, min(caf_num_images()-1, size(script))
+          do delta_j = 1, min(prif_num_images()-1, size(script))
             associate(periodic_index => 1 + mod(j+delta_j-1, size(script)))
               expected_script(j) = min(expected_script(j), script(periodic_index))
             end associate
@@ -131,14 +131,14 @@ contains
       character(len=*), parameter :: words(*) = [character(len=len("to party!")):: "Loddy","doddy","we","like","to party!"]
       character(len=:), allocatable :: my_word
 
-      associate(me => caf_this_image())
+      associate(me => prif_this_image())
         associate(periodic_index => 1 + mod(me-1,size(words)))
           my_word = words(periodic_index)
-          call caf_co_min(my_word)
+          call prif_co_min(my_word)
         end associate
       end associate
 
-      associate(expected_word => minval(words(1:min(caf_num_images(), size(words)))))
+      associate(expected_word => minval(words(1:min(prif_num_images(), size(words)))))
         result_ = assert_equals(expected_word, my_word)
       end associate
     end function

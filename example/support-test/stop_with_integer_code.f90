@@ -1,5 +1,5 @@
 program stop_with_no_code
-  use caffeine_m, only : prif_caffeinate, prif_stop
+  use prif_m, only : prif_caffeinate, prif_stop
   implicit none
 
   if (prif_caffeinate() /= 0) error stop "caffeinate returned a non-zero exit_code"
