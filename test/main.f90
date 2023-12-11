@@ -9,32 +9,32 @@ contains
                 a00_caffeinate_caffeinate => &
                     test_caffeinate
         use caf_co_broadcast_test, only: &
-                caf_co_broadcast_caf_co_broadcast => &
-                    test_caf_co_broadcast
+                prif_co_broadcast_prif_co_broadcast => &
+                    test_prif_co_broadcast
         use caf_co_max_test, only: &
-                caf_co_max_caf_co_max => &
-                    test_caf_co_max
+                prif_co_max_prif_co_max => &
+                    test_prif_co_max
         use caf_co_min_test, only: &
-                caf_co_min_caf_co_min => &
-                    test_caf_co_min
+                prif_co_min_prif_co_min => &
+                    test_prif_co_min
         use caf_co_reduce_test, only: &
-                caf_co_reduce_caf_co_reduce => &
-                    test_caf_co_reduce
+                prif_co_reduce_prif_co_reduce => &
+                    test_prif_co_reduce
         use caf_co_sum_test, only: &
-                caf_co_sum_caf_co_sum => &
-                    test_caf_co_sum
+                prif_co_sum_prif_co_sum => &
+                    test_prif_co_sum
         use caf_error_stop_test, only: &
-                caf_error_stop_caf_this_image => &
-                    test_caf_this_image
+                prif_error_stop_prif_this_image => &
+                    test_prif_this_image
         use caf_num_images_test, only: &
-                caf_num_images_caf_num_images => &
-                    test_caf_num_images
+                prif_num_images_prif_num_images => &
+                    test_prif_num_images
         use caf_stop_test, only: &
-                caf_stop_caf_this_image => &
-                    test_caf_this_image
+                prif_stop_prif_this_image => &
+                    test_prif_this_image
         use caf_this_image_test, only: &
-                caf_this_image_caf_this_image => &
-                    test_caf_this_image
+                prif_this_image_prif_this_image => &
+                    test_prif_this_image
         use veggies, only: test_item_t, test_that, run_tests
 
 
@@ -45,15 +45,15 @@ contains
         type(test_item_t) :: individual_tests(10)
 
         individual_tests(1) = a00_caffeinate_caffeinate()
-        individual_tests(2) = caf_co_broadcast_caf_co_broadcast()
-        individual_tests(3) = caf_co_max_caf_co_max()
-        individual_tests(4) = caf_co_min_caf_co_min()
-        individual_tests(5) = caf_co_reduce_caf_co_reduce()
-        individual_tests(6) = caf_co_sum_caf_co_sum()
-        individual_tests(7) = caf_error_stop_caf_this_image()
-        individual_tests(8) = caf_num_images_caf_num_images()
-        individual_tests(9) = caf_stop_caf_this_image()
-        individual_tests(10) = caf_this_image_caf_this_image()
+        individual_tests(2) = prif_co_broadcast_prif_co_broadcast()
+        individual_tests(3) = prif_co_max_prif_co_max()
+        individual_tests(4) = prif_co_min_prif_co_min()
+        individual_tests(5) = prif_co_reduce_prif_co_reduce()
+        individual_tests(6) = prif_co_sum_prif_co_sum()
+        individual_tests(7) = prif_error_stop_prif_this_image()
+        individual_tests(8) = prif_num_images_prif_num_images()
+        individual_tests(9) = prif_stop_prif_this_image()
+        individual_tests(10) = prif_this_image_prif_this_image()
         tests = test_that(individual_tests)
 
 
