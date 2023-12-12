@@ -3,12 +3,12 @@
 submodule(program_termination_m) program_termination_s
   use iso_fortran_env, only : output_unit, error_unit
   use iso_c_binding, only : c_char, c_int
-  use caffeine_h_m, only : caf_c_decaffeinate
+  use caffeine_h_m, only : caf_decaffeinate
   implicit none
 
 contains
 
-  module procedure caf_stop_integer
+  module procedure prif_stop_integer
 
     sync all
 
@@ -16,25 +16,25 @@ contains
     write(output_unit, *) stop_code
     flush output_unit
 
-    if (.not. present(stop_code)) call caf_c_decaffeinate(exit_code=0_c_int) ! does not return
-    call caf_c_decaffeinate(stop_code)
+    if (.not. present(stop_code)) call caf_decaffeinate(exit_code=0_c_int) ! does not return
+    call caf_decaffeinate(stop_code)
 
   end procedure
 
-  module procedure caf_stop_character
+  module procedure prif_stop_character
 
     sync all
 
     write(output_unit, *) "caf_stop: stop code '" // stop_code // "'"
     flush output_unit
 
-    call caf_c_decaffeinate(exit_code=0_c_int) ! does not return
+    call caf_decaffeinate(exit_code=0_c_int) ! does not return
 
   end procedure
 
 
 
-  module procedure caf_error_stop_character
+  module procedure prif_error_stop_character
     interface
       pure subroutine caf_error_stop_character_c(stop_code, length) bind(C, name = "caf_error_stop_character_c")
         use, intrinsic :: iso_c_binding, only: c_char, c_int
@@ -55,11 +55,11 @@ contains
     write(error_unit, *) c_f_string(stop_code, length)
     flush error_unit
 
-    call caf_error_stop_integer(error_occured)
+    call prif_error_stop_integer(error_occured)
 
   end subroutine
 
-  module procedure caf_error_stop_integer
+  module procedure prif_error_stop_integer
     interface
       pure subroutine caf_error_stop_integer_c(stop_code) bind(C, name = "caf_error_stop_integer_c")
         use, intrinsic :: iso_c_binding, only: c_int
@@ -77,7 +77,7 @@ contains
 
     if (.not. present(stop_code)) then
 
-      call caf_c_decaffeinate(exit_code=1)
+      call caf_decaffeinate(exit_code=1)
 
     else if (stop_code==0) then
 
@@ -88,7 +88,7 @@ contains
       exit_code = stop_code
     end if
 
-    call caf_c_decaffeinate(exit_code) ! does not return
+    call caf_decaffeinate(exit_code) ! does not return
 
   end subroutine
 

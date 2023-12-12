@@ -3,14 +3,14 @@ module caf_error_stop_test
 
     implicit none
     private
-    public :: test_caf_this_image
+    public :: test_prif_this_image
 
 contains
-    function test_caf_this_image() result(tests)
+    function test_prif_this_image() result(tests)
         type(test_item_t) :: tests
 
         tests = describe( &
-                "A program that executes the caf_error_stop function", &
+                "A program that executes the prif_error_stop function", &
                 [ it("exits with a non-zero exitstat when stop code is an integer", check_integer_stop_code) &
                  ,it("exits with a non-zero exitstat when stop code is an character", check_character_stop_code) &
                 ])
