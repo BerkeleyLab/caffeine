@@ -1,5 +1,5 @@
 module caf_this_image_test
-    use prif_m, only : prif_this_image, prif_num_images, prif_co_sum
+    use prif, only : prif_this_image, prif_num_images, prif_co_sum
     use veggies, only: result_t, test_item_t, assert_that, describe, it, succeed
 
     implicit none

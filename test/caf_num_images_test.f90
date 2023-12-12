@@ -1,5 +1,5 @@
 module caf_num_images_test
-  use prif_m, only : prif_num_images
+  use prif, only : prif_num_images
   use veggies, only: result_t, test_item_t, assert_that, describe, it
 
   implicit none

@@ -1,5 +1,5 @@
 module caf_co_sum_test
-    use prif_m, only : prif_co_sum, prif_num_images, prif_this_image
+    use prif, only : prif_co_sum, prif_num_images, prif_this_image
     use veggies, only: result_t, test_item_t, assert_equals, describe, it, assert_that, assert_equals, succeed
 
     implicit none
