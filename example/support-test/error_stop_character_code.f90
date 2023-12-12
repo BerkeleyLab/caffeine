@@ -1,8 +1,8 @@
 program error_stop_character_code
-  use prif, only : prif_caffeinate, prif_error_stop
+  use prif, only : prif_init, prif_error_stop
   implicit none
 
-  if (prif_caffeinate() /= 0) error stop "caffeinate returned a non-zero exit_code"
+  if (prif_init() /= 0) error stop "caffeinate returned a non-zero exit_code"
 
   call prif_error_stop("Oh snap!")
 

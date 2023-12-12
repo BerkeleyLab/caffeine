@@ -1,8 +1,8 @@
 program hello_world
-  use prif, only : prif_caffeinate, this_image => prif_this_image, num_images => prif_num_images, prif_stop
+  use prif, only : prif_init, this_image => prif_this_image, num_images => prif_num_images, prif_stop
   implicit none
 
-  if (prif_caffeinate() /= 0) error stop "caffeinate returned a non-zero exit code"
+  if (prif_init() /= 0) error stop "caffeinate returned a non-zero exit code"
   
   print *, "Hello from image", this_image(), "of", num_images()
 

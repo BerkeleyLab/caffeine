@@ -1,6 +1,6 @@
 ! Copyright (c), The Regents of the University of California
 ! Terms of use are as specified in LICENSE.txt
-submodule(caffeinate_decaffeinate_m) caffeinate_decaffeinate_s
+submodule(program_startup_m) program_startup_s
   use iso_c_binding, only : c_int, c_loc, c_char, c_null_char
   use synchronization_m, only : prif_sync_all
   use caffeine_h_m, only : caf_caffeinate, caf_decaffeinate
@@ -9,7 +9,7 @@ submodule(caffeinate_decaffeinate_m) caffeinate_decaffeinate_s
 
 contains
 
-  module procedure prif_caffeinate
+  module procedure prif_init
 
     integer i
     integer, parameter :: max_arg_len = 1024
@@ -45,8 +45,4 @@ contains
 
   end procedure
 
-  module procedure prif_decaffeinate
-    call caf_decaffeinate(exit_code)
-  end procedure
-
-end submodule caffeinate_decaffeinate_s
+end submodule program_startup_s

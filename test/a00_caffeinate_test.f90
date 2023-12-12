@@ -1,5 +1,5 @@
 module a00_caffeinate_test
-    use caffeinate_decaffeinate_m, only : prif_caffeinate
+    use program_startup_m, only : prif_init
     use veggies, only: test_item_t, describe, result_t, it, assert_that
 
     implicit none
@@ -22,7 +22,7 @@ contains
 
         integer, parameter :: successful_initiation = 0
 
-        result_ = assert_that(prif_caffeinate() == successful_initiation)
+        result_ = assert_that(prif_init() == successful_initiation)
     end function
 
 end module a00_caffeinate_test

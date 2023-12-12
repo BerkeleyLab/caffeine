@@ -1,8 +1,8 @@
 program stop_with_no_code
-  use prif, only : prif_caffeinate, prif_stop
+  use prif, only : prif_init, prif_stop
   implicit none
 
-  if (prif_caffeinate() /= 0) error stop "caffeinate returned a non-zero exit_code"
+  if (prif_init() /= 0) error stop "caffeinate returned a non-zero exit_code"
 
   call prif_stop
 
