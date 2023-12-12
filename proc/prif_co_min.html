@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+   <meta name="description" content="Library functions and derived types implementing the parallel features of Fortran 2018.">
+    <meta name="author" content="Lawrence Berkeley National Laboratory" >
+    <link rel="icon" href="../favicon.png">
+
+    <title>prif_co_min &ndash; Caffeine</title>
+
+    <link href="../css/bootstrap.min.css" rel="stylesheet">
+    <link href="../css/pygments.css" rel="stylesheet">
+    <link href="../css/font-awesome.min.css" rel="stylesheet">
+    <link href="../css/local.css" rel="stylesheet">
+    <link  href="../tipuesearch/tipuesearch.css" rel="stylesheet">
+    <link href="../css/user.css" rel="stylesheet">
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    
+    <script src="../js/jquery-2.1.3.min.js"></script>
+    <script src="../js/svg-pan-zoom.min.js"></script>
+
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="../index.html">Caffeine </a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+          <ul class="nav navbar-nav">
+            <li class="dropdown hidden-xs visible-sm visible-md hidden-lg">
+              <a href="#" class="dropdown-toggle"
+              data-toggle="dropdown" role="button"
+              aria-haspopup="true"
+     aria-expanded="false">Contents <span class="caret"></span></a>
+        <ul class="dropdown-menu">
+            <li><a href="../lists/files.html">Source Files</a></li>
+            <li><a href="../lists/modules.html">Modules</a></li>
+            <li><a href="../lists/procedures.html">Procedures</a></li>
+            <li><a href="../lists/absint.html">Abstract Interfaces</a></li>
+                   <li><a href="../lists/types.html">Derived Types</a></li>
+       
+            </ul>
+        
+            </li>
+<li class="visible-xs hidden-sm visible-lg"><a href="../lists/files.html">Source Files</a></li>
+<li class="visible-xs hidden-sm visible-lg"><a href="../lists/modules.html">Modules</a></li>
+<li class="visible-xs hidden-sm visible-lg"><a href="../lists/procedures.html">Procedures</a></li>
+<li class="visible-xs hidden-sm visible-lg"><a href="../lists/absint.html">Abstract Interfaces</a></li>
+                             <li class="visible-xs hidden-sm visible-lg"><a href="../lists/types.html">Derived Types</a></li>
+          </ul>
+        <form action="../search.html" class="navbar-form navbar-right" role="search">
+        <div class="form-group">
+          <input type="text" class="form-control" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+        </div>
+<!--
+        <button type="submit" class="btn btn-default">Submit</button>
+-->
+        </form>
+        </div><!--/.nav-collapse -->
+      </div>
+    </nav>
+
+    <div class="container">
+  <div class="row">
+    <h1>prif_co_min
+      <small>Module Procedure</small>
+    </h1>
+    <div class="row">
+  <div class="col-lg-12">
+<div class="well well-sm">
+  <ul class="list-inline" style="margin-bottom:0px;display:inline">
+     <li><i class="fa fa-list-ol"></i>
+       <a data-toggle="tooltip"
+    data-placement="bottom" data-html="true"
+    title=" 1.5% of total for procedures.">24 statements</a>
+     </li> 
+    <li><i class="fa fa-code"></i><a href="../src/co_min_s.f90"> Source File</a></li>
+  </ul>
+  <ol class="breadcrumb in-well text-right">
+     <li><a href='../sourcefile/co_min_s.f90.html'>co_min_s.f90</a></li>
+     <li><a href='../module/co_min_s.html'>co_min_s</a></li>
+     <li class="active">prif_co_min</li>
+  </ol>
+</div>
+</div>
+</div>
+<script>
+  $(function () {
+  $('[data-toggle="tooltip"]').tooltip()
+  })
+</script>
+
+  </div>
+  
+  <div class="row">
+    <div class="col-md-3 hidden-xs hidden-sm visible-md visible-lg">
+    <div id="sidebar">
+  <h3>Contents</h3>
+ 
+<em>None</em>
+
+</div>
+
+    </div>
+    
+    <div class="col-md-9" id='text'>
+    <h2>module procedure prif_co_min <small>module module subroutine prif_co_min(a, result_image, stat, errmsg)</small>   <a href='../interface/prif_co_min.html'><button type="button" class="btn btn-info depwarn">Interface &rarr;</button></a>
+</h2>
+    
+
+
+    <h3>Arguments</h3>
+      <table class="table table-striped varlist">
+<thead><tr><th>Type</th><th>Intent</th><th>Optional</th><th>Attributes</th><th></th><th>Name</th><th></th></thead>
+<tbody>
+<tr>
+  <td><span class="anchor" id="variable-a~12"></span>type(*),</td>
+<td>intent(inout),</td>
+  <td></td>  <td>contiguous, target</td><td>::</td>
+  <td><strong>a</strong>(..)</td><td></td>
+</tr>
+<tr>
+  <td><span class="anchor" id="variable-result_image~6"></span>integer,</td>
+<td>intent(in),</td>
+  <td>optional</td>  <td>target</td><td>::</td>
+  <td><strong>result_image</strong></td><td></td>
+</tr>
+<tr>
+  <td><span class="anchor" id="variable-stat~6"></span>integer,</td>
+<td>intent(out),</td>
+  <td>optional</td>  <td>target</td><td>::</td>
+  <td><strong>stat</strong></td><td></td>
+</tr>
+<tr>
+  <td><span class="anchor" id="variable-errmsg~5"></span>character(len=*),</td>
+<td>intent(inout),</td>
+  <td>optional</td>  <td>target</td><td>::</td>
+  <td><strong>errmsg</strong></td><td></td>
+</tr>
+</tbody>
+</table>
+
+    <br>
+    <div class="panel panel-default">
+      <div class="panel-heading">
+  <h3 class="panel-title">Calls</h3>
+      </div>
+      <div class="panel-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: proc~~prif_co_min~~CallsGraph Pages: 1 -->
+<svg id="procprif_co_minCallsGraph" width="641pt" height="394pt"
+ viewBox="0.00 0.00 641.00 394.19" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~prif_co_min~~CallsGraph" class="graph" transform="scale(1.13 1.13) rotate(0) translate(4 440)">
+<title>proc~~prif_co_min~~CallsGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-440 718,-440 718,4 -4,4"/>
+<!-- proc~prif_co_min -->
+<g id="proc~~prif_co_min~~CallsGraph_node1" class="node">
+<title>proc~prif_co_min</title>
+<polygon fill="none" stroke="black" points="74,-172 0,-172 0,-148 74,-148 74,-172"/>
+<text text-anchor="middle" x="37" y="-157.6" font-family="Helvetica,sans-Serif" font-size="10.50">prif_co_min</text>
+</g>
+<!-- interface~caf_numeric_type -->
+<g id="proc~~prif_co_min~~CallsGraph_node2" class="node">
+<title>interface~caf_numeric_type</title>
+<g id="a_proc~~prif_co_min~~CallsGraph_node2"><a xlink:href=".././interface/caf_numeric_type.html" xlink:title="caf_numeric_type">
+<polygon fill="#a7506f" stroke="#a7506f" points="217,-436 110,-436 110,-412 217,-412 217,-436"/>
+<text text-anchor="middle" x="163.5" y="-421.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">caf_numeric_type</text>
+</a>
+</g>
+</g>
+<!-- proc~prif_co_min&#45;&gt;interface~caf_numeric_type -->
+<g id="proc~~prif_co_min~~CallsGraph_edge1" class="edge">
+<title>proc~prif_co_min&#45;&gt;interface~caf_numeric_type</title>
+<path fill="none" stroke="#ff0000" d="M38.4,-172.21C40.25,-210.21 50.74,-327.98 110,-398 112.74,-401.23 115.97,-404.1 119.47,-406.64"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="117.66,-409.64 128,-411.97 121.37,-403.7 117.66,-409.64"/>
+</g>
+<!-- interface~prif_error_stop -->
+<g id="proc~~prif_co_min~~CallsGraph_node3" class="node">
+<title>interface~prif_error_stop</title>
+<g id="a_proc~~prif_co_min~~CallsGraph_node3"><a xlink:href=".././interface/prif_error_stop.html" xlink:title="prif_error_stop">
+<polygon fill="#a7506f" stroke="#a7506f" points="714,-316 624,-316 624,-292 714,-292 714,-316"/>
+<text text-anchor="middle" x="669" y="-301.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">prif_error_stop</text>
+</a>
+</g>
+</g>
+<!-- proc~prif_co_min&#45;&gt;interface~prif_error_stop -->
+<g id="proc~~prif_co_min~~CallsGraph_edge5" class="edge">
+<title>proc~prif_co_min&#45;&gt;interface~prif_error_stop</title>
+<path fill="none" stroke="#ff0000" d="M44.18,-172.04C69.03,-218.57 166.57,-384 297.5,-384 297.5,-384 297.5,-384 440,-384 515.27,-384 597.03,-344.7 639.21,-321.19"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="641.12,-324.13 648.08,-316.15 637.66,-318.05 641.12,-324.13"/>
+</g>
+<!-- interface~caf_co_min -->
+<g id="proc~~prif_co_min~~CallsGraph_node4" class="node">
+<title>interface~caf_co_min</title>
+<g id="a_proc~~prif_co_min~~CallsGraph_node4"><a xlink:href=".././interface/caf_co_min.html" xlink:title="caf_co_min">
+<polygon fill="#a7506f" stroke="#a7506f" points="200,-36 127,-36 127,-12 200,-12 200,-36"/>
+<text text-anchor="middle" x="163.5" y="-21.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">caf_co_min</text>
+</a>
+</g>
+</g>
+<!-- proc~prif_co_min&#45;&gt;interface~caf_co_min -->
+<g id="proc~~prif_co_min~~CallsGraph_edge2" class="edge">
+<title>proc~prif_co_min&#45;&gt;interface~caf_co_min</title>
+<path fill="none" stroke="#ff0000" d="M43.26,-147.92C53.36,-125.92 77.38,-78.93 110,-50 113.7,-46.71 117.9,-43.74 122.26,-41.07"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="124.3,-43.94 131.36,-36.04 120.91,-37.82 124.3,-43.94"/>
+</g>
+<!-- interface~caf_is_f_string -->
+<g id="proc~~prif_co_min~~CallsGraph_node5" class="node">
+<title>interface~caf_is_f_string</title>
+<g id="a_proc~~prif_co_min~~CallsGraph_node5"><a xlink:href=".././interface/caf_is_f_string.html" xlink:title="caf_is_f_string">
+<polygon fill="#a7506f" stroke="#a7506f" points="482.5,-356 395.5,-356 395.5,-332 482.5,-332 482.5,-356"/>
+<text text-anchor="middle" x="439" y="-341.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">caf_is_f_string</text>
+</a>
+</g>
+</g>
+<!-- proc~prif_co_min&#45;&gt;interface~caf_is_f_string -->
+<g id="proc~~prif_co_min~~CallsGraph_edge4" class="edge">
+<title>proc~prif_co_min&#45;&gt;interface~caf_is_f_string</title>
+<path fill="none" stroke="#ff0000" d="M57.86,-172.07C72.15,-180.56 91.99,-191.98 110,-201 211.49,-251.84 335.2,-302.96 397.71,-328.05"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="396.62,-331.39 407.2,-331.86 399.22,-324.89 396.62,-331.39"/>
+</g>
+<!-- proc~get_c_ptr_character -->
+<g id="proc~~prif_co_min~~CallsGraph_node6" class="node">
+<title>proc~get_c_ptr_character</title>
+<g id="a_proc~~prif_co_min~~CallsGraph_node6"><a xlink:href=".././proc/get_c_ptr_character.html" xlink:title="get_c_ptr_character">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="498,-108 380,-108 380,-84 498,-84 498,-108"/>
+<text text-anchor="middle" x="439" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_c_ptr_character</text>
+</a>
+</g>
+</g>
+<!-- proc~prif_co_min&#45;&gt;proc~get_c_ptr_character -->
+<g id="proc~~prif_co_min~~CallsGraph_edge3" class="edge">
+<title>proc~prif_co_min&#45;&gt;proc~get_c_ptr_character</title>
+<path fill="none" stroke="#ff0000" d="M74.4,-155.57C131.86,-148.39 247.04,-133.27 344,-116 353.86,-114.24 364.26,-112.21 374.4,-110.13"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="375.36,-113.51 384.44,-108.04 373.93,-106.66 375.36,-113.51"/>
+</g>
+<!-- proc~optional_value -->
+<g id="proc~~prif_co_min~~CallsGraph_node7" class="node">
+<title>proc~optional_value</title>
+<g id="a_proc~~prif_co_min~~CallsGraph_node7"><a xlink:href=".././proc/optional_value.html" xlink:title="optional_value">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="484.5,-66 393.5,-66 393.5,-42 484.5,-42 484.5,-66"/>
+<text text-anchor="middle" x="439" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">optional_value</text>
+</a>
+</g>
+</g>
+<!-- proc~prif_co_min&#45;&gt;proc~optional_value -->
+<g id="proc~~prif_co_min~~CallsGraph_edge6" class="edge">
+<title>proc~prif_co_min&#45;&gt;proc~optional_value</title>
+<path fill="none" stroke="#ff0000" d="M67.48,-147.97C80.4,-142.95 95.82,-137.31 110,-133 212.22,-101.96 240.24,-103.44 344,-78 356.65,-74.9 370.23,-71.48 383.03,-68.22"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="384.28,-71.52 393.1,-65.65 382.54,-64.73 384.28,-71.52"/>
+</g>
+<!-- proc~get_c_ptr -->
+<g id="proc~~prif_co_min~~CallsGraph_node8" class="node">
+<title>proc~get_c_ptr</title>
+<g id="a_proc~~prif_co_min~~CallsGraph_node8"><a xlink:href=".././proc/get_c_ptr.html" xlink:title="get_c_ptr">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="469.5,-24 408.5,-24 408.5,0 469.5,0 469.5,-24"/>
+<text text-anchor="middle" x="439" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_c_ptr</text>
+</a>
+</g>
+</g>
+<!-- proc~prif_co_min&#45;&gt;proc~get_c_ptr -->
+<g id="proc~~prif_co_min~~CallsGraph_edge7" class="edge">
+<title>proc~prif_co_min&#45;&gt;proc~get_c_ptr</title>
+<path fill="none" stroke="#ff0000" d="M50.13,-147.56C63.61,-134.42 86.57,-113.99 110,-102 207.1,-52.31 334.84,-27.47 398.45,-17.49"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="399.11,-20.93 408.47,-15.96 398.05,-14.01 399.11,-20.93"/>
+</g>
+<!-- interface~prif_co_reduce -->
+<g id="proc~~prif_co_min~~CallsGraph_node9" class="node">
+<title>interface~prif_co_reduce</title>
+<g id="a_proc~~prif_co_min~~CallsGraph_node9"><a xlink:href=".././interface/prif_co_reduce.html" xlink:title="prif_co_reduce">
+<polygon fill="#a7506f" stroke="#a7506f" points="209,-192 118,-192 118,-168 209,-168 209,-192"/>
+<text text-anchor="middle" x="163.5" y="-177.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">prif_co_reduce</text>
+</a>
+</g>
+</g>
+<!-- proc~prif_co_min&#45;&gt;interface~prif_co_reduce -->
+<g id="proc~~prif_co_min~~CallsGraph_edge8" class="edge">
+<title>proc~prif_co_min&#45;&gt;interface~prif_co_reduce</title>
+<path fill="none" stroke="#ff0000" d="M74.01,-165.78C84.56,-167.48 96.35,-169.37 107.79,-171.21"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="107.29,-174.68 117.71,-172.81 108.4,-167.76 107.29,-174.68"/>
+</g>
+<!-- proc~prif_co_reduce -->
+<g id="proc~~prif_co_min~~CallsGraph_node10" class="node">
+<title>proc~prif_co_reduce</title>
+<g id="a_proc~~prif_co_min~~CallsGraph_node10"><a xlink:href=".././proc/prif_co_reduce.html" xlink:title="prif_co_reduce">
+<polygon fill="#d9534f" stroke="#d9534f" points="344,-192 253,-192 253,-168 344,-168 344,-192"/>
+<text text-anchor="middle" x="298.5" y="-177.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">prif_co_reduce</text>
+</a>
+</g>
+</g>
+<!-- interface~prif_co_reduce&#45;&gt;proc~prif_co_reduce -->
+<g id="proc~~prif_co_min~~CallsGraph_edge9" class="edge">
+<title>interface~prif_co_reduce&#45;&gt;proc~prif_co_reduce</title>
+<path fill="none" stroke="#ff00bf" stroke-dasharray="5,2" d="M209.16,-180C219.9,-180 231.51,-180 242.66,-180"/>
+<polygon fill="#ff00bf" stroke="#ff00bf" points="242.73,-183.5 252.73,-180 242.73,-176.5 242.73,-183.5"/>
+</g>
+<!-- proc~prif_co_reduce&#45;&gt;interface~prif_error_stop -->
+<g id="proc~~prif_co_min~~CallsGraph_edge14" class="edge">
+<title>proc~prif_co_reduce&#45;&gt;interface~prif_error_stop</title>
+<path fill="none" stroke="#ff0000" d="M304.62,-192.15C315.01,-215.03 340.91,-264.09 380,-285 453.51,-324.33 553.11,-320.56 613.85,-313.11"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="614.52,-316.55 623.98,-311.78 613.62,-309.61 614.52,-316.55"/>
+</g>
+<!-- proc~prif_co_reduce&#45;&gt;interface~caf_is_f_string -->
+<g id="proc~~prif_co_min~~CallsGraph_edge13" class="edge">
+<title>proc~prif_co_reduce&#45;&gt;interface~caf_is_f_string</title>
+<path fill="none" stroke="#ff0000" d="M305.51,-192.43C320.33,-222.69 358.96,-299.09 380,-318 383.85,-321.46 388.24,-324.53 392.84,-327.23"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="391.38,-330.41 401.85,-331.97 394.64,-324.22 391.38,-330.41"/>
+</g>
+<!-- proc~prif_co_reduce&#45;&gt;proc~get_c_ptr_character -->
+<g id="proc~~prif_co_min~~CallsGraph_edge11" class="edge">
+<title>proc~prif_co_reduce&#45;&gt;proc~get_c_ptr_character</title>
+<path fill="none" stroke="#ff0000" d="M322.91,-167.91C329.95,-163.86 337.52,-159.07 344,-154 362.07,-139.86 360.72,-129.44 380,-117 382.57,-115.34 385.29,-113.79 388.09,-112.34"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="389.66,-115.47 397.25,-108.08 386.71,-109.13 389.66,-115.47"/>
+</g>
+<!-- proc~prif_co_reduce&#45;&gt;proc~optional_value -->
+<g id="proc~~prif_co_min~~CallsGraph_edge16" class="edge">
+<title>proc~prif_co_reduce&#45;&gt;proc~optional_value</title>
+<path fill="none" stroke="#ff0000" d="M307.45,-167.97C323.92,-143.34 361.75,-88.37 380,-75 382.08,-73.48 384.28,-72.06 386.56,-70.73"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="388.36,-73.74 395.67,-66.07 385.17,-67.51 388.36,-73.74"/>
+</g>
+<!-- proc~prif_co_reduce&#45;&gt;proc~get_c_ptr -->
+<g id="proc~~prif_co_min~~CallsGraph_edge17" class="edge">
+<title>proc~prif_co_reduce&#45;&gt;proc~get_c_ptr</title>
+<path fill="none" stroke="#ff0000" d="M304.91,-167.6C318.99,-135.8 357.24,-52.5 380,-33 385.41,-28.36 391.92,-24.72 398.6,-21.86"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="400.24,-24.99 408.4,-18.22 397.8,-18.43 400.24,-24.99"/>
+</g>
+<!-- interface~assert -->
+<g id="proc~~prif_co_min~~CallsGraph_node11" class="node">
+<title>interface~assert</title>
+<g id="a_proc~~prif_co_min~~CallsGraph_node11"><a xlink:href=".././interface/assert.html" xlink:title="assert">
+<polygon fill="#a7506f" stroke="#a7506f" points="466,-276 412,-276 412,-252 466,-252 466,-276"/>
+<text text-anchor="middle" x="439" y="-261.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">assert</text>
+</a>
+</g>
+</g>
+<!-- proc~prif_co_reduce&#45;&gt;interface~assert -->
+<g id="proc~~prif_co_min~~CallsGraph_edge10" class="edge">
+<title>proc~prif_co_reduce&#45;&gt;interface~assert</title>
+<path fill="none" stroke="#ff0000" d="M312.25,-192.1C327.4,-205.94 353.92,-228.56 380,-243 386.9,-246.82 394.64,-250.19 402.16,-253.04"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="401.23,-256.42 411.83,-256.48 403.58,-249.83 401.23,-256.42"/>
+</g>
+<!-- interface~caf_same_cfi_type -->
+<g id="proc~~prif_co_min~~CallsGraph_node12" class="node">
+<title>interface~caf_same_cfi_type</title>
+<g id="a_proc~~prif_co_min~~CallsGraph_node12"><a xlink:href=".././interface/caf_same_cfi_type.html" xlink:title="caf_same_cfi_type">
+<polygon fill="#a7506f" stroke="#a7506f" points="494,-234 384,-234 384,-210 494,-210 494,-234"/>
+<text text-anchor="middle" x="439" y="-219.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">caf_same_cfi_type</text>
+</a>
+</g>
+</g>
+<!-- proc~prif_co_reduce&#45;&gt;interface~caf_same_cfi_type -->
+<g id="proc~~prif_co_min~~CallsGraph_edge15" class="edge">
+<title>proc~prif_co_reduce&#45;&gt;interface~caf_same_cfi_type</title>
+<path fill="none" stroke="#ff0000" d="M339.19,-192.04C354.55,-196.69 372.29,-202.07 388.47,-206.98"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="387.72,-210.41 398.31,-209.96 389.75,-203.71 387.72,-210.41"/>
+</g>
+<!-- interface~caf_co_reduce -->
+<g id="proc~~prif_co_min~~CallsGraph_node13" class="node">
+<title>interface~caf_co_reduce</title>
+<g id="a_proc~~prif_co_min~~CallsGraph_node13"><a xlink:href=".././interface/caf_co_reduce.html" xlink:title="caf_co_reduce">
+<polygon fill="#a7506f" stroke="#a7506f" points="483.5,-192 394.5,-192 394.5,-168 483.5,-168 483.5,-192"/>
+<text text-anchor="middle" x="439" y="-177.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">caf_co_reduce</text>
+</a>
+</g>
+</g>
+<!-- proc~prif_co_reduce&#45;&gt;interface~caf_co_reduce -->
+<g id="proc~~prif_co_min~~CallsGraph_edge12" class="edge">
+<title>proc~prif_co_reduce&#45;&gt;interface~caf_co_reduce</title>
+<path fill="none" stroke="#ff0000" d="M344.08,-180C356.94,-180 371.1,-180 384.44,-180"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="384.45,-183.5 394.45,-180 384.44,-176.5 384.45,-183.5"/>
+</g>
+<!-- interface~caf_elem_len -->
+<g id="proc~~prif_co_min~~CallsGraph_node14" class="node">
+<title>interface~caf_elem_len</title>
+<g id="a_proc~~prif_co_min~~CallsGraph_node14"><a xlink:href=".././interface/caf_elem_len.html" xlink:title="caf_elem_len">
+<polygon fill="#a7506f" stroke="#a7506f" points="480.5,-150 397.5,-150 397.5,-126 480.5,-126 480.5,-150"/>
+<text text-anchor="middle" x="439" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">caf_elem_len</text>
+</a>
+</g>
+</g>
+<!-- proc~prif_co_reduce&#45;&gt;interface~caf_elem_len -->
+<g id="proc~~prif_co_min~~CallsGraph_edge18" class="edge">
+<title>proc~prif_co_reduce&#45;&gt;interface~caf_elem_len</title>
+<path fill="none" stroke="#ff0000" d="M339.19,-167.96C354.55,-163.31 372.29,-157.93 388.47,-153.02"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="389.75,-156.29 398.31,-150.04 387.72,-149.59 389.75,-156.29"/>
+</g>
+<!-- proc~assert -->
+<g id="proc~~prif_co_min~~CallsGraph_node15" class="node">
+<title>proc~assert</title>
+<g id="a_proc~~prif_co_min~~CallsGraph_node15"><a xlink:href=".././proc/assert.html" xlink:title="assert">
+<polygon fill="#d9534f" stroke="#d9534f" points="588,-276 534,-276 534,-252 588,-252 588,-276"/>
+<text text-anchor="middle" x="561" y="-261.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">assert</text>
+</a>
+</g>
+</g>
+<!-- interface~assert&#45;&gt;proc~assert -->
+<g id="proc~~prif_co_min~~CallsGraph_edge19" class="edge">
+<title>interface~assert&#45;&gt;proc~assert</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M466.04,-264C482.83,-264 504.91,-264 523.44,-264"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="523.6,-267.5 533.6,-264 523.6,-260.5 523.6,-267.5"/>
+</g>
+<!-- proc~assert&#45;&gt;interface~prif_error_stop -->
+<g id="proc~~prif_co_min~~CallsGraph_edge20" class="edge">
+<title>proc~assert&#45;&gt;interface~prif_error_stop</title>
+<path fill="none" stroke="#ff0000" d="M588.2,-273.89C599.73,-278.24 613.56,-283.46 626.44,-288.32"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="625.46,-291.69 636.05,-291.94 627.93,-285.14 625.46,-291.69"/>
+</g>
+</g>
+</svg>
+</div><script>var panprocprif_co_minCallsGraph = svgPanZoom('#procprif_co_minCallsGraph', {zoomEnabled: true,controlIconsEnabled: true, fit: true, center: true,}); </script><div><a type="button" class="graph-help" data-toggle="modal" href="#graph-help-text">Help</a></div><div class="modal fade" id="graph-help-text" tabindex="-1" role="dialog"><div class="modal-dialog modal-lg" role="document"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button><h4 class="modal-title" id="-graph-help-label">Graph Key</h4></div><div class="modal-body">
+    <p>Nodes of different colours represent the following: </p>
+    <?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="597pt" height="32pt"
+ viewBox="0.00 0.00 596.50 32.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 592.5,-28 592.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node4" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="388.5,-24 243.5,-24 243.5,0 388.5,0 388.5,-24"/>
+<text text-anchor="middle" x="316" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node5" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="465,-24 407,-24 407,0 465,0 465,-24"/>
+<text text-anchor="middle" x="436" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node6" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="588.5,-24 483.5,-24 483.5,0 588.5,0 588.5,-24"/>
+<text text-anchor="middle" x="536" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+    
+    <p>Solid arrows point from a procedure to one which it calls. Dashed 
+    arrows point from an interface to procedures which implement that interface.
+    This could include the module procedures in a generic interface or the
+    implementation in a submodule of an interface in a parent module. Where possible, edges connecting nodes are given different colours to make them easier to distinguish in large graphs.
+    </p>
+    </div></div></div></div>
+      </div>
+    </div>
+    <div class="panel panel-default">
+      <div class="panel-heading">
+  <h3 class="panel-title">Called by</h3>
+      </div>
+      <div class="panel-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: proc~~prif_co_min~~CalledByGraph Pages: 1 -->
+<svg id="procprif_co_minCalledByGraph" width="192pt" height="32pt"
+ viewBox="0.00 0.00 192.00 32.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~prif_co_min~~CalledByGraph" class="graph" transform="scale(1 1) rotate(0) translate(4 28)">
+<title>proc~~prif_co_min~~CalledByGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 188,-28 188,4 -4,4"/>
+<!-- proc~prif_co_min -->
+<g id="proc~~prif_co_min~~CalledByGraph_node1" class="node">
+<title>proc~prif_co_min</title>
+<polygon fill="none" stroke="black" points="184,-24 110,-24 110,0 184,0 184,-24"/>
+<text text-anchor="middle" x="147" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">prif_co_min</text>
+</g>
+<!-- interface~prif_co_min -->
+<g id="proc~~prif_co_min~~CalledByGraph_node2" class="node">
+<title>interface~prif_co_min</title>
+<g id="a_proc~~prif_co_min~~CalledByGraph_node2"><a xlink:href=".././interface/prif_co_min.html" xlink:title="prif_co_min">
+<polygon fill="#a7506f" stroke="#a7506f" points="74,-24 0,-24 0,0 74,0 74,-24"/>
+<text text-anchor="middle" x="37" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">prif_co_min</text>
+</a>
+</g>
+</g>
+<!-- interface~prif_co_min&#45;&gt;proc~prif_co_min -->
+<g id="proc~~prif_co_min~~CalledByGraph_edge1" class="edge">
+<title>interface~prif_co_min&#45;&gt;proc~prif_co_min</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M74.26,-12C82.37,-12 91.07,-12 99.52,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="99.65,-15.5 109.65,-12 99.65,-8.5 99.65,-15.5"/>
+</g>
+</g>
+</svg>
+</div><div><a type="button" class="graph-help" data-toggle="modal" href="#graph-help-text">Help</a></div><div class="modal fade" id="graph-help-text" tabindex="-1" role="dialog"><div class="modal-dialog modal-lg" role="document"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button><h4 class="modal-title" id="-graph-help-label">Graph Key</h4></div><div class="modal-body">
+    <p>Nodes of different colours represent the following: </p>
+    <?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="597pt" height="32pt"
+ viewBox="0.00 0.00 596.50 32.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 592.5,-28 592.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node4" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="388.5,-24 243.5,-24 243.5,0 388.5,0 388.5,-24"/>
+<text text-anchor="middle" x="316" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node5" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="465,-24 407,-24 407,0 465,0 465,-24"/>
+<text text-anchor="middle" x="436" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node6" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="588.5,-24 483.5,-24 483.5,0 588.5,0 588.5,-24"/>
+<text text-anchor="middle" x="536" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+    
+    <p>Solid arrows point from a procedure to one which it calls. Dashed 
+    arrows point from an interface to procedures which implement that interface.
+    This could include the module procedures in a generic interface or the
+    implementation in a submodule of an interface in a parent module. Where possible, edges connecting nodes are given different colours to make them easier to distinguish in large graphs.
+    </p>
+    </div></div></div></div>
+      </div>
+    </div>
+    <br>
+
+    <section class="visible-xs visible-sm hidden-md">
+      <h3>Contents</h3>
+ 
+<em>None</em>
+
+    </section>
+    <br class="visible-xs visible-sm hidden-md">
+
+
+    
+    
+
+    
+    
+
+
+    
+    
+    </div>
+  </div>
+
+    <hr>    
+    </div> <!-- /container -->
+    <footer>
+      <div class="container">
+      <div class="row">
+        <div class="col-xs-6 col-md-6"><p>Caffeine was developed by Lawrence Berkeley National Laboratory<br>&copy; 2023 
+</p>
+        </div>
+        <div class="col-xs-6 col-md-6">
+          <p class="text-right">
+            Documentation generated by 
+            <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
+ on 2023-12-12 21:41            </p>
+        </div>
+      </div>
+      <br>
+      </div> <!-- /container -->    
+    </footer>
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+<!--
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+-->
+    <script src="../js/bootstrap.min.js"></script>
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <script src="../js/ie10-viewport-bug-workaround.js"></script>
+
+    <!-- MathJax JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } },
+        jax: ['input/TeX','input/MathML','output/HTML-CSS'],
+        extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']
+      });
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script src="../tipuesearch/tipuesearch_content.js"></script>
+    <script src="../tipuesearch/tipuesearch_set.js"></script>
+    <script src="../tipuesearch/tipuesearch.js"></script>
+    
+  </body>
+</html>

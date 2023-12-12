@@ -11,8 +11,8 @@ contains
 
   module procedure assert
     use caffeine_characterizable_m, only : characterizable_t
-    use program_termination_m, only: caf_error_stop
-    use image_enumeration_m, only: this_image => caf_this_image
+    use program_termination_m, only: prif_error_stop
+    use image_enumeration_m, only: this_image => prif_this_image
 
     character(len=:), allocatable :: header, trailer
 
@@ -52,7 +52,7 @@ contains
 
         end if represent_diagnostics_as_string
 
-        call caf_error_stop(header // ' with diagnostic data "' // trailer // '"')
+        call prif_error_stop(header // ' with diagnostic data "' // trailer // '"')
 
       end if check_assertion
 
@@ -77,7 +77,7 @@ contains
         type is(real)
           write(untrimmed_string, *) numeric
         class default
-          call caf_error_stop("Internal error in subroutine 'assert': unsupported type in function 'string'.")
+          call prif_error_stop("Internal error in subroutine 'assert': unsupported type in function 'string'.")
       end select
 
       number_as_string = trim(adjustl(untrimmed_string))

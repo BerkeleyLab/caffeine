@@ -5,13 +5,13 @@ submodule(team_type_m) team_type_s
 
 contains
 
-  module procedure caf_change_team
+  module procedure prif_change_team
   end procedure
 
-  module procedure caf_end_team
+  module procedure prif_end_team
   end procedure
 
-  module procedure caf_form_team
+  module procedure prif_form_team
   end procedure
 
 end submodule

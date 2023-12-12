@@ -5,11 +5,11 @@ module collective_subroutines_m
   implicit none
 
   private
-  public :: caf_co_sum
-  public :: caf_co_max
-  public :: caf_co_min
-  public :: caf_co_reduce
-  public :: caf_co_broadcast
+  public :: prif_co_sum
+  public :: prif_co_max
+  public :: prif_co_min
+  public :: prif_co_reduce
+  public :: prif_co_broadcast
 
   public :: c_int32_t_operation
   public :: c_int64_t_operation
@@ -82,7 +82,7 @@ module collective_subroutines_m
 
   interface
  
-     module subroutine caf_co_sum(a, result_image, stat, errmsg)
+     module subroutine prif_co_sum(a, result_image, stat, errmsg)
        implicit none
        type(*), intent(inout), contiguous, target :: a(..)
        integer, intent(in), target, optional :: result_image
@@ -90,7 +90,7 @@ module collective_subroutines_m
        character(len=*), intent(inout), target, optional :: errmsg
      end subroutine
 
-     module subroutine caf_co_max(a, result_image, stat, errmsg)
+     module subroutine prif_co_max(a, result_image, stat, errmsg)
        implicit none
        type(*), intent(inout), contiguous, target :: a(..)
        integer, intent(in), optional, target :: result_image
@@ -98,7 +98,7 @@ module collective_subroutines_m
        character(len=*), intent(inout), optional, target :: errmsg
      end subroutine
 
-     module subroutine caf_co_min(a, result_image, stat, errmsg)
+     module subroutine prif_co_min(a, result_image, stat, errmsg)
        implicit none
        type(*), intent(inout), contiguous, target :: a(..)
        integer, intent(in), optional, target :: result_image
@@ -106,7 +106,7 @@ module collective_subroutines_m
        character(len=*), intent(inout), optional, target :: errmsg
      end subroutine
 
-     module subroutine caf_co_reduce(a, operation, result_image, stat, errmsg)
+     module subroutine prif_co_reduce(a, operation, result_image, stat, errmsg)
        implicit none
        type(*), intent(inout), contiguous, target :: a(..)
        type(c_funptr), value :: operation
@@ -115,7 +115,7 @@ module collective_subroutines_m
        character(len=*), intent(inout), optional, target :: errmsg
      end subroutine
 
-     module subroutine caf_co_broadcast(a, source_image, stat, errmsg)
+     module subroutine prif_co_broadcast(a, source_image, stat, errmsg)
        implicit none
        type(*), intent(inout), contiguous, target :: a(..)
        integer, optional, intent(in) :: source_image
