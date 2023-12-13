@@ -52,7 +52,7 @@ contains
 
         end if represent_diagnostics_as_string
 
-        call prif_error_stop(header // ' with diagnostic data "' // trailer // '"')
+        call prif_error_stop(stop_code_char=header // ' with diagnostic data "' // trailer // '"')
 
       end if check_assertion
 
@@ -77,7 +77,7 @@ contains
         type is(real)
           write(untrimmed_string, *) numeric
         class default
-          call prif_error_stop("Internal error in subroutine 'assert': unsupported type in function 'string'.")
+          call prif_error_stop(stop_code_char="Internal error in subroutine 'assert': unsupported type in function 'string'.")
       end select
 
       number_as_string = trim(adjustl(untrimmed_string))

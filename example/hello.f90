@@ -6,6 +6,6 @@ program hello_world
   
   print *, "Hello from image", this_image(), "of", num_images()
 
-  call prif_stop(stop_code=0) ! normal termination
+  call prif_stop(stop_code_int=0) ! normal termination
 
 end program
