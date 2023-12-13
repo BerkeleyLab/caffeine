@@ -34,7 +34,11 @@ module team_type_m
       character(len=:), intent(inout), allocatable, optional :: errmsg_alloc
     end subroutine
 
-    module subroutine prif_end_team()
+    module subroutine prif_end_team(stat, errmsg, errmsg_alloc)
+      implicit none
+      integer(c_int), intent(out), optional :: stat
+      character(len=*), intent(inout), optional :: errmsg
+      character(len=:), intent(inout), allocatable, optional :: errmsg_alloc
     end subroutine
 
   end interface
