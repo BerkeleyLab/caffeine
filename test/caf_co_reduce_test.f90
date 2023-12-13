@@ -35,14 +35,14 @@ contains
     procedure(c_char_operation), pointer :: alphabetize_operation
     character(len=*, kind=c_char), parameter :: names(*) = ["larry","harry","carey","betty","tommy","billy"]
     character(len=:, kind=c_char), allocatable :: my_name(:)
+    integer :: me
 
     alphabetize_operation => alphabetize
 
-    associate(me => prif_this_image())
-      associate(periodic_index => 1 + mod(me-1,size(names)))
-        my_name = [names(periodic_index)]
-        call prif_co_reduce(my_name, c_funloc(alphabetize_operation))
-      end associate
+    call prif_this_image(image_index=me)
+    associate(periodic_index => 1 + mod(me-1,size(names)))
+      my_name = [names(periodic_index)]
+      call prif_co_reduce(my_name, c_funloc(alphabetize_operation))
     end associate
 
     associate(expected_name => minval(names(1:min(prif_num_images(), size(names)))))
@@ -172,13 +172,16 @@ contains
     procedure(c_bool_operation), pointer :: boolean_operation
     logical(c_bool), parameter :: c_true=.true._c_bool, c_false=.false._c_bool
     logical ans1, ans2, ans3
+    integer :: me
 
     boolean_operation => logical_and
 
-    one_false = merge(c_false, c_true, prif_this_image()==1)
+    call prif_this_image(image_index=me)
+    one_false = merge(c_false, c_true, me==1)
     call prif_co_reduce(one_false, c_funloc(boolean_operation))
 
-    one_true = merge(c_true, c_false, prif_this_image()==1)
+    call prif_this_image(image_index=me)
+    one_true = merge(c_true, c_false, me==1)
     call prif_co_reduce(one_true, c_funloc(boolean_operation))
 
     all_true = c_true
@@ -203,21 +206,20 @@ contains
   function multiply_c_double_scalars() result(result_)
     type(result_t) result_
     real(c_double) p
-    integer j, status_
+    integer j, status_, me
     character(len=:), allocatable :: error_message
     procedure(c_double_operation), pointer :: multiply_operation
 
     error_message = "unused"
     multiply_operation => multiply_doubles
-    associate(me => prif_this_image())
-      p = real(me,c_double)
-      call prif_co_reduce(p, c_funloc(multiply_operation), result_image=1, stat=status_, errmsg=error_message)
-      associate(expected_result => merge( product([(real(j,c_double), j = 1, prif_num_images())]), real(me,c_double), me==1 ))
-        result_ = &
-          assert_equals(expected_result, real(p,c_double)) .and. &
-          assert_equals(0, status_) .and. &
-          assert_equals("unused", error_message)
-      end associate
+    call prif_this_image(image_index=me)
+    p = real(me,c_double)
+    call prif_co_reduce(p, c_funloc(multiply_operation), result_image=1, stat=status_, errmsg=error_message)
+    associate(expected_result => merge( product([(real(j,c_double), j = 1, prif_num_images())]), real(me,c_double), me==1 ))
+      result_ = &
+        assert_equals(expected_result, real(p,c_double)) .and. &
+        assert_equals(0, status_) .and. &
+        assert_equals("unused", error_message)
     end associate
 
   contains
@@ -233,21 +235,20 @@ contains
   function multiply_default_real_scalars() result(result_)
     type(result_t) result_
     real p
-    integer j, status_
+    integer j, status_, me
     character(len=:), allocatable :: error_message
     procedure(c_float_operation), pointer :: multiply_operation
 
     error_message = "unused"
     multiply_operation => multiply
-    associate(me => prif_this_image())
-      p = real(me)
-      call prif_co_reduce(p, c_funloc(multiply_operation), result_image=1, stat=status_, errmsg=error_message)
-      associate(expected_result => merge( product([(dble(j), j = 1, prif_num_images())]), dble(me), me==1 ))
-        result_ = &
-          assert_equals(expected_result, dble(p)) .and. &
-          assert_equals(0, status_) .and. &
-          assert_equals("unused", error_message)
-      end associate
+    call prif_this_image(image_index=me)
+    p = real(me)
+    call prif_co_reduce(p, c_funloc(multiply_operation), result_image=1, stat=status_, errmsg=error_message)
+    associate(expected_result => merge( product([(dble(j), j = 1, prif_num_images())]), dble(me), me==1 ))
+      result_ = &
+        assert_equals(expected_result, dble(p)) .and. &
+        assert_equals(0, status_) .and. &
+        assert_equals("unused", error_message)
     end associate
 
   contains

@@ -21,9 +21,10 @@ contains
     function check_this_image_set() result(result_)
         type(result_t) :: result_
         integer, allocatable :: image_numbers(:)
-        integer i
- 
-        associate(me => prif_this_image(), ni => prif_num_images())
+        integer i, me
+
+        call prif_this_image(image_index=me)
+        associate(ni => prif_num_images())
           image_numbers = [(merge(0, me, me/=i), i = 1, ni)]
           call prif_co_sum(image_numbers)
           result_ = assert_that(all(image_numbers == [(i, i = 1, ni)]) .and. size(image_numbers)>0, "correct image set")

@@ -13,14 +13,15 @@ contains
   module procedure num_images_team_number
   end procedure
 
-  module procedure this_image_team
-    image_number = caf_this_image()
+  module procedure prif_this_image_no_coarray
+    ! TODO: handle optional arg `team`
+    image_index = caf_this_image()
   end procedure
 
-  module procedure this_image_coarray_team
+  module procedure prif_this_image_with_coarray
   end procedure
 
-  module procedure this_image_coarray_dim_team
+  module procedure prif_this_image_with_dim
   end procedure
 
 end submodule image_enumeration_s

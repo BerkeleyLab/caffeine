@@ -1,7 +1,9 @@
 ! Copyright (c), The Regents of the University of California
 ! Terms of use are as specified in LICENSE.txt
 module image_enumeration_m
+  use iso_c_binding, only: c_int, c_intmax_t
   use team_type_m, only : prif_team_type
+  use allocation_m, only: prif_coarray_handle
   implicit none
 
   private
@@ -25,28 +27,26 @@ module image_enumeration_m
   end interface
 
   interface prif_this_image
-
-    pure module function this_image_team(team) result(image_number)
+    pure module subroutine prif_this_image_no_coarray(team, image_index)
       implicit none
       type(prif_team_type), intent(in), optional :: team
-      integer image_number
-    end function
+      integer(c_int), intent(out) :: image_index
+    end subroutine
 
-    module function this_image_coarray_team(coarray, team) result(image_number)
+    module subroutine prif_this_image_with_coarray(team, coarray_handle, cosubscripts)
       implicit none
       type(prif_team_type), intent(in), optional :: team
-      class(*), intent(in) :: coarray(..)
-      integer image_number
-    end function
+      type(prif_coarray_handle), intent(in) :: coarray_handle
+      integer(c_intmax_t), intent(out) :: cosubscripts(:)
+    end subroutine
 
-    module function this_image_coarray_dim_team(coarray, dim, team) result(image_number)
+    module subroutine prif_this_image_with_dim(team, coarray_handle, dim, cosubscript)
       implicit none
-      class(*), intent(in) :: coarray(..)
-      integer, intent(in) :: dim
       type(prif_team_type), intent(in), optional :: team
-      integer image_number
-    end function
-
+      type(prif_coarray_handle), intent(in) :: coarray_handle
+      integer(c_int), intent(in) :: dim
+      integer(c_intmax_t), intent(out) :: cosubscript
+    end subroutine
   end interface
 
 end module image_enumeration_m

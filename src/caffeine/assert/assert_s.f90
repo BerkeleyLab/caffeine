@@ -15,6 +15,7 @@ contains
     use image_enumeration_m, only: this_image => prif_this_image
 
     character(len=:), allocatable :: header, trailer
+    integer :: me
 
     toggle_assertions: &
     if (enforce_assertions) then
@@ -22,9 +23,8 @@ contains
       check_assertion: &
       if (.not. assertion) then
 
-        associate(me=>this_image()) ! work around gfortran bug
-          header = 'Assertion "' // description // '" failed on image ' // string(me)
-        end associate
+        call this_image(image_index=me)
+        header = 'Assertion "' // description // '" failed on image ' // string(me)
 
         represent_diagnostics_as_string: &
         if (.not. present(diagnostic_data)) then

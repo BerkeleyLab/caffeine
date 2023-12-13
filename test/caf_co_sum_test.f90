@@ -9,7 +9,7 @@ module caf_co_sum_test
 contains
     function test_prif_co_sum() result(tests)
         type(test_item_t) tests
-    
+
         tests = describe( &
           "The prif_co_sum subroutine", &
           [ it("sums default integer scalars with no optional arguments present", sum_default_integer_scalars) &
@@ -27,7 +27,7 @@ contains
     function sum_default_integer_scalars() result(result_)
         type(result_t) result_
         integer i
- 
+
         i = 1
         call prif_co_sum(i)
         result_ = assert_equals(prif_num_images(), i)
@@ -35,7 +35,7 @@ contains
 
     function sum_integers_all_arguments() result(result_)
         type(result_t) result_
-        integer i, status_, result_image_
+        integer i, status_, result_image_, me
         character(len=*), parameter :: whitespace = repeat(" ", ncopies=29)
         character(len=:), allocatable :: error_message
 
@@ -44,14 +44,15 @@ contains
         status_ = -1
         error_message = whitespace
 
-        associate(expected_i => merge(prif_num_images()*i, i, prif_this_image()==result_image_))
+        call prif_this_image(image_index=me)
+        associate(expected_i => merge(prif_num_images()*i, i, me==result_image_))
           call prif_co_sum(i, result_image_, status_, error_message)
           result_ = assert_equals(expected_i, i) .and. assert_equals(0, status_) .and. assert_equals(whitespace, error_message)
         end associate
     end function
 
     function sum_c_int64_scalars() result(result_)
-        use iso_c_binding, only : c_int64_t 
+        use iso_c_binding, only : c_int64_t
         type(result_t) result_
         integer(c_int64_t) i
         integer i_default_kind, status_
@@ -67,7 +68,7 @@ contains
         type(result_t) result_
         integer i
         integer, allocatable :: array(:)
- 
+
         associate(images => prif_num_images())
           associate(sequence_ => [(i,i=1,images)])
             array = sequence_
@@ -81,7 +82,7 @@ contains
         type(result_t) result_
         integer array(2,1,1, 1,1,1, 1,1,1, 1,1,1, 1,2,1)
         integer status_
- 
+
         status_ = -1
         array = 3
         call prif_co_sum(array, stat=status_)
@@ -92,12 +93,13 @@ contains
         type(result_t) result_
         real scalar
         real, parameter :: e = 2.7182818459045
-        integer result_image_
+        integer result_image_, me
 
         result_image_ = 1
         scalar = e
         call prif_co_sum(scalar, result_image=result_image_)
-        associate(expected_result => merge(prif_num_images()*e, e, prif_this_image()==result_image_))
+        call prif_this_image(image_index=me)
+        associate(expected_result => merge(prif_num_images()*e, e, me==result_image_))
           result_ = assert_equals(dble(expected_result), dble(scalar))
         end associate
     end function
@@ -106,7 +108,7 @@ contains
         type(result_t) result_
         double precision, allocatable :: array(:,:)
         double precision, parameter :: input(*,*) = reshape(-[6,5,4,3,2,1], [3,2])
- 
+
         array = input
         call prif_co_sum(array)
         result_ = assert_equals(product(prif_num_images()*input), product(array))
@@ -124,13 +126,13 @@ contains
         call prif_co_sum(z, stat=status_)
         result_ = assert_equals(dble(abs(i*prif_num_images())), dble(abs(z)) ) .and. assert_equals(0, status_)
     end function
-             
+
     function sum_dble_complex_1D_arrays() result(result_)
         type(result_t) result_
         integer, parameter :: dp = kind(1.D0)
         complex(dp), allocatable :: array(:)
         complex(dp), parameter :: input(*) = [(1.D0,1.0D0)]
- 
+
         array = [(1.D0,1.D0)]
         call prif_co_sum(array)
         result_ = assert_that(all([input*prif_num_images()] == array))
