@@ -21,8 +21,10 @@ contains
         type(result_t) :: result_
 
         integer, parameter :: successful_initiation = 0
+        integer :: init_exit_code
 
-        result_ = assert_that(prif_init() == successful_initiation)
+        call prif_init(init_exit_code)
+        result_ = assert_that(init_exit_code == successful_initiation)
     end function
 
 end module a00_caffeinate_test

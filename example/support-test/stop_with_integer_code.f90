@@ -2,7 +2,10 @@ program stop_with_no_code
   use prif, only : prif_init, prif_stop
   implicit none
 
-  if (prif_init() /= 0) error stop "caffeinate returned a non-zero exit_code"
+  integer :: init_exit_code
+
+  call prif_init(init_exit_code)
+  if (init_exit_code /= 0) error stop "caffeinate returned a non-zero exit_code"
 
   call prif_stop(1)
 
