@@ -69,7 +69,7 @@ contains
       call caf_co_reduce(a, optional_value(result_image), stat_ptr, errmsg_ptr, &
         int(product(shape(a)), c_size_t), c_funloc(Coll_ReduceSub_c_double_complex), c_null_ptr)
     else
-      call prif_error_stop(logical(.false., c_bool), stop_code_char="caf_co_reduce: unsupported type")
+      call prif_error_stop(.false._c_bool, stop_code_char="caf_co_reduce: unsupported type")
     end if
 
   contains

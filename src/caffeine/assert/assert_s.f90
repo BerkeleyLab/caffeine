@@ -53,7 +53,7 @@ contains
 
         end if represent_diagnostics_as_string
 
-        call prif_error_stop(logical(.false., c_bool), stop_code_char=header // ' with diagnostic data "' // trailer // '"')
+        call prif_error_stop(.false._c_bool, stop_code_char=header // ' with diagnostic data "' // trailer // '"')
 
       end if check_assertion
 
@@ -78,7 +78,7 @@ contains
         type is(real)
           write(untrimmed_string, *) numeric
         class default
-          call prif_error_stop(logical(.false., c_bool), &
+          call prif_error_stop(.false._c_bool, &
             stop_code_char="Internal error in subroutine 'assert': unsupported type in function 'string'.")
       end select
 

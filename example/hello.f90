@@ -12,6 +12,6 @@ program hello_world
   call num_images(image_count=num_imgs)
   print *, "Hello from image", me, "of", num_imgs
 
-  call prif_stop(logical(.false., c_bool), stop_code_int=0) ! normal termination
+  call prif_stop(.false._c_bool, stop_code_int=0) ! normal termination
 
 end program

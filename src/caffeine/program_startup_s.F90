@@ -39,7 +39,7 @@ contains
       arg => targ
 #endif
       call get_command_argument(argnum, arg, arglen)
-      if (arglen+1>max_arg_len) call prif_error_stop(logical(.false., c_bool), stop_code_char="maximum argument length exceeded")
+      if (arglen+1>max_arg_len) call prif_error_stop(.false._c_bool, stop_code_char="maximum argument length exceeded")
       arg(arglen+1:arglen+1) = c_null_char
     end function
 
