@@ -121,7 +121,7 @@
     </div>
     
     <div class="col-md-9" id='text'>
-    <h2>module procedure prif_co_sum <small>module module subroutine prif_co_sum(a, result_image, stat, errmsg)</small>   <a href='../interface/prif_co_sum.html'><button type="button" class="btn btn-info depwarn">Interface &rarr;</button></a>
+    <h2>module procedure prif_co_sum <small>module module subroutine prif_co_sum(a, result_image, stat, errmsg, errmsg_alloc)</small>   <a href='../interface/prif_co_sum.html'><button type="button" class="btn btn-info depwarn">Interface &rarr;</button></a>
 </h2>
     
 
@@ -137,22 +137,28 @@
   <td><strong>a</strong>(..)</td><td></td>
 </tr>
 <tr>
-  <td><span class="anchor" id="variable-result_image~8"></span>integer,</td>
+  <td><span class="anchor" id="variable-result_image~8"></span>integer(kind=c_int),</td>
 <td>intent(in),</td>
-  <td>optional</td>  <td>target</td><td>::</td>
+  <td>optional</td>  <td></td><td>::</td>
   <td><strong>result_image</strong></td><td></td>
 </tr>
 <tr>
-  <td><span class="anchor" id="variable-stat~8"></span>integer,</td>
+  <td><span class="anchor" id="variable-stat~11"></span>integer(kind=c_int),</td>
 <td>intent(out),</td>
-  <td>optional</td>  <td>target</td><td>::</td>
+  <td>optional</td>  <td></td><td>::</td>
   <td><strong>stat</strong></td><td></td>
 </tr>
 <tr>
-  <td><span class="anchor" id="variable-errmsg~7"></span>character(len=*),</td>
+  <td><span class="anchor" id="variable-errmsg~10"></span>character(len=*),</td>
 <td>intent(inout),</td>
-  <td>optional</td>  <td>target</td><td>::</td>
+  <td>optional</td>  <td></td><td>::</td>
   <td><strong>errmsg</strong></td><td></td>
+</tr>
+<tr>
+  <td><span class="anchor" id="variable-errmsg_alloc~9"></span>character(len=:),</td>
+<td>intent(inout),</td>
+  <td>optional</td>  <td>allocatable</td><td>::</td>
+  <td><strong>errmsg_alloc</strong></td><td></td>
 </tr>
 </tbody>
 </table>
@@ -210,33 +216,33 @@
 <path fill="none" stroke="#ff0000" d="M76.19,-80.96C88.37,-82.91 102.16,-85.12 115.35,-87.24"/>
 <polygon fill="#ff0000" stroke="#ff0000" points="114.85,-90.7 125.28,-88.83 115.96,-83.79 114.85,-90.7"/>
 </g>
-<!-- interface~caf_co_sum -->
-<g id="proc~~prif_co_sum~~CallsGraph_node4" class="node">
-<title>interface~caf_co_sum</title>
-<g id="a_proc~~prif_co_sum~~CallsGraph_node4"><a xlink:href=".././interface/caf_co_sum.html" xlink:title="caf_co_sum">
-<polygon fill="#a7506f" stroke="#a7506f" points="208.5,-66 133.5,-66 133.5,-42 208.5,-42 208.5,-66"/>
-<text text-anchor="middle" x="171" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">caf_co_sum</text>
-</a>
-</g>
-</g>
-<!-- proc~prif_co_sum&#45;&gt;interface~caf_co_sum -->
-<g id="proc~~prif_co_sum~~CallsGraph_edge3" class="edge">
-<title>proc~prif_co_sum&#45;&gt;interface~caf_co_sum</title>
-<path fill="none" stroke="#ff0000" d="M76.19,-69.04C90.83,-66.69 107.81,-63.97 123.27,-61.49"/>
-<polygon fill="#ff0000" stroke="#ff0000" points="123.85,-64.94 133.17,-59.9 122.74,-58.03 123.85,-64.94"/>
-</g>
 <!-- proc~get_c_ptr_character -->
-<g id="proc~~prif_co_sum~~CallsGraph_node5" class="node">
+<g id="proc~~prif_co_sum~~CallsGraph_node4" class="node">
 <title>proc~get_c_ptr_character</title>
-<g id="a_proc~~prif_co_sum~~CallsGraph_node5"><a xlink:href=".././proc/get_c_ptr_character.html" xlink:title="get_c_ptr_character">
-<polygon fill="#d94e8f" stroke="#d94e8f" points="230,-24 112,-24 112,0 230,0 230,-24"/>
-<text text-anchor="middle" x="171" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_c_ptr_character</text>
+<g id="a_proc~~prif_co_sum~~CallsGraph_node4"><a xlink:href=".././proc/get_c_ptr_character.html" xlink:title="get_c_ptr_character">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="230,-66 112,-66 112,-42 230,-42 230,-66"/>
+<text text-anchor="middle" x="171" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_c_ptr_character</text>
 </a>
 </g>
 </g>
 <!-- proc~prif_co_sum&#45;&gt;proc~get_c_ptr_character -->
-<g id="proc~~prif_co_sum~~CallsGraph_edge4" class="edge">
+<g id="proc~~prif_co_sum~~CallsGraph_edge3" class="edge">
 <title>proc~prif_co_sum&#45;&gt;proc~get_c_ptr_character</title>
+<path fill="none" stroke="#ff0000" d="M76.19,-69.04C84.21,-67.75 92.94,-66.35 101.73,-64.94"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="102.33,-68.39 111.65,-63.35 101.23,-61.48 102.33,-68.39"/>
+</g>
+<!-- interface~caf_co_sum -->
+<g id="proc~~prif_co_sum~~CallsGraph_node5" class="node">
+<title>interface~caf_co_sum</title>
+<g id="a_proc~~prif_co_sum~~CallsGraph_node5"><a xlink:href=".././interface/caf_co_sum.html" xlink:title="caf_co_sum">
+<polygon fill="#a7506f" stroke="#a7506f" points="208.5,-24 133.5,-24 133.5,0 208.5,0 208.5,-24"/>
+<text text-anchor="middle" x="171" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">caf_co_sum</text>
+</a>
+</g>
+</g>
+<!-- proc~prif_co_sum&#45;&gt;interface~caf_co_sum -->
+<g id="proc~~prif_co_sum~~CallsGraph_edge4" class="edge">
+<title>proc~prif_co_sum&#45;&gt;interface~caf_co_sum</title>
 <path fill="none" stroke="#ff0000" d="M58.03,-62.82C72.48,-53.88 93.04,-41.81 112,-33 115.88,-31.2 119.96,-29.45 124.08,-27.78"/>
 <polygon fill="#ff0000" stroke="#ff0000" points="125.66,-30.92 133.71,-24.03 123.12,-24.39 125.66,-30.92"/>
 </g>
@@ -438,7 +444,7 @@
           <p class="text-right">
             Documentation generated by 
             <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
- on 2023-12-12 21:41            </p>
+ on 2023-12-13 23:34            </p>
         </div>
       </div>
       <br>

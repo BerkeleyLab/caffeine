@@ -89,7 +89,7 @@
      <li><i class="fa fa-list-ol"></i>
        <a data-toggle="tooltip"
     data-placement="bottom" data-html="true"
-    title="<p> 1.3% of total for procedures.</p>Including implementation: 20 statements,  1.3% of total for procedures.">20 statements</a>
+    title="<p> 1.2% of total for procedures.</p>Including implementation: 20 statements,  1.2% of total for procedures.">20 statements</a>
      </li> 
     <li><i class="fa fa-code"></i><a href="../src/image_enumeration_m.f90"> Source File</a></li>
   </ul>
@@ -115,12 +115,12 @@
   <h3>Contents</h3>
  
 <div class="panel panel-primary">
-  <div class="panel-heading text-left"><h3 class="panel-title"><a data-toggle="collapse" href="#funcs-0">Functions</a></h3></div>
-  <div id="funcs-0" class="panel-collapse collapse">
-    <div class="list-group">
-      <a class="list-group-item" href="../interface/prif_this_image.html#proc-this_image_coarray_dim_team">this_image_coarray_dim_team</a>
-      <a class="list-group-item" href="../interface/prif_this_image.html#proc-this_image_coarray_team">this_image_coarray_team</a>
-      <a class="list-group-item" href="../interface/prif_this_image.html#proc-this_image_team">this_image_team</a>
+  <div class="panel-heading text-left"><h3 class="panel-title"><a data-toggle="collapse" href="#subs-0">Subroutines</a></h3></div>
+  <div class="list-group">
+    <div id="subs-0" class="panel-collapse collapse">
+      <a class="list-group-item" href="../interface/prif_this_image.html#proc-prif_this_image_no_coarray">prif_this_image_no_coarray</a>
+      <a class="list-group-item" href="../interface/prif_this_image.html#proc-prif_this_image_with_coarray">prif_this_image_with_coarray</a>
+      <a class="list-group-item" href="../interface/prif_this_image.html#proc-prif_this_image_with_dim">prif_this_image_with_dim</a>
     </div>
   </div>
 </div>
@@ -137,12 +137,12 @@
        <h3>Contents</h3>
  
 <div class="panel panel-primary">
-  <div class="panel-heading text-left"><h3 class="panel-title"><a data-toggle="collapse" href="#funcs-1">Functions</a></h3></div>
-  <div id="funcs-1" class="panel-collapse collapse">
-    <div class="list-group">
-      <a class="list-group-item" href="../interface/prif_this_image.html#proc-this_image_coarray_dim_team">this_image_coarray_dim_team</a>
-      <a class="list-group-item" href="../interface/prif_this_image.html#proc-this_image_coarray_team">this_image_coarray_team</a>
-      <a class="list-group-item" href="../interface/prif_this_image.html#proc-this_image_team">this_image_team</a>
+  <div class="panel-heading text-left"><h3 class="panel-title"><a data-toggle="collapse" href="#subs-1">Subroutines</a></h3></div>
+  <div class="list-group">
+    <div id="subs-1" class="panel-collapse collapse">
+      <a class="list-group-item" href="../interface/prif_this_image.html#proc-prif_this_image_no_coarray">prif_this_image_no_coarray</a>
+      <a class="list-group-item" href="../interface/prif_this_image.html#proc-prif_this_image_with_coarray">prif_this_image_with_coarray</a>
+      <a class="list-group-item" href="../interface/prif_this_image.html#proc-prif_this_image_with_dim">prif_this_image_with_dim</a>
     </div>
   </div>
 </div>
@@ -150,22 +150,81 @@
      </section>
      <br class="visible-xs visible-sm hidden-md">
      
-   <h2>Functions</h2>
+
+   <h2>Subroutines</h2>
       <div class="panel panel-default">
-  <div class="panel-heading codesum"><span class="anchor" id="proc-this_image_coarray_dim_team"></span><h3>private module function this_image_coarray_dim_team(coarray, dim, team) result(image_number)</h3></div>
+  <div class="panel-heading codesum"><span class="anchor" id="proc-prif_this_image_no_coarray"></span><h3>private pure module subroutine prif_this_image_no_coarray(team, image_index)</h3></div>
   <div class="panel-body">
            
 <h4>Arguments</h4>      <table class="table table-striped varlist">
 <thead><tr><th>Type</th><th>Intent</th><th>Optional</th><th>Attributes</th><th></th><th>Name</th><th></th></thead>
 <tbody>
 <tr>
-  <td><span class="anchor" ></span>class(*),</td>
-<td>intent(in)</td>
-  <td></td>  <td></td><td>::</td>
-  <td><strong>coarray</strong>(..)</td><td></td>
+  <td><span class="anchor" ></span>type(<a href='../type/prif_team_type.html'>prif_team_type</a>),</td>
+<td>intent(in),</td>
+  <td>optional</td>  <td></td><td>::</td>
+  <td><strong>team</strong></td><td></td>
 </tr>
 <tr>
-  <td><span class="anchor" ></span>integer,</td>
+  <td><span class="anchor" ></span>integer(kind=c_int),</td>
+<td>intent(out)</td>
+  <td></td>  <td></td><td>::</td>
+  <td><strong>image_index</strong></td><td></td>
+</tr>
+</tbody>
+</table>
+
+
+  </div>
+  </div>
+
+      <div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="proc-prif_this_image_with_coarray"></span><h3>private module subroutine prif_this_image_with_coarray(coarray_handle, team, cosubscripts)</h3></div>
+  <div class="panel-body">
+           
+<h4>Arguments</h4>      <table class="table table-striped varlist">
+<thead><tr><th>Type</th><th>Intent</th><th>Optional</th><th>Attributes</th><th></th><th>Name</th><th></th></thead>
+<tbody>
+<tr>
+  <td><span class="anchor" ></span>type(<a href='../type/prif_coarray_handle.html'>prif_coarray_handle</a>),</td>
+<td>intent(in)</td>
+  <td></td>  <td></td><td>::</td>
+  <td><strong>coarray_handle</strong></td><td></td>
+</tr>
+<tr>
+  <td><span class="anchor" ></span>type(<a href='../type/prif_team_type.html'>prif_team_type</a>),</td>
+<td>intent(in),</td>
+  <td>optional</td>  <td></td><td>::</td>
+  <td><strong>team</strong></td><td></td>
+</tr>
+<tr>
+  <td><span class="anchor" ></span>integer(kind=c_intmax_t),</td>
+<td>intent(out)</td>
+  <td></td>  <td></td><td>::</td>
+  <td><strong>cosubscripts</strong>(:)</td><td></td>
+</tr>
+</tbody>
+</table>
+
+
+  </div>
+  </div>
+
+      <div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="proc-prif_this_image_with_dim"></span><h3>private module subroutine prif_this_image_with_dim(coarray_handle, dim, team, cosubscript)</h3></div>
+  <div class="panel-body">
+           
+<h4>Arguments</h4>      <table class="table table-striped varlist">
+<thead><tr><th>Type</th><th>Intent</th><th>Optional</th><th>Attributes</th><th></th><th>Name</th><th></th></thead>
+<tbody>
+<tr>
+  <td><span class="anchor" ></span>type(<a href='../type/prif_coarray_handle.html'>prif_coarray_handle</a>),</td>
+<td>intent(in)</td>
+  <td></td>  <td></td><td>::</td>
+  <td><strong>coarray_handle</strong></td><td></td>
+</tr>
+<tr>
+  <td><span class="anchor" ></span>integer(kind=c_int),</td>
 <td>intent(in)</td>
   <td></td>  <td></td><td>::</td>
   <td><strong>dim</strong></td><td></td>
@@ -176,62 +235,18 @@
   <td>optional</td>  <td></td><td>::</td>
   <td><strong>team</strong></td><td></td>
 </tr>
-</tbody>
-</table>
-
-<h4>Return Value <small>integer</small></h4>  
-
-  </div>
-  </div>
-
-      <div class="panel panel-default">
-  <div class="panel-heading codesum"><span class="anchor" id="proc-this_image_coarray_team"></span><h3>private module function this_image_coarray_team(coarray, team) result(image_number)</h3></div>
-  <div class="panel-body">
-           
-<h4>Arguments</h4>      <table class="table table-striped varlist">
-<thead><tr><th>Type</th><th>Intent</th><th>Optional</th><th>Attributes</th><th></th><th>Name</th><th></th></thead>
-<tbody>
 <tr>
-  <td><span class="anchor" ></span>class(*),</td>
-<td>intent(in)</td>
+  <td><span class="anchor" ></span>integer(kind=c_intmax_t),</td>
+<td>intent(out)</td>
   <td></td>  <td></td><td>::</td>
-  <td><strong>coarray</strong>(..)</td><td></td>
-</tr>
-<tr>
-  <td><span class="anchor" ></span>type(<a href='../type/prif_team_type.html'>prif_team_type</a>),</td>
-<td>intent(in),</td>
-  <td>optional</td>  <td></td><td>::</td>
-  <td><strong>team</strong></td><td></td>
+  <td><strong>cosubscript</strong></td><td></td>
 </tr>
 </tbody>
 </table>
 
-<h4>Return Value <small>integer</small></h4>  
 
   </div>
   </div>
-
-      <div class="panel panel-default">
-  <div class="panel-heading codesum"><span class="anchor" id="proc-this_image_team"></span><h3>private pure module function this_image_team(team) result(image_number)</h3></div>
-  <div class="panel-body">
-           
-<h4>Arguments</h4>      <table class="table table-striped varlist">
-<thead><tr><th>Type</th><th>Intent</th><th>Optional</th><th>Attributes</th><th></th><th>Name</th><th></th></thead>
-<tbody>
-<tr>
-  <td><span class="anchor" ></span>type(<a href='../type/prif_team_type.html'>prif_team_type</a>),</td>
-<td>intent(in),</td>
-  <td>optional</td>  <td></td><td>::</td>
-  <td><strong>team</strong></td><td></td>
-</tr>
-</tbody>
-</table>
-
-<h4>Return Value <small>integer</small></h4>  
-
-  </div>
-  </div>
-
 
 
 
@@ -250,7 +265,7 @@
           <p class="text-right">
             Documentation generated by 
             <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
- on 2023-12-12 21:41            </p>
+ on 2023-12-13 23:34            </p>
         </div>
       </div>
       <br>

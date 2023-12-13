@@ -89,7 +89,7 @@
      <li><i class="fa fa-list-ol"></i>
        <a data-toggle="tooltip"
     data-placement="bottom" data-html="true"
-    title=" 1.0% of total for modules and submodules.">10 statements</a>
+    title=" 0.9% of total for modules and submodules.">10 statements</a>
      </li> 
     <li><i class="fa fa-code"></i><a href="../src/team_type_s.f90"> Source File</a></li>
   </ul>
@@ -287,7 +287,7 @@
         <section>
         <h2>Module Procedures</h2>
           <div class="panel panel-default">
-  <div class="panel-heading codesum"><span class="anchor" id="proc-prif_change_team"></span><h3>module procedure <a href='../proc/prif_change_team.html'>prif_change_team</a> <small>module module subroutine prif_change_team(team)</small>   <a href='../interface/prif_change_team.html'><button type="button" class="btn btn-info depwarn">Interface &rarr;</button></a>
+  <div class="panel-heading codesum"><span class="anchor" id="proc-prif_change_team"></span><h3>module procedure <a href='../proc/prif_change_team.html'>prif_change_team</a> <small>module module subroutine prif_change_team(team, stat, errmsg, errmsg_alloc)</small>   <a href='../interface/prif_change_team.html'><button type="button" class="btn btn-info depwarn">Interface &rarr;</button></a>
 </h3></div>
   <div class="panel-body">
            
@@ -296,55 +296,12 @@
 <tbody>
 <tr>
   <td><span class="anchor" ></span>type(<a href='../type/prif_team_type.html'>prif_team_type</a>),</td>
-<td>intent(in),</td>
-  <td></td>  <td>target</td><td>::</td>
-  <td><strong>team</strong></td><td></td>
-</tr>
-</tbody>
-</table>
-
-
-  </div>
-  </div>
-
-          <div class="panel panel-default">
-  <div class="panel-heading codesum"><span class="anchor" id="proc-prif_end_team"></span><h3>module procedure <a href='../proc/prif_end_team.html'>prif_end_team</a> <small>module module subroutine prif_end_team()</small>   <a href='../interface/prif_end_team.html'><button type="button" class="btn btn-info depwarn">Interface &rarr;</button></a>
-</h3></div>
-  <div class="panel-body">
-           
-<h4>Arguments</h4>      <em>None</em>
-
-  </div>
-  </div>
-
-          <div class="panel panel-default">
-  <div class="panel-heading codesum"><span class="anchor" id="proc-prif_form_team"></span><h3>module procedure <a href='../proc/prif_form_team.html'>prif_form_team</a> <small>module module subroutine prif_form_team(num, team, new_index, stat, errmsg)</small>   <a href='../interface/prif_form_team.html'><button type="button" class="btn btn-info depwarn">Interface &rarr;</button></a>
-</h3></div>
-  <div class="panel-body">
-           
-<h4>Arguments</h4>      <table class="table table-striped varlist">
-<thead><tr><th>Type</th><th>Intent</th><th>Optional</th><th>Attributes</th><th></th><th>Name</th><th></th></thead>
-<tbody>
-<tr>
-  <td><span class="anchor" ></span>integer,</td>
 <td>intent(in)</td>
   <td></td>  <td></td><td>::</td>
-  <td><strong>num</strong></td><td></td>
-</tr>
-<tr>
-  <td><span class="anchor" ></span>type(<a href='../type/prif_team_type.html'>prif_team_type</a>),</td>
-<td>intent(out)</td>
-  <td></td>  <td></td><td>::</td>
   <td><strong>team</strong></td><td></td>
 </tr>
 <tr>
-  <td><span class="anchor" ></span>integer,</td>
-<td>intent(in),</td>
-  <td>optional</td>  <td></td><td>::</td>
-  <td><strong>new_index</strong></td><td></td>
-</tr>
-<tr>
-  <td><span class="anchor" ></span>integer,</td>
+  <td><span class="anchor" ></span>integer(kind=c_int),</td>
 <td>intent(out),</td>
   <td>optional</td>  <td></td><td>::</td>
   <td><strong>stat</strong></td><td></td>
@@ -354,6 +311,96 @@
 <td>intent(inout),</td>
   <td>optional</td>  <td></td><td>::</td>
   <td><strong>errmsg</strong></td><td></td>
+</tr>
+<tr>
+  <td><span class="anchor" ></span>character(len=:),</td>
+<td>intent(inout),</td>
+  <td>optional</td>  <td>allocatable</td><td>::</td>
+  <td><strong>errmsg_alloc</strong></td><td></td>
+</tr>
+</tbody>
+</table>
+
+
+  </div>
+  </div>
+
+          <div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="proc-prif_end_team"></span><h3>module procedure <a href='../proc/prif_end_team.html'>prif_end_team</a> <small>module module subroutine prif_end_team(stat, errmsg, errmsg_alloc)</small>   <a href='../interface/prif_end_team.html'><button type="button" class="btn btn-info depwarn">Interface &rarr;</button></a>
+</h3></div>
+  <div class="panel-body">
+           
+<h4>Arguments</h4>      <table class="table table-striped varlist">
+<thead><tr><th>Type</th><th>Intent</th><th>Optional</th><th>Attributes</th><th></th><th>Name</th><th></th></thead>
+<tbody>
+<tr>
+  <td><span class="anchor" ></span>integer(kind=c_int),</td>
+<td>intent(out),</td>
+  <td>optional</td>  <td></td><td>::</td>
+  <td><strong>stat</strong></td><td></td>
+</tr>
+<tr>
+  <td><span class="anchor" ></span>character(len=*),</td>
+<td>intent(inout),</td>
+  <td>optional</td>  <td></td><td>::</td>
+  <td><strong>errmsg</strong></td><td></td>
+</tr>
+<tr>
+  <td><span class="anchor" ></span>character(len=:),</td>
+<td>intent(inout),</td>
+  <td>optional</td>  <td>allocatable</td><td>::</td>
+  <td><strong>errmsg_alloc</strong></td><td></td>
+</tr>
+</tbody>
+</table>
+
+
+  </div>
+  </div>
+
+          <div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="proc-prif_form_team"></span><h3>module procedure <a href='../proc/prif_form_team.html'>prif_form_team</a> <small>module module subroutine prif_form_team(team_number, team, new_index, stat, errmsg, errmsg_alloc)</small>   <a href='../interface/prif_form_team.html'><button type="button" class="btn btn-info depwarn">Interface &rarr;</button></a>
+</h3></div>
+  <div class="panel-body">
+           
+<h4>Arguments</h4>      <table class="table table-striped varlist">
+<thead><tr><th>Type</th><th>Intent</th><th>Optional</th><th>Attributes</th><th></th><th>Name</th><th></th></thead>
+<tbody>
+<tr>
+  <td><span class="anchor" ></span>integer(kind=c_intmax_t),</td>
+<td>intent(in)</td>
+  <td></td>  <td></td><td>::</td>
+  <td><strong>team_number</strong></td><td></td>
+</tr>
+<tr>
+  <td><span class="anchor" ></span>type(<a href='../type/prif_team_type.html'>prif_team_type</a>),</td>
+<td>intent(out)</td>
+  <td></td>  <td></td><td>::</td>
+  <td><strong>team</strong></td><td></td>
+</tr>
+<tr>
+  <td><span class="anchor" ></span>integer(kind=c_int),</td>
+<td>intent(in),</td>
+  <td>optional</td>  <td></td><td>::</td>
+  <td><strong>new_index</strong></td><td></td>
+</tr>
+<tr>
+  <td><span class="anchor" ></span>integer(kind=c_int),</td>
+<td>intent(out),</td>
+  <td>optional</td>  <td></td><td>::</td>
+  <td><strong>stat</strong></td><td></td>
+</tr>
+<tr>
+  <td><span class="anchor" ></span>character(len=*),</td>
+<td>intent(inout),</td>
+  <td>optional</td>  <td></td><td>::</td>
+  <td><strong>errmsg</strong></td><td></td>
+</tr>
+<tr>
+  <td><span class="anchor" ></span>character(len=:),</td>
+<td>intent(inout),</td>
+  <td>optional</td>  <td>allocatable</td><td>::</td>
+  <td><strong>errmsg_alloc</strong></td><td></td>
 </tr>
 </tbody>
 </table>
@@ -379,7 +426,7 @@
           <p class="text-right">
             Documentation generated by 
             <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
- on 2023-12-12 21:41            </p>
+ on 2023-12-13 23:34            </p>
         </div>
       </div>
       <br>

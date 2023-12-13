@@ -2,7 +2,7 @@
 ! Terms of use are as specified in LICENSE.txt
 submodule(collective_subroutines_m) co_reduce_s
   use iso_c_binding, only : &
-    c_ptr, c_size_t, c_loc, c_null_ptr, c_funloc, c_associated, c_f_pointer, c_int, c_f_procpointer
+    c_ptr, c_size_t, c_loc, c_null_ptr, c_funloc, c_associated, c_f_pointer, c_f_procpointer
   use caffeine_assert_m, only : assert
   use caffeine_intrinsic_array_m, only : intrinsic_array_t
   use utilities_m, only : get_c_ptr, get_c_ptr_character, optional_value
@@ -69,7 +69,7 @@ contains
       call caf_co_reduce(a, optional_value(result_image), stat_ptr, errmsg_ptr, &
         int(product(shape(a)), c_size_t), c_funloc(Coll_ReduceSub_c_double_complex), c_null_ptr)
     else
-      call prif_error_stop("caf_co_reduce: unsupported type")
+      call prif_error_stop(.false._c_bool, stop_code_char="caf_co_reduce: unsupported type")
     end if
 
   contains

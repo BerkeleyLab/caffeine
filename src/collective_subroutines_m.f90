@@ -1,7 +1,7 @@
 ! Copyright (c), The Regents of the University of California
 ! Terms of use are as specified in LICENSE.txt
 module collective_subroutines_m 
-  use iso_c_binding, only : c_int32_t, c_int64_t, c_float, c_char, c_bool, c_funptr, c_double
+  use iso_c_binding, only : c_int, c_int32_t, c_int64_t, c_float, c_char, c_bool, c_funptr, c_double
   implicit none
 
   private
@@ -82,45 +82,50 @@ module collective_subroutines_m
 
   interface
  
-     module subroutine prif_co_sum(a, result_image, stat, errmsg)
+     module subroutine prif_co_sum(a, result_image, stat, errmsg, errmsg_alloc)
        implicit none
        type(*), intent(inout), contiguous, target :: a(..)
-       integer, intent(in), target, optional :: result_image
-       integer, intent(out), target, optional :: stat
-       character(len=*), intent(inout), target, optional :: errmsg
+       integer(c_int), intent(in), optional :: result_image
+       integer(c_int), intent(out), optional :: stat
+       character(len=*), intent(inout), optional :: errmsg
+       character(len=:), intent(inout), allocatable, optional :: errmsg_alloc
      end subroutine
 
-     module subroutine prif_co_max(a, result_image, stat, errmsg)
+     module subroutine prif_co_max(a, result_image, stat, errmsg, errmsg_alloc)
        implicit none
        type(*), intent(inout), contiguous, target :: a(..)
-       integer, intent(in), optional, target :: result_image
-       integer, intent(out), optional, target :: stat
-       character(len=*), intent(inout), optional, target :: errmsg
+       integer(c_int), intent(in), optional :: result_image
+       integer(c_int), intent(out), optional :: stat
+       character(len=*), intent(inout), optional :: errmsg
+       character(len=:), intent(inout), allocatable, optional :: errmsg_alloc
      end subroutine
 
-     module subroutine prif_co_min(a, result_image, stat, errmsg)
+     module subroutine prif_co_min(a, result_image, stat, errmsg, errmsg_alloc)
        implicit none
        type(*), intent(inout), contiguous, target :: a(..)
-       integer, intent(in), optional, target :: result_image
-       integer, intent(out), optional, target :: stat
-       character(len=*), intent(inout), optional, target :: errmsg
+       integer(c_int), intent(in), optional :: result_image
+       integer(c_int), intent(out), optional :: stat
+       character(len=*), intent(inout), optional :: errmsg
+       character(len=:), intent(inout), allocatable, optional :: errmsg_alloc
      end subroutine
 
-     module subroutine prif_co_reduce(a, operation, result_image, stat, errmsg)
+     module subroutine prif_co_reduce(a, operation, result_image, stat, errmsg, errmsg_alloc)
        implicit none
        type(*), intent(inout), contiguous, target :: a(..)
        type(c_funptr), value :: operation
-       integer, intent(in), optional, target :: result_image
-       integer, intent(out), optional, target :: stat
-       character(len=*), intent(inout), optional, target :: errmsg
+       integer(c_int), intent(in), optional :: result_image
+       integer(c_int), intent(out), optional :: stat
+       character(len=*), intent(inout), optional :: errmsg
+       character(len=:), intent(inout), allocatable, optional :: errmsg_alloc
      end subroutine
 
-     module subroutine prif_co_broadcast(a, source_image, stat, errmsg)
+     module subroutine prif_co_broadcast(a, source_image, stat, errmsg, errmsg_alloc)
        implicit none
        type(*), intent(inout), contiguous, target :: a(..)
-       integer, optional, intent(in) :: source_image
-       integer, optional, intent(out), target :: stat
-       character(len=*), intent(inout), optional, target :: errmsg
+       integer(c_int), intent(in) :: source_image
+       integer(c_int), intent(out), optional :: stat
+       character(len=*), intent(inout), optional :: errmsg
+       character(len=:), intent(inout), allocatable, optional :: errmsg_alloc
      end subroutine
 
   end interface

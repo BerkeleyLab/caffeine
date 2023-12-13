@@ -90,7 +90,7 @@
      <li><i class="fa fa-list-ol"></i>
        <a data-toggle="tooltip"
     data-placement="bottom" data-html="true"
-    title=" 2.4% of total for procedures.">38 statements</a>
+    title=" 2.6% of total for procedures.">43 statements</a>
      </li> 
     <li><i class="fa fa-code"></i><a href="../src/collective_subroutines_m.f90"> Source File</a></li>
   </ul>
@@ -192,33 +192,33 @@
 <path fill="none" stroke="#ff0000" d="M188.19,-80.96C200.37,-82.91 214.16,-85.12 227.35,-87.24"/>
 <polygon fill="#ff0000" stroke="#ff0000" points="226.85,-90.7 237.28,-88.83 227.96,-83.79 226.85,-90.7"/>
 </g>
-<!-- interface~caf_co_sum -->
-<g id="interface~~prif_co_sum~~CallsGraph_node5" class="node">
-<title>interface~caf_co_sum</title>
-<g id="a_interface~~prif_co_sum~~CallsGraph_node5"><a xlink:href=".././interface/caf_co_sum.html" xlink:title="caf_co_sum">
-<polygon fill="#a7506f" stroke="#a7506f" points="320.5,-66 245.5,-66 245.5,-42 320.5,-42 320.5,-66"/>
-<text text-anchor="middle" x="283" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">caf_co_sum</text>
-</a>
-</g>
-</g>
-<!-- proc~prif_co_sum&#45;&gt;interface~caf_co_sum -->
-<g id="interface~~prif_co_sum~~CallsGraph_edge4" class="edge">
-<title>proc~prif_co_sum&#45;&gt;interface~caf_co_sum</title>
-<path fill="none" stroke="#ff0000" d="M188.19,-69.04C202.83,-66.69 219.81,-63.97 235.27,-61.49"/>
-<polygon fill="#ff0000" stroke="#ff0000" points="235.85,-64.94 245.17,-59.9 234.74,-58.03 235.85,-64.94"/>
-</g>
 <!-- proc~get_c_ptr_character -->
-<g id="interface~~prif_co_sum~~CallsGraph_node6" class="node">
+<g id="interface~~prif_co_sum~~CallsGraph_node5" class="node">
 <title>proc~get_c_ptr_character</title>
-<g id="a_interface~~prif_co_sum~~CallsGraph_node6"><a xlink:href=".././proc/get_c_ptr_character.html" xlink:title="get_c_ptr_character">
-<polygon fill="#d94e8f" stroke="#d94e8f" points="342,-24 224,-24 224,0 342,0 342,-24"/>
-<text text-anchor="middle" x="283" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_c_ptr_character</text>
+<g id="a_interface~~prif_co_sum~~CallsGraph_node5"><a xlink:href=".././proc/get_c_ptr_character.html" xlink:title="get_c_ptr_character">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="342,-66 224,-66 224,-42 342,-42 342,-66"/>
+<text text-anchor="middle" x="283" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_c_ptr_character</text>
 </a>
 </g>
 </g>
 <!-- proc~prif_co_sum&#45;&gt;proc~get_c_ptr_character -->
-<g id="interface~~prif_co_sum~~CallsGraph_edge5" class="edge">
+<g id="interface~~prif_co_sum~~CallsGraph_edge4" class="edge">
 <title>proc~prif_co_sum&#45;&gt;proc~get_c_ptr_character</title>
+<path fill="none" stroke="#ff0000" d="M188.19,-69.04C196.21,-67.75 204.94,-66.35 213.73,-64.94"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="214.33,-68.39 223.65,-63.35 213.23,-61.48 214.33,-68.39"/>
+</g>
+<!-- interface~caf_co_sum -->
+<g id="interface~~prif_co_sum~~CallsGraph_node6" class="node">
+<title>interface~caf_co_sum</title>
+<g id="a_interface~~prif_co_sum~~CallsGraph_node6"><a xlink:href=".././interface/caf_co_sum.html" xlink:title="caf_co_sum">
+<polygon fill="#a7506f" stroke="#a7506f" points="320.5,-24 245.5,-24 245.5,0 320.5,0 320.5,-24"/>
+<text text-anchor="middle" x="283" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">caf_co_sum</text>
+</a>
+</g>
+</g>
+<!-- proc~prif_co_sum&#45;&gt;interface~caf_co_sum -->
+<g id="interface~~prif_co_sum~~CallsGraph_edge5" class="edge">
+<title>proc~prif_co_sum&#45;&gt;interface~caf_co_sum</title>
 <path fill="none" stroke="#ff0000" d="M170.03,-62.82C184.48,-53.88 205.04,-41.81 224,-33 227.88,-31.2 231.96,-29.45 236.08,-27.78"/>
 <polygon fill="#ff0000" stroke="#ff0000" points="237.66,-30.92 245.71,-24.03 235.12,-24.39 237.66,-30.92"/>
 </g>
@@ -286,7 +286,7 @@
       </div>
     </div>
     <br>
-      <h2>public module module subroutine prif_co_sum(a, result_image, stat, errmsg)   <a href='../proc/prif_co_sum.html'><button type="button" class="btn btn-info depwarn">Implementation &rarr;</button></a>
+      <h2>public module module subroutine prif_co_sum(a, result_image, stat, errmsg, errmsg_alloc)   <a href='../proc/prif_co_sum.html'><button type="button" class="btn btn-info depwarn">Implementation &rarr;</button></a>
 </h2>
 
     
@@ -302,22 +302,28 @@
   <td><strong>a</strong>(..)</td><td></td>
 </tr>
 <tr>
-  <td><span class="anchor" id="variable-result_image~8"></span>integer,</td>
+  <td><span class="anchor" id="variable-result_image~8"></span>integer(kind=c_int),</td>
 <td>intent(in),</td>
-  <td>optional</td>  <td>target</td><td>::</td>
+  <td>optional</td>  <td></td><td>::</td>
   <td><strong>result_image</strong></td><td></td>
 </tr>
 <tr>
-  <td><span class="anchor" id="variable-stat~8"></span>integer,</td>
+  <td><span class="anchor" id="variable-stat~11"></span>integer(kind=c_int),</td>
 <td>intent(out),</td>
-  <td>optional</td>  <td>target</td><td>::</td>
+  <td>optional</td>  <td></td><td>::</td>
   <td><strong>stat</strong></td><td></td>
 </tr>
 <tr>
-  <td><span class="anchor" id="variable-errmsg~7"></span>character(len=*),</td>
+  <td><span class="anchor" id="variable-errmsg~10"></span>character(len=*),</td>
 <td>intent(inout),</td>
-  <td>optional</td>  <td>target</td><td>::</td>
+  <td>optional</td>  <td></td><td>::</td>
   <td><strong>errmsg</strong></td><td></td>
+</tr>
+<tr>
+  <td><span class="anchor" id="variable-errmsg_alloc~9"></span>character(len=:),</td>
+<td>intent(inout),</td>
+  <td>optional</td>  <td>allocatable</td><td>::</td>
+  <td><strong>errmsg_alloc</strong></td><td></td>
 </tr>
 </tbody>
 </table>
@@ -339,7 +345,7 @@
           <p class="text-right">
             Documentation generated by 
             <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
- on 2023-12-12 21:41            </p>
+ on 2023-12-13 23:34            </p>
         </div>
       </div>
       <br>
