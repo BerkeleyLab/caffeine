@@ -1,7 +1,7 @@
 ! Copyright (c), The Regents of the University of California
 ! Terms of use are as specified in LICENSE.txt
 module team_type_m
-  use iso_c_binding, only: c_ptr
+  use iso_c_binding, only: c_ptr, c_int, c_intmax_t
 
   implicit none
 
@@ -15,12 +15,15 @@ module team_type_m
   type(prif_team_type), pointer :: current_team => null()
 
   interface
-    module subroutine prif_form_team (num, team, new_index, stat, errmsg)
-      integer,          intent(in)  :: num
-      type(prif_team_type),  intent(out) :: team
-      integer,          intent(in),    optional :: new_index
-      integer,          intent(out),   optional :: stat
+
+    module subroutine prif_form_team(team_number, team, new_index, stat, errmsg, errmsg_alloc)
+      implicit none
+      integer(c_intmax_t), intent(in) :: team_number
+      type(prif_team_type), intent(out) :: team
+      integer(c_int), intent(in), optional :: new_index
+      integer(c_int), intent(out), optional :: stat
       character(len=*), intent(inout), optional :: errmsg
+      character(len=:), intent(inout), allocatable, optional :: errmsg_alloc
     end subroutine
 
     module subroutine prif_change_team(team)
