@@ -10,7 +10,7 @@ contains
 
   module procedure prif_stop
 
-    !TODO: deal with optional argument `quiet`
+    !TODO: deal with argument `quiet`
     if (present(stop_code_char)) then
        call prif_stop_character(stop_code_char)
     else if (present(stop_code_int)) then
@@ -53,7 +53,7 @@ contains
 
   module procedure prif_error_stop
 
-    !TODO: deal with optional argument `quiet`
+    !TODO: deal with argument `quiet`
     if (present(stop_code_char)) then
        call prif_error_stop_character(stop_code_char)
     else if (present(stop_code_int)) then

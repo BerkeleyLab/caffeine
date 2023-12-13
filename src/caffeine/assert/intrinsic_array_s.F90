@@ -1,4 +1,5 @@
 submodule(caffeine_intrinsic_array_m) caffeine_intrinsic_array_s
+  use iso_c_binding, only: c_bool
   use program_termination_m, only: prif_error_stop
   implicit none
 
@@ -22,7 +23,7 @@ contains
       type is(double precision)
         intrinsic_array%double_precision_1D = array
       class default
-        call prif_error_stop(stop_code_char="intrinsic_array_t construct: unsupported rank-2 type")
+        call prif_error_stop(logical(.false., c_bool), stop_code_char="intrinsic_array_t construct: unsupported rank-2 type")
       end select
 #ifndef NAGFOR
     rank(2)
@@ -38,7 +39,7 @@ contains
       type is(double precision)
         intrinsic_array%double_precision_2D = array
       class default
-        call prif_error_stop(stop_code_char="intrinsic_array_t construct: unsupported rank-2 type")
+        call prif_error_stop(logical(.false., c_bool), stop_code_char="intrinsic_array_t construct: unsupported rank-2 type")
       end select
 
     rank(3)
@@ -54,11 +55,11 @@ contains
       type is(double precision)
         intrinsic_array%double_precision_3D = array
       class default
-        call prif_error_stop(stop_code_char="intrinsic_array_t construct: unsupported rank-3 type")
+        call prif_error_stop(logical(.false., c_bool), stop_code_char="intrinsic_array_t construct: unsupported rank-3 type")
       end select
 
     rank default
-      call prif_error_stop(stop_code_char="intrinsic_array_t construct: unsupported rank")
+      call prif_error_stop(logical(.false., c_bool), stop_code_char="intrinsic_array_t construct: unsupported rank")
     end select
 #endif
 
@@ -74,7 +75,8 @@ contains
         allocated(self%logical_2D), allocated(self%real_2D), &
         allocated(self%complex_3D), allocated(self%complex_double_3D), allocated(self%integer_3D), &
         allocated(self%logical_3D), allocated(self%real_3D) &
-      ])) call prif_error_stop(stop_code_char="intrinsic_array_t as_character: ambiguous component allocation status.")
+        ])) call prif_error_stop(logical(.false., c_bool), &
+              stop_code_char="intrinsic_array_t as_character: ambiguous component allocation status.")
 
     if (allocated(self%complex_1D)) then
       character_self = repeat(" ", ncopies = single_number_width*size(self%complex_1D))
