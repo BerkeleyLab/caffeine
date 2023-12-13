@@ -8,6 +8,7 @@ contains
 
   module procedure prif_sync_all
 
+    !TODO: handle optional args stat, errmsg, errmsg_alloc
     call caf_sync_all
 
   end procedure 

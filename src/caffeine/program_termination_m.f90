@@ -1,36 +1,25 @@
 ! Copyright (c), The Regents of the University of California
 ! Terms of use are as specified in LICENSE.txt
 module program_termination_m
+    use iso_c_binding, only: c_int, c_bool
     implicit none
     private
-    public :: prif_stop
-    public :: prif_error_stop
+    public :: prif_stop, prif_error_stop
 
-    interface prif_stop
+    interface
 
-      module subroutine prif_stop_integer(stop_code)
-        !! synchronize, stop the executing image, and provide the stop_code, or 0 if not present, as the process exit status
-        integer, intent(in), optional :: stop_code
-      end subroutine
+       module subroutine prif_stop(quiet, stop_code_int, stop_code_char)
+         implicit none
+         logical(c_bool), intent(in) :: quiet
+         integer(c_int), intent(in), optional :: stop_code_int
+         character(len=*), intent(in), optional :: stop_code_char
+       end subroutine
 
-      module subroutine prif_stop_character(stop_code)
-        !! synchronize, stop the executing image, and provide the stop_code as the process exit status
-        character(len=*), intent(in) :: stop_code
-      end subroutine
-
-    end interface
-
-    interface prif_error_stop
-
-      pure module subroutine prif_error_stop_integer(stop_code)
-        !! stop all images and provide the stop_code, or 0 if not present, as the process exit status
-        integer, intent(in), optional :: stop_code
-      end subroutine
-
-      pure module subroutine prif_error_stop_character(stop_code)
-        !! stop all images and provide the stop_code as the process exit status
-        character(len=*), intent(in) :: stop_code
-      end subroutine
+       module pure subroutine prif_error_stop(quiet, stop_code_int, stop_code_char)
+         logical(c_bool), intent(in) :: quiet
+         integer(c_int), intent(in), optional :: stop_code_int
+         character(len=*), intent(in), optional :: stop_code_char
+       end subroutine
 
     end interface
 

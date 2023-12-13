@@ -29,7 +29,7 @@ contains
     else if (caf_is_f_string(a)) then
       call prif_co_reduce(a, c_funloc(alphabetize), optional_value(result_image), stat, errmsg)
     else
-      call prif_error_stop("prif_co_min: unsupported type")
+      call prif_error_stop(.false._c_bool, stop_code_char="prif_co_min: unsupported type")
     end if
 
   contains

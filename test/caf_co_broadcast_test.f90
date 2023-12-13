@@ -41,10 +41,11 @@ contains
 
   function broadcast_default_integer_scalar() result(result_)
     type(result_t) result_
-    integer iPhone
+    integer iPhone, me
     integer, parameter :: source_value = 7779311, junk = -99
 
-    iPhone = merge(source_value, junk, prif_this_image()==1)
+    call prif_this_image(image_index=me)
+    iPhone = merge(source_value, junk, me==1)
     call prif_co_broadcast(iPhone, source_image=1)
     result_ = assert_equals(source_value, iPhone)
   end function
@@ -52,17 +53,14 @@ contains
   function broadcast_derived_type() result(result_)
     type(result_t) result_
     type(object_t) object
+    integer :: me, ni
 
-
-    associate(me => prif_this_image(), ni => prif_num_images())
-
-     object = object_t(me, .false., "gooey", me*(1.,0.))
-
-      call prif_co_broadcast(object, source_image=ni)
-
-      associate(expected_object => object_t(ni, .false., "gooey", ni*(1.,0.)))
-        result_ = assert_that(expected_object == object, "co_broadcast derived type")
-      end associate
+    call prif_this_image(image_index=me)
+    call prif_num_images(image_count=ni)
+    object = object_t(me, .false., "gooey", me*(1.,0.))
+    call prif_co_broadcast(object, source_image=ni)
+    associate(expected_object => object_t(ni, .false., "gooey", ni*(1.,0.)))
+      result_ = assert_that(expected_object == object, "co_broadcast derived type")
     end associate
 
   end function
