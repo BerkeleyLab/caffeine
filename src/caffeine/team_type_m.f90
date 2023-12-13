@@ -26,8 +26,12 @@ module team_type_m
       character(len=:), intent(inout), allocatable, optional :: errmsg_alloc
     end subroutine
 
-    module subroutine prif_change_team(team)
-      type(prif_team_type), target, intent(in) :: team
+    module subroutine prif_change_team(team, stat, errmsg, errmsg_alloc)
+      implicit none
+      type(prif_team_type), intent(in) :: team
+      integer(c_int), intent(out), optional :: stat
+      character(len=*), intent(inout), optional :: errmsg
+      character(len=:), intent(inout), allocatable, optional :: errmsg_alloc
     end subroutine
 
     module subroutine prif_end_team()
