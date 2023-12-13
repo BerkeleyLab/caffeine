@@ -35,7 +35,7 @@ contains
     procedure(c_char_operation), pointer :: alphabetize_operation
     character(len=*, kind=c_char), parameter :: names(*) = ["larry","harry","carey","betty","tommy","billy"]
     character(len=:, kind=c_char), allocatable :: my_name(:)
-    integer :: me
+    integer :: me, num_imgs
 
     alphabetize_operation => alphabetize
 
@@ -45,7 +45,8 @@ contains
       call prif_co_reduce(my_name, c_funloc(alphabetize_operation))
     end associate
 
-    associate(expected_name => minval(names(1:min(prif_num_images(), size(names)))))
+    call prif_num_images(image_count=num_imgs)
+    associate(expected_name => minval(names(1:min(num_imgs, size(names)))))
       result_ = assert_that(all(expected_name == my_name))
     end associate
 
@@ -62,7 +63,7 @@ contains
 
   function sum_integer_array_elements() result(result_)
     type(result_t) result_
-    integer status_
+    integer status_, num_imgs
     integer, parameter :: input_array(*,*) = reshape([1, 2, 3, 4], [2, 2])
     integer array(2,2)
     procedure(c_int32_t_operation), pointer :: add_operation=>null()
@@ -70,7 +71,8 @@ contains
     add_operation => add_integers
     array = input_array
     call prif_co_reduce(array, c_funloc(add_operation))
-    result_ = assert_that(all(prif_num_images()*input_array==array))
+    call prif_num_images(image_count=num_imgs)
+    result_ = assert_that(all(num_imgs*input_array==array))
 
   contains
 
@@ -84,7 +86,7 @@ contains
 
   function sum_complex_c_double_scalars() result(result_)
     type(result_t) result_
-    integer status_
+    integer status_, num_imgs
     complex(c_double) z
     procedure(c_double_complex_operation), pointer :: add_operation
     complex(c_double), parameter :: z_input=(1._c_double, 1._c_double)
@@ -92,7 +94,8 @@ contains
     add_operation => add_complex
     z = z_input
     call prif_co_reduce(z, c_funloc(add_operation), stat=status_)
-    result_ = assert_equals(real(prif_num_images()*z_input, c_double), real(z, c_double)) .and. assert_equals(0, status_)
+    call prif_num_images(image_count=num_imgs)
+    result_ = assert_equals(real(num_imgs*z_input, c_double), real(z, c_double)) .and. assert_equals(0, status_)
 
   contains
 
@@ -106,7 +109,7 @@ contains
 
   function sum_default_complex_scalars() result(result_)
     type(result_t) result_
-    integer status_
+    integer status_, num_imgs
     complex z
     procedure(c_float_complex_operation), pointer :: add_operation
     complex, parameter :: z_input=(1.,1.)
@@ -114,7 +117,8 @@ contains
     add_operation => add_complex
     z = z_input
     call prif_co_reduce(z, c_funloc(add_operation), stat=status_)
-    result_ = assert_equals(dble(prif_num_images()*z_input), dble(z)) .and. assert_equals(0, status_)
+    call prif_num_images(image_count=num_imgs)
+    result_ = assert_equals(dble(num_imgs*z_input), dble(z)) .and. assert_equals(0, status_)
 
   contains
 
@@ -128,13 +132,14 @@ contains
 
   function sum_default_integer_scalars() result(result_)
     type(result_t) result_
-    integer i
+    integer i, num_imgs
     procedure(c_int32_t_operation), pointer :: add_operation
 
     add_operation => add
     i = 1
     call prif_co_reduce(i, c_funloc(add_operation))
-    result_ = assert_equals(prif_num_images(), i)
+    call prif_num_images(image_count=num_imgs)
+    result_ = assert_equals(num_imgs, i)
 
   contains
 
@@ -149,12 +154,14 @@ contains
   function sum_c_int64_t_scalars() result(result_)
     type(result_t) result_
     integer(c_int64_t) i
+    integer :: num_imgs
     procedure(c_int64_t_operation), pointer :: add_operation
 
     add_operation => add
     i = 1_c_int64_t
     call prif_co_reduce(i, c_funloc(add_operation))
-    result_ = assert_that(int(prif_num_images(), c_int64_t)==i)
+    call prif_num_images(image_count=num_imgs)
+    result_ = assert_that(int(num_imgs, c_int64_t)==i)
 
   contains
 
@@ -172,7 +179,7 @@ contains
     procedure(c_bool_operation), pointer :: boolean_operation
     logical(c_bool), parameter :: c_true=.true._c_bool, c_false=.false._c_bool
     logical ans1, ans2, ans3
-    integer :: me
+    integer :: me, num_imgs
 
     boolean_operation => logical_and
 
@@ -186,9 +193,10 @@ contains
 
     all_true = c_true
     call prif_co_reduce(all_true, c_funloc(boolean_operation))
+    call prif_num_images(image_count=num_imgs)
 
     ans1 = one_false .eqv. c_false
-    ans2 = one_true  .eqv. merge(c_true,c_false,prif_num_images()==1)
+    ans2 = one_true  .eqv. merge(c_true,c_false,num_imgs==1)
     ans3 = all_true  .eqv. c_true
     result_ = assert_that(ans1) .and. &
               assert_that(ans2) .and. &
@@ -206,7 +214,7 @@ contains
   function multiply_c_double_scalars() result(result_)
     type(result_t) result_
     real(c_double) p
-    integer j, status_, me
+    integer j, status_, me, num_imgs
     character(len=:), allocatable :: error_message
     procedure(c_double_operation), pointer :: multiply_operation
 
@@ -215,7 +223,8 @@ contains
     call prif_this_image(image_index=me)
     p = real(me,c_double)
     call prif_co_reduce(p, c_funloc(multiply_operation), result_image=1, stat=status_, errmsg=error_message)
-    associate(expected_result => merge( product([(real(j,c_double), j = 1, prif_num_images())]), real(me,c_double), me==1 ))
+    call prif_num_images(image_count=num_imgs)
+    associate(expected_result => merge( product([(real(j,c_double), j = 1, num_imgs)]), real(me,c_double), me==1 ))
       result_ = &
         assert_equals(expected_result, real(p,c_double)) .and. &
         assert_equals(0, status_) .and. &
@@ -235,7 +244,7 @@ contains
   function multiply_default_real_scalars() result(result_)
     type(result_t) result_
     real p
-    integer j, status_, me
+    integer j, status_, me, num_imgs
     character(len=:), allocatable :: error_message
     procedure(c_float_operation), pointer :: multiply_operation
 
@@ -244,7 +253,8 @@ contains
     call prif_this_image(image_index=me)
     p = real(me)
     call prif_co_reduce(p, c_funloc(multiply_operation), result_image=1, stat=status_, errmsg=error_message)
-    associate(expected_result => merge( product([(dble(j), j = 1, prif_num_images())]), dble(me), me==1 ))
+    call prif_num_images(image_count=num_imgs)
+    associate(expected_result => merge( product([(dble(j), j = 1, num_imgs)]), dble(me), me==1 ))
       result_ = &
         assert_equals(expected_result, dble(p)) .and. &
         assert_equals(0, status_) .and. &

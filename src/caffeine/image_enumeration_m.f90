@@ -10,19 +10,14 @@ module image_enumeration_m
   public :: prif_num_images
   public :: prif_this_image
 
-  interface prif_num_images
+  interface
 
-    module function num_images_team(team) result(image_count)
-      implicit none
-      type(prif_team_type), intent(in), optional :: team
-      integer image_count
-    end function
-
-    module function num_images_team_number(team_number) result(image_count)
-      implicit none
-      integer, intent(in) :: team_number
-      integer image_count
-    end function
+     module subroutine prif_num_images(team, team_number, image_count)
+       implicit none
+       type(prif_team_type), intent(in), optional :: team
+       integer(c_intmax_t), intent(in), optional :: team_number
+       integer(c_int), intent(out) :: image_count
+     end subroutine prif_num_images
 
   end interface
 

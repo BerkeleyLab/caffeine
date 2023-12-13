@@ -53,18 +53,14 @@ contains
   function broadcast_derived_type() result(result_)
     type(result_t) result_
     type(object_t) object
-    integer :: me
+    integer :: me, ni
 
     call prif_this_image(image_index=me)
-    associate(ni => prif_num_images())
-
-     object = object_t(me, .false., "gooey", me*(1.,0.))
-
-      call prif_co_broadcast(object, source_image=ni)
-
-      associate(expected_object => object_t(ni, .false., "gooey", ni*(1.,0.)))
-        result_ = assert_that(expected_object == object, "co_broadcast derived type")
-      end associate
+    call prif_num_images(image_count=ni)
+    object = object_t(me, .false., "gooey", me*(1.,0.))
+    call prif_co_broadcast(object, source_image=ni)
+    associate(expected_object => object_t(ni, .false., "gooey", ni*(1.,0.)))
+      result_ = assert_that(expected_object == object, "co_broadcast derived type")
     end associate
 
   end function

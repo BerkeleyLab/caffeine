@@ -1,5 +1,5 @@
 module caf_co_max_test
-    use prif, only : prif_co_max, prif_num_images
+    use prif, only : prif_co_max
     use veggies, only: result_t, test_item_t, assert_equals, describe, it, assert_that, assert_equals
     use image_enumeration_m, only : prif_this_image, prif_num_images
 
@@ -40,24 +40,26 @@ contains
         use iso_c_binding, only : c_int64_t
         type(result_t) result_
         integer(c_int64_t) i
-        integer :: me
+        integer :: me, num_imgs
 
         call prif_this_image(image_index=me)
         i = me
         call prif_co_max(i)
-        result_ = assert_equals(prif_num_images(), int(i))
+        call prif_num_images(image_count=num_imgs)
+        result_ = assert_equals(num_imgs, int(i))
     end function
 
     function max_default_integer_1D_array() result(result_)
         type(result_t) result_
-        integer i, me
+        integer i, me, num_imgs
         integer, allocatable :: array(:)
 
         call prif_this_image(image_index=me)
-        associate(sequence_ => me*[(i, i=1, prif_num_images())])
+        call prif_num_images(image_count=num_imgs)
+        associate(sequence_ => me*[(i, i=1, num_imgs)])
           array = sequence_
           call prif_co_max(array)
-          associate(max_sequence => prif_num_images()*[(i, i=1, prif_num_images())])
+          associate(max_sequence => num_imgs*[(i, i=1, num_imgs)])
             result_ = assert_that(all(max_sequence == array))
           end associate
         end associate
@@ -65,13 +67,14 @@ contains
 
     function max_default_integer_7D_array() result(result_)
         type(result_t) result_
-        integer array(2,1,1, 1,1,1, 2), status_, me
+        integer array(2,1,1, 1,1,1, 2), status_, me, num_imgs
 
         status_ = -1
         call prif_this_image(image_index=me)
         array = 3 + me
         call prif_co_max(array, stat=status_)
-        result_ = assert_that(all(array == 3+prif_num_images())) .and. assert_equals(0, status_)
+        call prif_num_images(image_count=num_imgs)
+        result_ = assert_that(all(array == 3+num_imgs)) .and. assert_equals(0, status_)
     end function
 
     function max_default_real_scalars() result(result_)
@@ -115,12 +118,13 @@ contains
       call prif_co_max(co_max_scramlet, result_image=1)
 
       block
-        integer j, delta_j
+        integer j, delta_j, num_imgs
         character(len=len(script)) expected_script(size(script)), expected_scramlet(size(scramlet,1),size(scramlet,2))
 
+        call prif_num_images(image_count=num_imgs)
         do j=1, size(script)
           expected_script(j) = script(j)
-          do delta_j = 1, max(prif_num_images()-1, size(script))
+          do delta_j = 1, max(num_imgs-1, size(script))
             associate(periodic_index => 1 + mod(j+delta_j-1, size(script)))
               expected_script(j) = max(expected_script(j), script(periodic_index))
             end associate
@@ -137,7 +141,7 @@ contains
       type(result_t) result_
       character(len=*), parameter :: words(*) = [character(len=len("loddy")):: "loddy","doddy","we","like","to","party"]
       character(len=:), allocatable :: my_word
-      integer :: me
+      integer :: me, num_imgs
 
       call prif_this_image(image_index=me)
       associate(periodic_index => 1 + mod(me-1,size(words)))
@@ -145,7 +149,8 @@ contains
         call prif_co_max(my_word)
       end associate
 
-      associate(expected_word => maxval(words(1:min(prif_num_images(), size(words)))))
+      call prif_num_images(image_count=num_imgs)
+      associate(expected_word => maxval(words(1:min(num_imgs, size(words)))))
         result_ = assert_equals(expected_word, my_word)
       end associate
     end function

@@ -6,11 +6,9 @@ submodule(image_enumeration_m) image_enumeration_s
 
 contains
 
-  module procedure num_images_team
+  module procedure prif_num_images
+    ! TODO: handle optional args `team` and `team_number`
     image_count = caf_num_images()
-  end procedure
-
-  module procedure num_images_team_number
   end procedure
 
   module procedure prif_this_image_no_coarray
