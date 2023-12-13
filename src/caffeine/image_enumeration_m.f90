@@ -22,26 +22,28 @@ module image_enumeration_m
   end interface
 
   interface prif_this_image
+
     pure module subroutine prif_this_image_no_coarray(team, image_index)
       implicit none
       type(prif_team_type), intent(in), optional :: team
       integer(c_int), intent(out) :: image_index
     end subroutine
 
-    module subroutine prif_this_image_with_coarray(team, coarray_handle, cosubscripts)
+    module subroutine prif_this_image_with_coarray(coarray_handle, team, cosubscripts)
       implicit none
-      type(prif_team_type), intent(in), optional :: team
       type(prif_coarray_handle), intent(in) :: coarray_handle
+      type(prif_team_type), intent(in), optional :: team
       integer(c_intmax_t), intent(out) :: cosubscripts(:)
     end subroutine
 
-    module subroutine prif_this_image_with_dim(team, coarray_handle, dim, cosubscript)
+    module subroutine prif_this_image_with_dim(coarray_handle, dim, team, cosubscript)
       implicit none
-      type(prif_team_type), intent(in), optional :: team
       type(prif_coarray_handle), intent(in) :: coarray_handle
       integer(c_int), intent(in) :: dim
+      type(prif_team_type), intent(in), optional :: team
       integer(c_intmax_t), intent(out) :: cosubscript
     end subroutine
+
   end interface
 
 end module image_enumeration_m
