@@ -1,5 +1,5 @@
 module caf_allocate_test
-  use prif, only : prif_allocate, prif_coarray_handle
+  use prif, only : prif_allocate, prif_coarray_handle, prif_num_images
   use veggies, only: result_t, test_item_t, assert_that, assert_equals, describe, it
   use iso_c_binding, only: c_ptr, c_int, c_intmax_t, c_size_t, c_funptr, c_null_funptr, c_f_pointer, c_null_ptr
 
@@ -28,10 +28,14 @@ contains
     integer(kind=c_intmax_t), dimension(1) :: lcobounds, ucobounds
     integer(kind=c_intmax_t), dimension(0), parameter :: lbounds = [integer(kind=c_intmax_t) ::]
     integer(kind=c_intmax_t), dimension(0), parameter :: ubounds = [integer(kind=c_intmax_t) ::]
-    integer :: dummy_element
+    integer :: dummy_element, num_imgs
     type(prif_coarray_handle) :: coarray_handle
     type(c_ptr) :: allocated_memory
     integer, pointer :: local_slice
+
+    call prif_num_images(image_count=num_imgs)
+    lcobounds(1) = 1
+    ucobounds(1) = num_imgs
 
     allocated_memory = c_null_ptr
     local_slice => null()
