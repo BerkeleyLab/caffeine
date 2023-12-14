@@ -7,6 +7,10 @@ submodule(allocation_m) allocation_s
 contains
 
   module procedure prif_allocate
+    use caffeine_h_m, only: caf_allocate
+
+    allocated_memory = caf_allocate( &
+      product(ubounds-lbounds+1)*element_length, size(ucobounds), lcobounds, ucobounds, final_func, coarray_handle%ptr)
   end procedure
 
 end submodule allocation_s

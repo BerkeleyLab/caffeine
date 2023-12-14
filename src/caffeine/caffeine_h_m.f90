@@ -2,12 +2,13 @@
 ! Terms of use are as specified in LICENSE.txt
 module caffeine_h_m
   ! Fortran module shadowing the caffeine.h header file
-  use iso_c_binding, only : c_int, c_ptr, c_size_t, c_funptr, c_bool
+  use iso_c_binding, only : c_int, c_ptr, c_size_t, c_funptr, c_bool, c_size_t, c_intmax_t
   implicit none
 
   private
   public :: caf_caffeinate, caf_decaffeinate
   public :: caf_num_images, caf_this_image
+  public :: caf_allocate
   public :: caf_sync_all
   public :: caf_co_broadcast, caf_co_sum, caf_co_min, caf_co_max, caf_co_reduce
   public :: caf_same_cfi_type, caf_elem_len, caf_numeric_type, caf_is_f_string
@@ -47,6 +48,18 @@ module caffeine_h_m
       integer(c_int) caf_num_images
     end function
 
+    ! _________________ Memory allocation ____________________
+
+    function caf_allocate(sz, corank, lcobounds, ucobounds, final_func, coarray_handle) result(ptr) bind(c)
+       import c_int, c_size_t, c_intmax_t, c_funptr, c_ptr
+       implicit none
+       integer(kind=c_size_t), intent(in), value :: sz
+       integer(kind=c_int), intent(in), value :: corank
+       integer(kind=c_intmax_t), dimension(:), intent(in) :: lcobounds, ucobounds
+       type(c_funptr), intent(in), value  :: final_func
+       type(c_ptr), intent(out) :: coarray_handle
+       type(c_ptr) :: ptr
+     end function
     ! __________________ Synchronization _____________________
 
     subroutine caf_sync_all() bind(C)

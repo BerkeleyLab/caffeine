@@ -14,6 +14,8 @@ enum {
   ERRMSG_TOO_SHORT
 };
 
+typedef void(*final_func_ptr)(void*, size_t) ;
+
 // Program launch and finalization
 
 void caf_caffeinate(int argc, char *argv[]);
@@ -23,6 +25,10 @@ void caf_decaffeinate(int exit_code);
 
 int caf_this_image();
 int caf_num_images();
+
+// Memory allocation
+
+void* caf_allocate(size_t sz, int corank, CFI_cdesc_t* desc_co_lbounds, CFI_cdesc_t* desc_co_ubounds, final_func_ptr final_func, void** coarray_handle);
 
 // Synchronization 
 
