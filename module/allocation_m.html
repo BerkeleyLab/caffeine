@@ -89,7 +89,7 @@
      <li><i class="fa fa-list-ol"></i>
        <a data-toggle="tooltip"
     data-placement="bottom" data-html="true"
-    title=" 0.7% of total for modules and submodules.">8 statements</a>
+    title=" 2.0% of total for modules and submodules.">23 statements</a>
      </li> 
     <li><i class="fa fa-code"></i><a href="../src/allocation_m.f90"> Source File</a></li>
   </ul>
@@ -113,6 +113,14 @@
     <div id="sidebar">
   <h3>Contents</h3>
  
+<div class="panel panel-primary">
+  <div class="panel-heading text-left"><h3 class="panel-title"><a data-toggle="collapse" href="#inters-0">Interfaces</a></h3></div>
+  <div id="inters-0" class="panel-collapse collapse">
+    <div class="list-group">
+      <a class="list-group-item" href="../module/allocation_m.html#interface-prif_allocate">prif_allocate</a>
+    </div>
+  </div>
+</div>
 <div class="panel panel-primary">
   <div class="panel-heading text-left"><h3 class="panel-title"><a data-toggle="collapse" href="#types-0">Derived Types</a></h3></div>
   <div id="types-0" class="panel-collapse collapse">
@@ -240,6 +248,12 @@
   <h3 class="panel-title">Used by</h3>
       </div>
       <ul class="list-group">
+  <li class="list-group-item">  
+    <ul class="list-inline">
+      <li><h5>Descendants:</h5></li>
+      <li><a href='../module/allocation_s.html'>allocation_s</a></li>
+    </ul>
+  </li>
   <li class="list-group-item">
     <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
@@ -255,8 +269,8 @@
 <!-- module~allocation_m -->
 <g id="module~~allocation_m~~UsedByGraph_node1" class="node">
 <title>module~allocation_m</title>
-<polygon fill="none" stroke="black" points="81,-87 0,-87 0,-63 81,-63 81,-87"/>
-<text text-anchor="middle" x="40.5" y="-72.6" font-family="Helvetica,sans-Serif" font-size="10.50">allocation_m</text>
+<polygon fill="none" stroke="black" points="81,-67 0,-67 0,-43 81,-43 81,-67"/>
+<text text-anchor="middle" x="40.5" y="-52.6" font-family="Helvetica,sans-Serif" font-size="10.50">allocation_m</text>
 </g>
 <!-- module~image_enumeration_m -->
 <g id="module~~allocation_m~~UsedByGraph_node2" class="node">
@@ -270,13 +284,28 @@
 <!-- module~image_enumeration_m&#45;&gt;module~allocation_m -->
 <g id="module~~allocation_m~~UsedByGraph_edge1" class="edge">
 <title>module~image_enumeration_m&#45;&gt;module~allocation_m</title>
-<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M116.92,-64.41C108.2,-65.64 99.39,-66.88 91.02,-68.05"/>
-<polygon fill="#ff0000" stroke="#ff0000" points="90.49,-64.59 81.07,-69.45 91.46,-71.52 90.49,-64.59"/>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M116.92,-55C108.29,-55 99.58,-55 91.3,-55"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="91.07,-51.5 81.07,-55 91.07,-58.5 91.07,-51.5"/>
+</g>
+<!-- module~allocation_s -->
+<g id="module~~allocation_m~~UsedByGraph_node3" class="node">
+<title>module~allocation_s</title>
+<g id="a_module~~allocation_m~~UsedByGraph_node3"><a xlink:href=".././module/allocation_s.html" xlink:title="allocation_s">
+<polygon fill="#5bc0de" stroke="#5bc0de" points="223,-25 147,-25 147,-1 223,-1 223,-25"/>
+<text text-anchor="middle" x="185" y="-10.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">allocation_s</text>
+</a>
+</g>
+</g>
+<!-- module~allocation_s&#45;&gt;module~allocation_m -->
+<g id="module~~allocation_m~~UsedByGraph_edge3" class="edge">
+<title>module~allocation_s&#45;&gt;module~allocation_m</title>
+<path fill="none" stroke="#ff0000" d="M146.93,-23.93C129.81,-28.97 109.23,-35.04 90.81,-40.47"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="89.73,-37.14 81.13,-43.32 91.71,-43.85 89.73,-37.14"/>
 </g>
 <!-- module~prif -->
-<g id="module~~allocation_m~~UsedByGraph_node3" class="node">
+<g id="module~~allocation_m~~UsedByGraph_node4" class="node">
 <title>module~prif</title>
-<g id="a_module~~allocation_m~~UsedByGraph_node3"><a xlink:href=".././module/prif.html" xlink:title="prif">
+<g id="a_module~~allocation_m~~UsedByGraph_node4"><a xlink:href=".././module/prif.html" xlink:title="prif">
 <polygon fill="#337ab7" stroke="#337ab7" points="381.5,-108 327.5,-108 327.5,-84 381.5,-84 381.5,-108"/>
 <text text-anchor="middle" x="354.5" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">prif</text>
 </a>
@@ -285,41 +314,41 @@
 <!-- module~prif&#45;&gt;module~allocation_m -->
 <g id="module~~allocation_m~~UsedByGraph_edge2" class="edge">
 <title>module~prif&#45;&gt;module~allocation_m</title>
-<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M327.44,-94.25C275.58,-90.76 158.71,-82.89 91.54,-78.37"/>
-<polygon fill="#ff0000" stroke="#ff0000" points="91.41,-74.85 81.2,-77.67 90.94,-81.84 91.41,-74.85"/>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M327.4,-95.38C283.59,-94 192.64,-89.59 117,-76 107.95,-74.37 98.42,-72.14 89.29,-69.74"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="90.16,-66.35 79.59,-67.09 88.31,-73.1 90.16,-66.35"/>
 </g>
 <!-- module~prif&#45;&gt;module~image_enumeration_m -->
-<g id="module~~allocation_m~~UsedByGraph_edge4" class="edge">
+<g id="module~~allocation_m~~UsedByGraph_edge5" class="edge">
 <title>module~prif&#45;&gt;module~image_enumeration_m</title>
 <path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M327.33,-89.59C305.35,-84.21 273.13,-76.33 244.99,-69.44"/>
 <polygon fill="#ff0000" stroke="#ff0000" points="245.78,-66.03 235.24,-67.05 244.12,-72.83 245.78,-66.03"/>
 </g>
 <!-- proc~assert -->
-<g id="module~~allocation_m~~UsedByGraph_node4" class="node">
+<g id="module~~allocation_m~~UsedByGraph_node5" class="node">
 <title>proc~assert</title>
-<g id="a_module~~allocation_m~~UsedByGraph_node4"><a xlink:href=".././proc/assert.html" xlink:title="assert">
+<g id="a_module~~allocation_m~~UsedByGraph_node5"><a xlink:href=".././proc/assert.html" xlink:title="assert">
 <polygon fill="#d9534f" stroke="#d9534f" points="381.5,-66 327.5,-66 327.5,-42 381.5,-42 381.5,-66"/>
 <text text-anchor="middle" x="354.5" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">assert</text>
 </a>
 </g>
 </g>
 <!-- proc~assert&#45;&gt;module~image_enumeration_m -->
-<g id="module~~allocation_m~~UsedByGraph_edge3" class="edge">
+<g id="module~~allocation_m~~UsedByGraph_edge4" class="edge">
 <title>proc~assert&#45;&gt;module~image_enumeration_m</title>
 <path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M327.33,-54.16C310.02,-54.26 286.34,-54.4 263.32,-54.54"/>
 <polygon fill="#ff0000" stroke="#ff0000" points="263.14,-51.04 253.16,-54.6 263.18,-58.04 263.14,-51.04"/>
 </g>
 <!-- module~image_enumeration_s -->
-<g id="module~~allocation_m~~UsedByGraph_node5" class="node">
+<g id="module~~allocation_m~~UsedByGraph_node6" class="node">
 <title>module~image_enumeration_s</title>
-<g id="a_module~~allocation_m~~UsedByGraph_node5"><a xlink:href=".././module/image_enumeration_s.html" xlink:title="image_enumeration_s">
+<g id="a_module~~allocation_m~~UsedByGraph_node6"><a xlink:href=".././module/image_enumeration_s.html" xlink:title="image_enumeration_s">
 <polygon fill="#5bc0de" stroke="#5bc0de" points="420,-24 289,-24 289,0 420,0 420,-24"/>
 <text text-anchor="middle" x="354.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">image_enumeration_s</text>
 </a>
 </g>
 </g>
 <!-- module~image_enumeration_s&#45;&gt;module~image_enumeration_m -->
-<g id="module~~allocation_m~~UsedByGraph_edge5" class="edge">
+<g id="module~~allocation_m~~UsedByGraph_edge6" class="edge">
 <title>module~image_enumeration_s&#45;&gt;module~image_enumeration_m</title>
 <path fill="none" stroke="#ff0000" d="M306.4,-24.09C286.61,-29.17 263.41,-35.13 242.7,-40.45"/>
 <polygon fill="#ff0000" stroke="#ff0000" points="241.57,-37.12 232.75,-43 243.31,-43.9 241.57,-37.12"/>
@@ -394,6 +423,14 @@
       <h3>Contents</h3>
  
 <div class="panel panel-primary">
+  <div class="panel-heading text-left"><h3 class="panel-title"><a data-toggle="collapse" href="#inters-1">Interfaces</a></h3></div>
+  <div id="inters-1" class="panel-collapse collapse">
+    <div class="list-group">
+      <a class="list-group-item" href="../module/allocation_m.html#interface-prif_allocate">prif_allocate</a>
+    </div>
+  </div>
+</div>
+<div class="panel panel-primary">
   <div class="panel-heading text-left"><h3 class="panel-title"><a data-toggle="collapse" href="#types-1">Derived Types</a></h3></div>
   <div id="types-1" class="panel-collapse collapse">
     <div class="list-group">
@@ -408,6 +445,93 @@
 
     
     
+    <section>
+   <h2>Interfaces</h2>
+     <div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="interface-prif_allocate"></span><h3>interface   </h3></div>
+  <ul class="list-group">
+    <li class="list-group-item">
+    <h3>public module module subroutine prif_allocate(lcobounds, ucobounds, lbounds, ubounds, element_length, final_func, coarray_handle, allocated_memory, stat, errmsg, errmsg_alloc)   <a href='../proc/prif_allocate.html'><button type="button" class="btn btn-info depwarn">Implementation &rarr;</button></a>
+</h3>    
+<h4>Arguments</h4>      <table class="table table-striped varlist">
+<thead><tr><th>Type</th><th>Intent</th><th>Optional</th><th>Attributes</th><th></th><th>Name</th><th></th></thead>
+<tbody>
+<tr>
+  <td><span class="anchor" ></span>integer(kind=c_intmax_t),</td>
+<td>intent(in),</td>
+  <td></td>  <td>dimension(:)</td><td>::</td>
+  <td><strong>lcobounds</strong></td><td></td>
+</tr>
+<tr>
+  <td><span class="anchor" ></span>integer(kind=c_intmax_t),</td>
+<td>intent(in),</td>
+  <td></td>  <td>dimension(:)</td><td>::</td>
+  <td><strong>ucobounds</strong></td><td></td>
+</tr>
+<tr>
+  <td><span class="anchor" ></span>integer(kind=c_intmax_t),</td>
+<td>intent(in),</td>
+  <td></td>  <td>dimension(:)</td><td>::</td>
+  <td><strong>lbounds</strong></td><td></td>
+</tr>
+<tr>
+  <td><span class="anchor" ></span>integer(kind=c_intmax_t),</td>
+<td>intent(in),</td>
+  <td></td>  <td>dimension(:)</td><td>::</td>
+  <td><strong>ubounds</strong></td><td></td>
+</tr>
+<tr>
+  <td><span class="anchor" ></span>integer(kind=c_size_t),</td>
+<td>intent(in)</td>
+  <td></td>  <td></td><td>::</td>
+  <td><strong>element_length</strong></td><td></td>
+</tr>
+<tr>
+  <td><span class="anchor" ></span>type(c_funptr),</td>
+<td>intent(in)</td>
+  <td></td>  <td></td><td>::</td>
+  <td><strong>final_func</strong></td><td></td>
+</tr>
+<tr>
+  <td><span class="anchor" ></span>type(<a href='../type/prif_coarray_handle.html'>prif_coarray_handle</a>),</td>
+<td>intent(out)</td>
+  <td></td>  <td></td><td>::</td>
+  <td><strong>coarray_handle</strong></td><td></td>
+</tr>
+<tr>
+  <td><span class="anchor" ></span>type(c_ptr),</td>
+<td>intent(out)</td>
+  <td></td>  <td></td><td>::</td>
+  <td><strong>allocated_memory</strong></td><td></td>
+</tr>
+<tr>
+  <td><span class="anchor" ></span>integer(kind=c_int),</td>
+<td>intent(out),</td>
+  <td>optional</td>  <td></td><td>::</td>
+  <td><strong>stat</strong></td><td></td>
+</tr>
+<tr>
+  <td><span class="anchor" ></span>character(len=*),</td>
+<td>intent(inout),</td>
+  <td>optional</td>  <td></td><td>::</td>
+  <td><strong>errmsg</strong></td><td></td>
+</tr>
+<tr>
+  <td><span class="anchor" ></span>character(len=:),</td>
+<td>intent(inout),</td>
+  <td>optional</td>  <td>allocatable</td><td>::</td>
+  <td><strong>errmsg_alloc</strong></td><td></td>
+</tr>
+</tbody>
+</table>
+
+
+    </li>
+  </ul>
+</div>
+
+    </section>
+  <br>
 
     
     <section>
@@ -451,7 +575,7 @@
           <p class="text-right">
             Documentation generated by 
             <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
- on 2023-12-13 23:34            </p>
+ on 2023-12-15 01:16            </p>
         </div>
       </div>
       <br>
