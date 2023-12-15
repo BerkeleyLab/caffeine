@@ -35,6 +35,9 @@ contains
         use caf_this_image_test, only: &
                 prif_this_image_prif_this_image => &
                     test_prif_this_image
+        use caf_allocate_test, only: &
+                prif_allocate_prif_allocate => &
+                    test_prif_allocate
         use veggies, only: test_item_t, test_that, run_tests
 
 
@@ -42,7 +45,7 @@ contains
         logical :: passed
 
         type(test_item_t) :: tests
-        type(test_item_t) :: individual_tests(10)
+        type(test_item_t) :: individual_tests(11)
 
         individual_tests(1) = a00_caffeinate_caffeinate()
         individual_tests(2) = prif_co_broadcast_prif_co_broadcast()
@@ -54,6 +57,7 @@ contains
         individual_tests(8) = prif_num_images_prif_num_images()
         individual_tests(9) = prif_stop_prif_this_image()
         individual_tests(10) = prif_this_image_prif_this_image()
+        individual_tests(11) = prif_allocate_prif_allocate()
         tests = test_that(individual_tests)
 
 
