@@ -1,6 +1,6 @@
 ! Copyright (c), The Regents of the University of California
 ! Terms of use are as specified in LICENSE.txt
-module team_type_m
+module teams_m
   use iso_c_binding, only: c_ptr, c_int, c_intmax_t
 
   implicit none
@@ -44,4 +44,4 @@ module team_type_m
   end interface
 
 
-end module team_type_m
+end module teams_m

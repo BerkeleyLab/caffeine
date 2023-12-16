@@ -2,7 +2,7 @@
 ! Terms of use are as specified in LICENSE.txt
 module image_enumeration_m
   use iso_c_binding, only: c_int, c_intmax_t
-  use team_type_m, only : prif_team_type
+  use teams_m, only : prif_team_type
   use allocation_m, only: prif_coarray_handle
   implicit none
 
