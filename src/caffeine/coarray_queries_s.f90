@@ -6,16 +6,22 @@ submodule(coarray_queries_m) coarray_queries_s
 
 contains
 
-  module subroutine prif_lcobound_with_dim
-  end subroutine
+  module procedure prif_lcobound_with_dim
+  end procedure
 
-  module subroutine prif_lcobound_no_dim
-  end subroutine
+  module procedure prif_lcobound_no_dim
+  end procedure
 
-  module subroutine prif_ucobound_with_dim
-  end subroutine
+  module procedure prif_ucobound_with_dim
+  end procedure
 
-  module subroutine prif_ucobound_no_dim
-  end subroutine
+  module procedure prif_ucobound_no_dim
+  end procedure prif_ucobound_no_dim
+
+  module procedure prif_coshape
+  end procedure
+
+  module procedure prif_image_index
+  end procedure
 
 end submodule coarray_queries_s
