@@ -9,5 +9,6 @@ module prif
   use collective_subroutines_m, only : prif_co_sum, prif_co_max, prif_co_min, prif_co_reduce, prif_co_broadcast
   use teams_m, only: prif_form_team, prif_change_team, prif_end_team, prif_team_type
   use synchronization_m, only : prif_sync_all, prif_sync_images, prif_sync_team, prif_sync_memory
+  use locks_m, only: prif_lock_type, prif_lock, prif_unlock
   implicit none
 end module prif
