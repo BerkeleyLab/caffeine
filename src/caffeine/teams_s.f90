@@ -14,4 +14,10 @@ contains
   module procedure prif_form_team
   end procedure
 
+  module procedure prif_get_team
+  end procedure
+
+  module procedure prif_team_number
+  end procedure
+
 end submodule

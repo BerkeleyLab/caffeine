@@ -7,7 +7,7 @@ module prif
   use coarray_queries_m, only: prif_lcobound, prif_ucobound, prif_coshape, prif_image_index
   use image_enumeration_m, only : prif_this_image, prif_num_images
   use collective_subroutines_m, only : prif_co_sum, prif_co_max, prif_co_min, prif_co_reduce, prif_co_broadcast
-  use teams_m, only: prif_form_team, prif_change_team, prif_end_team, prif_team_type
+  use teams_m, only: prif_form_team, prif_change_team, prif_end_team, prif_team_type, prif_get_team, prif_team_number
   use synchronization_m, only : prif_sync_all, prif_sync_images, prif_sync_team, prif_sync_memory
   use locks_m, only: prif_lock_type, prif_lock, prif_unlock
   use critical_m, only: prif_critical, prif_end_critical

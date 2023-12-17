@@ -6,7 +6,7 @@ module teams_m
   implicit none
 
   private
-  public :: prif_team_type, prif_form_team, current_team, prif_end_team, prif_change_team
+  public :: prif_team_type, prif_form_team, current_team, prif_end_team, prif_change_team, prif_get_team, prif_team_number
 
   type :: prif_team_type
     type(c_ptr) :: team_ptr
@@ -39,6 +39,18 @@ module teams_m
       integer(c_int), intent(out), optional :: stat
       character(len=*), intent(inout), optional :: errmsg
       character(len=:), intent(inout), allocatable, optional :: errmsg_alloc
+    end subroutine
+
+    module subroutine prif_get_team(level, team)
+      implicit none
+      integer(c_int), intent(in), optional :: level
+      type(prif_team_type), intent(out) :: team
+    end subroutine
+
+    module subroutine prif_team_number(team, team_number)
+      implicit none
+      type(prif_team_type), intent(in), optional :: team
+      integer(c_intmax_t), intent(out) :: team_number
     end subroutine
 
   end interface
