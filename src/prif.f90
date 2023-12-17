@@ -10,5 +10,6 @@ module prif
   use teams_m, only: prif_form_team, prif_change_team, prif_end_team, prif_team_type
   use synchronization_m, only : prif_sync_all, prif_sync_images, prif_sync_team, prif_sync_memory
   use locks_m, only: prif_lock_type, prif_lock, prif_unlock
+  use critical_m, only: prif_critical, prif_end_critical
   implicit none
 end module prif
