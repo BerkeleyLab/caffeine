@@ -12,5 +12,6 @@ module prif
   use locks_m, only: prif_lock_type, prif_lock, prif_unlock
   use critical_m, only: prif_critical, prif_end_critical
   use events_m, only: prif_event_post, prif_event_wait, prif_event_query
+  use atomic_m, only: prif_atomic_add, prif_atomic_and
   implicit none
 end module prif
