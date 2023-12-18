@@ -12,6 +12,7 @@ module prif
   use locks_m, only: prif_lock_type, prif_lock, prif_unlock
   use critical_m, only: prif_critical, prif_end_critical
   use events_m, only: prif_event_post, prif_event_wait, prif_event_query
-  use atomic_m, only: prif_atomic_add, prif_atomic_and
+  use atomic_m, only: prif_atomic_add, prif_atomic_and, prif_atomic_or, prif_atomic_xor, prif_atomic_cas, prif_atomic_fetch_add
+  use atomic_m, only: prif_atomic_fetch_and, prif_atomic_fetch_or, prif_atomic_fetch_xor, prif_atomic_define, prif_atomic_ref
   implicit none
 end module prif
