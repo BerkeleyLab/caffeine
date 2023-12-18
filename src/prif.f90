@@ -2,7 +2,7 @@
 ! Terms of use are as specified in LICENSE.txt
 module prif
   use program_startup_m, only : prif_init
-  use program_termination_m, only : prif_stop, prif_error_stop
+  use program_termination_m, only : prif_stop, prif_error_stop, prif_fail_image
   use allocation_m, only: prif_coarray_handle, prif_allocate
   use coarray_queries_m, only: prif_lcobound, prif_ucobound, prif_coshape, prif_image_index
   use image_enumeration_m, only : prif_this_image, prif_num_images
