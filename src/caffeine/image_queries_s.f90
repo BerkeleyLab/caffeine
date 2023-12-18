@@ -22,4 +22,10 @@ contains
   module procedure prif_this_image_with_dim
   end procedure
 
+  module procedure prif_failed_images
+  end procedure
+
+  module procedure prif_stopped_images
+  end procedure
+
 end submodule image_queries_s
