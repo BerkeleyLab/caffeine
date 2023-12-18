@@ -1,6 +1,6 @@
 ! Copyright (c), The Regents of the University of California
 ! Terms of use are as specified in LICENSE.txt
-module image_enumeration_m
+module image_queries_m
   use iso_c_binding, only: c_int, c_intmax_t
   use teams_m, only : prif_team_type
   use allocation_m, only: prif_coarray_handle
@@ -46,4 +46,4 @@ module image_enumeration_m
 
   end interface
 
-end module image_enumeration_m
+end module image_queries_m
