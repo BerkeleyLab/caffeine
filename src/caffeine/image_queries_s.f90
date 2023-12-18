@@ -28,4 +28,7 @@ contains
   module procedure prif_stopped_images
   end procedure
 
+  module procedure prif_image_status
+  end procedure
+
 end submodule image_queries_s

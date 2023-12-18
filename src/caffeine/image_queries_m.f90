@@ -7,7 +7,7 @@ module image_queries_m
   implicit none
 
   private
-  public :: prif_num_images, prif_this_image, prif_failed_images, prif_stopped_images
+  public :: prif_num_images, prif_this_image, prif_failed_images, prif_stopped_images, prif_image_status
 
   interface
 
@@ -28,6 +28,13 @@ module image_queries_m
        implicit none
        type(prif_team_type), intent(in), optional :: team
        integer(c_int), allocatable, intent(out) :: stopped_images(:)
+     end subroutine
+
+     module elemental subroutine prif_image_status(image, team, image_status)
+       implicit none
+       integer(c_int), intent(in) :: image
+       type(prif_team_type), intent(in), optional :: team
+       integer(c_int), intent(out) :: image_status
      end subroutine
 
   end interface
