@@ -12,7 +12,7 @@ module critical_m
 
      module subroutine prif_critical(critical_coarray, stat, errmsg, errmsg_alloc)
        implicit none
-       type(prif_coarray_handle), intent(inout) :: critical_coarray
+       type(prif_coarray_handle), intent(in) :: critical_coarray
        integer(c_int), intent(out), optional :: stat
        character(len=*), intent(inout), optional :: errmsg
        character(len=:), intent(inout), allocatable, optional :: errmsg_alloc
@@ -20,7 +20,7 @@ module critical_m
 
      module subroutine prif_end_critical(critical_coarray)
        implicit none
-       type(prif_coarray_handle), intent(inout) :: critical_coarray
+       type(prif_coarray_handle), intent(in) :: critical_coarray
      end subroutine
 
   end interface
