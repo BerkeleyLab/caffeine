@@ -5,6 +5,8 @@ module prif
   use program_termination_m, only : prif_stop, prif_error_stop, prif_fail_image
   use allocation_m, only: &
     prif_coarray_handle, prif_allocate, prif_allocate_non_symmetric, prif_deallocate, prif_deallocate_non_symmetric
+  use coarray_access_m, only: &
+    prif_put, prif_put_strided, prif_put_raw, prif_put_raw_strided, prif_get, prif_get_raw, prif_get_raw_strided
   use alias_m, only: prif_alias_create, prif_alias_destroy
   use coarray_queries_m, only: prif_lcobound, prif_ucobound, prif_coshape, prif_image_index
   use image_queries_m, only : prif_this_image, prif_num_images, prif_failed_images, prif_stopped_images, prif_image_status
