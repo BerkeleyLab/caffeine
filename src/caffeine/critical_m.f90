@@ -3,10 +3,11 @@
 module critical_m
   use allocation_m, only: prif_coarray_handle
   use iso_c_binding, only: c_int
+  use locks_m, only: prif_critical_type => prif_lock_type
 
   implicit none
   private
-  public :: prif_critical, prif_end_critical
+  public :: prif_critical_type, prif_critical, prif_end_critical
 
   interface
 

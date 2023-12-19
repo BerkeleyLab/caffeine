@@ -15,7 +15,7 @@ module prif
   use teams_m, only: prif_form_team, prif_change_team, prif_end_team, prif_team_type, prif_get_team, prif_team_number
   use synchronization_m, only : prif_sync_all, prif_sync_images, prif_sync_team, prif_sync_memory
   use locks_m, only: prif_lock_type, prif_lock, prif_unlock
-  use critical_m, only: prif_critical, prif_end_critical
+  use critical_m, only: prif_critical_type, prif_critical, prif_end_critical
   use events_m, only: prif_event_post, prif_event_wait, prif_event_query
   use atomic_m, only: &
     prif_atomic_add, prif_atomic_and, prif_atomic_or, prif_atomic_xor, prif_atomic_cas, prif_atomic_fetch_add, &
