@@ -1,6 +1,6 @@
 ! Copyright (c), The Regents of the University of California
 ! Terms of use are as specified in LICENSE.txt
-submodule(team_type_m) team_type_s
+submodule(teams_m) teams_s
   implicit none
 
 contains
@@ -12,6 +12,12 @@ contains
   end procedure
 
   module procedure prif_form_team
+  end procedure
+
+  module procedure prif_get_team
+  end procedure
+
+  module procedure prif_team_number
   end procedure
 
 end submodule

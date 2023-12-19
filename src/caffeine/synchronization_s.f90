@@ -7,10 +7,17 @@ submodule(synchronization_m) sychronization_s
 contains
 
   module procedure prif_sync_all
-
     !TODO: handle optional args stat, errmsg, errmsg_alloc
     call caf_sync_all
+  end procedure
 
-  end procedure 
+  module procedure prif_sync_images
+  end procedure
+
+  module procedure prif_sync_team
+  end procedure
+
+  module procedure prif_sync_memory
+  end procedure
 
 end submodule

@@ -1,7 +1,7 @@
 module caf_co_min_test
     use prif, only : prif_co_min, prif_num_images
     use veggies, only: result_t, test_item_t, assert_equals, describe, it, assert_that, assert_equals, succeed
-    use image_enumeration_m, only : prif_this_image, prif_num_images
+    use image_queries_m, only : prif_this_image, prif_num_images
 
     implicit none
     private

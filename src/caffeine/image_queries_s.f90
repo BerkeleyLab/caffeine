@@ -1,6 +1,6 @@
 ! Copyright (c), The Regents of the University of California
 ! Terms of use are as specified in LICENSE.txt
-submodule(image_enumeration_m) image_enumeration_s
+submodule(image_queries_m) image_queries_s
   use caffeine_h_m, only : caf_num_images, caf_this_image
   implicit none
 
@@ -22,4 +22,13 @@ contains
   module procedure prif_this_image_with_dim
   end procedure
 
-end submodule image_enumeration_s
+  module procedure prif_failed_images
+  end procedure
+
+  module procedure prif_stopped_images
+  end procedure
+
+  module procedure prif_image_status
+  end procedure
+
+end submodule image_queries_s
