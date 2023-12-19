@@ -30,7 +30,7 @@ module image_queries_m
        integer(c_int), allocatable, intent(out) :: stopped_images(:)
      end subroutine
 
-     module elemental subroutine prif_image_status(image, team, image_status)
+     module impure elemental subroutine prif_image_status(image, team, image_status)
        implicit none
        integer(c_int), intent(in) :: image
        type(prif_team_type), intent(in), optional :: team
@@ -41,7 +41,7 @@ module image_queries_m
 
   interface prif_this_image
 
-    pure module subroutine prif_this_image_no_coarray(team, image_index)
+    module subroutine prif_this_image_no_coarray(team, image_index)
       implicit none
       type(prif_team_type), intent(in), optional :: team
       integer(c_int), intent(out) :: image_index
