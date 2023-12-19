@@ -34,7 +34,7 @@ module caffeine_h_m
 
     ! _________________ Image enumeration ____________________
 
-    pure function caf_this_image() bind(C)
+    function caf_this_image() bind(C)
       !! int caf_this_image();
       import c_int
       implicit none

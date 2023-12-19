@@ -57,7 +57,7 @@ module collective_subroutines_m
       logical(c_bool) lhs_op_rhs
     end function
 
-    pure function c_char_operation(lhs, rhs) result(lhs_op_rhs)
+    function c_char_operation(lhs, rhs) result(lhs_op_rhs)
       import c_char
       implicit none
       character(kind=c_char,len=*), intent(in) :: lhs, rhs

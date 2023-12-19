@@ -2,7 +2,7 @@
 ! Terms of use are as specified in LICENSE.txt
 module program_startup_m
   use iso_c_binding, only : c_int
-  use team_type_m, only: prif_team_type
+  use teams_m, only: prif_team_type
   implicit none
 
   private

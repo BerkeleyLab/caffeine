@@ -34,7 +34,7 @@ contains
 
   contains
 
-    pure function reverse_alphabetize(lhs, rhs) result(last_alphabetically)
+    function reverse_alphabetize(lhs, rhs) result(last_alphabetically)
       character(len=*), intent(in) :: lhs, rhs
       character(len=:), allocatable :: last_alphabetically
       call assert(len(lhs)==len(rhs), "caf_co_max: LHS/RHS length match", lhs//" , "//rhs)

@@ -13,4 +13,13 @@ contains
       product(ubounds-lbounds+1)*element_length, size(ucobounds), lcobounds, ucobounds, final_func, coarray_handle%ptr)
   end procedure
 
+  module procedure prif_allocate_non_symmetric
+  end procedure
+
+  module procedure prif_deallocate
+  end procedure
+
+  module procedure prif_deallocate_non_symmetric
+  end procedure
+
 end submodule allocation_s

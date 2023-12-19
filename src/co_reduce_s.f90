@@ -225,7 +225,7 @@ contains
       block
         integer(c_size_t) i
 
-        do concurrent(i=1:count)
+        do i=1, count
           rhs_and_result(i) = char_op(lhs(i), rhs_and_result(i))
         end do
       end block

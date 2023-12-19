@@ -89,7 +89,7 @@
      <li><i class="fa fa-list-ol"></i>
        <a data-toggle="tooltip"
     data-placement="bottom" data-html="true"
-    title=" 0.7% of total for modules and submodules.">8 statements</a>
+    title=" 0.8% of total for modules and submodules.">14 statements</a>
      </li> 
     <li><i class="fa fa-code"></i><a href="../src/allocation_s.f90"> Source File</a></li>
   </ul>
@@ -118,6 +118,9 @@
   <div id="modprocs-0" class="panel-collapse collapse">
     <div class="list-group">
       <a class="list-group-item" href="../module/allocation_s.html#proc-prif_allocate">prif_allocate</a>
+      <a class="list-group-item" href="../module/allocation_s.html#proc-prif_allocate_non_symmetric">prif_allocate_non_symmetric</a>
+      <a class="list-group-item" href="../module/allocation_s.html#proc-prif_deallocate">prif_deallocate</a>
+      <a class="list-group-item" href="../module/allocation_s.html#proc-prif_deallocate_non_symmetric">prif_deallocate_non_symmetric</a>
     </div>
   </div>
 </div>
@@ -262,6 +265,9 @@
   <div id="modprocs-1" class="panel-collapse collapse">
     <div class="list-group">
       <a class="list-group-item" href="../module/allocation_s.html#proc-prif_allocate">prif_allocate</a>
+      <a class="list-group-item" href="../module/allocation_s.html#proc-prif_allocate_non_symmetric">prif_allocate_non_symmetric</a>
+      <a class="list-group-item" href="../module/allocation_s.html#proc-prif_deallocate">prif_deallocate</a>
+      <a class="list-group-item" href="../module/allocation_s.html#proc-prif_deallocate_non_symmetric">prif_deallocate_non_symmetric</a>
     </div>
   </div>
 </div>
@@ -363,6 +369,129 @@
   </div>
   </div>
 
+          <div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="proc-prif_allocate_non_symmetric"></span><h3>module procedure <a href='../proc/prif_allocate_non_symmetric.html'>prif_allocate_non_symmetric</a> <small>module module subroutine prif_allocate_non_symmetric(size_in_bytes, allocated_memory, stat, errmsg, errmsg_alloc)</small>   <a href='../interface/prif_allocate_non_symmetric.html'><button type="button" class="btn btn-info depwarn">Interface &rarr;</button></a>
+</h3></div>
+  <div class="panel-body">
+           
+<h4>Arguments</h4>      <table class="table table-striped varlist">
+<thead><tr><th>Type</th><th>Intent</th><th>Optional</th><th>Attributes</th><th></th><th>Name</th><th></th></thead>
+<tbody>
+<tr>
+  <td><span class="anchor" ></span>integer(kind=c_size_t)</td>
+<td></td>
+  <td></td>  <td></td><td>::</td>
+  <td><strong>size_in_bytes</strong></td><td></td>
+</tr>
+<tr>
+  <td><span class="anchor" ></span>type(c_ptr),</td>
+<td>intent(out)</td>
+  <td></td>  <td></td><td>::</td>
+  <td><strong>allocated_memory</strong></td><td></td>
+</tr>
+<tr>
+  <td><span class="anchor" ></span>integer(kind=c_int),</td>
+<td>intent(out),</td>
+  <td>optional</td>  <td></td><td>::</td>
+  <td><strong>stat</strong></td><td></td>
+</tr>
+<tr>
+  <td><span class="anchor" ></span>character(len=*),</td>
+<td>intent(inout),</td>
+  <td>optional</td>  <td></td><td>::</td>
+  <td><strong>errmsg</strong></td><td></td>
+</tr>
+<tr>
+  <td><span class="anchor" ></span>character(len=:),</td>
+<td>intent(inout),</td>
+  <td>optional</td>  <td>allocatable</td><td>::</td>
+  <td><strong>errmsg_alloc</strong></td><td></td>
+</tr>
+</tbody>
+</table>
+
+
+  </div>
+  </div>
+
+          <div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="proc-prif_deallocate"></span><h3>module procedure <a href='../proc/prif_deallocate.html'>prif_deallocate</a> <small>module module subroutine prif_deallocate(coarray_handles, stat, errmsg, errmsg_alloc)</small>   <a href='../interface/prif_deallocate.html'><button type="button" class="btn btn-info depwarn">Interface &rarr;</button></a>
+</h3></div>
+  <div class="panel-body">
+           
+<h4>Arguments</h4>      <table class="table table-striped varlist">
+<thead><tr><th>Type</th><th>Intent</th><th>Optional</th><th>Attributes</th><th></th><th>Name</th><th></th></thead>
+<tbody>
+<tr>
+  <td><span class="anchor" ></span>type(<a href='../type/prif_coarray_handle.html'>prif_coarray_handle</a>),</td>
+<td>intent(in)</td>
+  <td></td>  <td></td><td>::</td>
+  <td><strong>coarray_handles</strong>(:)</td><td></td>
+</tr>
+<tr>
+  <td><span class="anchor" ></span>integer(kind=c_int),</td>
+<td>intent(out),</td>
+  <td>optional</td>  <td></td><td>::</td>
+  <td><strong>stat</strong></td><td></td>
+</tr>
+<tr>
+  <td><span class="anchor" ></span>character(len=*),</td>
+<td>intent(inout),</td>
+  <td>optional</td>  <td></td><td>::</td>
+  <td><strong>errmsg</strong></td><td></td>
+</tr>
+<tr>
+  <td><span class="anchor" ></span>character(len=:),</td>
+<td>intent(inout),</td>
+  <td>optional</td>  <td>allocatable</td><td>::</td>
+  <td><strong>errmsg_alloc</strong></td><td></td>
+</tr>
+</tbody>
+</table>
+
+
+  </div>
+  </div>
+
+          <div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="proc-prif_deallocate_non_symmetric"></span><h3>module procedure <a href='../proc/prif_deallocate_non_symmetric.html'>prif_deallocate_non_symmetric</a> <small>module module subroutine prif_deallocate_non_symmetric(mem, stat, errmsg, errmsg_alloc)</small>   <a href='../interface/prif_deallocate_non_symmetric.html'><button type="button" class="btn btn-info depwarn">Interface &rarr;</button></a>
+</h3></div>
+  <div class="panel-body">
+           
+<h4>Arguments</h4>      <table class="table table-striped varlist">
+<thead><tr><th>Type</th><th>Intent</th><th>Optional</th><th>Attributes</th><th></th><th>Name</th><th></th></thead>
+<tbody>
+<tr>
+  <td><span class="anchor" ></span>type(c_ptr),</td>
+<td>intent(in)</td>
+  <td></td>  <td></td><td>::</td>
+  <td><strong>mem</strong></td><td></td>
+</tr>
+<tr>
+  <td><span class="anchor" ></span>integer(kind=c_int),</td>
+<td>intent(out),</td>
+  <td>optional</td>  <td></td><td>::</td>
+  <td><strong>stat</strong></td><td></td>
+</tr>
+<tr>
+  <td><span class="anchor" ></span>character(len=*),</td>
+<td>intent(inout),</td>
+  <td>optional</td>  <td></td><td>::</td>
+  <td><strong>errmsg</strong></td><td></td>
+</tr>
+<tr>
+  <td><span class="anchor" ></span>character(len=:),</td>
+<td>intent(inout),</td>
+  <td>optional</td>  <td>allocatable</td><td>::</td>
+  <td><strong>errmsg_alloc</strong></td><td></td>
+</tr>
+</tbody>
+</table>
+
+
+  </div>
+  </div>
+
         </section>    
     
     </div>
@@ -380,7 +509,7 @@
           <p class="text-right">
             Documentation generated by 
             <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
- on 2023-12-15 01:16            </p>
+ on 2023-12-19 03:31            </p>
         </div>
       </div>
       <br>
