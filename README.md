@@ -17,8 +17,8 @@ Caffeine leverages the following non-parallel features of Fortran to simplify th
 | The `contiguous` attribute [1]            | Fortran 2008  |
 | `do concurrent` [2]                       | Fortran 2008  |
 | The `ISO_Fortran_binding.h` C header file | Fortran 2018  |
-| Assumed-type dummy arguments: `type(*)`,  | Fortran 2018  |
-| Assumed-rank dummy arguments: `array(..)`,| Fortran 2018  |
+| Assumed-type dummy arguments: `type(*)`   | Fortran 2018  |
+| Assumed-rank dummy arguments: `array(..)` | Fortran 2018  |
 
 [1] This requirement simplifies development but might be removed in a future release.
 
