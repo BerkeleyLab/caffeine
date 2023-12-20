@@ -9,9 +9,6 @@ contains
   module procedure prif_put
   end procedure
 
-  module procedure prif_put_strided
-  end procedure
-
   module procedure prif_put_raw
   end procedure
 
