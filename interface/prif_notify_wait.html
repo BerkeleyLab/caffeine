@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -8,7 +9,7 @@
     <meta name="author" content="Lawrence Berkeley National Laboratory" >
     <link rel="icon" href="../favicon.png">
 
-    <title>prif_put_strided &ndash; Caffeine</title>
+    <title>prif_notify_wait &ndash; Caffeine</title>
 
     <link href="../css/bootstrap.min.css" rel="stylesheet">
     <link href="../css/pygments.css" rel="stylesheet">
@@ -79,8 +80,8 @@
 
     <div class="container">
   <div class="row">
-    <h1>prif_put_strided
-      <small>Module Procedure</small>
+    <h1>prif_notify_wait
+   <small>Interface</small>
     </h1>
     <div class="row">
   <div class="col-lg-12">
@@ -89,14 +90,14 @@
      <li><i class="fa fa-list-ol"></i>
        <a data-toggle="tooltip"
     data-placement="bottom" data-html="true"
-    title=" 0.0% of total for procedures.">2 statements</a>
+    title=" 0.2% of total for procedures.">10 statements</a>
      </li> 
-    <li><i class="fa fa-code"></i><a href="../src/coarray_access_s.f90"> Source File</a></li>
+    <li><i class="fa fa-code"></i><a href="../src/notify_m.f90"> Source File</a></li>
   </ul>
   <ol class="breadcrumb in-well text-right">
-     <li><a href='../sourcefile/coarray_access_s.f90.html'>coarray_access_s.f90</a></li>
-     <li><a href='../module/coarray_access_s.html'>coarray_access_s</a></li>
-     <li class="active">prif_put_strided</li>
+     <li><a href='../sourcefile/notify_m.f90.html'>notify_m.f90</a></li>
+     <li><a href='../module/notify_m.html'>notify_m</a></li>
+     <li class="active">prif_notify_wait</li>
   </ol>
 </div>
 </div>
@@ -121,94 +122,12 @@
     </div>
     
     <div class="col-md-9" id='text'>
-    <h2>module procedure prif_put_strided <small>module module subroutine prif_put_strided(coarray_handle, coindices, value, element_size, first_element_addr, extent, stride, team, team_number, stat, errmsg, errmsg_alloc)</small>   <a href='../interface/prif_put_strided.html'><button type="button" class="btn btn-info depwarn">Interface &rarr;</button></a>
-</h2>
-    
-
-
-    <h3>Arguments</h3>
-      <table class="table table-striped varlist">
-<thead><tr><th>Type</th><th>Intent</th><th>Optional</th><th>Attributes</th><th></th><th>Name</th><th></th></thead>
-<tbody>
-<tr>
-  <td><span class="anchor" id="variable-coarray_handle~11"></span>type(<a href='../type/prif_coarray_handle.html'>prif_coarray_handle</a>),</td>
-<td>intent(in)</td>
-  <td></td>  <td></td><td>::</td>
-  <td><strong>coarray_handle</strong></td><td></td>
-</tr>
-<tr>
-  <td><span class="anchor" id="variable-coindices~3"></span>integer(kind=c_intmax_t),</td>
-<td>intent(in)</td>
-  <td></td>  <td></td><td>::</td>
-  <td><strong>coindices</strong>(:)</td><td></td>
-</tr>
-<tr>
-  <td><span class="anchor" id="variable-value~3"></span>type(*),</td>
-<td>intent(in),</td>
-  <td></td>  <td>dimension(..)</td><td>::</td>
-  <td><strong>value</strong></td><td></td>
-</tr>
-<tr>
-  <td><span class="anchor" id="variable-element_size~4"></span>integer(kind=c_size_t),</td>
-<td>intent(in)</td>
-  <td></td>  <td></td><td>::</td>
-  <td><strong>element_size</strong></td><td></td>
-</tr>
-<tr>
-  <td><span class="anchor" id="variable-first_element_addr~2"></span>type(c_ptr),</td>
-<td>intent(in)</td>
-  <td></td>  <td></td><td>::</td>
-  <td><strong>first_element_addr</strong></td><td></td>
-</tr>
-<tr>
-  <td><span class="anchor" id="variable-extent~3"></span>integer(kind=c_size_t)</td>
-<td></td>
-  <td></td>  <td></td><td>::</td>
-  <td><strong>extent</strong>(:)</td><td></td>
-</tr>
-<tr>
-  <td><span class="anchor" id="variable-stride"></span>integer(kind=c_ptrdiff_t)</td>
-<td></td>
-  <td></td>  <td></td><td>::</td>
-  <td><strong>stride</strong>(:)</td><td></td>
-</tr>
-<tr>
-  <td><span class="anchor" id="variable-team~8"></span>type(<a href='../type/prif_team_type.html'>prif_team_type</a>),</td>
-<td>intent(in),</td>
-  <td>optional</td>  <td></td><td>::</td>
-  <td><strong>team</strong></td><td></td>
-</tr>
-<tr>
-  <td><span class="anchor" id="variable-team_number~5"></span>integer(kind=c_intmax_t),</td>
-<td>intent(in),</td>
-  <td>optional</td>  <td></td><td>::</td>
-  <td><strong>team_number</strong></td><td></td>
-</tr>
-<tr>
-  <td><span class="anchor" id="variable-stat~19"></span>integer(kind=c_int),</td>
-<td>intent(out),</td>
-  <td>optional</td>  <td></td><td>::</td>
-  <td><strong>stat</strong></td><td></td>
-</tr>
-<tr>
-  <td><span class="anchor" id="variable-errmsg~18"></span>character(len=*),</td>
-<td>intent(inout),</td>
-  <td>optional</td>  <td></td><td>::</td>
-  <td><strong>errmsg</strong></td><td></td>
-</tr>
-<tr>
-  <td><span class="anchor" id="variable-errmsg_alloc~17"></span>character(len=:),</td>
-<td>intent(inout),</td>
-  <td>optional</td>  <td>allocatable</td><td>::</td>
-  <td><strong>errmsg_alloc</strong></td><td></td>
-</tr>
-</tbody>
-</table>
-
-    <br>
+      <h2>interface</h2>
+      
+      <br>
     <div class="panel panel-default">
       <div class="panel-heading">
-  <h3 class="panel-title">Called by</h3>
+  <h3 class="panel-title">Calls</h3>
       </div>
       <div class="panel-body">
   <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
@@ -216,32 +135,32 @@
  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
 <!-- Generated by graphviz version 2.43.0 (0)
  -->
-<!-- Title: proc~~prif_put_strided~~CalledByGraph Pages: 1 -->
-<svg id="procprif_put_stridedCalledByGraph" width="234pt" height="32pt"
- viewBox="0.00 0.00 234.00 32.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-<g id="proc~~prif_put_strided~~CalledByGraph" class="graph" transform="scale(1 1) rotate(0) translate(4 28)">
-<title>proc~~prif_put_strided~~CalledByGraph</title>
-<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 230,-28 230,4 -4,4"/>
-<!-- proc~prif_put_strided -->
-<g id="proc~~prif_put_strided~~CalledByGraph_node1" class="node">
-<title>proc~prif_put_strided</title>
-<polygon fill="none" stroke="black" points="226,-24 131,-24 131,0 226,0 226,-24"/>
-<text text-anchor="middle" x="178.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">prif_put_strided</text>
+<!-- Title: interface~~prif_notify_wait~~CallsGraph Pages: 1 -->
+<svg id="interfaceprif_notify_waitCallsGraph" width="230pt" height="32pt"
+ viewBox="0.00 0.00 230.00 32.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="interface~~prif_notify_wait~~CallsGraph" class="graph" transform="scale(1 1) rotate(0) translate(4 28)">
+<title>interface~~prif_notify_wait~~CallsGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 226,-28 226,4 -4,4"/>
+<!-- interface~prif_notify_wait -->
+<g id="interface~~prif_notify_wait~~CallsGraph_node1" class="node">
+<title>interface~prif_notify_wait</title>
+<polygon fill="none" stroke="black" points="93,-24 0,-24 0,0 93,0 93,-24"/>
+<text text-anchor="middle" x="46.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">prif_notify_wait</text>
 </g>
-<!-- interface~prif_put_strided -->
-<g id="proc~~prif_put_strided~~CalledByGraph_node2" class="node">
-<title>interface~prif_put_strided</title>
-<g id="a_proc~~prif_put_strided~~CalledByGraph_node2"><a xlink:href=".././interface/prif_put_strided.html" xlink:title="prif_put_strided">
-<polygon fill="#a7506f" stroke="#a7506f" points="95,-24 0,-24 0,0 95,0 95,-24"/>
-<text text-anchor="middle" x="47.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">prif_put_strided</text>
+<!-- proc~prif_notify_wait -->
+<g id="interface~~prif_notify_wait~~CallsGraph_node2" class="node">
+<title>proc~prif_notify_wait</title>
+<g id="a_interface~~prif_notify_wait~~CallsGraph_node2"><a xlink:href=".././proc/prif_notify_wait.html" xlink:title="prif_notify_wait">
+<polygon fill="#d9534f" stroke="#d9534f" points="222,-24 129,-24 129,0 222,0 222,-24"/>
+<text text-anchor="middle" x="175.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">prif_notify_wait</text>
 </a>
 </g>
 </g>
-<!-- interface~prif_put_strided&#45;&gt;proc~prif_put_strided -->
-<g id="proc~~prif_put_strided~~CalledByGraph_edge1" class="edge">
-<title>interface~prif_put_strided&#45;&gt;proc~prif_put_strided</title>
-<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M95.07,-12C103.48,-12 112.32,-12 120.97,-12"/>
-<polygon fill="#ff0000" stroke="#ff0000" points="121,-15.5 131,-12 121,-8.5 121,-15.5"/>
+<!-- interface~prif_notify_wait&#45;&gt;proc~prif_notify_wait -->
+<g id="interface~~prif_notify_wait~~CallsGraph_edge1" class="edge">
+<title>interface~prif_notify_wait&#45;&gt;proc~prif_notify_wait</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M93.35,-12C101.53,-12 110.14,-12 118.57,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="118.72,-15.5 128.72,-12 118.72,-8.5 118.72,-15.5"/>
 </g>
 </g>
 </svg>
@@ -307,27 +226,52 @@
       </div>
     </div>
     <br>
-
-    <section class="visible-xs visible-sm hidden-md">
-      <h3>Contents</h3>
- 
-<em>None</em>
-
-    </section>
-    <br class="visible-xs visible-sm hidden-md">
-
+      <h2>public module module subroutine prif_notify_wait(notify_var_ptr, until_count, stat, errmsg, errmsg_alloc)   <a href='../proc/prif_notify_wait.html'><button type="button" class="btn btn-info depwarn">Implementation &rarr;</button></a>
+</h2>
 
     
-    
 
-    
-    
+    <h3>Arguments</h3>
+      <table class="table table-striped varlist">
+<thead><tr><th>Type</th><th>Intent</th><th>Optional</th><th>Attributes</th><th></th><th>Name</th><th></th></thead>
+<tbody>
+<tr>
+  <td><span class="anchor" id="variable-notify_var_ptr"></span>type(c_ptr),</td>
+<td>intent(in)</td>
+  <td></td>  <td></td><td>::</td>
+  <td><strong>notify_var_ptr</strong></td><td></td>
+</tr>
+<tr>
+  <td><span class="anchor" id="variable-until_count"></span>integer(kind=c_intmax_t),</td>
+<td>intent(in),</td>
+  <td>optional</td>  <td></td><td>::</td>
+  <td><strong>until_count</strong></td><td></td>
+</tr>
+<tr>
+  <td><span class="anchor" id="variable-stat~2"></span>integer(kind=c_int),</td>
+<td>intent(out),</td>
+  <td>optional</td>  <td></td><td>::</td>
+  <td><strong>stat</strong></td><td></td>
+</tr>
+<tr>
+  <td><span class="anchor" id="variable-errmsg~2"></span>character(len=*),</td>
+<td>intent(inout),</td>
+  <td>optional</td>  <td></td><td>::</td>
+  <td><strong>errmsg</strong></td><td></td>
+</tr>
+<tr>
+  <td><span class="anchor" id="variable-errmsg_alloc~2"></span>character(len=:),</td>
+<td>intent(inout),</td>
+  <td>optional</td>  <td>allocatable</td><td>::</td>
+  <td><strong>errmsg_alloc</strong></td><td></td>
+</tr>
+</tbody>
+</table>
 
+    <br>
 
-    
-    
-    </div>
-  </div>
+ </div>
+</div>
 
     <hr>    
     </div> <!-- /container -->
@@ -341,7 +285,7 @@
           <p class="text-right">
             Documentation generated by 
             <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
- on 2023-12-19 03:31            </p>
+ on 2023-12-20 16:08            </p>
         </div>
       </div>
       <br>

@@ -18,7 +18,7 @@ module synchronization_m
 
       module subroutine prif_sync_images(image_set, stat, errmsg, errmsg_alloc)
         implicit none
-        integer(c_int), intent(in) :: image_set(:)
+        integer(c_int), intent(in), optional :: image_set(:)
         integer(c_int), intent(out), optional :: stat
         character(len=*), intent(inout), optional :: errmsg
         character(len=:), intent(inout), allocatable, optional :: errmsg_alloc

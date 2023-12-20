@@ -244,33 +244,33 @@
 <path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M207.91,-89.44C185.67,-83.84 152.9,-75.6 124.56,-68.48"/>
 <polygon fill="#ff0000" stroke="#ff0000" points="125.3,-65.05 114.74,-66.01 123.59,-71.84 125.3,-65.05"/>
 </g>
-<!-- sourcefile~program_startup_s.f90 -->
-<g id="sourcefile~~synchronization_m.f90~~AfferentGraph_node3" class="node">
-<title>sourcefile~program_startup_s.f90</title>
-<g id="a_sourcefile~~synchronization_m.f90~~AfferentGraph_node3"><a xlink:href=".././sourcefile/program_startup_s.f90.html" xlink:title="program_startup_s.F90">
-<polygon fill="#f0ad4e" stroke="#f0ad4e" points="302,-66 168,-66 168,-42 302,-42 302,-66"/>
-<text text-anchor="middle" x="235" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">program_startup_s.F90</text>
-</a>
-</g>
-</g>
-<!-- sourcefile~program_startup_s.f90&#45;&gt;sourcefile~synchronization_m.f90 -->
-<g id="sourcefile~~synchronization_m.f90~~AfferentGraph_edge2" class="edge">
-<title>sourcefile~program_startup_s.f90&#45;&gt;sourcefile~synchronization_m.f90</title>
-<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M168,-54C159.54,-54 150.84,-54 142.25,-54"/>
-<polygon fill="#ff0000" stroke="#ff0000" points="142.25,-50.5 132.25,-54 142.25,-57.5 142.25,-50.5"/>
-</g>
 <!-- sourcefile~synchronization_s.f90 -->
-<g id="sourcefile~~synchronization_m.f90~~AfferentGraph_node4" class="node">
+<g id="sourcefile~~synchronization_m.f90~~AfferentGraph_node3" class="node">
 <title>sourcefile~synchronization_s.f90</title>
-<g id="a_sourcefile~~synchronization_m.f90~~AfferentGraph_node4"><a xlink:href=".././sourcefile/synchronization_s.f90.html" xlink:title="synchronization_s.f90">
-<polygon fill="#f0ad4e" stroke="#f0ad4e" points="298.5,-24 171.5,-24 171.5,0 298.5,0 298.5,-24"/>
-<text text-anchor="middle" x="235" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">synchronization_s.f90</text>
+<g id="a_sourcefile~~synchronization_m.f90~~AfferentGraph_node3"><a xlink:href=".././sourcefile/synchronization_s.f90.html" xlink:title="synchronization_s.f90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="298.5,-66 171.5,-66 171.5,-42 298.5,-42 298.5,-66"/>
+<text text-anchor="middle" x="235" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">synchronization_s.f90</text>
 </a>
 </g>
 </g>
 <!-- sourcefile~synchronization_s.f90&#45;&gt;sourcefile~synchronization_m.f90 -->
-<g id="sourcefile~~synchronization_m.f90~~AfferentGraph_edge3" class="edge">
+<g id="sourcefile~~synchronization_m.f90~~AfferentGraph_edge2" class="edge">
 <title>sourcefile~synchronization_s.f90&#45;&gt;sourcefile~synchronization_m.f90</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M171.34,-54C161.86,-54 152,-54 142.29,-54"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="142.24,-50.5 132.24,-54 142.24,-57.5 142.24,-50.5"/>
+</g>
+<!-- sourcefile~program_startup_s.f90 -->
+<g id="sourcefile~~synchronization_m.f90~~AfferentGraph_node4" class="node">
+<title>sourcefile~program_startup_s.f90</title>
+<g id="a_sourcefile~~synchronization_m.f90~~AfferentGraph_node4"><a xlink:href=".././sourcefile/program_startup_s.f90.html" xlink:title="program_startup_s.F90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="302,-24 168,-24 168,0 302,0 302,-24"/>
+<text text-anchor="middle" x="235" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">program_startup_s.F90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~program_startup_s.f90&#45;&gt;sourcefile~synchronization_m.f90 -->
+<g id="sourcefile~~synchronization_m.f90~~AfferentGraph_edge3" class="edge">
+<title>sourcefile~program_startup_s.f90&#45;&gt;sourcefile~synchronization_m.f90</title>
 <path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M186.14,-24.04C167.02,-28.85 144.81,-34.43 124.8,-39.46"/>
 <polygon fill="#ff0000" stroke="#ff0000" points="123.71,-36.13 114.86,-41.96 125.41,-42.92 123.71,-36.13"/>
 </g>
@@ -356,7 +356,7 @@
 <a id="ln-18" name="ln-18" href="#ln-18"></a>
 <a id="ln-19" name="ln-19" href="#ln-19"></a><span class="k">      module subroutine </span><span class="n">prif_sync_images</span><span class="p">(</span><span class="n">image_set</span><span class="p">,</span><span class="w"> </span><span class="nb">stat</span><span class="p">,</span><span class="w"> </span><span class="n">errmsg</span><span class="p">,</span><span class="w"> </span><span class="n">errmsg_alloc</span><span class="p">)</span><span class="w"></span>
 <a id="ln-20" name="ln-20" href="#ln-20"></a><span class="w">        </span><span class="k">implicit none</span>
-<a id="ln-21" name="ln-21" href="#ln-21"></a><span class="k">        </span><span class="kt">integer</span><span class="p">(</span><span class="kt">c_int</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">image_set</span><span class="p">(:)</span><span class="w"></span>
+<a id="ln-21" name="ln-21" href="#ln-21"></a><span class="k">        </span><span class="kt">integer</span><span class="p">(</span><span class="kt">c_int</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">),</span><span class="w"> </span><span class="k">optional</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">image_set</span><span class="p">(:)</span><span class="w"></span>
 <a id="ln-22" name="ln-22" href="#ln-22"></a><span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="kt">c_int</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">out</span><span class="p">),</span><span class="w"> </span><span class="k">optional</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="nb">stat</span>
 <a id="ln-23" name="ln-23" href="#ln-23"></a><span class="nb">        </span><span class="kt">character</span><span class="p">(</span><span class="nb">len</span><span class="o">=*</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">),</span><span class="w"> </span><span class="k">optional</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">errmsg</span><span class="w"></span>
 <a id="ln-24" name="ln-24" href="#ln-24"></a><span class="w">        </span><span class="kt">character</span><span class="p">(</span><span class="nb">len</span><span class="o">=</span><span class="p">:),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">),</span><span class="w"> </span><span class="k">allocatable</span><span class="p">,</span><span class="w"> </span><span class="k">optional</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">errmsg_alloc</span><span class="w"></span>
@@ -398,7 +398,7 @@
           <p class="text-right">
             Documentation generated by 
             <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
- on 2023-12-19 03:31            </p>
+ on 2023-12-20 16:08            </p>
         </div>
       </div>
       <br>
