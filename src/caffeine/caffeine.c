@@ -13,6 +13,7 @@ static gex_Client_t myclient;
 static gex_EP_t myep;
 static gex_TM_t myteam;
 static gex_Rank_t rank, size;
+static mspace symmetric_heap;
 
 #if __GNUC__ >= 12
   const int float_Complex_workaround = CFI_type_float_Complex;
@@ -61,6 +62,8 @@ void caf_caffeinate(int argc, char *argv[])
 
   gex_Segment_t mysegment;
   GASNET_SAFE(gex_Segment_Attach(&mysegment, myteam, segsz));
+  symmetric_heap = create_mspace_with_base(gex_Segment_QueryAddr(mysegment), gex_Segment_QuerySize(mysegment), 0);
+  mspace_set_footprint_limit(symmetric_heap, gex_Segment_QuerySize(mysegment));
 }
 
 void caf_decaffeinate(int exit_code)

@@ -8,6 +8,8 @@
 #include <gasnetex.h>
 #include <gasnet_coll.h>
 #include <ISO_Fortran_binding.h>
+#include "../dlmalloc/dl_malloc_caf.h"
+#include "../dlmalloc/dl_malloc.h"
 
 enum {
   UNRECOGNIZED_TYPE, 
