@@ -43,13 +43,20 @@ Run tests
 Publications
 ------------
 
-Citing Caffeine? Please use the following publication:
+### Citing Caffeine? Please use the following publication:
 
 Damian Rouson, Dan Bonachea.   
 "[**Caffeine: CoArray Fortran Framework of Efficient Interfaces to Network Environments**](https://github.com/BerkeleyLab/caffeine/wiki/pubs/Caffeine_for_LLVM-2022.pdf)",     
 Proceedings of the [Eighth Annual Workshop on the LLVM Compiler Infrastructure in HPC (LLVM-HPC2022)](https://llvm-hpc-2022-workshop.github.io), November 2022.    
 Paper: <https://doi.org/10.25344/S4459B>     
 [Talk Slides](https://github.com/BerkeleyLab/caffeine/wiki/pubs/Caffeine_for_LLVM-2022-Slides.pdf)
+
+### Caffeine is an implementation of the Parallel Runtime Interface for Fortran (PRIF):
+
+Damian Rouson, Brad Richardson, Dan Bonachea, Katherine Rasmussen.    
+"[**Parallel Runtime Interface for Fortran (PRIF) Design Document, Revision 0.2**](https://github.com/BerkeleyLab/caffeine/wiki/pubs/PRIF_0.2.pdf)",     
+Lawrence Berkeley National Laboratory Technical Report (LBNL-2001563), December 2023.    
+<https://doi.org/10.25344/S4DG6S>
 
 
 Documentation
