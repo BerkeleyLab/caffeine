@@ -19,7 +19,7 @@ print_usage_info()
 }
 
 GCC_VERSION=13
-GASNET_VERSION="2023.3.0"
+GASNET_VERSION="stable"
 
 list_prerequisites()
 {
@@ -263,7 +263,7 @@ if ! $PKG_CONFIG $pkg ; then
   exit_if_user_declines "GASNet-EX"
 
   GASNET_TAR_FILE="GASNet-$GASNET_VERSION.tar.gz"
-  GASNET_SOURCE_URL="https://gasnet.lbl.gov/EX/GASNet-$GASNET_VERSION.tar.gz"
+  GASNET_SOURCE_URL="https://bitbucket.org/berkeleylab/gasnet/downloads/GASNet-$GASNET_VERSION.tar.gz"
   if [ ! -d $DEPENDENCIES_DIR ]; then
     mkdir -pv $DEPENDENCIES_DIR
   fi
