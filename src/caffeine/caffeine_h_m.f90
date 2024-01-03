@@ -17,12 +17,8 @@ module caffeine_h_m
 
     ! ________ Program initiation and finalization ___________
 
-    subroutine caf_caffeinate(argc, argv) bind(C)
-      !! void c_caffeinate(int argc, char *argv[]);
-      import c_int, c_ptr
+    subroutine caf_caffeinate() bind(C)
       implicit none
-      integer(c_int), value :: argc
-      type(c_ptr) argv(*)
     end subroutine
 
     subroutine caf_decaffeinate(exit_code) bind(C)

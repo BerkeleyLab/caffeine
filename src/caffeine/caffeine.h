@@ -20,7 +20,7 @@ typedef void(*final_func_ptr)(void*, size_t) ;
 
 // Program launch and finalization
 
-void caf_caffeinate(int argc, char *argv[]);
+void caf_caffeinate();
 void caf_decaffeinate(int exit_code);
 
 // Image enumeration

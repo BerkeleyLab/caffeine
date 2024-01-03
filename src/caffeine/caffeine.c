@@ -43,22 +43,11 @@ static mspace symmetric_heap;
 
 static void setupCoarrayHandle(void* handle_mem, int corank, intmax_t* lcobounds, intmax_t* ucobounds, final_func_ptr final_func, size_t sz, int64_t allocator, void* object_base_addr_ptr);
 
-void caf_caffeinate(int argc, char *argv[])
+void caf_caffeinate()
 {
-  GASNET_SAFE(gex_Client_Init(&myclient, &myep, &myteam, "caffeine", &argc, &argv, 0));
+  GASNET_SAFE(gex_Client_Init(&myclient, &myep, &myteam, "caffeine", NULL, NULL, 0));
 
   size_t segsz = GASNET_PAGESIZE;
-
-  int argi = 1;
-  if (argi < argc) {
-    if (!strcmp(argv[argi], "-m")) {
-      segsz = gasnet_getMaxLocalSegmentSize();
-    } else {
-      size_t tmp = atol(argv[argi]);
-      if (tmp) segsz = tmp;
-    }
-    ++argi;
-  }
 
   gex_Segment_t mysegment;
   GASNET_SAFE(gex_Segment_Attach(&mysegment, myteam, segsz));
