@@ -13,7 +13,6 @@ static gex_Client_t myclient;
 static gex_EP_t myep;
 static gex_TM_t myteam;
 static gex_Rank_t rank, size;
-static mspace symmetric_heap;
 
 #if __GNUC__ >= 12
   const int float_Complex_workaround = CFI_type_float_Complex;
@@ -43,7 +42,7 @@ static mspace symmetric_heap;
 
 static void setupCoarrayHandle(void* handle_mem, int corank, intmax_t* lcobounds, intmax_t* ucobounds, final_func_ptr final_func, size_t sz, int64_t allocator, void* object_base_addr_ptr);
 
-void caf_caffeinate()
+void caf_caffeinate(mspace* symmetric_heap)
 {
   GASNET_SAFE(gex_Client_Init(&myclient, &myep, &myteam, "caffeine", NULL, NULL, 0));
 
@@ -51,8 +50,8 @@ void caf_caffeinate()
 
   gex_Segment_t mysegment;
   GASNET_SAFE(gex_Segment_Attach(&mysegment, myteam, segsz));
-  symmetric_heap = create_mspace_with_base(gex_Segment_QueryAddr(mysegment), gex_Segment_QuerySize(mysegment), 0);
-  mspace_set_footprint_limit(symmetric_heap, gex_Segment_QuerySize(mysegment));
+  *symmetric_heap = create_mspace_with_base(gex_Segment_QueryAddr(mysegment), gex_Segment_QuerySize(mysegment), 0);
+  mspace_set_footprint_limit(*symmetric_heap, gex_Segment_QuerySize(mysegment));
 }
 
 void caf_decaffeinate(int exit_code)
@@ -71,7 +70,7 @@ int caf_num_images()
 }
 
 // allocate memory for the Fortran object plus memory for a header which contains the coarray handle information
-void* caf_allocate(size_t sz, int corank, CFI_cdesc_t* desc_lcobounds, CFI_cdesc_t* desc_ucobounds, final_func_ptr final_func, void** coarray_handle)
+void* caf_allocate(size_t sz, int corank, CFI_cdesc_t* desc_lcobounds, CFI_cdesc_t* desc_ucobounds, final_func_ptr final_func, void** coarray_handle, mspace symmetric_heap)
 {
    // coarray handle contains
    //      corank (scalar intmax_t)
@@ -114,7 +113,7 @@ void* caf_allocate(size_t sz, int corank, CFI_cdesc_t* desc_lcobounds, CFI_cdesc
    }
 
    size_t handle_sz = HANDLE_SIZE(corank);
-   void* allocated_mem = malloc(sz + handle_sz);
+   void* allocated_mem = mspace_memalign(symmetric_heap, 8, sz + handle_sz);
 
    setupCoarrayHandle(allocated_mem, corank, lcobounds, ucobounds, final_func, sz, -1, (char*)allocated_mem + handle_sz);
 

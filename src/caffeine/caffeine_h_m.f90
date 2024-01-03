@@ -17,8 +17,10 @@ module caffeine_h_m
 
     ! ________ Program initiation and finalization ___________
 
-    subroutine caf_caffeinate() bind(C)
+    subroutine caf_caffeinate(symmetric_heap) bind(C)
+      import c_ptr
       implicit none
+      type(c_ptr), intent(out) :: symmetric_heap
     end subroutine
 
     subroutine caf_decaffeinate(exit_code) bind(C)
@@ -46,7 +48,7 @@ module caffeine_h_m
 
     ! _________________ Memory allocation ____________________
 
-    function caf_allocate(sz, corank, lcobounds, ucobounds, final_func, coarray_handle) result(ptr) bind(c)
+    function caf_allocate(sz, corank, lcobounds, ucobounds, final_func, coarray_handle, symmetric_heap) result(ptr) bind(c)
        import c_int, c_size_t, c_intmax_t, c_funptr, c_ptr
        implicit none
        integer(kind=c_size_t), intent(in), value :: sz
@@ -54,6 +56,7 @@ module caffeine_h_m
        integer(kind=c_intmax_t), dimension(:), intent(in) :: lcobounds, ucobounds
        type(c_funptr), intent(in), value  :: final_func
        type(c_ptr), intent(out) :: coarray_handle
+       type(c_ptr), intent(in), value :: symmetric_heap
        type(c_ptr) :: ptr
      end function
     ! __________________ Synchronization _____________________
