@@ -11,6 +11,7 @@ contains
 
   module procedure prif_init
     call caf_caffeinate()
+    exit_code = 0
   end procedure
 
 end submodule program_startup_s
