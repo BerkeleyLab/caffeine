@@ -1,6 +1,7 @@
 ! Copyright (c), The Regents of the University of California
 ! Terms of use are as specified in LICENSE.txt
 module teams_m
+  use allocation_m, only: handle_data
   use iso_c_binding, only: c_ptr, c_int, c_intmax_t
 
   implicit none
@@ -9,7 +10,10 @@ module teams_m
   public :: prif_team_type, prif_form_team, current_team, prif_end_team, prif_change_team, prif_get_team, prif_team_number
 
   type :: prif_team_type
-    type(c_ptr) :: team_ptr
+    type(c_ptr) :: gex_team
+    type(c_ptr) :: heap
+    type(prif_team_type), pointer :: parent_team
+    type(handle_data), pointer :: coarrays
   end type
 
   type(prif_team_type), pointer :: current_team => null()

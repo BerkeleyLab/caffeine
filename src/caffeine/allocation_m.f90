@@ -6,6 +6,7 @@ module allocation_m
     implicit none
     private
     public :: &
+        handle_data, &
         prif_coarray_handle, &
         prif_allocate, &
         prif_allocate_non_symmetric, &

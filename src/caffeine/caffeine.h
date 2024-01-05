@@ -20,13 +20,13 @@ typedef void(*final_func_ptr)(void*, size_t) ;
 
 // Program launch and finalization
 
-void caf_caffeinate(mspace* symmetric_heap);
+void caf_caffeinate(mspace* symmetric_heap, gex_TM_t** initial_team);
 void caf_decaffeinate(int exit_code);
 
 // Image enumeration
 
-int caf_this_image();
-int caf_num_images();
+int caf_this_image(gex_TM_t* team);
+int caf_num_images(gex_TM_t* team);
 
 // Memory allocation
 
@@ -39,23 +39,23 @@ void caf_sync_all();
 // _______ Collective Subroutines _______ 
 
 void caf_co_reduce(
-  CFI_cdesc_t* a_desc, int result_image, int* stat, char* errmsg, int num_elements, gex_Coll_ReduceFn_t* user_op, void* client_data
+  CFI_cdesc_t* a_desc, int result_image, int* stat, char* errmsg, int num_elements, gex_Coll_ReduceFn_t* user_op, void* client_data, gex_TM_t* team
 );
 
 void caf_co_broadcast(
-  CFI_cdesc_t * a_desc, int source_image, int* stat, int num_elements
+  CFI_cdesc_t * a_desc, int source_image, int* stat, int num_elements, gex_TM_t* team
 );
 
 void caf_co_sum(
-  CFI_cdesc_t* a_desc,  int result_image, int* stat, char* errmsg, size_t num_elements
+  CFI_cdesc_t* a_desc,  int result_image, int* stat, char* errmsg, size_t num_elements, gex_TM_t* team
 );
 
 void caf_co_min(
-  CFI_cdesc_t* a_desc,  int result_image, int* stat, char* errmsg, size_t num_elements
+  CFI_cdesc_t* a_desc,  int result_image, int* stat, char* errmsg, size_t num_elements, gex_TM_t* team
 );
 
 void caf_co_max(
-  CFI_cdesc_t* a_desc, int result_image, int* stat, char* errmsg, size_t num_elements
+  CFI_cdesc_t* a_desc, int result_image, int* stat, char* errmsg, size_t num_elements, gex_TM_t* team
 );
 
 // ____________ Utilities ____________ 

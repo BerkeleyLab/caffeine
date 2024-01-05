@@ -17,10 +17,11 @@ module caffeine_h_m
 
     ! ________ Program initiation and finalization ___________
 
-    subroutine caf_caffeinate(symmetric_heap) bind(C)
+    subroutine caf_caffeinate(symmetric_heap, initial_team) bind(C)
       import c_ptr
       implicit none
       type(c_ptr), intent(out) :: symmetric_heap
+      type(c_ptr), intent(out) :: initial_team
     end subroutine
 
     subroutine caf_decaffeinate(exit_code) bind(C)
@@ -32,17 +33,19 @@ module caffeine_h_m
 
     ! _________________ Image enumeration ____________________
 
-    function caf_this_image() bind(C)
+    function caf_this_image(team) bind(C)
       !! int caf_this_image();
-      import c_int
+      import c_ptr, c_int
       implicit none
+      type(c_ptr), value :: team
       integer(c_int) caf_this_image
     end function
 
-    pure function caf_num_images() bind(C)
+    pure function caf_num_images(team) bind(C)
       !! int caf_num_images();
-      import c_int
+      import c_ptr, c_int
       implicit none
+      type(c_ptr), value :: team
       integer(c_int) caf_num_images
     end function
 
@@ -65,16 +68,17 @@ module caffeine_h_m
 
     ! ______________ Collective Subroutines __________________
 
-     subroutine caf_co_broadcast(a, source_image, stat, Nelem) bind(C)
+     subroutine caf_co_broadcast(a, source_image, stat, Nelem, team) bind(C)
        !! void c_co_broadcast(CFI_cdesc_t * a_desc, int source_image, int* stat, int num_elements);
        import c_int, c_ptr
        implicit none
        type(*) a(..)
        type(c_ptr), value :: stat
        integer(c_int), value :: source_image, Nelem
+       type(c_ptr), value :: team
      end subroutine
 
-     subroutine caf_co_reduce(a, result_image, c_loc_stat, c_loc_errmsg, num_elements, Coll_ReduceSub, client_data ) bind(C)
+     subroutine caf_co_reduce(a, result_image, c_loc_stat, c_loc_errmsg, num_elements, Coll_ReduceSub, client_data, team) bind(C)
        !! void caf_co_reduce(CFI_cdesc_t* a_desc, int result_image, int* stat, char* errmsg, int num_elements, gex_Coll_ReduceFn_t* user_op, void* client_data)
        import c_int, c_ptr, c_size_t, c_funptr
        implicit none 
@@ -83,9 +87,10 @@ module caffeine_h_m
        type(c_ptr), value :: c_loc_stat, c_loc_errmsg, client_data
        type(c_funptr), value :: Coll_ReduceSub
        integer(c_size_t), value :: num_elements
+       type(c_ptr), value :: team
      end subroutine
 
-     subroutine caf_co_sum(a, result_image, c_loc_stat, c_loc_errmsg, num_elements) bind(C)
+     subroutine caf_co_sum(a, result_image, c_loc_stat, c_loc_errmsg, num_elements, team) bind(C)
        !! void c_co_sum(CFI_cdesc_t* a_desc, int result_image, int* stat, char* errmsg, size_t num_elements);
        import c_int, c_ptr, c_size_t
        implicit none 
@@ -93,9 +98,10 @@ module caffeine_h_m
        integer(c_int), value :: result_image
        type(c_ptr), value :: c_loc_stat, c_loc_errmsg
        integer(c_size_t), value :: num_elements
+       type(c_ptr), value :: team
      end subroutine
 
-     subroutine caf_co_min(a, result_image, c_loc_stat, c_loc_errmsg, num_elements) bind(C)
+     subroutine caf_co_min(a, result_image, c_loc_stat, c_loc_errmsg, num_elements, team) bind(C)
        !! void c_co_min(CFI_cdesc_t* a_desc, int result_image, int* stat, char* errmsg, size_t num_elements);
        import c_int, c_ptr, c_size_t
        implicit none 
@@ -103,9 +109,10 @@ module caffeine_h_m
        integer(c_int), value :: result_image
        type(c_ptr), value :: c_loc_stat, c_loc_errmsg
        integer(c_size_t), value :: num_elements
+       type(c_ptr), value :: team
      end subroutine
 
-     subroutine caf_co_max(a, result_image, c_loc_stat, c_loc_errmsg, num_elements) bind(C)
+     subroutine caf_co_max(a, result_image, c_loc_stat, c_loc_errmsg, num_elements, team) bind(C)
        !! void c_co_max(CFI_cdesc_t* a_desc, int result_image, int* stat, char* errmsg, size_t num_elements);
        import c_int, c_ptr, c_size_t
        implicit none 
@@ -113,6 +120,7 @@ module caffeine_h_m
        integer(c_int), value :: result_image
        type(c_ptr), value :: c_loc_stat, c_loc_errmsg
        integer(c_size_t), value :: num_elements
+       type(c_ptr), value :: team
      end subroutine
 
      logical(c_bool) pure function caf_same_cfi_type(a, b) bind(C)

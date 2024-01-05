@@ -2,18 +2,19 @@
 ! Terms of use are as specified in LICENSE.txt
 submodule(image_queries_m) image_queries_s
   use caffeine_h_m, only : caf_num_images, caf_this_image
+  use teams_m, only: current_team
   implicit none
 
 contains
 
   module procedure prif_num_images
     ! TODO: handle optional args `team` and `team_number`
-    image_count = caf_num_images()
+    image_count = caf_num_images(current_team%gex_team)
   end procedure
 
   module procedure prif_this_image_no_coarray
     ! TODO: handle optional arg `team`
-    image_index = caf_this_image()
+    image_index = caf_this_image(current_team%gex_team)
   end procedure
 
   module procedure prif_this_image_with_coarray
