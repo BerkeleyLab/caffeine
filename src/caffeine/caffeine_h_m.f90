@@ -48,15 +48,11 @@ module caffeine_h_m
 
     ! _________________ Memory allocation ____________________
 
-    function caf_allocate(sz, corank, lcobounds, ucobounds, final_func, coarray_handle, symmetric_heap) result(ptr) bind(c)
-       import c_int, c_size_t, c_intmax_t, c_funptr, c_ptr
+    function caf_allocate(mspace, bytes) result(ptr) bind(c)
+       import c_size_t, c_ptr
        implicit none
-       integer(kind=c_size_t), intent(in), value :: sz
-       integer(kind=c_int), intent(in), value :: corank
-       integer(kind=c_intmax_t), dimension(:), intent(in) :: lcobounds, ucobounds
-       type(c_funptr), intent(in), value  :: final_func
-       type(c_ptr), intent(out) :: coarray_handle
-       type(c_ptr), intent(in), value :: symmetric_heap
+       type(c_ptr), intent(in), value :: mspace
+       integer(c_size_t), intent(in), value :: bytes
        type(c_ptr) :: ptr
      end function
     ! __________________ Synchronization _____________________

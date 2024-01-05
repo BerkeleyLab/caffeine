@@ -2,13 +2,33 @@
 ! Terms of use are as specified in LICENSE.txt
 module allocation_m
     use iso_c_binding, only: c_ptr, c_int, c_intmax_t, c_size_t, c_funptr
+
     implicit none
     private
-    public :: prif_allocate, prif_allocate_non_symmetric, prif_deallocate, prif_deallocate_non_symmetric
+    public :: &
+        prif_coarray_handle, &
+        prif_allocate, &
+        prif_allocate_non_symmetric, &
+        prif_deallocate, &
+        prif_deallocate_non_symmetric
 
+    ! TODO: Should these actually be interleaved if we use explicit size?
+    type, bind(C) :: cobound_pair
+      integer(c_intmax_t) :: lcobound, ucobound
+    end type
+    
+    type, bind(C) :: handle_data
+      type(c_ptr) :: coarray_data
+      integer(c_int) :: corank
+      integer(c_size_t) :: coarray_size
+      type(c_funptr) :: final_func
+      type(c_ptr) :: previous_handle, next_handle
+      type(cobound_pair) :: cobounds(15)
+    end type
 
-    type, public :: prif_coarray_handle
-       type(c_ptr) :: ptr
+    type :: prif_coarray_handle
+      private
+      type(handle_data), pointer :: info
     end type
 
     interface

@@ -30,7 +30,7 @@ int caf_num_images();
 
 // Memory allocation
 
-void* caf_allocate(size_t sz, int corank, CFI_cdesc_t* desc_co_lbounds, CFI_cdesc_t* desc_co_ubounds, final_func_ptr final_func, void** coarray_handle, mspace symmetric_heap);
+void* caf_allocate(mspace heap, size_t bytes);
 
 // Synchronization 
 
