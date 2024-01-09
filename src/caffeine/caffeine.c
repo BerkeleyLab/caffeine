@@ -21,15 +21,14 @@ static gex_Rank_t rank, size;
   const int double_Complex_workaround =4100;
 #endif
 
-void caf_caffeinate(mspace* symmetric_heap, gex_TM_t** initial_team)
+void caf_caffeinate(mspace* symmetric_heap, gex_TM_t* initial_team)
 {
-  *initial_team = malloc(sizeof(gex_TM_t));
-  GASNET_SAFE(gex_Client_Init(&myclient, &myep, *initial_team, "caffeine", NULL, NULL, 0));
+  GASNET_SAFE(gex_Client_Init(&myclient, &myep, initial_team, "caffeine", NULL, NULL, 0));
 
   size_t segsz = GASNET_PAGESIZE; // TODO: how big can we make this?
 
   gex_Segment_t mysegment;
-  GASNET_SAFE(gex_Segment_Attach(&mysegment, **initial_team, segsz));
+  GASNET_SAFE(gex_Segment_Attach(&mysegment, *initial_team, segsz));
   // TODO: split into symmetric and non-symmetric heaps
   // TODO: only the "team leader" should do the following
   *symmetric_heap = create_mspace_with_base(gex_Segment_QueryAddr(mysegment), gex_Segment_QuerySize(mysegment), 0);
@@ -41,14 +40,14 @@ void caf_decaffeinate(int exit_code)
   gasnet_exit(exit_code);
 }
 
-int caf_this_image(gex_TM_t* team)
+int caf_this_image(gex_TM_t team)
 {
-  return gex_TM_QueryRank(*team) + 1;
+  return gex_TM_QueryRank(team) + 1;
 }
 
-int caf_num_images(gex_TM_t* team)
+int caf_num_images(gex_TM_t team)
 {
-  return gex_TM_QuerySize(*team);
+  return gex_TM_QuerySize(team);
 }
 
 
@@ -64,7 +63,7 @@ void caf_sync_all()
 }
 
 void caf_co_reduce(
-  CFI_cdesc_t* a_desc, int result_image, int* stat, char* errmsg, int num_elements, gex_Coll_ReduceFn_t* user_op, void* client_data, gex_TM_t* team
+  CFI_cdesc_t* a_desc, int result_image, int* stat, char* errmsg, int num_elements, gex_Coll_ReduceFn_t* user_op, void* client_data, gex_TM_t team
 )
 {
   char* a_address = (char*) a_desc->base_addr;
@@ -73,11 +72,11 @@ void caf_co_reduce(
 
   if (result_image) {
     ev = gex_Coll_ReduceToOneNB(
-      *team, result_image-1, a_address, a_address, GEX_DT_USER, c_sizeof_a, num_elements, GEX_OP_USER, user_op, &c_sizeof_a, 0
+      team, result_image-1, a_address, a_address, GEX_DT_USER, c_sizeof_a, num_elements, GEX_OP_USER, user_op, &c_sizeof_a, 0
     );
   } else {
     ev = gex_Coll_ReduceToAllNB(
-      *team,                 a_address, a_address, GEX_DT_USER, c_sizeof_a, num_elements, GEX_OP_USER, user_op, &c_sizeof_a, 0
+      team,                 a_address, a_address, GEX_DT_USER, c_sizeof_a, num_elements, GEX_OP_USER, user_op, &c_sizeof_a, 0
     );
   }
   gex_Event_Wait(ev);
@@ -85,7 +84,7 @@ void caf_co_reduce(
   if (stat != NULL) *stat = 0;
 }
 
-void caf_co_broadcast(CFI_cdesc_t * a_desc, int source_image, int* stat, int num_elements, gex_TM_t* team)
+void caf_co_broadcast(CFI_cdesc_t * a_desc, int source_image, int* stat, int num_elements, gex_TM_t team)
 {
   char* c_loc_a = (char*) a_desc->base_addr;
   size_t c_sizeof_a = a_desc->elem_len;
@@ -94,7 +93,7 @@ void caf_co_broadcast(CFI_cdesc_t * a_desc, int source_image, int* stat, int num
   int data_type = a_desc->type;
 
   gex_Event_t ev
-    = gex_Coll_BroadcastNB(*team, source_image-1, c_loc_a, c_loc_a, nbytes, 0);
+    = gex_Coll_BroadcastNB(team, source_image-1, c_loc_a, c_loc_a, nbytes, 0);
   gex_Event_Wait(ev);
 
   if (stat != NULL) *stat = 0;
@@ -117,7 +116,7 @@ void set_stat_errmsg_or_abort(int* stat, char* errmsg, const int return_stat, co
   }
 }
 
-void caf_co_max(CFI_cdesc_t* a_desc, int result_image, int* stat, char* errmsg, size_t num_elements, gex_TM_t* team)
+void caf_co_max(CFI_cdesc_t* a_desc, int result_image, int* stat, char* errmsg, size_t num_elements, gex_TM_t team)
 {
   gex_DT_t a_type;
 
@@ -138,16 +137,16 @@ void caf_co_max(CFI_cdesc_t* a_desc, int result_image, int* stat, char* errmsg, 
   gex_Event_t ev;
 
   if (result_image) {
-    ev = gex_Coll_ReduceToOneNB(*team, result_image-1, a_address, a_address, a_type, c_sizeof_a, num_elements, GEX_OP_MAX, NULL, NULL, 0);
+    ev = gex_Coll_ReduceToOneNB(team, result_image-1, a_address, a_address, a_type, c_sizeof_a, num_elements, GEX_OP_MAX, NULL, NULL, 0);
   } else {
-    ev = gex_Coll_ReduceToAllNB(*team,                 a_address, a_address, a_type, c_sizeof_a, num_elements, GEX_OP_MAX, NULL, NULL, 0);
+    ev = gex_Coll_ReduceToAllNB(team,                 a_address, a_address, a_type, c_sizeof_a, num_elements, GEX_OP_MAX, NULL, NULL, 0);
   }
   gex_Event_Wait(ev);
 
   if (stat != NULL) *stat = 0;
 }
 
-void caf_co_min(CFI_cdesc_t* a_desc, int result_image, int* stat, char* errmsg, size_t num_elements, gex_TM_t* team)
+void caf_co_min(CFI_cdesc_t* a_desc, int result_image, int* stat, char* errmsg, size_t num_elements, gex_TM_t team)
 {
   gex_DT_t a_type;
 
@@ -168,16 +167,16 @@ void caf_co_min(CFI_cdesc_t* a_desc, int result_image, int* stat, char* errmsg, 
   gex_Event_t ev;
 
   if (result_image) {
-    ev = gex_Coll_ReduceToOneNB(*team, result_image-1, a_address, a_address, a_type, c_sizeof_a, num_elements, GEX_OP_MIN, NULL, NULL, 0);
+    ev = gex_Coll_ReduceToOneNB(team, result_image-1, a_address, a_address, a_type, c_sizeof_a, num_elements, GEX_OP_MIN, NULL, NULL, 0);
   } else {
-    ev = gex_Coll_ReduceToAllNB(*team,                 a_address, a_address, a_type, c_sizeof_a, num_elements, GEX_OP_MIN, NULL, NULL, 0);
+    ev = gex_Coll_ReduceToAllNB(team,                 a_address, a_address, a_type, c_sizeof_a, num_elements, GEX_OP_MIN, NULL, NULL, 0);
   }
   gex_Event_Wait(ev);
 
   if (stat != NULL) *stat = 0;
 }
 
-void caf_co_sum(CFI_cdesc_t* a_desc, int result_image, int* stat, char* errmsg, size_t num_elements, gex_TM_t* team)
+void caf_co_sum(CFI_cdesc_t* a_desc, int result_image, int* stat, char* errmsg, size_t num_elements, gex_TM_t team)
 {
   gex_DT_t a_type;
 
@@ -200,9 +199,9 @@ void caf_co_sum(CFI_cdesc_t* a_desc, int result_image, int* stat, char* errmsg, 
   gex_Event_t ev;
 
   if (result_image) {
-    ev = gex_Coll_ReduceToOneNB(*team, result_image-1, a_address, a_address, a_type, c_sizeof_a, num_elements, GEX_OP_ADD, NULL, NULL, 0);
+    ev = gex_Coll_ReduceToOneNB(team, result_image-1, a_address, a_address, a_type, c_sizeof_a, num_elements, GEX_OP_ADD, NULL, NULL, 0);
   } else {
-    ev = gex_Coll_ReduceToAllNB(*team,                 a_address, a_address, a_type, c_sizeof_a, num_elements, GEX_OP_ADD, NULL, NULL, 0);
+    ev = gex_Coll_ReduceToAllNB(team,                 a_address, a_address, a_type, c_sizeof_a, num_elements, GEX_OP_ADD, NULL, NULL, 0);
   }
   gex_Event_Wait(ev);
 
