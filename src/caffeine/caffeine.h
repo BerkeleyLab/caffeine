@@ -31,6 +31,7 @@ int caf_num_images(gex_TM_t team);
 // Memory allocation
 
 void* caf_allocate(mspace heap, size_t bytes);
+void caf_deallocate(mspace heap, void* mem);
 
 // Synchronization 
 

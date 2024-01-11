@@ -60,7 +60,8 @@ module allocation_m
 
        module subroutine prif_deallocate(coarray_handles, stat, errmsg, errmsg_alloc)
          implicit none
-         type(prif_coarray_handle), intent(in) :: coarray_handles(:)
+         ! TODO: I think we need to add target here, to be able to pass to bind(C) final_func
+         type(prif_coarray_handle), intent(inout) :: coarray_handles(:)
          integer(c_int), intent(out), optional :: stat
          character(len=*), intent(inout), optional :: errmsg
          character(len=:), intent(inout), allocatable, optional :: errmsg_alloc

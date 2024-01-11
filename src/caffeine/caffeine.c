@@ -56,6 +56,11 @@ void* caf_allocate(mspace heap, size_t bytes)
    return mspace_memalign(heap, 8, bytes);
 }
 
+void caf_deallocate(mspace heap, void* mem)
+{
+  mspace_free(heap, mem);
+}
+
 void caf_sync_all()
 {
   gasnet_barrier_notify(0,GASNET_BARRIERFLAG_ANONYMOUS);

@@ -8,7 +8,7 @@ module caffeine_h_m
   private
   public :: caf_caffeinate, caf_decaffeinate
   public :: caf_num_images, caf_this_image
-  public :: caf_allocate
+  public :: caf_allocate, caf_deallocate
   public :: caf_sync_all
   public :: caf_co_broadcast, caf_co_sum, caf_co_min, caf_co_max, caf_co_reduce
   public :: caf_same_cfi_type, caf_elem_len, caf_numeric_type, caf_is_f_string
@@ -57,7 +57,14 @@ module caffeine_h_m
        type(c_ptr), intent(in), value :: mspace
        integer(c_size_t), intent(in), value :: bytes
        type(c_ptr) :: ptr
-     end function
+    end function
+
+    subroutine caf_deallocate(mspace, mem) bind(c)
+      import c_ptr
+      implicit none
+      type(c_ptr), intent(in), value :: mspace
+      type(c_ptr), intent(in), value :: mem
+    end subroutine
     ! __________________ Synchronization _____________________
 
     subroutine caf_sync_all() bind(C)
