@@ -3,6 +3,7 @@
 submodule(allocation_m) allocation_s
   use iso_c_binding, only: c_sizeof, c_f_pointer, c_loc, c_null_ptr
   use caffeine_h_m, only: caf_allocate
+  use synchronization_m, only: prif_sync_all
   use teams_m, only: prif_team_type, current_team
 
   implicit none
@@ -22,7 +23,10 @@ contains
     handle_size = c_sizeof(unused)
     total_size = handle_size + coarray_size
 
+    ! TODO: have only "team leader" perform allocation
+    !       and "broadcast" offset as part of synchronization
     whole_block = caf_allocate(current_team%heap, total_size)
+    call prif_sync_all
 
     call c_f_pointer(whole_block, coarray_handle%info)
     call c_f_pointer(whole_block, unused2, [2])
