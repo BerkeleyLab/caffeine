@@ -88,6 +88,7 @@ contains
         call prif_error_stop(.false._c_bool, stop_code_char=unallocated_message)
       end if
     end if
+    ! TODO: invoke finalizers from coarray_handles(:)%info%final_func
     ! do i = 1, num_handles
     !   if (coarray_handles(i)%info%final_func /= c_null_funptr) then
     !     call c_f_procpointer(coarray_handles(i)%info%final_func, coarray_cleanup)
