@@ -2,6 +2,8 @@ submodule(collective_subroutines_m)  co_broadcast_s
   use iso_c_binding, only : c_ptr
   use utilities_m, only : get_c_ptr
   use caffeine_h_m, only : caf_co_broadcast
+  use teams_m, only: current_team
+
   implicit none
 
 contains
@@ -11,7 +13,7 @@ contains
 
     stat_ptr = get_c_ptr(stat)
 
-    call caf_co_broadcast(a, source_image, stat_ptr, product(shape(a)))
+    call caf_co_broadcast(a, source_image, stat_ptr, product(shape(a)), current_team%gex_team)
       ! With a compliant Fortran 2018 compiler, pass in c_sizeof(a) as the final argument
       ! and eliminate the calculation of num_elements*sizeof(a) in caffeine.c.
   end procedure

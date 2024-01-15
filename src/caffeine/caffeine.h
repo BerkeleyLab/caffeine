@@ -8,6 +8,8 @@
 #include <gasnetex.h>
 #include <gasnet_coll.h>
 #include <ISO_Fortran_binding.h>
+#include "../dlmalloc/dl_malloc_caf.h"
+#include "../dlmalloc/dl_malloc.h"
 
 enum {
   UNRECOGNIZED_TYPE, 
@@ -18,17 +20,18 @@ typedef void(*final_func_ptr)(void*, size_t) ;
 
 // Program launch and finalization
 
-void caf_caffeinate(int argc, char *argv[]);
+void caf_caffeinate(mspace* symmetric_heap, gex_TM_t* initial_team);
 void caf_decaffeinate(int exit_code);
 
 // Image enumeration
 
-int caf_this_image();
-int caf_num_images();
+int caf_this_image(gex_TM_t team);
+int caf_num_images(gex_TM_t team);
 
 // Memory allocation
 
-void* caf_allocate(size_t sz, int corank, CFI_cdesc_t* desc_co_lbounds, CFI_cdesc_t* desc_co_ubounds, final_func_ptr final_func, void** coarray_handle);
+void* caf_allocate(mspace heap, size_t bytes);
+void caf_deallocate(mspace heap, void* mem);
 
 // Synchronization 
 
@@ -37,23 +40,23 @@ void caf_sync_all();
 // _______ Collective Subroutines _______ 
 
 void caf_co_reduce(
-  CFI_cdesc_t* a_desc, int result_image, int* stat, char* errmsg, int num_elements, gex_Coll_ReduceFn_t* user_op, void* client_data
+  CFI_cdesc_t* a_desc, int result_image, int* stat, char* errmsg, int num_elements, gex_Coll_ReduceFn_t* user_op, void* client_data, gex_TM_t team
 );
 
 void caf_co_broadcast(
-  CFI_cdesc_t * a_desc, int source_image, int* stat, int num_elements
+  CFI_cdesc_t * a_desc, int source_image, int* stat, int num_elements, gex_TM_t team
 );
 
 void caf_co_sum(
-  CFI_cdesc_t* a_desc,  int result_image, int* stat, char* errmsg, size_t num_elements
+  CFI_cdesc_t* a_desc,  int result_image, int* stat, char* errmsg, size_t num_elements, gex_TM_t team
 );
 
 void caf_co_min(
-  CFI_cdesc_t* a_desc,  int result_image, int* stat, char* errmsg, size_t num_elements
+  CFI_cdesc_t* a_desc,  int result_image, int* stat, char* errmsg, size_t num_elements, gex_TM_t team
 );
 
 void caf_co_max(
-  CFI_cdesc_t* a_desc, int result_image, int* stat, char* errmsg, size_t num_elements
+  CFI_cdesc_t* a_desc, int result_image, int* stat, char* errmsg, size_t num_elements, gex_TM_t team
 );
 
 // ____________ Utilities ____________ 
