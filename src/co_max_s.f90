@@ -6,6 +6,7 @@ submodule(collective_subroutines_m) co_max_s
   use caffeine_h_m, only : caf_co_max, caf_same_cfi_type, caf_numeric_type, caf_is_f_string
   use caffeine_assert_m, only : assert
   use program_termination_m, only: prif_error_stop
+  use teams_m, only: current_team
   implicit none
 
 contains
@@ -21,7 +22,8 @@ contains
       c_string = errmsg // c_null_char
       errmsg_c_ptr = get_c_ptr_character(c_string)
 
-      call caf_co_max(a, optional_value(result_image), stat_c_ptr, errmsg_c_ptr, int(product(shape(a)), c_size_t))
+      call caf_co_max( &
+          a, optional_value(result_image), stat_c_ptr, errmsg_c_ptr, int(product(shape(a)), c_size_t), current_team%gex_team)
 
       call c_f_pointer(errmsg_c_ptr, errmsg_f_ptr) ! no need to do this for stat was passed by reference
       errmsg = errmsg_f_ptr ! copy the output back & truncate the null terminator
