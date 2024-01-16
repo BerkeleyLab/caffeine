@@ -20,7 +20,7 @@ typedef void(*final_func_ptr)(void*, size_t) ;
 
 // Program launch and finalization
 
-void caf_caffeinate(mspace* symmetric_heap, gex_TM_t* initial_team);
+void caf_caffeinate(mspace* symmetric_heap, intptr_t* symmetric_heap_start, gex_TM_t* initial_team);
 void caf_decaffeinate(int exit_code);
 
 // Image enumeration
@@ -68,5 +68,9 @@ bool caf_numeric_type(CFI_cdesc_t* a_desc);
 bool caf_is_f_string(CFI_cdesc_t* a_desc);
 
 size_t caf_elem_len(CFI_cdesc_t* a_desc);
+
+intptr_t as_int(void* ptr);
+
+void* as_c_ptr(intptr_t i);
 
 #endif // CAFFEINE_H

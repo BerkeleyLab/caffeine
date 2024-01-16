@@ -9,8 +9,9 @@ submodule(allocation_m) allocation_s
       c_associated, &
       c_null_ptr, &
       c_null_funptr, &
-      c_bool
-  use caffeine_h_m, only: caf_allocate, caf_deallocate
+      c_bool, &
+      c_ptrdiff_t
+  use caffeine_h_m, only: caf_allocate, caf_deallocate, caf_this_image, as_int, as_c_ptr
   use collective_subroutines_m, only: prif_co_sum
   use program_termination_m, only: prif_error_stop
   use synchronization_m, only: prif_sync_all
@@ -24,19 +25,26 @@ contains
     ! TODO: determining the size of the handle and where the coarray begins
     !       becomes a bit more complicated if we don't allocate space for
     !       15 cobounds
+    integer :: me
     type(c_ptr) :: whole_block
+    integer(c_ptrdiff_t) :: block_offset
     integer(c_size_t) :: handle_size, coarray_size, total_size
     type(handle_data) :: unused
     type(handle_data), pointer :: unused2(:)
 
     coarray_size = product(ubounds-lbounds+1)*element_length
-    handle_size = c_sizeof(unused)
-    total_size = handle_size + coarray_size
 
-    ! TODO: have only "team leader" perform allocation
-    !       and "broadcast" offset as part of synchronization
-    whole_block = caf_allocate(current_team%heap, total_size)
-    call prif_sync_all
+    me = caf_this_image(current_team%gex_team)
+    if (me == 1) then
+      handle_size = c_sizeof(unused)
+      total_size = handle_size + coarray_size
+      whole_block = caf_allocate(current_team%heap_mspace, total_size)
+      block_offset = as_int(whole_block) - current_team%heap_start
+    else
+      block_offset = 0
+    end if
+    call prif_co_sum(block_offset)
+    if (me /= 1) whole_block = as_c_ptr(current_team%heap_start + block_offset)
 
     call c_f_pointer(whole_block, coarray_handle%info)
     call c_f_pointer(whole_block, unused2, [2])
@@ -111,8 +119,8 @@ contains
     ! end do
     do i = 1, num_handles
       call remove_from_team_list(coarray_handles(i))
-      ! TODO: only team leader should perform deallocation
-      call caf_deallocate(current_team%heap, c_loc(coarray_handles(i)%info))
+      if (caf_this_image(current_team%gex_team) == 1) &
+        call caf_deallocate(current_team%heap_mspace, c_loc(coarray_handles(i)%info))
       nullify(coarray_handles(i)%info)
     end do
     if (present(stat)) stat = 0

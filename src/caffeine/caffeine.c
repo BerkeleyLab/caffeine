@@ -21,7 +21,7 @@ static gex_Rank_t rank, size;
   const int double_Complex_workaround =4100;
 #endif
 
-void caf_caffeinate(mspace* symmetric_heap, gex_TM_t* initial_team)
+void caf_caffeinate(mspace* symmetric_heap, intptr_t* symmetric_heap_start, gex_TM_t* initial_team)
 {
   GASNET_SAFE(gex_Client_Init(&myclient, &myep, initial_team, "caffeine", NULL, NULL, 0));
 
@@ -30,9 +30,11 @@ void caf_caffeinate(mspace* symmetric_heap, gex_TM_t* initial_team)
   gex_Segment_t mysegment;
   GASNET_SAFE(gex_Segment_Attach(&mysegment, *initial_team, segsz));
   // TODO: split into symmetric and non-symmetric heaps
-  // TODO: only the "team leader" should do the following
-  *symmetric_heap = create_mspace_with_base(gex_Segment_QueryAddr(mysegment), gex_Segment_QuerySize(mysegment), 0);
-  mspace_set_footprint_limit(*symmetric_heap, gex_Segment_QuerySize(mysegment));
+  *symmetric_heap_start = (intptr_t)gex_Segment_QueryAddr(mysegment);
+  if (caf_this_image(*initial_team) == 1) {
+    *symmetric_heap = create_mspace_with_base(gex_Segment_QueryAddr(mysegment), gex_Segment_QuerySize(mysegment), 0);
+    mspace_set_footprint_limit(*symmetric_heap, gex_Segment_QuerySize(mysegment));
+  }
 }
 
 void caf_decaffeinate(int exit_code)
@@ -249,3 +251,11 @@ bool caf_is_f_string(CFI_cdesc_t* a_desc){
   return false;
 }
 #endif
+
+intptr_t as_int(void* ptr) {
+  return (intptr_t)ptr;
+}
+
+void* as_c_ptr(intptr_t i) {
+  return (void*)i;
+}
