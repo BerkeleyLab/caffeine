@@ -61,6 +61,7 @@ contains
   end procedure
 
   module procedure prif_allocate_non_symmetric
+    allocated_memory = caf_allocate(non_symmetric_heap_mspace, size_in_bytes)
   end procedure
 
   module procedure prif_deallocate
@@ -126,6 +127,7 @@ contains
   end procedure
 
   module procedure prif_deallocate_non_symmetric
+    call caf_deallocate(non_symmetric_heap_mspace, mem)
   end procedure
 
   subroutine add_to_team_list(current_team, coarray_handle)

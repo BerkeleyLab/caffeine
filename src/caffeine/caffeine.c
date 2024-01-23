@@ -25,7 +25,7 @@ void caf_caffeinate(mspace* symmetric_heap, intptr_t* symmetric_heap_start, mspa
 {
   GASNET_SAFE(gex_Client_Init(&myclient, &myep, initial_team, "caffeine", NULL, NULL, 0));
 
-  size_t segsz = GASNET_PAGESIZE; // TODO: how big can we make this?
+  size_t segsz = GASNET_PAGESIZE*10; // TODO: how big can we make this?
 
   gex_Segment_t mysegment;
   GASNET_SAFE(gex_Segment_Attach(&mysegment, *initial_team, segsz));
