@@ -121,7 +121,6 @@ contains
       call remove_from_team_list(coarray_handles(i))
       if (caf_this_image(current_team%gex_team) == 1) &
         call caf_deallocate(current_team%heap_mspace, c_loc(coarray_handles(i)%info))
-      nullify(coarray_handles(i)%info)
     end do
     if (present(stat)) stat = 0
   end procedure
@@ -146,7 +145,7 @@ contains
   end subroutine
 
   subroutine remove_from_team_list(coarray_handle)
-    type(prif_coarray_handle), intent(inout) :: coarray_handle
+    type(prif_coarray_handle), intent(in) :: coarray_handle
 
     type(handle_data), pointer :: tmp_data
 
