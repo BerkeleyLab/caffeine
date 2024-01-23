@@ -20,7 +20,7 @@ typedef void(*final_func_ptr)(void*, size_t) ;
 
 // Program launch and finalization
 
-void caf_caffeinate(mspace* symmetric_heap, intptr_t* symmetric_heap_start, gex_TM_t* initial_team);
+void caf_caffeinate(mspace* symmetric_heap, intptr_t* symmetric_heap_start, mspace* non_symmetric_heap, gex_TM_t* initial_team);
 void caf_decaffeinate(int exit_code);
 
 // Image enumeration
