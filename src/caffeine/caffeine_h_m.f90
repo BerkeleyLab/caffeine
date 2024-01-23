@@ -2,7 +2,7 @@
 ! Terms of use are as specified in LICENSE.txt
 module caffeine_h_m
   ! Fortran module shadowing the caffeine.h header file
-  use iso_c_binding, only : c_int, c_ptr, c_size_t, c_funptr, c_bool, c_size_t, c_intmax_t
+  use iso_c_binding, only : c_int, c_ptr, c_size_t, c_funptr, c_bool, c_size_t, c_intmax_t, c_intptr_t
   implicit none
 
   private
@@ -12,15 +12,17 @@ module caffeine_h_m
   public :: caf_sync_all
   public :: caf_co_broadcast, caf_co_sum, caf_co_min, caf_co_max, caf_co_reduce
   public :: caf_same_cfi_type, caf_elem_len, caf_numeric_type, caf_is_f_string
+  public :: as_int, as_c_ptr
 
   interface
 
     ! ________ Program initiation and finalization ___________
 
-    subroutine caf_caffeinate(symmetric_heap, initial_team) bind(C)
-      import c_ptr
+    subroutine caf_caffeinate(symmetric_heap, symmetric_heap_start, initial_team) bind(C)
+      import c_ptr, c_intptr_t
       implicit none
       type(c_ptr), intent(out) :: symmetric_heap
+      integer(c_intptr_t), intent(out) :: symmetric_heap_start
       type(c_ptr), intent(out) :: initial_team
     end subroutine
 
@@ -154,7 +156,20 @@ module caffeine_h_m
        type(*), intent(in) :: a(..)
        integer(c_size_t), target :: a_elem_len
      end function
-  
+
+     pure function as_int(ptr) bind(C)
+       !! intptr_t as_int(void* ptr);
+       import c_ptr, c_intptr_t
+       type(c_ptr), intent(in), value :: ptr
+       integer(c_intptr_t) :: as_int
+     end function
+
+     pure function as_c_ptr(i) bind(C)
+       !! void* as_c_ptr(intptr_t i);
+       import c_ptr, c_intptr_t
+       integer(c_intptr_t), intent(in), value :: i
+       type(c_ptr) :: as_c_ptr
+     end function
   end interface
 
 end module caffeine_h_m

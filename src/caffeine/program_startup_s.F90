@@ -9,7 +9,7 @@ contains
 
   module procedure prif_init
     allocate(current_team)
-    call caf_caffeinate(current_team%heap, current_team%gex_team)
+    call caf_caffeinate(current_team%heap_mspace, current_team%heap_start, current_team%gex_team)
     nullify(current_team%parent_team)
     nullify(current_team%coarrays)
     exit_code = 0
