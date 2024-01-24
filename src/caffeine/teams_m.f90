@@ -7,7 +7,15 @@ module teams_m
   implicit none
 
   private
-  public :: prif_team_type, prif_form_team, current_team, prif_end_team, prif_change_team, prif_get_team, prif_team_number
+  public :: &
+      prif_team_type, &
+      prif_form_team, &
+      current_team, &
+      initial_team, &
+      prif_end_team, &
+      prif_change_team, &
+      prif_get_team, &
+      prif_team_number
 
   type :: prif_team_type
     type(c_ptr) :: gex_team
@@ -17,6 +25,7 @@ module teams_m
     type(handle_data), pointer :: coarrays
   end type
 
+  type(prif_team_type), target :: initial_team
   type(prif_team_type), pointer :: current_team => null()
 
   interface
