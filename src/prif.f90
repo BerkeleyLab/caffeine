@@ -1033,6 +1033,8 @@ module prif
     integer(c_intptr_t) :: heap_start, heap_size
     type(team_data), pointer :: parent_team => null()
     type(handle_data), pointer :: coarrays => null()
+    type(prif_coarray_handle) :: child_team_handle
+    integer(c_intptr_t), pointer :: child_heap_info(:) => null()
   end type
 
 end module prif
