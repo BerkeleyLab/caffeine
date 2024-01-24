@@ -25,7 +25,19 @@ void caf_caffeinate(mspace* symmetric_heap, intptr_t* symmetric_heap_start, mspa
 {
   GASNET_SAFE(gex_Client_Init(&myclient, &myep, initial_team, "caffeine", NULL, NULL, 0));
 
-  size_t segsz = GASNET_PAGESIZE*10; // TODO: how big can we make this?
+  // query largest possible segment GASNet can give us of the same size across all processes:
+  size_t max_seg = gasnet_getMaxGlobalSegmentSize(); 
+  // impose a reasonable default size
+  #ifndef CAF_DEFAULT_SHARED_HEAP_SIZE
+  #define CAF_DEFAULT_SHARED_HEAP_SIZE (128*1024*1024) // 128 MiB
+  #endif
+  size_t default_seg = MIN(max_seg, CAF_DEFAULT_SHARED_HEAP_SIZE);
+  // retrieve user preference, defaulting to the above and units of MiB
+  size_t segsz = gasnett_getenv_int_withdefault("CAF_SHARED_HEAP_SIZE", 
+                                                default_seg, 1024*1024);
+  // cap user request to the largest available:     
+  // TODO: issue a console warning here instead of silently capping                                           
+  segsz = MIN(segsz,max_seg);  
 
   gex_Segment_t mysegment;
   GASNET_SAFE(gex_Segment_Attach(&mysegment, *initial_team, segsz));
