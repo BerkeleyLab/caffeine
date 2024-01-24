@@ -20,7 +20,7 @@ module teams_m
   type :: prif_team_type
     type(c_ptr) :: gex_team
     type(c_ptr) :: heap_mspace
-    integer(c_intptr_t) :: heap_start
+    integer(c_intptr_t) :: heap_start, heap_size
     type(prif_team_type), pointer :: parent_team
     type(handle_data), pointer :: coarrays
   end type

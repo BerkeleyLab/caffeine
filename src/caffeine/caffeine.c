@@ -21,8 +21,13 @@ static gex_Rank_t rank, size;
   const int double_Complex_workaround =4100;
 #endif
 
-void caf_caffeinate(mspace* symmetric_heap, intptr_t* symmetric_heap_start, mspace* non_symmetric_heap, gex_TM_t* initial_team)
-{
+void caf_caffeinate(
+  mspace* symmetric_heap,
+  intptr_t* symmetric_heap_start,
+  intptr_t* symmetric_heap_size,
+  mspace* non_symmetric_heap,
+  gex_TM_t* initial_team
+) {
   GASNET_SAFE(gex_Client_Init(&myclient, &myep, initial_team, "caffeine", NULL, NULL, 0));
 
   // query largest possible segment GASNet can give us of the same size across all processes:
@@ -53,12 +58,12 @@ void caf_caffeinate(mspace* symmetric_heap, intptr_t* symmetric_heap_start, mspa
   assert(non_symmetric_fraction > 0 && non_symmetric_fraction < 1); // TODO: real error reporting
 
   size_t non_symmetric_heap_size = total_heap_size * non_symmetric_fraction;
-  size_t symmetric_heap_size = total_heap_size - non_symmetric_heap_size;
-  intptr_t non_symmetric_heap_start = *symmetric_heap_start + symmetric_heap_size;
+  *symmetric_heap_size = total_heap_size - non_symmetric_heap_size;
+  intptr_t non_symmetric_heap_start = *symmetric_heap_start + *symmetric_heap_size;
 
   if (caf_this_image(*initial_team) == 1) {
-    *symmetric_heap = create_mspace_with_base(*symmetric_heap_start, symmetric_heap_size, 0);
-    mspace_set_footprint_limit(*symmetric_heap, symmetric_heap_size);
+    *symmetric_heap = create_mspace_with_base(*symmetric_heap_start, *symmetric_heap_size, 0);
+    mspace_set_footprint_limit(*symmetric_heap, *symmetric_heap_size);
   }
   *non_symmetric_heap = create_mspace_with_base(non_symmetric_heap_start, non_symmetric_heap_size, 0);
   mspace_set_footprint_limit(*non_symmetric_heap, non_symmetric_heap_size);

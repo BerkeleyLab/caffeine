@@ -9,7 +9,12 @@ submodule(program_startup_m) program_startup_s
 contains
 
   module procedure prif_init
-    call caf_caffeinate(initial_team%heap_mspace, initial_team%heap_start, non_symmetric_heap_mspace, initial_team%gex_team)
+    call caf_caffeinate( &
+        initial_team%heap_mspace, &
+        initial_team%heap_start, &
+        initial_team%heap_size, &
+        non_symmetric_heap_mspace, &
+        initial_team%gex_team)
     nullify(initial_team%parent_team)
     nullify(initial_team%coarrays)
     current_team => initial_team
