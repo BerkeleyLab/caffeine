@@ -44,7 +44,8 @@ void caf_caffeinate(mspace* symmetric_heap, intptr_t* symmetric_heap_start, mspa
 
   *symmetric_heap_start = (intptr_t)gex_Segment_QueryAddr(mysegment);
   size_t total_heap_size = gex_Segment_QuerySize(mysegment);
-  float non_symmetric_fraction = 0.5f; // TODO: Configurable via env var?
+  float non_symmetric_fraction = gasnett_getenv_dbl_withdefault("CAF_NONSYM_FRACTION", 0.5f);
+  assert(non_symmetric_fraction > 0 && non_symmetric_fraction < 1); // TODO: real error reporting
   size_t non_symmetric_heap_size = total_heap_size * non_symmetric_fraction;
   size_t symmetric_heap_size = total_heap_size - non_symmetric_heap_size;
   intptr_t non_symmetric_heap_start = symmetric_heap_start + symmetric_heap_size;
