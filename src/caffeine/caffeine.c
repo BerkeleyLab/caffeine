@@ -48,7 +48,7 @@ void caf_caffeinate(mspace* symmetric_heap, intptr_t* symmetric_heap_start, mspa
   assert(non_symmetric_fraction > 0 && non_symmetric_fraction < 1); // TODO: real error reporting
   size_t non_symmetric_heap_size = total_heap_size * non_symmetric_fraction;
   size_t symmetric_heap_size = total_heap_size - non_symmetric_heap_size;
-  intptr_t non_symmetric_heap_start = symmetric_heap_start + symmetric_heap_size;
+  intptr_t non_symmetric_heap_start = *symmetric_heap_start + symmetric_heap_size;
 
   if (caf_this_image(*initial_team) == 1) {
     *symmetric_heap = create_mspace_with_base(*symmetric_heap_start, symmetric_heap_size, 0);
