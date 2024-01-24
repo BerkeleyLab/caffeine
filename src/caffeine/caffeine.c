@@ -41,9 +41,14 @@ int caf_this_image(gex_TM_t team)
 }
 
 // NOTE: gex_TM_T is a typedef to a C pointer, so the `gex_TM_t* initial_team` arg in the C signature matches the BIND(C) interface of an `intent(out)` arg of type `c_ptr` for the same argument
-void caf_caffeinate(mspace* symmetric_heap, intptr_t* symmetric_heap_start, mspace* non_symmetric_heap, gex_TM_t* initial_team)
-{
-  GASNET_SAFE(gex_Client_Init(&myclient, &myep, &myworldteam, "caffeine", NULL, NULL, 0));
+void caf_caffeinate(
+  mspace* symmetric_heap,
+  intptr_t* symmetric_heap_start,
+  intptr_t* symmetric_heap_size,
+  mspace* non_symmetric_heap,
+  gex_TM_t* initial_team
+) {
+  GASNET_SAFE(gex_Client_Init(&myclient, &myep, initial_team, "caffeine", NULL, NULL, 0));
 
   // query largest possible segment GASNet can give us of the same size across all processes:
   size_t max_seg = gasnet_getMaxGlobalSegmentSize();
@@ -59,7 +64,7 @@ void caf_caffeinate(mspace* symmetric_heap, intptr_t* symmetric_heap_start, mspa
   // TODO: issue a console warning here instead of silently capping
   segsz = MIN(segsz,max_seg);
 
-  GASNET_SAFE(gex_Segment_Attach(&mysegment, myworldteam, segsz));
+  GASNET_SAFE(gex_Segment_Attach(&mysegment, *initial_team, segsz));
 
   *symmetric_heap_start = (intptr_t)gex_Segment_QueryAddr(mysegment);
   size_t total_heap_size = gex_Segment_QuerySize(mysegment);
@@ -72,16 +77,16 @@ void caf_caffeinate(mspace* symmetric_heap, intptr_t* symmetric_heap_start, mspa
   assert(non_symmetric_fraction > 0 && non_symmetric_fraction < 1); // TODO: real error reporting
 
   size_t non_symmetric_heap_size = total_heap_size * non_symmetric_fraction;
-  size_t symmetric_heap_size = total_heap_size - non_symmetric_heap_size;
-  intptr_t non_symmetric_heap_start = *symmetric_heap_start + symmetric_heap_size;
+  *symmetric_heap_size = total_heap_size - non_symmetric_heap_size;
+  intptr_t non_symmetric_heap_start = *symmetric_heap_start + *symmetric_heap_size;
 
-  if (caf_this_image(myworldteam) == 1) {
-    *symmetric_heap = create_mspace_with_base((void*)*symmetric_heap_start, symmetric_heap_size, 0);
-    mspace_set_footprint_limit(*symmetric_heap, symmetric_heap_size);
+  if (caf_this_image(*initial_team) == 1) {
+    *symmetric_heap = create_mspace_with_base((void*)*symmetric_heap_start, *symmetric_heap_size, 0);
+    mspace_set_footprint_limit(*symmetric_heap, *symmetric_heap_size);
   }
   *non_symmetric_heap = create_mspace_with_base((void*)non_symmetric_heap_start, non_symmetric_heap_size, 0);
   mspace_set_footprint_limit(*non_symmetric_heap, non_symmetric_heap_size);
-  *initial_team = myworldteam;
+  myworldteam = *initial_team;
 }
 
 void caf_decaffeinate(int exit_code)

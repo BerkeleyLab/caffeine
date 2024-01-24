@@ -18,11 +18,17 @@ submodule(prif) prif_private_s
 
     ! ________ Program initiation and finalization ___________
 
-    subroutine caf_caffeinate(symmetric_heap, symmetric_heap_start, non_symmetric_heap, initial_team) bind(C)
+    subroutine caf_caffeinate( &
+        symmetric_heap, &
+        symmetric_heap_start, &
+        symmetric_heap_size, &
+        non_symmetric_heap, &
+        initial_team) &
+        bind(C)
       import c_ptr, c_intptr_t
       implicit none
       type(c_ptr), intent(out) :: symmetric_heap
-      integer(c_intptr_t), intent(out) :: symmetric_heap_start
+      integer(c_intptr_t), intent(out) :: symmetric_heap_start, symmetric_heap_size
       type(c_ptr), intent(out) :: non_symmetric_heap
       type(c_ptr), intent(out) :: initial_team
     end subroutine

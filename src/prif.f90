@@ -1030,7 +1030,7 @@ module prif
   type, private :: team_data
     type(c_ptr) :: gex_team
     type(c_ptr) :: heap_mspace
-    integer(c_intptr_t) :: heap_start
+    integer(c_intptr_t) :: heap_start, heap_size
     type(team_data), pointer :: parent_team => null()
     type(handle_data), pointer :: coarrays => null()
   end type

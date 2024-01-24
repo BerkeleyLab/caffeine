@@ -13,6 +13,7 @@ contains
        call caf_caffeinate( &
           initial_team%heap_mspace, &
           initial_team%heap_start, &
+          initial_team%heap_size, &
           non_symmetric_heap_mspace, &
           initial_team%gex_team)
        current_team%info => initial_team
