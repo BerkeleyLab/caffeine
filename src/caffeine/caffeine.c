@@ -33,8 +33,8 @@ void caf_caffeinate(mspace* symmetric_heap, intptr_t* symmetric_heap_start, mspa
   *symmetric_heap_start = (intptr_t)gex_Segment_QueryAddr(mysegment);
   size_t total_heap_size = gex_Segment_QuerySize(mysegment);
   float non_symmetric_fraction = 0.5f; // TODO: Configurable via env var?
-  size_t symmetric_heap_size = total_heap_size * non_symmetric_fraction;
-  size_t non_symmetric_heap_size = total_heap_size - symmetric_heap_size;
+  size_t non_symmetric_heap_size = total_heap_size * non_symmetric_fraction;
+  size_t symmetric_heap_size = total_heap_size - non_symmetric_heap_size;
   intptr_t non_symmetric_heap_start = symmetric_heap_start + symmetric_heap_size;
 
   if (caf_this_image(*initial_team) == 1) {
