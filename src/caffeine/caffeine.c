@@ -28,24 +28,30 @@ void caf_caffeinate(mspace* symmetric_heap, intptr_t* symmetric_heap_start, mspa
   // query largest possible segment GASNet can give us of the same size across all processes:
   size_t max_seg = gasnet_getMaxGlobalSegmentSize(); 
   // impose a reasonable default size
-  #ifndef CAF_DEFAULT_SHARED_HEAP_SIZE
-  #define CAF_DEFAULT_SHARED_HEAP_SIZE (128*1024*1024) // 128 MiB
+  #ifndef CAF_DEFAULT_HEAP_SIZE
+  #define CAF_DEFAULT_HEAP_SIZE (128*1024*1024) // 128 MiB
   #endif
-  size_t default_seg = MIN(max_seg, CAF_DEFAULT_SHARED_HEAP_SIZE);
+  size_t default_seg = MIN(max_seg, CAF_DEFAULT_HEAP_SIZE);
   // retrieve user preference, defaulting to the above and units of MiB
-  size_t segsz = gasnett_getenv_int_withdefault("CAF_SHARED_HEAP_SIZE", 
+  size_t segsz = gasnett_getenv_int_withdefault("CAF_HEAP_SIZE", 
                                                 default_seg, 1024*1024);
-  // cap user request to the largest available:     
-  // TODO: issue a console warning here instead of silently capping                                           
-  segsz = MIN(segsz,max_seg);  
+  // cap user request to the largest available:
+  // TODO: issue a console warning here instead of silently capping
+  segsz = MIN(segsz,max_seg);
 
   gex_Segment_t mysegment;
   GASNET_SAFE(gex_Segment_Attach(&mysegment, *initial_team, segsz));
 
   *symmetric_heap_start = (intptr_t)gex_Segment_QueryAddr(mysegment);
   size_t total_heap_size = gex_Segment_QuerySize(mysegment);
-  float non_symmetric_fraction = gasnett_getenv_dbl_withdefault("CAF_NONSYM_FRACTION", 0.5f);
+
+  #ifndef CAF_DEFAULT_COMP_FRAC
+  #define CAF_DEFAULT_COMP_FRAC 0.1f // 10%
+  #endif
+  float default_comp_frac = MAX(MIN(0.99f, CAF_DEFAULT_COMP_FRAC), 0.01f);
+  float non_symmetric_fraction = gasnett_getenv_dbl_withdefault("CAF_COMP_FRAC", default_comp_frac);
   assert(non_symmetric_fraction > 0 && non_symmetric_fraction < 1); // TODO: real error reporting
+
   size_t non_symmetric_heap_size = total_heap_size * non_symmetric_fraction;
   size_t symmetric_heap_size = total_heap_size - non_symmetric_heap_size;
   intptr_t non_symmetric_heap_start = *symmetric_heap_start + symmetric_heap_size;
