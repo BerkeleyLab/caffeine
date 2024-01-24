@@ -17,6 +17,7 @@ contains
         initial_team%gex_team)
     nullify(initial_team%parent_team)
     nullify(initial_team%coarrays)
+    nullify(initial_team%child_heap_info)
     current_team => initial_team
     exit_code = 0
   end procedure

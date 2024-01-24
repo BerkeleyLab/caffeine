@@ -1,7 +1,7 @@
 ! Copyright (c), The Regents of the University of California
 ! Terms of use are as specified in LICENSE.txt
 module teams_m
-  use allocation_m, only: handle_data
+  use allocation_m, only: prif_coarray_handle, handle_data
   use iso_c_binding, only: c_ptr, c_int, c_intmax_t, c_intptr_t
 
   implicit none
@@ -23,6 +23,8 @@ module teams_m
     integer(c_intptr_t) :: heap_start, heap_size
     type(prif_team_type), pointer :: parent_team
     type(handle_data), pointer :: coarrays
+    type(prif_coarray_handle) :: child_team_handle
+    integer(c_intptr_t), pointer :: child_heap_info(:)
   end type
 
   type(prif_team_type), target :: initial_team
