@@ -13,6 +13,7 @@ module caffeine_h_m
   public :: caf_co_broadcast, caf_co_sum, caf_co_min, caf_co_max, caf_co_reduce
   public :: caf_same_cfi_type, caf_elem_len, caf_numeric_type, caf_is_f_string
   public :: as_int, as_c_ptr
+  public :: caf_form_team
 
   interface
 
@@ -163,6 +164,15 @@ module caffeine_h_m
        type(*), intent(in) :: a(..)
        integer(c_size_t), target :: a_elem_len
      end function
+
+     subroutine caf_form_team(current_team, new_team, team_number, new_index) bind(C)
+      !! void caf_form_team(gex_TM_t* current_team, gex_TM_t* new_team, intmax_t team_number, int new_index);
+      import c_ptr, c_int, c_intmax_t
+      type(c_ptr), intent(in) :: current_team
+      type(c_ptr), intent(out) :: new_team
+      integer(c_intmax_t), intent(in), value :: team_number
+      integer(c_int), intent(in), value :: new_index
+     end subroutine
 
      pure function as_int(ptr) bind(C)
        !! intptr_t as_int(void* ptr);

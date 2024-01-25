@@ -75,6 +75,8 @@ bool caf_is_f_string(CFI_cdesc_t* a_desc);
 
 size_t caf_elem_len(CFI_cdesc_t* a_desc);
 
+void caf_form_team(gex_TM_t* current_team, gex_TM_t* new_team, intmax_t team_number, int new_index);
+
 intptr_t as_int(void* ptr);
 
 void* as_c_ptr(intptr_t i);

@@ -2,7 +2,7 @@
 ! Terms of use are as specified in LICENSE.txt
 module teams_m
   use allocation_m, only: prif_coarray_handle, handle_data
-  use iso_c_binding, only: c_ptr, c_int, c_intmax_t, c_intptr_t
+  use iso_c_binding, only: c_ptr, c_int, c_intmax_t, c_intptr_t, c_ptrdiff_t, c_size_t
 
   implicit none
 
@@ -17,14 +17,20 @@ module teams_m
       prif_get_team, &
       prif_team_number
 
+  type :: child_team_info
+    integer(c_ptrdiff_t) :: offset
+    integer(c_size_t) :: size
+  end type
+
   type :: prif_team_type
     type(c_ptr) :: gex_team
     type(c_ptr) :: heap_mspace
-    integer(c_intptr_t) :: heap_start, heap_size
+    integer(c_intptr_t) :: heap_start
+    integer(c_size_t) :: heap_size
     type(prif_team_type), pointer :: parent_team
     type(handle_data), pointer :: coarrays
     type(prif_coarray_handle) :: child_team_handle
-    integer(c_intptr_t), pointer :: child_heap_info(:)
+    type(child_team_info), pointer :: child_heap_info ! offset and size
   end type
 
   type(prif_team_type), target :: initial_team
