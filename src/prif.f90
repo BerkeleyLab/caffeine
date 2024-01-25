@@ -1030,11 +1030,16 @@ module prif
   type, private :: team_data
     type(c_ptr) :: gex_team
     type(c_ptr) :: heap_mspace
-    integer(c_intptr_t) :: heap_start, heap_size
+    integer(c_intptr_t) :: heap_start
+    integer(c_size_t) :: heap_size
     type(team_data), pointer :: parent_team => null()
     type(handle_data), pointer :: coarrays => null()
     type(prif_coarray_handle) :: child_team_handle
-    integer(c_intptr_t), pointer :: child_heap_info(:) => null()
+    type(child_team_info), pointer :: child_heap_info => null()
   end type
 
+  type :: child_team_info
+    integer(c_ptrdiff_t) :: offset
+    integer(c_size_t) :: size
+  end type
 end module prif

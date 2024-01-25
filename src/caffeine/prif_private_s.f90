@@ -191,6 +191,15 @@ submodule(prif) prif_private_s
        integer(c_size_t), target :: a_elem_len
      end function
 
+     subroutine caf_form_team(current_team, new_team, team_number, new_index) bind(C)
+      !! void caf_form_team(gex_TM_t* current_team, gex_TM_t* new_team, intmax_t team_number, int new_index);
+      import c_ptr, c_int, c_intmax_t
+      type(c_ptr), intent(in) :: current_team
+      type(c_ptr), intent(out) :: new_team
+      integer(c_intmax_t), intent(in), value :: team_number
+      integer(c_int), intent(in), value :: new_index
+     end subroutine
+
   end interface
 
 contains
