@@ -28,6 +28,12 @@ contains
     coarray_size = product(ubounds-lbounds+1)*element_size
 
     me = caf_this_image(current_team%info%gex_team)
+    if (caf_have_child_teams()) then
+      ! Free the child team space to make sure we have space to allocate the coarray
+      if (me == 1) then
+        call caf_deallocate(current_team%info%heap_mspace, current_team%info%child_heap_info%allocated_memory)
+      end if
+    end if
     if (me == 1) then
       handle_size = c_sizeof(unused)
       total_size = handle_size + coarray_size
@@ -52,6 +58,9 @@ contains
     call add_to_team_list(current_team, coarray_handle)
 
     allocated_memory = coarray_handle%info%coarray_data
+    if (caf_have_child_teams()) then
+      call caf_establish_child_heap
+    end if
   end procedure
 
   module procedure prif_allocate
@@ -118,6 +127,13 @@ contains
         call caf_deallocate(current_team%info%heap_mspace, c_loc(coarray_handles(i)%info))
     end do
     if (present(stat)) stat = 0
+    if (caf_have_child_teams()) then
+      ! reclaim any free space possible for the child teams to use
+      if (caf_this_image(current_team%info%gex_team) == 1) then
+        call caf_deallocate(current_team%info%heap_mspace, current_team%info%child_heap_info%allocated_memory)
+      end if
+      call caf_establish_child_heap
+    end if
   end procedure
 
   module procedure prif_deallocate

@@ -68,11 +68,27 @@ submodule(prif) prif_private_s
        type(c_ptr) :: ptr
     end function
 
+    subroutine caf_allocate_remaining(mspace, allocated_space, allocated_size) bind(c)
+      import c_size_t, c_ptr
+      implicit none
+      type(c_ptr), intent(in), value :: mspace
+      type(c_ptr), intent(out) :: allocated_space
+      integer(c_size_t), intent(out) :: allocated_size
+    end subroutine
+
     subroutine caf_deallocate(mspace, mem) bind(c)
       import c_ptr
       implicit none
       type(c_ptr), intent(in), value :: mspace
       type(c_ptr), intent(in), value :: mem
+    end subroutine
+
+    subroutine caf_establish_mspace(mspace, mem, mem_size)
+      import c_size_t, c_ptr
+      implicit none
+      type(c_ptr), intent(out) :: mspace
+      type(c_ptr), intent(in), value :: mem
+      integer(c_size_t), intent(in), value :: mem_size
     end subroutine
 
     ! ___________________ PRIF Queries ______________________
@@ -251,6 +267,23 @@ contains
     else
       c_val = 0_c_int
     end if
+  end function
+
+  subroutine caf_establish_child_heap
+    if (caf_this_image(current_team%info%gex_team) == 1) then
+      call caf_allocate_remaining( &
+          current_team%info%heap_mspace, &
+          current_team%info%child_heap_info%allocated_memory, &
+          current_team%info%child_heap_info%size)
+      current_team%info%child_heap_info%offset = &
+          as_int(current_team%info%child_heap_info%allocated_memory) - current_team%info%heap_start
+    end if
+    call prif_co_broadcast(current_team%info%child_heap_info%offset, 1)
+    call prif_co_broadcast(current_team%info%child_heap_info%size, 1)
+  end subroutine
+
+  logical function caf_have_child_teams()
+    caf_have_child_teams = associated(current_team%info%child_heap_info)
   end function
 
 end submodule prif_private_s

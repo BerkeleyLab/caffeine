@@ -1,13 +1,24 @@
 ! Copyright (c), The Regents of the University of California
 ! Terms of use are as specified in LICENSE.txt
 submodule(prif:prif_private_s) teams_s
-  use iso_c_binding, only: c_null_funptr, c_f_pointer
+  use iso_c_binding, only: c_null_funptr, c_f_pointer, c_loc
 
   implicit none
 contains
 
   module procedure prif_change_team
-    call unimplemented("prif_change_team")
+    if (caf_this_image(team%info%gex_team) == 1) then ! need to setup the heap for the team
+      team%info%heap_start = current_team%info%child_heap_info%offset + current_team%info%heap_start
+      team%info%heap_size = current_team%info%child_heap_info%size
+      call caf_establish_mspace( &
+          team%info%heap_mspace, &
+          as_c_ptr(team%info%heap_start), &
+          current_team%info%child_heap_info%size)
+    end if
+    current_team = team
+    if (caf_have_child_teams()) then ! need to establish heap for child teams
+      call caf_establish_child_heap
+    end if
   end procedure
 
   module procedure prif_end_team
@@ -15,33 +26,10 @@ contains
   end procedure
 
   module procedure prif_form_team
-    if (.not.associated(current_team%info%child_heap_info)) then
-      block
-        type(c_ptr) :: allocated_memory
-        integer :: num_imgs
-        type(child_team_info) :: dummy_element
-
-        call prif_num_images(num_images = num_imgs)
-        call prif_allocate_coarray( &
-            lcobounds = [1_c_intmax_t], &
-            ucobounds = [int(num_imgs, c_intmax_t)], &
-            lbounds = [integer(c_intmax_t)::], &
-            ubounds = [integer(c_intmax_t)::], &
-            element_size = int(storage_size(dummy_element)/8, c_size_t), &
-            final_func = c_null_funptr, &
-            coarray_handle = current_team%info%child_team_handle, &
-            allocated_memory = allocated_memory)
-        call c_f_pointer(allocated_memory, current_team%info%child_heap_info)
-
-        if (caf_this_image(current_team%info%gex_team) == 1) then
-          ! TODO: Take up remaining space and adjust during (de)allocations
-          current_team%info%child_heap_info%size = int(current_team%info%heap_size * 0.1d0, c_size_t)
-          current_team%info%child_heap_info%offset = &
-              as_int(caf_allocate( &
-                  current_team%info%heap_mspace, current_team%info%child_heap_info%size)) &
-              - current_team%info%heap_start
-        end if
-      end block
+    ! indicates this is the first time we're creating a child team
+    if (.not.caf_have_child_teams()) then
+      allocate(current_team%info%child_heap_info)
+      call caf_establish_child_heap
     end if
 
     block

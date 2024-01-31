@@ -104,9 +104,26 @@ void* caf_allocate(mspace heap, size_t bytes)
    return mspace_memalign(heap, 8, bytes);
 }
 
+void* caf_allocate_remaining(mspace heap, void** allocated_space, size_t* allocated_size)
+{
+  // The following doesn't necessarily give us all remaining space
+  // nor necessarily the largest open space, but in practice is likely
+  // to work out that way
+  struct mallinfo heap_info = mspace_mallinfo(heap);
+  *allocated_size = heap_info.keepcost;
+
+  *allocated_space = mspace_memalign(heap, 8, *allocated_size);
+}
+
 void caf_deallocate(mspace heap, void* mem)
 {
   mspace_free(heap, mem);
+}
+
+void caf_establish_mspace(mspace* heap, void* heap_start, size_t heap_size)
+{
+  *heap = create_mspace_with_base(heap_start, heap_size, 0);
+  mspace_set_footprint_limit(*heap, heap_size);
 }
 
 // take address in a segment and convert to an address on given image

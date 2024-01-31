@@ -1034,11 +1034,11 @@ module prif
     integer(c_size_t) :: heap_size
     type(team_data), pointer :: parent_team => null()
     type(handle_data), pointer :: coarrays => null()
-    type(prif_coarray_handle) :: child_team_handle
     type(child_team_info), pointer :: child_heap_info => null()
   end type
 
   type :: child_team_info
+    type(c_ptr) :: allocated_memory
     integer(c_ptrdiff_t) :: offset
     integer(c_size_t) :: size
   end type
