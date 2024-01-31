@@ -11,7 +11,8 @@ module allocation_m
         prif_allocate, &
         prif_allocate_non_symmetric, &
         prif_deallocate, &
-        prif_deallocate_non_symmetric
+        prif_deallocate_non_symmetric, &
+        non_symmetric_heap_mspace
 
     ! TODO: Should these actually be interleaved if we use explicit size?
     type, bind(C) :: cobound_pair
@@ -31,6 +32,8 @@ module allocation_m
       private
       type(handle_data), pointer :: info
     end type
+
+    type(c_ptr) :: non_symmetric_heap_mspace
 
     interface
 

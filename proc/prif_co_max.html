@@ -143,19 +143,19 @@
   <td><strong>result_image</strong></td><td></td>
 </tr>
 <tr>
-  <td><span class="anchor" id="variable-stat~10"></span>integer(kind=c_int),</td>
+  <td><span class="anchor" id="variable-stat~16"></span>integer(kind=c_int),</td>
 <td>intent(out),</td>
   <td>optional</td>  <td></td><td>::</td>
   <td><strong>stat</strong></td><td></td>
 </tr>
 <tr>
-  <td><span class="anchor" id="variable-errmsg~9"></span>character(len=*),</td>
+  <td><span class="anchor" id="variable-errmsg~15"></span>character(len=*),</td>
 <td>intent(inout),</td>
   <td>optional</td>  <td></td><td>::</td>
   <td><strong>errmsg</strong></td><td></td>
 </tr>
 <tr>
-  <td><span class="anchor" id="variable-errmsg_alloc~8"></span>character(len=:),</td>
+  <td><span class="anchor" id="variable-errmsg_alloc~15"></span>character(len=:),</td>
 <td>intent(inout),</td>
   <td>optional</td>  <td>allocatable</td><td>::</td>
   <td><strong>errmsg_alloc</strong></td><td></td>
@@ -183,8 +183,8 @@
 <!-- proc~prif_co_max -->
 <g id="proc~~prif_co_max~~CallsGraph_node1" class="node">
 <title>proc~prif_co_max</title>
-<polygon fill="none" stroke="black" points="77,-274 0,-274 0,-250 77,-250 77,-274"/>
-<text text-anchor="middle" x="38.5" y="-259.6" font-family="Helvetica,sans-Serif" font-size="10.50">prif_co_max</text>
+<polygon fill="none" stroke="black" points="77,-172 0,-172 0,-148 77,-148 77,-172"/>
+<text text-anchor="middle" x="38.5" y="-157.6" font-family="Helvetica,sans-Serif" font-size="10.50">prif_co_max</text>
 </g>
 <!-- interface~caf_numeric_type -->
 <g id="proc~~prif_co_max~~CallsGraph_node2" class="node">
@@ -198,13 +198,28 @@
 <!-- proc~prif_co_max&#45;&gt;interface~caf_numeric_type -->
 <g id="proc~~prif_co_max~~CallsGraph_edge1" class="edge">
 <title>proc~prif_co_max&#45;&gt;interface~caf_numeric_type</title>
-<path fill="none" stroke="#ff0000" d="M43.22,-274.1C51.7,-299.92 74.76,-361.1 113,-398 116.43,-401.31 120.37,-404.28 124.51,-406.93"/>
-<polygon fill="#ff0000" stroke="#ff0000" points="122.79,-409.97 133.21,-411.9 126.26,-403.9 122.79,-409.97"/>
+<path fill="none" stroke="#ff0000" d="M39.99,-172.22C42.11,-210.23 53.43,-328.03 113,-398 115.74,-401.22 118.98,-404.09 122.49,-406.62"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="120.69,-409.62 131.02,-411.95 124.39,-403.69 120.69,-409.62"/>
+</g>
+<!-- interface~prif_error_stop -->
+<g id="proc~~prif_co_max~~CallsGraph_node3" class="node">
+<title>interface~prif_error_stop</title>
+<g id="a_proc~~prif_co_max~~CallsGraph_node3"><a xlink:href=".././interface/prif_error_stop.html" xlink:title="prif_error_stop">
+<polygon fill="#a7506f" stroke="#a7506f" points="717,-316 627,-316 627,-292 717,-292 717,-316"/>
+<text text-anchor="middle" x="672" y="-301.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">prif_error_stop</text>
+</a>
+</g>
+</g>
+<!-- proc~prif_co_max&#45;&gt;interface~prif_error_stop -->
+<g id="proc~~prif_co_max~~CallsGraph_edge5" class="edge">
+<title>proc~prif_co_max&#45;&gt;interface~prif_error_stop</title>
+<path fill="none" stroke="#ff0000" d="M45.74,-172.04C70.8,-218.57 169.13,-384 300.5,-384 300.5,-384 300.5,-384 443,-384 518.27,-384 600.03,-344.7 642.21,-321.19"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="644.12,-324.13 651.08,-316.15 640.66,-318.05 644.12,-324.13"/>
 </g>
 <!-- proc~get_c_ptr -->
-<g id="proc~~prif_co_max~~CallsGraph_node3" class="node">
+<g id="proc~~prif_co_max~~CallsGraph_node4" class="node">
 <title>proc~get_c_ptr</title>
-<g id="a_proc~~prif_co_max~~CallsGraph_node3"><a xlink:href=".././proc/get_c_ptr.html" xlink:title="get_c_ptr">
+<g id="a_proc~~prif_co_max~~CallsGraph_node4"><a xlink:href=".././proc/get_c_ptr.html" xlink:title="get_c_ptr">
 <polygon fill="#d94e8f" stroke="#d94e8f" points="472.5,-356 411.5,-356 411.5,-332 472.5,-332 472.5,-356"/>
 <text text-anchor="middle" x="442" y="-341.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_c_ptr</text>
 </a>
@@ -213,53 +228,38 @@
 <!-- proc~prif_co_max&#45;&gt;proc~get_c_ptr -->
 <g id="proc~~prif_co_max~~CallsGraph_edge2" class="edge">
 <title>proc~prif_co_max&#45;&gt;proc~get_c_ptr</title>
-<path fill="none" stroke="#ff0000" d="M68.43,-274.04C81.81,-279.24 98.02,-285.03 113,-289 215.09,-316.06 338.75,-332.53 401.03,-339.73"/>
-<polygon fill="#ff0000" stroke="#ff0000" points="400.88,-343.23 411.21,-340.88 401.67,-336.28 400.88,-343.23"/>
+<path fill="none" stroke="#ff0000" d="M59.81,-172.03C74.41,-180.51 94.67,-191.92 113,-201 215.24,-251.65 339.62,-303.23 401.73,-328.34"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="400.57,-331.64 411.16,-332.13 403.19,-325.15 400.57,-331.64"/>
 </g>
 <!-- proc~optional_value -->
-<g id="proc~~prif_co_max~~CallsGraph_node4" class="node">
+<g id="proc~~prif_co_max~~CallsGraph_node5" class="node">
 <title>proc~optional_value</title>
-<g id="a_proc~~prif_co_max~~CallsGraph_node4"><a xlink:href=".././proc/optional_value.html" xlink:title="optional_value">
-<polygon fill="#d94e8f" stroke="#d94e8f" points="487.5,-314 396.5,-314 396.5,-290 487.5,-290 487.5,-314"/>
-<text text-anchor="middle" x="442" y="-299.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">optional_value</text>
+<g id="a_proc~~prif_co_max~~CallsGraph_node5"><a xlink:href=".././proc/optional_value.html" xlink:title="optional_value">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="487.5,-108 396.5,-108 396.5,-84 487.5,-84 487.5,-108"/>
+<text text-anchor="middle" x="442" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">optional_value</text>
 </a>
 </g>
 </g>
 <!-- proc~prif_co_max&#45;&gt;proc~optional_value -->
 <g id="proc~~prif_co_max~~CallsGraph_edge3" class="edge">
 <title>proc~prif_co_max&#45;&gt;proc~optional_value</title>
-<path fill="none" stroke="#ff0000" d="M77.27,-265.76C148.67,-272.88 303.67,-288.32 386.4,-296.56"/>
-<polygon fill="#ff0000" stroke="#ff0000" points="386.06,-300.04 396.36,-297.55 386.75,-293.08 386.06,-300.04"/>
-</g>
-<!-- interface~prif_error_stop -->
-<g id="proc~~prif_co_max~~CallsGraph_node5" class="node">
-<title>interface~prif_error_stop</title>
-<g id="a_proc~~prif_co_max~~CallsGraph_node5"><a xlink:href=".././interface/prif_error_stop.html" xlink:title="prif_error_stop">
-<polygon fill="#a7506f" stroke="#a7506f" points="717,-274 627,-274 627,-250 717,-250 717,-274"/>
-<text text-anchor="middle" x="672" y="-259.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">prif_error_stop</text>
-</a>
-</g>
-</g>
-<!-- proc~prif_co_max&#45;&gt;interface~prif_error_stop -->
-<g id="proc~~prif_co_max~~CallsGraph_edge5" class="edge">
-<title>proc~prif_co_max&#45;&gt;interface~prif_error_stop</title>
-<path fill="none" stroke="#ff0000" d="M53.69,-274.14C91.25,-305 197.46,-384 300.5,-384 300.5,-384 300.5,-384 443,-384 528.98,-384 613.92,-315.72 651.25,-281.32"/>
-<polygon fill="#ff0000" stroke="#ff0000" points="654,-283.54 658.89,-274.14 649.21,-278.44 654,-283.54"/>
+<path fill="none" stroke="#ff0000" d="M77.02,-155.46C135.08,-148.25 250.1,-133.22 347,-116 359.7,-113.74 373.31,-111.02 386.11,-108.33"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="387.13,-111.69 396.18,-106.18 385.67,-104.85 387.13,-111.69"/>
 </g>
 <!-- interface~caf_co_max -->
 <g id="proc~~prif_co_max~~CallsGraph_node6" class="node">
 <title>interface~caf_co_max</title>
 <g id="a_proc~~prif_co_max~~CallsGraph_node6"><a xlink:href=".././interface/caf_co_max.html" xlink:title="caf_co_max">
-<polygon fill="#a7506f" stroke="#a7506f" points="204.5,-116 128.5,-116 128.5,-92 204.5,-92 204.5,-116"/>
-<text text-anchor="middle" x="166.5" y="-101.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">caf_co_max</text>
+<polygon fill="#a7506f" stroke="#a7506f" points="204.5,-36 128.5,-36 128.5,-12 204.5,-12 204.5,-36"/>
+<text text-anchor="middle" x="166.5" y="-21.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">caf_co_max</text>
 </a>
 </g>
 </g>
 <!-- proc~prif_co_max&#45;&gt;interface~caf_co_max -->
 <g id="proc~~prif_co_max~~CallsGraph_edge4" class="edge">
 <title>proc~prif_co_max&#45;&gt;interface~caf_co_max</title>
-<path fill="none" stroke="#ff0000" d="M43.45,-249.88C52.23,-224.6 75.59,-165.65 113,-130 116.5,-126.67 120.5,-123.68 124.71,-121.01"/>
-<polygon fill="#ff0000" stroke="#ff0000" points="126.56,-123.99 133.53,-116.01 123.1,-117.9 126.56,-123.99"/>
+<path fill="none" stroke="#ff0000" d="M44.93,-147.93C55.35,-125.93 80.04,-78.95 113,-50 116.72,-46.73 120.92,-43.77 125.29,-41.11"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="127.33,-43.98 134.39,-36.08 123.95,-37.85 127.33,-43.98"/>
 </g>
 <!-- proc~get_c_ptr_character -->
 <g id="proc~~prif_co_max~~CallsGraph_node7" class="node">
@@ -273,8 +273,8 @@
 <!-- proc~prif_co_max&#45;&gt;proc~get_c_ptr_character -->
 <g id="proc~~prif_co_max~~CallsGraph_edge6" class="edge">
 <title>proc~prif_co_max&#45;&gt;proc~get_c_ptr_character</title>
-<path fill="none" stroke="#ff0000" d="M58.2,-249.87C72.69,-240.9 93.51,-228.92 113,-221 212.78,-180.46 265.48,-228.39 347,-158 377.43,-131.72 353.7,-102.54 383,-75 384.29,-73.79 385.65,-72.65 387.07,-71.57"/>
-<polygon fill="#ff0000" stroke="#ff0000" points="389.18,-74.38 395.77,-66.09 385.44,-68.46 389.18,-74.38"/>
+<path fill="none" stroke="#ff0000" d="M71.46,-147.87C84.28,-143.22 99.24,-138.07 113,-134 215.55,-103.68 243.19,-103.67 347,-78 359.13,-75 372.12,-71.72 384.45,-68.58"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="385.35,-71.97 394.18,-66.1 383.62,-65.18 385.35,-71.97"/>
 </g>
 <!-- interface~caf_is_f_string -->
 <g id="proc~~prif_co_max~~CallsGraph_node8" class="node">
@@ -288,118 +288,133 @@
 <!-- proc~prif_co_max&#45;&gt;interface~caf_is_f_string -->
 <g id="proc~~prif_co_max~~CallsGraph_edge7" class="edge">
 <title>proc~prif_co_max&#45;&gt;interface~caf_is_f_string</title>
-<path fill="none" stroke="#ff0000" d="M51.97,-249.99C66.17,-236.58 90.35,-214.6 113,-198 169.71,-156.43 319.62,-63.46 383,-33 386.8,-31.17 390.8,-29.41 394.86,-27.74"/>
-<polygon fill="#ff0000" stroke="#ff0000" points="396.32,-30.93 404.34,-24.01 393.75,-24.41 396.32,-30.93"/>
+<path fill="none" stroke="#ff0000" d="M51.98,-147.81C65.82,-134.93 89.33,-114.88 113,-103 204.31,-57.18 321.87,-31.74 388.59,-20.06"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="389.19,-23.51 398.46,-18.37 388.01,-16.61 389.19,-23.51"/>
 </g>
 <!-- interface~prif_co_reduce -->
 <g id="proc~~prif_co_max~~CallsGraph_node9" class="node">
 <title>interface~prif_co_reduce</title>
 <g id="a_proc~~prif_co_max~~CallsGraph_node9"><a xlink:href=".././interface/prif_co_reduce.html" xlink:title="prif_co_reduce">
-<polygon fill="#a7506f" stroke="#a7506f" points="212,-254 121,-254 121,-230 212,-230 212,-254"/>
-<text text-anchor="middle" x="166.5" y="-239.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">prif_co_reduce</text>
+<polygon fill="#a7506f" stroke="#a7506f" points="212,-192 121,-192 121,-168 212,-168 212,-192"/>
+<text text-anchor="middle" x="166.5" y="-177.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">prif_co_reduce</text>
 </a>
 </g>
 </g>
 <!-- proc~prif_co_max&#45;&gt;interface~prif_co_reduce -->
 <g id="proc~~prif_co_max~~CallsGraph_edge8" class="edge">
 <title>proc~prif_co_max&#45;&gt;interface~prif_co_reduce</title>
-<path fill="none" stroke="#ff0000" d="M77.3,-256C87.74,-254.34 99.28,-252.51 110.47,-250.73"/>
-<polygon fill="#ff0000" stroke="#ff0000" points="111.29,-254.15 120.62,-249.12 110.19,-247.24 111.29,-254.15"/>
+<path fill="none" stroke="#ff0000" d="M77.3,-166C87.74,-167.66 99.28,-169.49 110.47,-171.27"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="110.19,-174.76 120.62,-172.88 111.29,-167.85 110.19,-174.76"/>
 </g>
 <!-- proc~prif_error_stop -->
 <g id="proc~~prif_co_max~~CallsGraph_node10" class="node">
 <title>proc~prif_error_stop</title>
 <g id="a_proc~~prif_co_max~~CallsGraph_node10"><a xlink:href=".././proc/prif_error_stop.html" xlink:title="prif_error_stop">
-<polygon fill="#d9534f" stroke="#d9534f" points="843,-274 753,-274 753,-250 843,-250 843,-274"/>
-<text text-anchor="middle" x="798" y="-259.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">prif_error_stop</text>
+<polygon fill="#d9534f" stroke="#d9534f" points="843,-316 753,-316 753,-292 843,-292 843,-316"/>
+<text text-anchor="middle" x="798" y="-301.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">prif_error_stop</text>
 </a>
 </g>
 </g>
 <!-- interface~prif_error_stop&#45;&gt;proc~prif_error_stop -->
 <g id="proc~~prif_co_max~~CallsGraph_edge9" class="edge">
 <title>interface~prif_error_stop&#45;&gt;proc~prif_error_stop</title>
-<path fill="none" stroke="#00ff3f" stroke-dasharray="5,2" d="M717.07,-262C725.28,-262 733.96,-262 742.44,-262"/>
-<polygon fill="#00ff3f" stroke="#00ff3f" points="742.66,-265.5 752.66,-262 742.66,-258.5 742.66,-265.5"/>
+<path fill="none" stroke="#ffbf00" stroke-dasharray="5,2" d="M717.07,-304C725.28,-304 733.96,-304 742.44,-304"/>
+<polygon fill="#ffbf00" stroke="#ffbf00" points="742.66,-307.5 752.66,-304 742.66,-300.5 742.66,-307.5"/>
 </g>
 <!-- proc~prif_co_reduce -->
 <g id="proc~~prif_co_max~~CallsGraph_node11" class="node">
 <title>proc~prif_co_reduce</title>
 <g id="a_proc~~prif_co_max~~CallsGraph_node11"><a xlink:href=".././proc/prif_co_reduce.html" xlink:title="prif_co_reduce">
-<polygon fill="#d9534f" stroke="#d9534f" points="347,-234 256,-234 256,-210 347,-210 347,-234"/>
-<text text-anchor="middle" x="301.5" y="-219.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">prif_co_reduce</text>
+<polygon fill="#d9534f" stroke="#d9534f" points="347,-192 256,-192 256,-168 347,-168 347,-192"/>
+<text text-anchor="middle" x="301.5" y="-177.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">prif_co_reduce</text>
 </a>
 </g>
 </g>
 <!-- interface~prif_co_reduce&#45;&gt;proc~prif_co_reduce -->
 <g id="proc~~prif_co_max~~CallsGraph_edge10" class="edge">
 <title>interface~prif_co_reduce&#45;&gt;proc~prif_co_reduce</title>
-<path fill="none" stroke="#ff00bf" stroke-dasharray="5,2" d="M212.16,-235.28C222.9,-233.67 234.51,-231.92 245.66,-230.25"/>
-<polygon fill="#ff00bf" stroke="#ff00bf" points="246.37,-233.68 255.73,-228.73 245.33,-226.76 246.37,-233.68"/>
+<path fill="none" stroke="#ff00bf" stroke-dasharray="5,2" d="M212.16,-180C222.9,-180 234.51,-180 245.66,-180"/>
+<polygon fill="#ff00bf" stroke="#ff00bf" points="245.73,-183.5 255.73,-180 245.73,-176.5 245.73,-183.5"/>
 </g>
 <!-- proc~prif_error_stop_integer -->
 <g id="proc~~prif_co_max~~CallsGraph_node13" class="node">
 <title>proc~prif_error_stop_integer</title>
 <g id="a_proc~~prif_co_max~~CallsGraph_node13"><a xlink:href=".././proc/prif_error_stop_integer.html" xlink:title="prif_error_stop_integer">
-<polygon fill="#d9534f" stroke="#d9534f" points="1019,-295 886,-295 886,-271 1019,-271 1019,-295"/>
-<text text-anchor="middle" x="952.5" y="-280.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">prif_error_stop_integer</text>
+<polygon fill="#d9534f" stroke="#d9534f" points="1019,-337 886,-337 886,-313 1019,-313 1019,-337"/>
+<text text-anchor="middle" x="952.5" y="-322.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">prif_error_stop_integer</text>
 </a>
 </g>
 </g>
 <!-- proc~prif_error_stop&#45;&gt;proc~prif_error_stop_integer -->
 <g id="proc~~prif_co_max~~CallsGraph_edge12" class="edge">
 <title>proc~prif_error_stop&#45;&gt;proc~prif_error_stop_integer</title>
-<path fill="none" stroke="#ff0000" d="M843.11,-268.07C853.35,-269.48 864.53,-271.02 875.7,-272.56"/>
-<polygon fill="#ff0000" stroke="#ff0000" points="875.54,-276.07 885.93,-273.97 876.5,-269.14 875.54,-276.07"/>
+<path fill="none" stroke="#ff0000" d="M843.11,-310.07C853.35,-311.48 864.53,-313.02 875.7,-314.56"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="875.54,-318.07 885.93,-315.97 876.5,-311.14 875.54,-318.07"/>
 </g>
 <!-- proc~prif_error_stop_character -->
 <g id="proc~~prif_co_max~~CallsGraph_node16" class="node">
 <title>proc~prif_error_stop_character</title>
 <g id="a_proc~~prif_co_max~~CallsGraph_node16"><a xlink:href=".././proc/prif_error_stop_character.html" xlink:title="prif_error_stop_character">
-<polygon fill="#d9534f" stroke="#d9534f" points="1026,-253 879,-253 879,-229 1026,-229 1026,-253"/>
-<text text-anchor="middle" x="952.5" y="-238.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">prif_error_stop_character</text>
+<polygon fill="#d9534f" stroke="#d9534f" points="1026,-295 879,-295 879,-271 1026,-271 1026,-295"/>
+<text text-anchor="middle" x="952.5" y="-280.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">prif_error_stop_character</text>
 </a>
 </g>
 </g>
 <!-- proc~prif_error_stop&#45;&gt;proc~prif_error_stop_character -->
 <g id="proc~~prif_co_max~~CallsGraph_edge11" class="edge">
 <title>proc~prif_error_stop&#45;&gt;proc~prif_error_stop_character</title>
-<path fill="none" stroke="#ff0000" d="M843.11,-255.93C851.23,-254.81 859.94,-253.61 868.77,-252.39"/>
-<polygon fill="#ff0000" stroke="#ff0000" points="869.33,-255.85 878.76,-251.02 868.37,-248.91 869.33,-255.85"/>
-</g>
-<!-- proc~prif_co_reduce&#45;&gt;proc~get_c_ptr -->
-<g id="proc~~prif_co_max~~CallsGraph_edge14" class="edge">
-<title>proc~prif_co_reduce&#45;&gt;proc~get_c_ptr</title>
-<path fill="none" stroke="#00ffff" d="M309.08,-234.05C321.1,-255.01 348.57,-298.29 383,-323 388.67,-327.07 395.21,-330.43 401.81,-333.17"/>
-<polygon fill="#00ffff" stroke="#00ffff" points="400.84,-336.55 411.44,-336.77 403.29,-329.99 400.84,-336.55"/>
-</g>
-<!-- proc~prif_co_reduce&#45;&gt;proc~optional_value -->
-<g id="proc~~prif_co_max~~CallsGraph_edge15" class="edge">
-<title>proc~prif_co_reduce&#45;&gt;proc~optional_value</title>
-<path fill="none" stroke="#00ffff" d="M318.63,-234.01C334.53,-245.56 359.74,-263.11 383,-276 389.1,-279.38 395.71,-282.67 402.23,-285.72"/>
-<polygon fill="#00ffff" stroke="#00ffff" points="401.06,-289.03 411.62,-289.98 403.96,-282.66 401.06,-289.03"/>
+<path fill="none" stroke="#ff0000" d="M843.11,-297.93C851.23,-296.81 859.94,-295.61 868.77,-294.39"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="869.33,-297.85 878.76,-293.02 868.37,-290.91 869.33,-297.85"/>
 </g>
 <!-- proc~prif_co_reduce&#45;&gt;interface~prif_error_stop -->
 <g id="proc~~prif_co_max~~CallsGraph_edge18" class="edge">
 <title>proc~prif_co_reduce&#45;&gt;interface~prif_error_stop</title>
-<path fill="none" stroke="#00ffff" d="M342.72,-234.09C355.49,-237.49 369.74,-240.85 383,-243 463.73,-256.07 558.57,-260.2 616.73,-261.47"/>
-<polygon fill="#00ffff" stroke="#00ffff" points="616.73,-264.97 626.79,-261.67 616.87,-257.97 616.73,-264.97"/>
+<path fill="none" stroke="#00ffff" d="M307.62,-192.15C318.01,-215.03 343.91,-264.09 383,-285 456.51,-324.33 556.11,-320.56 616.85,-313.11"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="617.52,-316.55 626.98,-311.78 616.62,-309.61 617.52,-316.55"/>
+</g>
+<!-- proc~prif_co_reduce&#45;&gt;proc~get_c_ptr -->
+<g id="proc~~prif_co_max~~CallsGraph_edge14" class="edge">
+<title>proc~prif_co_reduce&#45;&gt;proc~get_c_ptr</title>
+<path fill="none" stroke="#00ffff" d="M308.51,-192.43C323.33,-222.69 361.96,-299.09 383,-318 388.59,-323.02 395.3,-327.21 402.15,-330.65"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="400.93,-333.94 411.48,-334.9 403.83,-327.57 400.93,-333.94"/>
+</g>
+<!-- proc~prif_co_reduce&#45;&gt;proc~optional_value -->
+<g id="proc~~prif_co_max~~CallsGraph_edge15" class="edge">
+<title>proc~prif_co_reduce&#45;&gt;proc~optional_value</title>
+<path fill="none" stroke="#00ffff" d="M325.91,-167.91C332.95,-163.86 340.52,-159.07 347,-154 365.07,-139.86 363.72,-129.44 383,-117 385.57,-115.34 388.29,-113.79 391.09,-112.34"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="392.66,-115.47 400.25,-108.08 389.71,-109.13 392.66,-115.47"/>
 </g>
 <!-- proc~prif_co_reduce&#45;&gt;proc~get_c_ptr_character -->
 <g id="proc~~prif_co_max~~CallsGraph_edge19" class="edge">
 <title>proc~prif_co_reduce&#45;&gt;proc~get_c_ptr_character</title>
-<path fill="none" stroke="#00ffff" d="M330.87,-209.73C336.88,-206.05 342.69,-201.49 347,-196 381.65,-151.87 344.5,-115.81 383,-75 384.03,-73.9 385.13,-72.87 386.27,-71.88"/>
-<polygon fill="#00ffff" stroke="#00ffff" points="388.3,-74.74 394.49,-66.14 384.29,-69 388.3,-74.74"/>
+<path fill="none" stroke="#00ffff" d="M310.45,-167.97C326.92,-143.34 364.75,-88.37 383,-75 385.08,-73.48 387.28,-72.06 389.56,-70.73"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="391.36,-73.74 398.67,-66.07 388.17,-67.51 391.36,-73.74"/>
 </g>
 <!-- proc~prif_co_reduce&#45;&gt;interface~caf_is_f_string -->
 <g id="proc~~prif_co_max~~CallsGraph_edge21" class="edge">
 <title>proc~prif_co_reduce&#45;&gt;interface~caf_is_f_string</title>
-<path fill="none" stroke="#00ffff" d="M312.66,-210C322.64,-197.67 337.7,-177.55 347,-158 371.83,-105.79 343.51,-75.23 383,-33 385.02,-30.84 387.29,-28.9 389.71,-27.15"/>
-<polygon fill="#00ffff" stroke="#00ffff" points="391.66,-30.07 398.49,-21.97 388.1,-24.04 391.66,-30.07"/>
+<path fill="none" stroke="#00ffff" d="M307.91,-167.6C321.99,-135.8 360.24,-52.5 383,-33 384.99,-31.29 387.13,-29.72 389.38,-28.27"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="391.38,-31.17 398.45,-23.28 388,-25.03 391.38,-31.17"/>
+</g>
+<!-- interface~caf_elem_len -->
+<g id="proc~~prif_co_max~~CallsGraph_node12" class="node">
+<title>interface~caf_elem_len</title>
+<g id="a_proc~~prif_co_max~~CallsGraph_node12"><a xlink:href=".././interface/caf_elem_len.html" xlink:title="caf_elem_len">
+<polygon fill="#a7506f" stroke="#a7506f" points="483.5,-234 400.5,-234 400.5,-210 483.5,-210 483.5,-234"/>
+<text text-anchor="middle" x="442" y="-219.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">caf_elem_len</text>
+</a>
+</g>
+</g>
+<!-- proc~prif_co_reduce&#45;&gt;interface~caf_elem_len -->
+<g id="proc~~prif_co_max~~CallsGraph_edge17" class="edge">
+<title>proc~prif_co_reduce&#45;&gt;interface~caf_elem_len</title>
+<path fill="none" stroke="#00ffff" d="M342.19,-192.04C357.55,-196.69 375.29,-202.07 391.47,-206.98"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="390.72,-210.41 401.31,-209.96 392.75,-203.71 390.72,-210.41"/>
 </g>
 <!-- interface~caf_co_reduce -->
-<g id="proc~~prif_co_max~~CallsGraph_node12" class="node">
+<g id="proc~~prif_co_max~~CallsGraph_node14" class="node">
 <title>interface~caf_co_reduce</title>
-<g id="a_proc~~prif_co_max~~CallsGraph_node12"><a xlink:href=".././interface/caf_co_reduce.html" xlink:title="caf_co_reduce">
+<g id="a_proc~~prif_co_max~~CallsGraph_node14"><a xlink:href=".././interface/caf_co_reduce.html" xlink:title="caf_co_reduce">
 <polygon fill="#a7506f" stroke="#a7506f" points="486.5,-192 397.5,-192 397.5,-168 486.5,-168 486.5,-192"/>
 <text text-anchor="middle" x="442" y="-177.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">caf_co_reduce</text>
 </a>
@@ -408,89 +423,74 @@
 <!-- proc~prif_co_reduce&#45;&gt;interface~caf_co_reduce -->
 <g id="proc~~prif_co_max~~CallsGraph_edge16" class="edge">
 <title>proc~prif_co_reduce&#45;&gt;interface~caf_co_reduce</title>
-<path fill="none" stroke="#00ffff" d="M342.19,-209.96C357.55,-205.31 375.29,-199.93 391.47,-195.02"/>
-<polygon fill="#00ffff" stroke="#00ffff" points="392.75,-198.29 401.31,-192.04 390.72,-191.59 392.75,-198.29"/>
-</g>
-<!-- interface~caf_elem_len -->
-<g id="proc~~prif_co_max~~CallsGraph_node14" class="node">
-<title>interface~caf_elem_len</title>
-<g id="a_proc~~prif_co_max~~CallsGraph_node14"><a xlink:href=".././interface/caf_elem_len.html" xlink:title="caf_elem_len">
-<polygon fill="#a7506f" stroke="#a7506f" points="483.5,-150 400.5,-150 400.5,-126 483.5,-126 483.5,-150"/>
-<text text-anchor="middle" x="442" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">caf_elem_len</text>
-</a>
-</g>
-</g>
-<!-- proc~prif_co_reduce&#45;&gt;interface~caf_elem_len -->
-<g id="proc~~prif_co_max~~CallsGraph_edge17" class="edge">
-<title>proc~prif_co_reduce&#45;&gt;interface~caf_elem_len</title>
-<path fill="none" stroke="#00ffff" d="M325.91,-209.91C332.95,-205.86 340.52,-201.07 347,-196 365.07,-181.86 363.72,-171.44 383,-159 385.57,-157.34 388.29,-155.79 391.09,-154.34"/>
-<polygon fill="#00ffff" stroke="#00ffff" points="392.66,-157.47 400.25,-150.08 389.71,-151.13 392.66,-157.47"/>
+<path fill="none" stroke="#00ffff" d="M347.08,-180C359.94,-180 374.1,-180 387.44,-180"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="387.45,-183.5 397.45,-180 387.44,-176.5 387.45,-183.5"/>
 </g>
 <!-- interface~assert -->
 <g id="proc~~prif_co_max~~CallsGraph_node15" class="node">
 <title>interface~assert</title>
 <g id="a_proc~~prif_co_max~~CallsGraph_node15"><a xlink:href=".././interface/assert.html" xlink:title="assert">
-<polygon fill="#a7506f" stroke="#a7506f" points="469,-234 415,-234 415,-210 469,-210 469,-234"/>
-<text text-anchor="middle" x="442" y="-219.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">assert</text>
+<polygon fill="#a7506f" stroke="#a7506f" points="469,-276 415,-276 415,-252 469,-252 469,-276"/>
+<text text-anchor="middle" x="442" y="-261.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">assert</text>
 </a>
 </g>
 </g>
 <!-- proc~prif_co_reduce&#45;&gt;interface~assert -->
 <g id="proc~~prif_co_max~~CallsGraph_edge13" class="edge">
 <title>proc~prif_co_reduce&#45;&gt;interface~assert</title>
-<path fill="none" stroke="#00ffff" d="M347.08,-222C365.55,-222 386.71,-222 404.26,-222"/>
-<polygon fill="#00ffff" stroke="#00ffff" points="404.67,-225.5 414.67,-222 404.67,-218.5 404.67,-225.5"/>
+<path fill="none" stroke="#00ffff" d="M315.25,-192.1C330.4,-205.94 356.92,-228.56 383,-243 389.9,-246.82 397.64,-250.19 405.16,-253.04"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="404.23,-256.42 414.83,-256.48 406.58,-249.83 404.23,-256.42"/>
 </g>
 <!-- interface~caf_same_cfi_type -->
 <g id="proc~~prif_co_max~~CallsGraph_node17" class="node">
 <title>interface~caf_same_cfi_type</title>
 <g id="a_proc~~prif_co_max~~CallsGraph_node17"><a xlink:href=".././interface/caf_same_cfi_type.html" xlink:title="caf_same_cfi_type">
-<polygon fill="#a7506f" stroke="#a7506f" points="497,-108 387,-108 387,-84 497,-84 497,-108"/>
-<text text-anchor="middle" x="442" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">caf_same_cfi_type</text>
+<polygon fill="#a7506f" stroke="#a7506f" points="497,-150 387,-150 387,-126 497,-126 497,-150"/>
+<text text-anchor="middle" x="442" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">caf_same_cfi_type</text>
 </a>
 </g>
 </g>
 <!-- proc~prif_co_reduce&#45;&gt;interface~caf_same_cfi_type -->
 <g id="proc~~prif_co_max~~CallsGraph_edge20" class="edge">
 <title>proc~prif_co_reduce&#45;&gt;interface~caf_same_cfi_type</title>
-<path fill="none" stroke="#00ffff" d="M329.41,-209.84C335.75,-206.07 342.08,-201.44 347,-196 372.87,-167.37 354.64,-143.17 383,-117 384.45,-115.67 385.98,-114.41 387.59,-113.24"/>
-<polygon fill="#00ffff" stroke="#00ffff" points="389.43,-116.22 396.13,-108.01 385.77,-110.25 389.43,-116.22"/>
+<path fill="none" stroke="#00ffff" d="M342.19,-167.96C357.55,-163.31 375.29,-157.93 391.47,-153.02"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="392.75,-156.29 401.31,-150.04 390.72,-149.59 392.75,-156.29"/>
 </g>
 <!-- proc~assert -->
 <g id="proc~~prif_co_max~~CallsGraph_node18" class="node">
 <title>proc~assert</title>
 <g id="a_proc~~prif_co_max~~CallsGraph_node18"><a xlink:href=".././proc/assert.html" xlink:title="assert">
-<polygon fill="#d9534f" stroke="#d9534f" points="591,-234 537,-234 537,-210 591,-210 591,-234"/>
-<text text-anchor="middle" x="564" y="-219.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">assert</text>
+<polygon fill="#d9534f" stroke="#d9534f" points="591,-276 537,-276 537,-252 591,-252 591,-276"/>
+<text text-anchor="middle" x="564" y="-261.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">assert</text>
 </a>
 </g>
 </g>
 <!-- interface~assert&#45;&gt;proc~assert -->
 <g id="proc~~prif_co_max~~CallsGraph_edge22" class="edge">
 <title>interface~assert&#45;&gt;proc~assert</title>
-<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M469.04,-222C485.83,-222 507.91,-222 526.44,-222"/>
-<polygon fill="#00ffff" stroke="#00ffff" points="526.6,-225.5 536.6,-222 526.6,-218.5 526.6,-225.5"/>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M469.04,-264C485.83,-264 507.91,-264 526.44,-264"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="526.6,-267.5 536.6,-264 526.6,-260.5 526.6,-267.5"/>
 </g>
 <!-- proc~f_c_string -->
 <g id="proc~~prif_co_max~~CallsGraph_node19" class="node">
 <title>proc~f_c_string</title>
 <g id="a_proc~~prif_co_max~~CallsGraph_node19"><a xlink:href=".././proc/f_c_string.html" xlink:title="f_c_string">
-<polygon fill="#d94e8f" stroke="#d94e8f" points="1125,-253 1062,-253 1062,-229 1125,-229 1125,-253"/>
-<text text-anchor="middle" x="1093.5" y="-238.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">f_c_string</text>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="1125,-295 1062,-295 1062,-271 1125,-271 1125,-295"/>
+<text text-anchor="middle" x="1093.5" y="-280.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">f_c_string</text>
 </a>
 </g>
 </g>
 <!-- proc~prif_error_stop_character&#45;&gt;proc~f_c_string -->
 <g id="proc~~prif_co_max~~CallsGraph_edge23" class="edge">
 <title>proc~prif_error_stop_character&#45;&gt;proc~f_c_string</title>
-<path fill="none" stroke="#0000ff" d="M1026.26,-241C1035.03,-241 1043.73,-241 1051.8,-241"/>
-<polygon fill="#0000ff" stroke="#0000ff" points="1052,-244.5 1062,-241 1052,-237.5 1052,-244.5"/>
+<path fill="none" stroke="#0000ff" d="M1026.26,-283C1035.03,-283 1043.73,-283 1051.8,-283"/>
+<polygon fill="#0000ff" stroke="#0000ff" points="1052,-286.5 1062,-283 1052,-279.5 1052,-286.5"/>
 </g>
 <!-- proc~assert&#45;&gt;interface~prif_error_stop -->
 <g id="proc~~prif_co_max~~CallsGraph_edge24" class="edge">
 <title>proc~assert&#45;&gt;interface~prif_error_stop</title>
-<path fill="none" stroke="#ff0000" d="M591.2,-231.89C602.73,-236.24 616.56,-241.46 629.44,-246.32"/>
-<polygon fill="#ff0000" stroke="#ff0000" points="628.46,-249.69 639.05,-249.94 630.93,-243.14 628.46,-249.69"/>
+<path fill="none" stroke="#ff0000" d="M591.2,-273.89C602.73,-278.24 616.56,-283.46 629.44,-288.32"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="628.46,-291.69 639.05,-291.94 630.93,-285.14 628.46,-291.69"/>
 </g>
 </g>
 </svg>
@@ -690,7 +690,7 @@
           <p class="text-right">
             Documentation generated by 
             <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
- on 2024-01-23 21:43            </p>
+ on 2024-01-31 18:03            </p>
         </div>
       </div>
       <br>
