@@ -21,20 +21,47 @@ static gex_Rank_t rank, size;
   const int double_Complex_workaround =4100;
 #endif
 
-void caf_caffeinate(mspace* symmetric_heap, intptr_t* symmetric_heap_start, gex_TM_t* initial_team)
+void caf_caffeinate(mspace* symmetric_heap, intptr_t* symmetric_heap_start, mspace* non_symmetric_heap, gex_TM_t* initial_team)
 {
   GASNET_SAFE(gex_Client_Init(&myclient, &myep, initial_team, "caffeine", NULL, NULL, 0));
 
-  size_t segsz = GASNET_PAGESIZE; // TODO: how big can we make this?
+  // query largest possible segment GASNet can give us of the same size across all processes:
+  size_t max_seg = gasnet_getMaxGlobalSegmentSize(); 
+  // impose a reasonable default size
+  #ifndef CAF_DEFAULT_HEAP_SIZE
+  #define CAF_DEFAULT_HEAP_SIZE (128*1024*1024) // 128 MiB
+  #endif
+  size_t default_seg = MIN(max_seg, CAF_DEFAULT_HEAP_SIZE);
+  // retrieve user preference, defaulting to the above and units of MiB
+  size_t segsz = gasnett_getenv_int_withdefault("CAF_HEAP_SIZE", 
+                                                default_seg, 1024*1024);
+  // cap user request to the largest available:
+  // TODO: issue a console warning here instead of silently capping
+  segsz = MIN(segsz,max_seg);
 
   gex_Segment_t mysegment;
   GASNET_SAFE(gex_Segment_Attach(&mysegment, *initial_team, segsz));
-  // TODO: split into symmetric and non-symmetric heaps
+
   *symmetric_heap_start = (intptr_t)gex_Segment_QueryAddr(mysegment);
+  size_t total_heap_size = gex_Segment_QuerySize(mysegment);
+
+  #ifndef CAF_DEFAULT_COMP_FRAC
+  #define CAF_DEFAULT_COMP_FRAC 0.1f // 10%
+  #endif
+  float default_comp_frac = MAX(MIN(0.99f, CAF_DEFAULT_COMP_FRAC), 0.01f);
+  float non_symmetric_fraction = gasnett_getenv_dbl_withdefault("CAF_COMP_FRAC", default_comp_frac);
+  assert(non_symmetric_fraction > 0 && non_symmetric_fraction < 1); // TODO: real error reporting
+
+  size_t non_symmetric_heap_size = total_heap_size * non_symmetric_fraction;
+  size_t symmetric_heap_size = total_heap_size - non_symmetric_heap_size;
+  intptr_t non_symmetric_heap_start = *symmetric_heap_start + symmetric_heap_size;
+
   if (caf_this_image(*initial_team) == 1) {
-    *symmetric_heap = create_mspace_with_base(gex_Segment_QueryAddr(mysegment), gex_Segment_QuerySize(mysegment), 0);
-    mspace_set_footprint_limit(*symmetric_heap, gex_Segment_QuerySize(mysegment));
+    *symmetric_heap = create_mspace_with_base(*symmetric_heap_start, symmetric_heap_size, 0);
+    mspace_set_footprint_limit(*symmetric_heap, symmetric_heap_size);
   }
+  *non_symmetric_heap = create_mspace_with_base(non_symmetric_heap_start, non_symmetric_heap_size, 0);
+  mspace_set_footprint_limit(*non_symmetric_heap, non_symmetric_heap_size);
 }
 
 void caf_decaffeinate(int exit_code)
