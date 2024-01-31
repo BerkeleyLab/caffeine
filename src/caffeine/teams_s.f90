@@ -11,6 +11,20 @@ submodule(teams_m) teams_s
 contains
 
   module procedure prif_change_team
+    if (caf_this_image(team%gex_team) == 1) then ! need to setup the shared heap
+      if (caf_this_image(current_team%gex_team) /= 1) then ! we need to get the heap info from the parent team leader
+        call prif_get( &
+            coarray_handle = current_team%child_team_handle, &
+            coindices = [1_c_intmax_t], &
+            first_element_addr = c_loc(current_team%child_heap_info), &
+            value = current_team%child_heap_info, &
+            team = current_team)
+      end if
+      
+    end if
+
+    allocate(current_team)
+    current_team = team
   end procedure
 
   module procedure prif_end_team
