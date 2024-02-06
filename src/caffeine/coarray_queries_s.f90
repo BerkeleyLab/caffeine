@@ -22,6 +22,15 @@ contains
   end procedure
 
   module procedure prif_image_index
+    integer :: dim
+    integer(c_int) :: prior_size
+
+    image_index = 1 + sub(1) - coarray_handle%info%lcobounds(1)
+    prior_size = 1
+    do dim = 2, size(sub)
+      prior_size = prior_size * (coarray_handle%info%ucobounds(dim-1) - coarray_handle%info%lcobounds(dim-1) + 1)
+      image_index = image_index + (sub(dim) - coarray_handle%info%lcobounds(dim)) * prior_size
+    end do
   end procedure
 
 end submodule coarray_queries_s
