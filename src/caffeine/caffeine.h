@@ -36,6 +36,7 @@ void caf_deallocate(mspace heap, void* mem);
 // RMA
 
 void caf_put(gex_TM_t team, int image, void* dest, CFI_cdesc_t* src);
+void caf_get(gex_TM_t team, int image, CFI_cdesc_t* dest, void* src);
 
 // Synchronization 
 

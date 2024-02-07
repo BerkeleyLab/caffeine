@@ -97,6 +97,13 @@ void caf_put(gex_TM_t team, int image, void* dest, CFI_cdesc_t* src)
   gex_RMA_PutBlocking(team, image-1, dest, src->base_addr, src->elem_len*num_elements, 0);
 }
 
+void caf_get(gex_TM_t team, int image, CFI_cdesc_t* dest, void* src)
+{
+  size_t num_elements = 1;
+  for (int i = 0; i < dest->rank; i++) num_elements *= dest->dim[i].extent;
+  gex_RMA_GetBlocking(team, dest->base_addr, image-1, src, dest->elem_len*num_elements, 0);
+}
+
 void caf_sync_all()
 {
   gasnet_barrier_notify(0,GASNET_BARRIERFLAG_ANONYMOUS);
