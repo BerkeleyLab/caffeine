@@ -35,6 +35,9 @@ contains
         use caf_num_images_test, only: &
                 caf_num_images_prif_num_images => &
                     test_prif_num_images
+        use caf_rma_test, only: &
+                caf_rma_prif_rma => &
+                    test_prif_rma
         use caf_stop_test, only: &
                 caf_stop_prif_this_image => &
                     test_prif_this_image
@@ -48,7 +51,7 @@ contains
         logical :: passed
 
         type(test_item_t) :: tests
-        type(test_item_t) :: individual_tests(12)
+        type(test_item_t) :: individual_tests(13)
 
         individual_tests(1) = a00_caffeinate_caffeinate()
         individual_tests(2) = caf_allocate_prif_allocate()
@@ -60,8 +63,9 @@ contains
         individual_tests(8) = caf_error_stop_prif_this_image()
         individual_tests(9) = caf_image_index_prif_image_index()
         individual_tests(10) = caf_num_images_prif_num_images()
-        individual_tests(11) = caf_stop_prif_this_image()
-        individual_tests(12) = caf_this_image_prif_this_image()
+        individual_tests(11) = caf_rma_prif_rma()
+        individual_tests(12) = caf_stop_prif_this_image()
+        individual_tests(13) = caf_this_image_prif_this_image()
         tests = test_that(individual_tests)
 
 

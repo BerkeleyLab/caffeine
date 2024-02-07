@@ -9,6 +9,7 @@ module caffeine_h_m
   public :: caf_caffeinate, caf_decaffeinate
   public :: caf_num_images, caf_this_image
   public :: caf_allocate, caf_deallocate
+  public :: caf_put
   public :: caf_sync_all
   public :: caf_co_broadcast, caf_co_sum, caf_co_min, caf_co_max, caf_co_reduce
   public :: caf_same_cfi_type, caf_elem_len, caf_numeric_type, caf_is_f_string
@@ -67,6 +68,17 @@ module caffeine_h_m
       implicit none
       type(c_ptr), intent(in), value :: mspace
       type(c_ptr), intent(in), value :: mem
+    end subroutine
+
+    ! _______________________ RMA ____________________________
+    subroutine caf_put(team, image, dest, src) bind(c)
+      !! void caf_put(gex_TM_t team, int image, void* dest, CFI_cdesc_t* src)
+      import c_ptr, c_int, c_size_t
+      implicit none
+      type(c_ptr), intent(in), value :: team
+      integer(c_int), intent(in), value :: image
+      type(c_ptr), intent(in), value :: dest
+      type(*), dimension(..), intent(in), contiguous :: src
     end subroutine
     ! __________________ Synchronization _____________________
 

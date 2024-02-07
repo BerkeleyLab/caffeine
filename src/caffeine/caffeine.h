@@ -33,6 +33,10 @@ int caf_num_images(gex_TM_t team);
 void* caf_allocate(mspace heap, size_t bytes);
 void caf_deallocate(mspace heap, void* mem);
 
+// RMA
+
+void caf_put(gex_TM_t team, int image, void* dest, CFI_cdesc_t* src);
+
 // Synchronization 
 
 void caf_sync_all();

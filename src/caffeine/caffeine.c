@@ -90,6 +90,13 @@ void caf_deallocate(mspace heap, void* mem)
   mspace_free(heap, mem);
 }
 
+void caf_put(gex_TM_t team, int image, void* dest, CFI_cdesc_t* src)
+{
+  size_t num_elements = 1;
+  for (int i = 0; i < src->rank; i++) num_elements *= src->dim[i].extent;
+  gex_RMA_PutBlocking(team, image-1, dest, src->base_addr, src->elem_len*num_elements, 0);
+}
+
 void caf_sync_all()
 {
   gasnet_barrier_notify(0,GASNET_BARRIERFLAG_ANONYMOUS);
