@@ -14,6 +14,7 @@ contains
           "prif_image_index", &
           [ it("returns 1 for the simplest case", check_simple_case) &
           , it("returns 1 when given the lower bounds", check_lower_bounds) &
+          , it("returns 0 with invalid subscripts", check_invalid_subscripts) &
           , it("returns the expected answer for a more complicated case", check_complicated) &
           ])
     end function
@@ -57,6 +58,27 @@ contains
                 allocated_memory = allocated_memory)
         call prif_image_index(coarray_handle, [2_c_intmax_t, 3_c_intmax_t], image_index=answer)
         result_ = assert_equals(1_c_int, answer)
+        call prif_deallocate([coarray_handle])
+    end function
+
+    function check_invalid_subscripts() result(result_)
+        type(result_t) :: result_
+
+        type(prif_coarray_handle) :: coarray_handle
+        type(c_ptr) :: allocated_memory
+        integer(c_int) :: answer
+
+        call prif_allocate( &
+                lcobounds = [-2_c_intmax_t, 2_c_intmax_t], &
+                ucobounds = [2_c_intmax_t, 6_c_intmax_t], &
+                lbounds = [integer(c_intmax_t)::], &
+                ubounds = [integer(c_intmax_t)::], &
+                element_length = 1_c_size_t, &
+                final_func = c_null_funptr, &
+                coarray_handle = coarray_handle, &
+                allocated_memory = allocated_memory)
+        call prif_image_index(coarray_handle, [-1_c_intmax_t, 1_c_intmax_t], image_index=answer)
+        result_ = assert_equals(0_c_int, answer)
         call prif_deallocate([coarray_handle])
     end function
 
