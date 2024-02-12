@@ -9,6 +9,7 @@ module caffeine_h_m
   public :: caf_caffeinate, caf_decaffeinate
   public :: caf_num_images, caf_this_image
   public :: caf_allocate, caf_deallocate
+  public :: caf_convert_base_addr
   public :: caf_sync_all
   public :: caf_co_broadcast, caf_co_sum, caf_co_min, caf_co_max, caf_co_reduce
   public :: caf_same_cfi_type, caf_elem_len, caf_numeric_type, caf_is_f_string
@@ -68,6 +69,17 @@ module caffeine_h_m
       type(c_ptr), intent(in), value :: mspace
       type(c_ptr), intent(in), value :: mem
     end subroutine
+
+    ! ___________________ PRIF Queries ______________________
+
+    module function caf_convert_base_addr(addr, image, initial_team) result(ptr) bind(c)
+      implicit none
+      type(c_ptr), intent(in), value :: addr
+      integer(c_int), intent(in), value :: image
+      type(c_ptr), intent(in), value :: initial_team
+      integer(c_intptr_t) :: ptr
+    end function
+
     ! __________________ Synchronization _____________________
 
     subroutine caf_sync_all() bind(C)

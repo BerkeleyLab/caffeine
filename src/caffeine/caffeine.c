@@ -12,6 +12,8 @@
 static gex_Client_t myclient;
 static gex_EP_t myep;
 static gex_Rank_t rank, size;
+static gex_Segment_t mysegment;
+
 
 #if __GNUC__ >= 12
   const int float_Complex_workaround = CFI_type_float_Complex;
@@ -26,20 +28,19 @@ void caf_caffeinate(mspace* symmetric_heap, intptr_t* symmetric_heap_start, mspa
   GASNET_SAFE(gex_Client_Init(&myclient, &myep, initial_team, "caffeine", NULL, NULL, 0));
 
   // query largest possible segment GASNet can give us of the same size across all processes:
-  size_t max_seg = gasnet_getMaxGlobalSegmentSize(); 
+  size_t max_seg = gasnet_getMaxGlobalSegmentSize();
   // impose a reasonable default size
   #ifndef CAF_DEFAULT_HEAP_SIZE
   #define CAF_DEFAULT_HEAP_SIZE (128*1024*1024) // 128 MiB
   #endif
   size_t default_seg = MIN(max_seg, CAF_DEFAULT_HEAP_SIZE);
   // retrieve user preference, defaulting to the above and units of MiB
-  size_t segsz = gasnett_getenv_int_withdefault("CAF_HEAP_SIZE", 
+  size_t segsz = gasnett_getenv_int_withdefault("CAF_HEAP_SIZE",
                                                 default_seg, 1024*1024);
   // cap user request to the largest available:
   // TODO: issue a console warning here instead of silently capping
   segsz = MIN(segsz,max_seg);
 
-  gex_Segment_t mysegment;
   GASNET_SAFE(gex_Segment_Attach(&mysegment, *initial_team, segsz));
 
   *symmetric_heap_start = (intptr_t)gex_Segment_QueryAddr(mysegment);
@@ -79,7 +80,6 @@ int caf_num_images(gex_TM_t team)
   return gex_TM_QuerySize(team);
 }
 
-
 void* caf_allocate(mspace heap, size_t bytes)
 {
    return mspace_memalign(heap, 8, bytes);
@@ -88,6 +88,15 @@ void* caf_allocate(mspace heap, size_t bytes)
 void caf_deallocate(mspace heap, void* mem)
 {
   mspace_free(heap, mem);
+}
+
+// take address in a segment and convert to an address on given image
+void* caf_convert_base_addr(void* addr, int image, gex_TM_t initial_team)
+{
+   size_t offset = (char*)addr - (char*)gex_Segment_QueryAddr(mysegment);
+   void* segment_start_remote_image = NULL;
+   gex_Event_Wait(gex_EP_QueryBoundSegmentNB(initial_team, image - 1, &segment_start_remote_image, NULL, NULL, 0));
+   return (char *)segment_start_remote_image + offset;
 }
 
 void caf_sync_all()

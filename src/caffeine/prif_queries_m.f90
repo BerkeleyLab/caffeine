@@ -1,7 +1,7 @@
 ! Copyright (c), The Regents of the University of California
 ! Terms of use are as specified in LICENSE.txt
 module prif_queries_m
-  use iso_c_binding, only: c_ptr, c_intmax_t, c_intptr_t, c_size_t
+  use iso_c_binding, only: c_ptr, c_intmax_t, c_intptr_t, c_size_t, c_int
   use allocation_m, only: prif_coarray_handle
   use teams_m, only: prif_team_type
 
@@ -23,12 +23,10 @@ module prif_queries_m
        type(c_ptr), intent(out) :: context_data
      end subroutine
 
-     module subroutine prif_base_pointer(coarray_handle, coindices, team, team_number, ptr)
+     module subroutine prif_base_pointer(coarray_handle, image_num, ptr)
        implicit none
        type(prif_coarray_handle), intent(in) :: coarray_handle
-       integer(c_intmax_t), intent(in) :: coindices(:)
-       type(prif_team_type), optional, intent(in) :: team
-       integer(c_intmax_t), optional, intent(in) :: team_number
+       integer(c_int), intent(in) :: image_num
        integer(c_intptr_t), intent(out) :: ptr
      end subroutine
 

@@ -33,6 +33,10 @@ int caf_num_images(gex_TM_t team);
 void* caf_allocate(mspace heap, size_t bytes);
 void caf_deallocate(mspace heap, void* mem);
 
+// PRIF Queries
+
+void* caf_convert_base_addr(void* addr, int image, gex_TM_t initial_team);
+
 // Synchronization 
 
 void caf_sync_all();
