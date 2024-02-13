@@ -15,6 +15,7 @@ static gex_Rank_t rank, size;
 static gex_Segment_t mysegment;
 static gex_TM_t myworldteam;
 
+typedef uint8_t byte;
 
 #if __GNUC__ >= 12
   const int float_Complex_workaround = CFI_type_float_Complex;
@@ -95,7 +96,7 @@ void caf_deallocate(mspace heap, void* mem)
 // take address in a segment and convert to an address on given image
 intptr_t caf_convert_base_addr(void* addr, int image)
 {
-   size_t offset = (char*)addr - (char*)gex_Segment_QueryAddr(mysegment);
+   ptrdiff_t offset = (byte*)addr - (byte*)gex_Segment_QueryAddr(mysegment);
    void* segment_start_remote_image = NULL;
    gex_Event_Wait(gex_EP_QueryBoundSegmentNB(myworldteam, image - 1, &segment_start_remote_image, NULL, NULL, 0));
    return (intptr_t)((char *)segment_start_remote_image + offset);
