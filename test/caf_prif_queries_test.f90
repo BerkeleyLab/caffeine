@@ -21,6 +21,8 @@ contains
               check_base_pointer_not_null) &
         , it("get same address passed into to prif_base_pointer when querying about the same image", &
               check_same_image_same_addr) &
+        , it("get value zero returned from prif_base_pointer when passing in a zero to image_num arg", &
+              check_base_pointer_returns_zero) &
       ])
   end function
 
@@ -40,7 +42,7 @@ contains
       [1_c_intmax_t], ucobounds, [integer(kind=c_intmax_t) ::], [integer(kind=c_intmax_t) ::], 1_c_size_t, c_null_funptr, &
       coarray_handle, allocated_mem)
 
-    call prif_base_pointer(coarray_handle, 2, ptr)
+    call prif_base_pointer(coarray_handle, num_imgs, ptr)
     result_ = assert_that(ptr .ne. 0)
 
     call prif_deallocate([coarray_handle])
@@ -67,7 +69,32 @@ contains
 
     call prif_base_pointer(coarray_handle, this_img, ptr)
 
-    result_ = assert_that(as_int(coarray_handle%info%coarray_data) .eq. ptr)
+    result_ = assert_that(as_int(allocated_mem) .eq. ptr)
+
+    call prif_deallocate([coarray_handle])
+  end function
+
+  function check_base_pointer_returns_zero() result(result_)
+    type(result_t) :: result_
+
+    integer(c_intmax_t), dimension(1) :: ucobounds
+    integer :: num_imgs
+    integer(c_int) :: this_img
+    integer(c_intptr_t) :: ptr
+    type(prif_coarray_handle) :: coarray_handle
+    type(c_ptr) :: allocated_mem
+
+    call prif_num_images(image_count=num_imgs)
+    ucobounds(1) = num_imgs
+    call prif_this_image(image_index=this_img)
+
+    call prif_allocate( &
+      [1_c_intmax_t], ucobounds, [integer(kind=c_intmax_t) ::], [integer(kind=c_intmax_t) ::], 1_c_size_t, c_null_funptr, &
+      coarray_handle, allocated_mem)
+
+    call prif_base_pointer(coarray_handle, 0, ptr)
+
+    result_ = assert_that(ptr .eq. 0)
 
     call prif_deallocate([coarray_handle])
   end function

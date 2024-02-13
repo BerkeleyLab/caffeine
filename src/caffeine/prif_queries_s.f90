@@ -19,7 +19,7 @@ contains
     integer(c_int) :: num_img
 
     call prif_num_images(image_count=num_img)
-    call assert(image_num .gt. 0 .or. image_num .lt. num_img, "prif_base_pointer: image_num not within valid range")
+    call assert(image_num .ge. 0 .and. image_num .le. num_img, "prif_base_pointer: image_num not within valid range")
     if (image_num .eq. 0) then
       ptr = 0
     else
