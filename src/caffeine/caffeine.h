@@ -20,7 +20,7 @@ typedef void(*final_func_ptr)(void*, size_t) ;
 
 // Program launch and finalization
 
-void caf_caffeinate(mspace* symmetric_heap, intptr_t* symmetric_heap_start, mspace* non_symmetric_heap, gex_TM_t* initial_team);
+void caf_caffeinate(mspace* symmetric_heap, intptr_t* symmetric_heap_start, mspace* non_symmetric_heap, gex_TM_t** initial_team);
 void caf_decaffeinate(int exit_code);
 
 // Image enumeration
@@ -35,7 +35,7 @@ void caf_deallocate(mspace heap, void* mem);
 
 // PRIF Queries
 
-void* caf_convert_base_addr(void* addr, int image, gex_TM_t initial_team);
+intptr_t caf_convert_base_addr(void* addr, int image);
 
 // Synchronization 
 

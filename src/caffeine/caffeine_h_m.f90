@@ -72,11 +72,10 @@ module caffeine_h_m
 
     ! ___________________ PRIF Queries ______________________
 
-    module function caf_convert_base_addr(addr, image, initial_team) result(ptr) bind(c)
+    module function caf_convert_base_addr(addr, image) result(ptr) bind(c)
       implicit none
       type(c_ptr), intent(in), value :: addr
       integer(c_int), intent(in), value :: image
-      type(c_ptr), intent(in), value :: initial_team
       integer(c_intptr_t) :: ptr
     end function
 

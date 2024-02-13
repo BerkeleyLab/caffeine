@@ -4,8 +4,6 @@ submodule(prif_queries_m) prif_queries_s
   use caffeine_assert_m, only: assert
   use caffeine_h_m, only: caf_convert_base_addr
   use image_queries_m, only: prif_num_images
-  use iso_c_binding, only: c_null_ptr
-  use teams_m, only: current_team
 
   implicit none
 
@@ -25,8 +23,7 @@ contains
     if (image_num .eq. 0) then
       ptr = 0
     else
-      ! TODO: after more team work, replace last arg with initial_team%gex_team
-      ptr = caf_convert_base_addr(coarray_handle%info%coarray_data, image_num, current_team%gex_team)
+      ptr = caf_convert_base_addr(coarray_handle%info%coarray_data, image_num)
     end if
   end procedure
 
