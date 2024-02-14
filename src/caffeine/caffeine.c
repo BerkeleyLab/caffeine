@@ -25,7 +25,7 @@ typedef uint8_t byte;
   const int double_Complex_workaround =4100;
 #endif
 
-void caf_caffeinate(mspace* symmetric_heap, intptr_t* symmetric_heap_start, mspace* non_symmetric_heap, gex_TM_t** initial_team)
+void caf_caffeinate(mspace* symmetric_heap, intptr_t* symmetric_heap_start, mspace* non_symmetric_heap, gex_TM_t* initial_team)
 {
   GASNET_SAFE(gex_Client_Init(&myclient, &myep, &myworldteam, "caffeine", NULL, NULL, 0));
 
@@ -65,7 +65,7 @@ void caf_caffeinate(mspace* symmetric_heap, intptr_t* symmetric_heap_start, mspa
   }
   *non_symmetric_heap = create_mspace_with_base(non_symmetric_heap_start, non_symmetric_heap_size, 0);
   mspace_set_footprint_limit(*non_symmetric_heap, non_symmetric_heap_size);
-  *initial_team = &myworldteam;
+  *initial_team = myworldteam;
 }
 
 void caf_decaffeinate(int exit_code)
@@ -75,12 +75,12 @@ void caf_decaffeinate(int exit_code)
 
 int caf_this_image(gex_TM_t team)
 {
-  return gex_TM_QueryRank(myworldteam) + 1;
+  return gex_TM_QueryRank(team) + 1;
 }
 
 int caf_num_images(gex_TM_t team)
 {
-  return gex_TM_QuerySize(myworldteam);
+  return gex_TM_QuerySize(team);
 }
 
 void* caf_allocate(mspace heap, size_t bytes)
@@ -99,7 +99,7 @@ intptr_t caf_convert_base_addr(void* addr, int image)
    ptrdiff_t offset = (byte*)addr - (byte*)gex_Segment_QueryAddr(mysegment);
    void* segment_start_remote_image = NULL;
    gex_Event_Wait(gex_EP_QueryBoundSegmentNB(myworldteam, image - 1, &segment_start_remote_image, NULL, NULL, 0));
-   return (intptr_t)((char *)segment_start_remote_image + offset);
+   return (intptr_t)((byte*)segment_start_remote_image + offset);
 }
 
 void caf_sync_all()
@@ -118,11 +118,11 @@ void caf_co_reduce(
 
   if (result_image) {
     ev = gex_Coll_ReduceToOneNB(
-      myworldteam, result_image-1, a_address, a_address, GEX_DT_USER, c_sizeof_a, num_elements, GEX_OP_USER, user_op, &c_sizeof_a, 0
+      team, result_image-1, a_address, a_address, GEX_DT_USER, c_sizeof_a, num_elements, GEX_OP_USER, user_op, &c_sizeof_a, 0
     );
   } else {
     ev = gex_Coll_ReduceToAllNB(
-      myworldteam,                 a_address, a_address, GEX_DT_USER, c_sizeof_a, num_elements, GEX_OP_USER, user_op, &c_sizeof_a, 0
+      team,                 a_address, a_address, GEX_DT_USER, c_sizeof_a, num_elements, GEX_OP_USER, user_op, &c_sizeof_a, 0
     );
   }
   gex_Event_Wait(ev);
@@ -139,7 +139,7 @@ void caf_co_broadcast(CFI_cdesc_t * a_desc, int source_image, int* stat, int num
   int data_type = a_desc->type;
 
   gex_Event_t ev
-    = gex_Coll_BroadcastNB(myworldteam, source_image-1, c_loc_a, c_loc_a, nbytes, 0);
+    = gex_Coll_BroadcastNB(team, source_image-1, c_loc_a, c_loc_a, nbytes, 0);
   gex_Event_Wait(ev);
 
   if (stat != NULL) *stat = 0;
@@ -183,9 +183,9 @@ void caf_co_max(CFI_cdesc_t* a_desc, int result_image, int* stat, char* errmsg, 
   gex_Event_t ev;
 
   if (result_image) {
-    ev = gex_Coll_ReduceToOneNB(myworldteam, result_image-1, a_address, a_address, a_type, c_sizeof_a, num_elements, GEX_OP_MAX, NULL, NULL, 0);
+    ev = gex_Coll_ReduceToOneNB(team, result_image-1, a_address, a_address, a_type, c_sizeof_a, num_elements, GEX_OP_MAX, NULL, NULL, 0);
   } else {
-    ev = gex_Coll_ReduceToAllNB(myworldteam,                 a_address, a_address, a_type, c_sizeof_a, num_elements, GEX_OP_MAX, NULL, NULL, 0);
+    ev = gex_Coll_ReduceToAllNB(team,                 a_address, a_address, a_type, c_sizeof_a, num_elements, GEX_OP_MAX, NULL, NULL, 0);
   }
   gex_Event_Wait(ev);
 
@@ -213,9 +213,9 @@ void caf_co_min(CFI_cdesc_t* a_desc, int result_image, int* stat, char* errmsg, 
   gex_Event_t ev;
 
   if (result_image) {
-    ev = gex_Coll_ReduceToOneNB(myworldteam, result_image-1, a_address, a_address, a_type, c_sizeof_a, num_elements, GEX_OP_MIN, NULL, NULL, 0);
+    ev = gex_Coll_ReduceToOneNB(team, result_image-1, a_address, a_address, a_type, c_sizeof_a, num_elements, GEX_OP_MIN, NULL, NULL, 0);
   } else {
-    ev = gex_Coll_ReduceToAllNB(myworldteam,                 a_address, a_address, a_type, c_sizeof_a, num_elements, GEX_OP_MIN, NULL, NULL, 0);
+    ev = gex_Coll_ReduceToAllNB(team,                 a_address, a_address, a_type, c_sizeof_a, num_elements, GEX_OP_MIN, NULL, NULL, 0);
   }
   gex_Event_Wait(ev);
 
@@ -245,9 +245,9 @@ void caf_co_sum(CFI_cdesc_t* a_desc, int result_image, int* stat, char* errmsg, 
   gex_Event_t ev;
 
   if (result_image) {
-    ev = gex_Coll_ReduceToOneNB(myworldteam, result_image-1, a_address, a_address, a_type, c_sizeof_a, num_elements, GEX_OP_ADD, NULL, NULL, 0);
+    ev = gex_Coll_ReduceToOneNB(team, result_image-1, a_address, a_address, a_type, c_sizeof_a, num_elements, GEX_OP_ADD, NULL, NULL, 0);
   } else {
-    ev = gex_Coll_ReduceToAllNB(myworldteam,                 a_address, a_address, a_type, c_sizeof_a, num_elements, GEX_OP_ADD, NULL, NULL, 0);
+    ev = gex_Coll_ReduceToAllNB(team,                 a_address, a_address, a_type, c_sizeof_a, num_elements, GEX_OP_ADD, NULL, NULL, 0);
   }
   gex_Event_Wait(ev);
 
