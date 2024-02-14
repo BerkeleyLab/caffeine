@@ -137,19 +137,19 @@
   <td><strong>coarray_handles</strong>(:)</td><td></td>
 </tr>
 <tr>
-  <td><span class="anchor" id="variable-stat~13"></span>integer(kind=c_int),</td>
+  <td><span class="anchor" id="variable-stat~6"></span>integer(kind=c_int),</td>
 <td>intent(out),</td>
   <td>optional</td>  <td></td><td>::</td>
   <td><strong>stat</strong></td><td></td>
 </tr>
 <tr>
-  <td><span class="anchor" id="variable-errmsg~12"></span>character(len=*),</td>
+  <td><span class="anchor" id="variable-errmsg~6"></span>character(len=*),</td>
 <td>intent(inout),</td>
   <td>optional</td>  <td></td><td>::</td>
   <td><strong>errmsg</strong></td><td></td>
 </tr>
 <tr>
-  <td><span class="anchor" id="variable-errmsg_alloc~12"></span>character(len=:),</td>
+  <td><span class="anchor" id="variable-errmsg_alloc~5"></span>character(len=:),</td>
 <td>intent(inout),</td>
   <td>optional</td>  <td>allocatable</td><td>::</td>
   <td><strong>errmsg_alloc</strong></td><td></td>
@@ -195,18 +195,18 @@
 <path fill="none" stroke="#ff0000" d="M59.47,-108.04C74.57,-122.05 101.33,-145.03 128,-159 134.02,-162.15 140.6,-164.93 147.21,-167.34"/>
 <polygon fill="#ff0000" stroke="#ff0000" points="146.25,-170.71 156.84,-170.62 148.5,-164.09 146.25,-170.71"/>
 </g>
-<!-- interface~caf_deallocate -->
+<!-- proc~remove_from_team_list -->
 <g id="proc~~prif_deallocate~~CallsGraph_node3" class="node">
-<title>interface~caf_deallocate</title>
-<g id="a_proc~~prif_deallocate~~CallsGraph_node3"><a xlink:href=".././interface/caf_deallocate.html" xlink:title="caf_deallocate">
-<polygon fill="#a7506f" stroke="#a7506f" points="241.5,-150 150.5,-150 150.5,-126 241.5,-126 241.5,-150"/>
-<text text-anchor="middle" x="196" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">caf_deallocate</text>
+<title>proc~remove_from_team_list</title>
+<g id="a_proc~~prif_deallocate~~CallsGraph_node3"><a xlink:href=".././proc/remove_from_team_list.html" xlink:title="remove_from_team_list">
+<polygon fill="#d9534f" stroke="#d9534f" points="264,-150 128,-150 128,-126 264,-126 264,-150"/>
+<text text-anchor="middle" x="196" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">remove_from_team_list</text>
 </a>
 </g>
 </g>
-<!-- proc~prif_deallocate&#45;&gt;interface~caf_deallocate -->
-<g id="proc~~prif_deallocate~~CallsGraph_edge2" class="edge">
-<title>proc~prif_deallocate&#45;&gt;interface~caf_deallocate</title>
+<!-- proc~prif_deallocate&#45;&gt;proc~remove_from_team_list -->
+<g id="proc~~prif_deallocate~~CallsGraph_edge3" class="edge">
+<title>proc~prif_deallocate&#45;&gt;proc~remove_from_team_list</title>
 <path fill="none" stroke="#ff0000" d="M89.41,-108.04C105.98,-112.74 125.14,-118.18 142.56,-123.12"/>
 <polygon fill="#ff0000" stroke="#ff0000" points="142.01,-126.6 152.58,-125.96 143.92,-119.87 142.01,-126.6"/>
 </g>
@@ -220,7 +220,7 @@
 </g>
 </g>
 <!-- proc~prif_deallocate&#45;&gt;interface~prif_error_stop -->
-<g id="proc~~prif_deallocate~~CallsGraph_edge3" class="edge">
+<g id="proc~~prif_deallocate~~CallsGraph_edge4" class="edge">
 <title>proc~prif_deallocate&#45;&gt;interface~prif_error_stop</title>
 <path fill="none" stroke="#ff0000" d="M92.21,-96C107.48,-96 124.69,-96 140.6,-96"/>
 <polygon fill="#ff0000" stroke="#ff0000" points="140.83,-99.5 150.83,-96 140.83,-92.5 140.83,-99.5"/>
@@ -235,25 +235,25 @@
 </g>
 </g>
 <!-- proc~prif_deallocate&#45;&gt;interface~caf_this_image -->
-<g id="proc~~prif_deallocate~~CallsGraph_edge4" class="edge">
+<g id="proc~~prif_deallocate~~CallsGraph_edge5" class="edge">
 <title>proc~prif_deallocate&#45;&gt;interface~caf_this_image</title>
 <path fill="none" stroke="#ff0000" d="M89.41,-83.96C105.98,-79.26 125.14,-73.82 142.56,-68.88"/>
 <polygon fill="#ff0000" stroke="#ff0000" points="143.92,-72.13 152.58,-66.04 142.01,-65.4 143.92,-72.13"/>
 </g>
-<!-- proc~remove_from_team_list -->
+<!-- interface~caf_deallocate -->
 <g id="proc~~prif_deallocate~~CallsGraph_node6" class="node">
-<title>proc~remove_from_team_list</title>
-<g id="a_proc~~prif_deallocate~~CallsGraph_node6"><a xlink:href=".././proc/remove_from_team_list.html" xlink:title="remove_from_team_list">
-<polygon fill="#d9534f" stroke="#d9534f" points="264,-24 128,-24 128,0 264,0 264,-24"/>
-<text text-anchor="middle" x="196" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">remove_from_team_list</text>
+<title>interface~caf_deallocate</title>
+<g id="a_proc~~prif_deallocate~~CallsGraph_node6"><a xlink:href=".././interface/caf_deallocate.html" xlink:title="caf_deallocate">
+<polygon fill="#a7506f" stroke="#a7506f" points="241.5,-24 150.5,-24 150.5,0 241.5,0 241.5,-24"/>
+<text text-anchor="middle" x="196" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">caf_deallocate</text>
 </a>
 </g>
 </g>
-<!-- proc~prif_deallocate&#45;&gt;proc~remove_from_team_list -->
-<g id="proc~~prif_deallocate~~CallsGraph_edge5" class="edge">
-<title>proc~prif_deallocate&#45;&gt;proc~remove_from_team_list</title>
-<path fill="none" stroke="#ff0000" d="M59.47,-83.96C74.57,-69.95 101.33,-46.97 128,-33 131.54,-31.14 135.28,-29.42 139.1,-27.82"/>
-<polygon fill="#ff0000" stroke="#ff0000" points="140.64,-30.98 148.71,-24.11 138.12,-24.45 140.64,-30.98"/>
+<!-- proc~prif_deallocate&#45;&gt;interface~caf_deallocate -->
+<g id="proc~~prif_deallocate~~CallsGraph_edge2" class="edge">
+<title>proc~prif_deallocate&#45;&gt;interface~caf_deallocate</title>
+<path fill="none" stroke="#ff0000" d="M59.47,-83.96C74.57,-69.95 101.33,-46.97 128,-33 132.06,-30.88 136.37,-28.92 140.77,-27.13"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="142.35,-30.28 150.49,-23.49 139.89,-23.72 142.35,-30.28"/>
 </g>
 <!-- proc~prif_sync_all -->
 <g id="proc~~prif_deallocate~~CallsGraph_node7" class="node">
@@ -543,7 +543,7 @@
           <p class="text-right">
             Documentation generated by 
             <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
- on 2024-01-31 18:03            </p>
+ on 2024-02-14 19:16            </p>
         </div>
       </div>
       <br>

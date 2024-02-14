@@ -29,7 +29,6 @@ module allocation_m
     end type
 
     type :: prif_coarray_handle
-      private
       type(handle_data), pointer :: info
     end type
 
