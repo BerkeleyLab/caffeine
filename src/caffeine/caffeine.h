@@ -12,7 +12,7 @@
 #include "../dlmalloc/dl_malloc.h"
 
 enum {
-  UNRECOGNIZED_TYPE, 
+  UNRECOGNIZED_TYPE,
   ERRMSG_TOO_SHORT
 };
 
@@ -33,16 +33,20 @@ int caf_num_images(gex_TM_t team);
 void* caf_allocate(mspace heap, size_t bytes);
 void caf_deallocate(mspace heap, void* mem);
 
+// PRIF Queries
+
+intptr_t caf_convert_base_addr(void* addr, int image);
+
 // RMA
 
 void caf_put(gex_TM_t team, int image, void* dest, CFI_cdesc_t* src);
 void caf_get(gex_TM_t team, int image, CFI_cdesc_t* dest, void* src);
 
-// Synchronization 
+// Synchronization
 
 void caf_sync_all();
 
-// _______ Collective Subroutines _______ 
+// _______ Collective Subroutines _______
 
 void caf_co_reduce(
   CFI_cdesc_t* a_desc, int result_image, int* stat, char* errmsg, int num_elements, gex_Coll_ReduceFn_t* user_op, void* client_data, gex_TM_t team
@@ -64,7 +68,7 @@ void caf_co_max(
   CFI_cdesc_t* a_desc, int result_image, int* stat, char* errmsg, size_t num_elements, gex_TM_t team
 );
 
-// ____________ Utilities ____________ 
+// ____________ Utilities ____________
 
 bool caf_same_cfi_type(CFI_cdesc_t* a_desc, CFI_cdesc_t* b_desc);
 

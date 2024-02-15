@@ -12,6 +12,10 @@
 static gex_Client_t myclient;
 static gex_EP_t myep;
 static gex_Rank_t rank, size;
+static gex_Segment_t mysegment;
+static gex_TM_t myworldteam;
+
+typedef uint8_t byte;
 
 #if __GNUC__ >= 12
   const int float_Complex_workaround = CFI_type_float_Complex;
@@ -21,26 +25,26 @@ static gex_Rank_t rank, size;
   const int double_Complex_workaround =4100;
 #endif
 
+// NOTE: gex_TM_T is a typedef to a C pointer, so the `gex_TM_t* initial_team` arg in the C signature matches the BIND(C) interface of an `intent(out)` arg of type `c_ptr` for the same argument
 void caf_caffeinate(mspace* symmetric_heap, intptr_t* symmetric_heap_start, mspace* non_symmetric_heap, gex_TM_t* initial_team)
 {
-  GASNET_SAFE(gex_Client_Init(&myclient, &myep, initial_team, "caffeine", NULL, NULL, 0));
+  GASNET_SAFE(gex_Client_Init(&myclient, &myep, &myworldteam, "caffeine", NULL, NULL, 0));
 
   // query largest possible segment GASNet can give us of the same size across all processes:
-  size_t max_seg = gasnet_getMaxGlobalSegmentSize(); 
+  size_t max_seg = gasnet_getMaxGlobalSegmentSize();
   // impose a reasonable default size
   #ifndef CAF_DEFAULT_HEAP_SIZE
   #define CAF_DEFAULT_HEAP_SIZE (128*1024*1024) // 128 MiB
   #endif
   size_t default_seg = MIN(max_seg, CAF_DEFAULT_HEAP_SIZE);
   // retrieve user preference, defaulting to the above and units of MiB
-  size_t segsz = gasnett_getenv_int_withdefault("CAF_HEAP_SIZE", 
+  size_t segsz = gasnett_getenv_int_withdefault("CAF_HEAP_SIZE",
                                                 default_seg, 1024*1024);
   // cap user request to the largest available:
   // TODO: issue a console warning here instead of silently capping
   segsz = MIN(segsz,max_seg);
 
-  gex_Segment_t mysegment;
-  GASNET_SAFE(gex_Segment_Attach(&mysegment, *initial_team, segsz));
+  GASNET_SAFE(gex_Segment_Attach(&mysegment, myworldteam, segsz));
 
   *symmetric_heap_start = (intptr_t)gex_Segment_QueryAddr(mysegment);
   size_t total_heap_size = gex_Segment_QuerySize(mysegment);
@@ -56,12 +60,13 @@ void caf_caffeinate(mspace* symmetric_heap, intptr_t* symmetric_heap_start, mspa
   size_t symmetric_heap_size = total_heap_size - non_symmetric_heap_size;
   intptr_t non_symmetric_heap_start = *symmetric_heap_start + symmetric_heap_size;
 
-  if (caf_this_image(*initial_team) == 1) {
+  if (caf_this_image(myworldteam) == 1) {
     *symmetric_heap = create_mspace_with_base(*symmetric_heap_start, symmetric_heap_size, 0);
     mspace_set_footprint_limit(*symmetric_heap, symmetric_heap_size);
   }
   *non_symmetric_heap = create_mspace_with_base(non_symmetric_heap_start, non_symmetric_heap_size, 0);
   mspace_set_footprint_limit(*non_symmetric_heap, non_symmetric_heap_size);
+  *initial_team = myworldteam;
 }
 
 void caf_decaffeinate(int exit_code)
@@ -79,7 +84,6 @@ int caf_num_images(gex_TM_t team)
   return gex_TM_QuerySize(team);
 }
 
-
 void* caf_allocate(mspace heap, size_t bytes)
 {
    return mspace_memalign(heap, 8, bytes);
@@ -88,6 +92,15 @@ void* caf_allocate(mspace heap, size_t bytes)
 void caf_deallocate(mspace heap, void* mem)
 {
   mspace_free(heap, mem);
+}
+
+// take address in a segment and convert to an address on given image
+intptr_t caf_convert_base_addr(void* addr, int image)
+{
+   ptrdiff_t offset = (byte*)addr - (byte*)gex_Segment_QueryAddr(mysegment);
+   void* segment_start_remote_image = NULL;
+   gex_Event_Wait(gex_EP_QueryBoundSegmentNB(myworldteam, image - 1, &segment_start_remote_image, NULL, NULL, 0));
+   return (intptr_t)((byte*)segment_start_remote_image + offset);
 }
 
 void caf_put(gex_TM_t team, int image, void* dest, CFI_cdesc_t* src)

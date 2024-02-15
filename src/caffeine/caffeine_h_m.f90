@@ -9,6 +9,7 @@ module caffeine_h_m
   public :: caf_caffeinate, caf_decaffeinate
   public :: caf_num_images, caf_this_image
   public :: caf_allocate, caf_deallocate
+  public :: caf_convert_base_addr
   public :: caf_put, caf_get
   public :: caf_sync_all
   public :: caf_co_broadcast, caf_co_sum, caf_co_min, caf_co_max, caf_co_reduce
@@ -70,6 +71,16 @@ module caffeine_h_m
       type(c_ptr), intent(in), value :: mem
     end subroutine
 
+    ! ___________________ PRIF Queries ______________________
+
+    module function caf_convert_base_addr(addr, image) result(ptr) bind(c)
+      implicit none
+      type(c_ptr), intent(in), value :: addr
+      integer(c_int), intent(in), value :: image
+      integer(c_intptr_t) :: ptr
+    end function
+
+
     ! _______________________ RMA ____________________________
     subroutine caf_put(team, image, dest, src) bind(c)
       !! void caf_put(gex_TM_t team, int image, void* dest, CFI_cdesc_t* src)
@@ -113,7 +124,7 @@ module caffeine_h_m
      subroutine caf_co_reduce(a, result_image, c_loc_stat, c_loc_errmsg, num_elements, Coll_ReduceSub, client_data, team) bind(C)
        !! void caf_co_reduce(CFI_cdesc_t* a_desc, int result_image, int* stat, char* errmsg, int num_elements, gex_Coll_ReduceFn_t* user_op, void* client_data)
        import c_int, c_ptr, c_size_t, c_funptr
-       implicit none 
+       implicit none
        type(*) a(..)
        integer(c_int), value :: result_image
        type(c_ptr), value :: c_loc_stat, c_loc_errmsg, client_data
@@ -125,7 +136,7 @@ module caffeine_h_m
      subroutine caf_co_sum(a, result_image, c_loc_stat, c_loc_errmsg, num_elements, team) bind(C)
        !! void c_co_sum(CFI_cdesc_t* a_desc, int result_image, int* stat, char* errmsg, size_t num_elements);
        import c_int, c_ptr, c_size_t
-       implicit none 
+       implicit none
        type(*) a(..)
        integer(c_int), value :: result_image
        type(c_ptr), value :: c_loc_stat, c_loc_errmsg
@@ -136,7 +147,7 @@ module caffeine_h_m
      subroutine caf_co_min(a, result_image, c_loc_stat, c_loc_errmsg, num_elements, team) bind(C)
        !! void c_co_min(CFI_cdesc_t* a_desc, int result_image, int* stat, char* errmsg, size_t num_elements);
        import c_int, c_ptr, c_size_t
-       implicit none 
+       implicit none
        type(*) a(..)
        integer(c_int), value :: result_image
        type(c_ptr), value :: c_loc_stat, c_loc_errmsg
@@ -147,7 +158,7 @@ module caffeine_h_m
      subroutine caf_co_max(a, result_image, c_loc_stat, c_loc_errmsg, num_elements, team) bind(C)
        !! void c_co_max(CFI_cdesc_t* a_desc, int result_image, int* stat, char* errmsg, size_t num_elements);
        import c_int, c_ptr, c_size_t
-       implicit none 
+       implicit none
        type(*) a(..)
        integer(c_int), value :: result_image
        type(c_ptr), value :: c_loc_stat, c_loc_errmsg
@@ -160,13 +171,13 @@ module caffeine_h_m
        import c_bool
        type(*), intent(in) :: a(..), b(..)
      end function
-  
+
      logical(c_bool) pure function caf_numeric_type(a) bind(C)
        !! bool caf_numeric_type(CFI_cdesc_t* a_desc);
        import c_bool
        type(*), intent(in) :: a(..)
      end function
-  
+
      logical(c_bool) pure function caf_is_f_string(a) bind(C)
        !! bool caf_is_f_string(CFI_cdesc_t* a_desc);
        import c_bool
