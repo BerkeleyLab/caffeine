@@ -39,6 +39,10 @@ contains
     if (.not. invalid_cosubscripts) then
       image_index = 1 + sub(1) - coarray_handle%info%lcobounds(1)
       prior_size = 1
+      ! Future work: values of prior_size are invariant across calls w/ the same coarray_handle
+      !  We could store them in the coarray metadata at allocation rather than redundantly
+      ! computing them here, which would accelerate calls with corank > 1 by removing
+      ! corank multiply/add operations and the loop-carried dependence
       do dim = 2, size(sub)
         prior_size = prior_size * (coarray_handle%info%ucobounds(dim-1) - coarray_handle%info%lcobounds(dim-1) + 1)
         image_index = image_index + (sub(dim) - coarray_handle%info%lcobounds(dim)) * prior_size
