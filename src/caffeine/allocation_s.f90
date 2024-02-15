@@ -52,6 +52,7 @@ contains
     coarray_handle%info%coarray_data = c_loc(unused2(2))
     coarray_handle%info%corank = size(lcobounds)
     coarray_handle%info%coarray_size = coarray_size
+    coarray_handle%info%element_length = element_length
     coarray_handle%info%final_func = final_func
     coarray_handle%info%lcobounds(1:size(lcobounds)) = lcobounds
     coarray_handle%info%ucobounds(1:size(ucobounds)) = ucobounds

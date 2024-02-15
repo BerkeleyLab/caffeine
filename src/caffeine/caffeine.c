@@ -103,11 +103,9 @@ intptr_t caf_convert_base_addr(void* addr, int image)
    return (intptr_t)((byte*)segment_start_remote_image + offset);
 }
 
-void caf_put(gex_TM_t team, int image, void* dest, CFI_cdesc_t* src)
+void caf_put(int image, intptr_t dest, void* src, size_t size)
 {
-  size_t num_elements = 1;
-  for (int i = 0; i < src->rank; i++) num_elements *= src->dim[i].extent;
-  gex_RMA_PutBlocking(team, image-1, dest, src->base_addr, src->elem_len*num_elements, 0);
+  gex_RMA_PutBlocking(myworldteam, image-1, (void*)dest, src, size, 0);
 }
 
 void caf_get(gex_TM_t team, int image, CFI_cdesc_t* dest, void* src)

@@ -18,6 +18,7 @@ module allocation_m
       type(c_ptr) :: coarray_data
       integer(c_int) :: corank
       integer(c_size_t) :: coarray_size
+      integer(c_size_t) :: element_length
       type(c_funptr) :: final_func
       type(c_ptr) :: previous_handle, next_handle
       integer(c_intmax_t) :: lcobounds(15), ucobounds(15)

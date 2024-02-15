@@ -16,7 +16,7 @@ module coarray_access_m
        implicit none
        type(prif_coarray_handle), intent(in) :: coarray_handle
        integer(c_intmax_t), intent(in) :: coindices(:)
-       type(*), dimension(..), intent(in), contiguous :: value
+       type(*), intent(in), contiguous, target :: value(..)
        type(c_ptr), intent(in) :: first_element_addr
        type(prif_team_type), optional, intent(in) :: team
        integer(c_intmax_t), optional, intent(in) :: team_number

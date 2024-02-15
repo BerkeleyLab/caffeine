@@ -82,14 +82,14 @@ module caffeine_h_m
 
 
     ! _______________________ RMA ____________________________
-    subroutine caf_put(team, image, dest, src) bind(c)
-      !! void caf_put(gex_TM_t team, int image, void* dest, CFI_cdesc_t* src)
-      import c_ptr, c_int, c_size_t
+    subroutine caf_put(image, dest, src, size) bind(c)
+      !! void caf_put(int image, intptr_t dest, void* src, size_t size)
+      import c_ptr, c_int, c_intptr_t, c_size_t
       implicit none
-      type(c_ptr), intent(in), value :: team
       integer(c_int), intent(in), value :: image
-      type(c_ptr), intent(in), value :: dest
-      type(*), dimension(..), intent(in), contiguous :: src
+      integer(c_intptr_t), intent(in), value :: dest
+      type(c_ptr), intent(in), value :: src
+      integer(c_size_t), intent(in), value :: size
     end subroutine
 
     subroutine caf_get(team, image, dest, src) bind(c)

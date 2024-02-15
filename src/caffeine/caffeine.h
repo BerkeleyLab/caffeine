@@ -39,7 +39,7 @@ intptr_t caf_convert_base_addr(void* addr, int image);
 
 // RMA
 
-void caf_put(gex_TM_t team, int image, void* dest, CFI_cdesc_t* src);
+void caf_put(int image, intptr_t dest, void* src, size_t size);
 void caf_get(gex_TM_t team, int image, CFI_cdesc_t* dest, void* src);
 
 // Synchronization
