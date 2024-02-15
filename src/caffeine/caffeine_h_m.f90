@@ -92,14 +92,14 @@ module caffeine_h_m
       integer(c_size_t), intent(in), value :: size
     end subroutine
 
-    subroutine caf_get(team, image, dest, src) bind(c)
-      !! void caf_get(gex_TM_t team, int image, CFI_cdesc_t* dest, void* src)
-      import c_ptr, c_int, c_size_t
+    subroutine caf_get(image, dest, src, size) bind(c)
+      !! void caf_get(int image, void* dest, intptr_t src, size_t size)
+      import c_ptr, c_int, c_intptr_t, c_size_t
       implicit none
-      type(c_ptr), intent(in), value :: team
       integer(c_int), intent(in), value :: image
-      type(*), dimension(..), intent(inout), contiguous :: dest
-      type(c_ptr), intent(in), value :: src
+      type(c_ptr), intent(in), value :: dest
+      integer(c_intptr_t), intent(in), value :: src
+      integer(c_size_t), intent(in), value :: size
     end subroutine
     ! __________________ Synchronization _____________________
 
