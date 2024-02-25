@@ -8,39 +8,45 @@ contains
         use a00_caffeinate_test, only: &
                 a00_caffeinate_caffeinate => &
                     test_caffeinate
+        use caf_allocate_test, only: &
+                caf_allocate_prif_allocate => &
+                    test_prif_allocate
         use caf_co_broadcast_test, only: &
-                prif_co_broadcast_prif_co_broadcast => &
+                caf_co_broadcast_prif_co_broadcast => &
                     test_prif_co_broadcast
         use caf_co_max_test, only: &
-                prif_co_max_prif_co_max => &
+                caf_co_max_prif_co_max => &
                     test_prif_co_max
         use caf_co_min_test, only: &
-                prif_co_min_prif_co_min => &
+                caf_co_min_prif_co_min => &
                     test_prif_co_min
         use caf_co_reduce_test, only: &
-                prif_co_reduce_prif_co_reduce => &
+                caf_co_reduce_prif_co_reduce => &
                     test_prif_co_reduce
         use caf_co_sum_test, only: &
-                prif_co_sum_prif_co_sum => &
+                caf_co_sum_prif_co_sum => &
                     test_prif_co_sum
         use caf_error_stop_test, only: &
-                prif_error_stop_prif_this_image => &
+                caf_error_stop_prif_this_image => &
                     test_prif_this_image
+        use caf_image_index_test, only: &
+                caf_image_index_prif_image_index => &
+                    test_prif_image_index
         use caf_num_images_test, only: &
-                prif_num_images_prif_num_images => &
+                caf_num_images_prif_num_images => &
                     test_prif_num_images
+        use caf_prif_queries_test, only: &
+                caf_prif_queries_prif_queries => &
+                    test_prif_queries
+        use caf_rma_test, only: &
+                caf_rma_prif_rma => &
+                    test_prif_rma
         use caf_stop_test, only: &
-                prif_stop_prif_this_image => &
+                caf_stop_prif_this_image => &
                     test_prif_this_image
         use caf_this_image_test, only: &
-                prif_this_image_prif_this_image => &
+                caf_this_image_prif_this_image => &
                     test_prif_this_image
-        use caf_allocate_test, only: &
-                prif_allocate_prif_allocate => &
-                    test_prif_allocate
-        use caf_prif_queries_test, only: &
-                prif_queries_prif_queries => &
-                    test_prif_queries
         use veggies, only: test_item_t, test_that, run_tests
 
 
@@ -48,20 +54,22 @@ contains
         logical :: passed
 
         type(test_item_t) :: tests
-        type(test_item_t) :: individual_tests(12)
+        type(test_item_t) :: individual_tests(14)
 
         individual_tests(1) = a00_caffeinate_caffeinate()
-        individual_tests(2) = prif_co_broadcast_prif_co_broadcast()
-        individual_tests(3) = prif_co_max_prif_co_max()
-        individual_tests(4) = prif_co_min_prif_co_min()
-        individual_tests(5) = prif_co_reduce_prif_co_reduce()
-        individual_tests(6) = prif_co_sum_prif_co_sum()
-        individual_tests(7) = prif_error_stop_prif_this_image()
-        individual_tests(8) = prif_num_images_prif_num_images()
-        individual_tests(9) = prif_stop_prif_this_image()
-        individual_tests(10) = prif_this_image_prif_this_image()
-        individual_tests(11) = prif_allocate_prif_allocate()
-        individual_tests(12) = prif_queries_prif_queries()
+        individual_tests(2) = caf_allocate_prif_allocate()
+        individual_tests(3) = caf_co_broadcast_prif_co_broadcast()
+        individual_tests(4) = caf_co_max_prif_co_max()
+        individual_tests(5) = caf_co_min_prif_co_min()
+        individual_tests(6) = caf_co_reduce_prif_co_reduce()
+        individual_tests(7) = caf_co_sum_prif_co_sum()
+        individual_tests(8) = caf_error_stop_prif_this_image()
+        individual_tests(9) = caf_image_index_prif_image_index()
+        individual_tests(10) = caf_num_images_prif_num_images()
+        individual_tests(11) = caf_prif_queries_prif_queries()
+        individual_tests(12) = caf_rma_prif_rma()
+        individual_tests(13) = caf_stop_prif_this_image()
+        individual_tests(14) = caf_this_image_prif_this_image()
         tests = test_that(individual_tests)
 
 

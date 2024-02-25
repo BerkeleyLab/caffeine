@@ -103,6 +103,16 @@ intptr_t caf_convert_base_addr(void* addr, int image)
    return (intptr_t)((byte*)segment_start_remote_image + offset);
 }
 
+void caf_put(int image, intptr_t dest, void* src, size_t size)
+{
+  gex_RMA_PutBlocking(myworldteam, image-1, (void*)dest, src, size, 0);
+}
+
+void caf_get(int image, void* dest, intptr_t src, size_t size)
+{
+  gex_RMA_GetBlocking(myworldteam, dest, image-1, (void*)src, size, 0);
+}
+
 void caf_sync_all()
 {
   gasnet_barrier_notify(0,GASNET_BARRIERFLAG_ANONYMOUS);
