@@ -10,6 +10,7 @@ module caffeine_h_m
   public :: caf_num_images, caf_this_image
   public :: caf_allocate, caf_deallocate
   public :: caf_convert_base_addr
+  public :: caf_put, caf_get
   public :: caf_sync_all
   public :: caf_co_broadcast, caf_co_sum, caf_co_min, caf_co_max, caf_co_reduce
   public :: caf_same_cfi_type, caf_elem_len, caf_numeric_type, caf_is_f_string
@@ -79,6 +80,27 @@ module caffeine_h_m
       integer(c_intptr_t) :: ptr
     end function
 
+
+    ! _______________________ RMA ____________________________
+    subroutine caf_put(image, dest, src, size) bind(c)
+      !! void caf_put(int image, intptr_t dest, void* src, size_t size)
+      import c_ptr, c_int, c_intptr_t, c_size_t
+      implicit none
+      integer(c_int), intent(in), value :: image
+      integer(c_intptr_t), intent(in), value :: dest
+      type(c_ptr), intent(in), value :: src
+      integer(c_size_t), intent(in), value :: size
+    end subroutine
+
+    subroutine caf_get(image, dest, src, size) bind(c)
+      !! void caf_get(int image, void* dest, intptr_t src, size_t size)
+      import c_ptr, c_int, c_intptr_t, c_size_t
+      implicit none
+      integer(c_int), intent(in), value :: image
+      type(c_ptr), intent(in), value :: dest
+      integer(c_intptr_t), intent(in), value :: src
+      integer(c_size_t), intent(in), value :: size
+    end subroutine
     ! __________________ Synchronization _____________________
 
     subroutine caf_sync_all() bind(C)
