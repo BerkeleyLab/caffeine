@@ -2,9 +2,8 @@
 ! Terms of use are as specified in LICENSE.txt
 submodule(coarray_access_m) coarray_access_s
   use caffeine_h_m, only: caf_put, caf_get, as_int
-  use coarray_queries_m, only: prif_image_index
   use iso_c_binding, only: c_loc
-  use prif, only: prif_base_pointer
+  use prif, only: prif_base_pointer, prif_image_index
 
   implicit none
 
