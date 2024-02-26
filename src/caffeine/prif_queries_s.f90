@@ -3,7 +3,7 @@
 submodule(prif:prif_private_s) prif_queries_s
   use caffeine_assert_m, only: assert
   use caffeine_h_m, only: caf_convert_base_addr
-  use image_queries_m, only: prif_num_images
+  use prif, only: prif_num_images
 
   implicit none
 

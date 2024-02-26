@@ -11,7 +11,6 @@ module prif
     prif_put, prif_put_raw, prif_put_raw_strided, prif_get, prif_get_raw, prif_get_raw_strided
   use alias_m, only: prif_alias_create, prif_alias_destroy
   use coarray_queries_m, only: prif_lcobound, prif_ucobound, prif_coshape, prif_image_index
-  use image_queries_m, only : prif_this_image, prif_num_images, prif_failed_images, prif_stopped_images, prif_image_status
   use teams_m, only: prif_form_team, prif_change_team, prif_end_team, prif_team_type, prif_get_team, prif_team_number
 
   implicit none
@@ -50,6 +49,31 @@ module prif
      module procedure prif_atomic_ref_logical
   end interface
 
+  interface prif_this_image
+
+    module subroutine prif_this_image_no_coarray(team, image_index)
+      implicit none
+      type(prif_team_type), intent(in), optional :: team
+      integer(c_int), intent(out) :: image_index
+    end subroutine
+
+    module subroutine prif_this_image_with_coarray(coarray_handle, team, cosubscripts)
+      implicit none
+      type(prif_coarray_handle), intent(in) :: coarray_handle
+      type(prif_team_type), intent(in), optional :: team
+      integer(c_intmax_t), intent(out) :: cosubscripts(:)
+    end subroutine
+
+    module subroutine prif_this_image_with_dim(coarray_handle, dim, team, cosubscript)
+      implicit none
+      type(prif_coarray_handle), intent(in) :: coarray_handle
+      integer(c_int), intent(in) :: dim
+      type(prif_team_type), intent(in), optional :: team
+      integer(c_intmax_t), intent(out) :: cosubscript
+    end subroutine
+
+  end interface
+
   interface
 
     module subroutine prif_init(exit_code)
@@ -72,6 +96,32 @@ module prif
 
     module subroutine prif_fail_image()
       implicit none
+    end subroutine
+
+    module subroutine prif_num_images(team, team_number, image_count)
+      implicit none
+      type(prif_team_type), intent(in), optional :: team
+      integer(c_intmax_t), intent(in), optional :: team_number
+      integer(c_int), intent(out) :: image_count
+    end subroutine
+
+    module subroutine prif_failed_images(team, failed_images)
+      implicit none
+      type(prif_team_type), intent(in), optional :: team
+      integer(c_int), allocatable, intent(out) :: failed_images(:)
+    end subroutine
+
+    module subroutine prif_stopped_images(team, stopped_images)
+      implicit none
+      type(prif_team_type), intent(in), optional :: team
+      integer(c_int), allocatable, intent(out) :: stopped_images(:)
+    end subroutine
+
+    module impure elemental subroutine prif_image_status(image, team, image_status)
+      implicit none
+      integer(c_int), intent(in) :: image
+      type(prif_team_type), intent(in), optional :: team
+      integer(c_int), intent(out) :: image_status
     end subroutine
 
     module subroutine prif_set_context_data(coarray_handle, context_data)
