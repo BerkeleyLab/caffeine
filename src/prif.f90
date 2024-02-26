@@ -9,7 +9,6 @@ module prif
     prif_coarray_handle, prif_allocate, prif_allocate_non_symmetric, prif_deallocate, prif_deallocate_non_symmetric
   use coarray_access_m, only: &
     prif_put, prif_put_raw, prif_put_raw_strided, prif_get, prif_get_raw, prif_get_raw_strided
-  use alias_m, only: prif_alias_create, prif_alias_destroy
   use teams_m, only: prif_form_team, prif_change_team, prif_end_team, prif_team_type, prif_get_team, prif_team_number
 
   implicit none
@@ -105,6 +104,19 @@ module prif
 
     module subroutine prif_fail_image()
       implicit none
+    end subroutine
+
+    module subroutine prif_alias_create(source_handle, alias_co_lbounds, alias_co_ubounds, alias_handle)
+      implicit none
+      type(prif_coarray_handle), intent(in) :: source_handle
+      integer(c_intmax_t), intent(in) :: alias_co_lbounds(:)
+      integer(c_intmax_t), intent(in) :: alias_co_ubounds(:)
+      type(prif_coarray_handle), intent(out) :: alias_handle
+    end subroutine
+
+    module subroutine prif_alias_destroy(alias_handle)
+      implicit none
+      type(prif_coarray_handle), intent(in) :: alias_handle
     end subroutine
 
     module subroutine prif_lcobound_with_dim(coarray_handle, dim, lcobound)
