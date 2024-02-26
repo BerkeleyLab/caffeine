@@ -12,7 +12,7 @@ contains
 
   module procedure assert
     use caffeine_characterizable_m, only : characterizable_t
-    use program_termination_m, only: prif_error_stop
+    use prif, only: prif_error_stop
     use image_queries_m, only: this_image => prif_this_image
 
     character(len=:), allocatable :: header, trailer

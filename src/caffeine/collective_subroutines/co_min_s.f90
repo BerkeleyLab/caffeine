@@ -5,7 +5,7 @@ submodule(collective_subroutines_m) co_min_s
   use utilities_m, only : get_c_ptr, get_c_ptr_character, optional_value
   use caffeine_h_m, only : caf_co_min, caf_same_cfi_type, caf_numeric_type, caf_is_f_string
   use caffeine_assert_m, only : assert
-  use program_termination_m, only: prif_error_stop
+  use prif, only: prif_error_stop
   use teams_m, only: current_team
   implicit none
 

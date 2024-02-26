@@ -7,7 +7,7 @@ submodule(collective_subroutines_m) co_reduce_s
   use caffeine_intrinsic_array_m, only : intrinsic_array_t
   use utilities_m, only : get_c_ptr, get_c_ptr_character, optional_value
   use caffeine_h_m, only : caf_co_reduce, caf_same_cfi_type, caf_elem_len, caf_is_f_string
-  use program_termination_m, only: prif_error_stop
+  use prif, only: prif_error_stop
   use teams_m, only: current_team
   implicit none
 

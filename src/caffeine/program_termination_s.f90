@@ -1,6 +1,6 @@
 ! Copyright (c), The Regents of the University of California
 ! Terms of use are as specified in LICENSE.txt
-submodule(program_termination_m) program_termination_s
+submodule(prif:prif_private_s) program_termination_s
   use iso_fortran_env, only : output_unit, error_unit
   use iso_c_binding, only : c_char
   use caffeine_h_m, only : caf_decaffeinate
