@@ -1,10 +1,14 @@
 ! Copyright (c), The Regents of the University of California
 ! Terms of use are as specified in LICENSE.txt
-submodule(collective_subroutines_m) co_reduce_s
+submodule(prif:prif_private_s) co_reduce_s
   use iso_c_binding, only : &
-    c_ptr, c_size_t, c_loc, c_null_ptr, c_funloc, c_associated, c_f_pointer, c_f_procpointer
+    c_size_t, c_loc, c_null_ptr, c_funloc, c_associated, c_f_pointer, c_f_procpointer, c_char, c_int64_t, c_double, &
+    c_float, c_int32_t
   use caffeine_assert_m, only : assert
   use caffeine_intrinsic_array_m, only : intrinsic_array_t
+  use collective_helpers_m, only: &
+    c_bool_operation, c_char_operation, c_double_complex_operation, c_double_operation, c_float_complex_operation, &
+    c_float_operation, c_int32_t_operation, c_int64_t_operation
   use utilities_m, only : get_c_ptr, get_c_ptr_character, optional_value
   use caffeine_h_m, only : caf_co_reduce, caf_same_cfi_type, caf_elem_len, caf_is_f_string
   use prif, only: prif_error_stop

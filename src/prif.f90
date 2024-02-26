@@ -2,7 +2,7 @@
 ! Terms of use are as specified in LICENSE.txt
 module prif
 
-  use iso_c_binding, only: c_int, c_bool, c_intptr_t, c_intmax_t, c_ptr
+  use iso_c_binding, only: c_int, c_bool, c_intptr_t, c_intmax_t, c_ptr, c_funptr
   use iso_fortran_env, only: atomic_int_kind, atomic_logical_kind
 
   use allocation_m, only: &
@@ -13,7 +13,6 @@ module prif
   use coarray_queries_m, only: prif_lcobound, prif_ucobound, prif_coshape, prif_image_index
   use image_queries_m, only : prif_this_image, prif_num_images, prif_failed_images, prif_stopped_images, prif_image_status
   use prif_queries_m, only: prif_set_context_data, prif_get_context_data, prif_base_pointer, prif_local_data_size
-  use collective_subroutines_m, only : prif_co_sum, prif_co_max, prif_co_min, prif_co_reduce, prif_co_broadcast
   use teams_m, only: prif_form_team, prif_change_team, prif_end_team, prif_team_type, prif_get_team, prif_team_number
 
   implicit none
@@ -74,6 +73,52 @@ module prif
 
     module subroutine prif_fail_image()
       implicit none
+    end subroutine
+
+    module subroutine prif_co_sum(a, result_image, stat, errmsg, errmsg_alloc)
+      implicit none
+      type(*), intent(inout), contiguous, target :: a(..)
+      integer(c_int), intent(in), optional :: result_image
+      integer(c_int), intent(out), optional :: stat
+      character(len=*), intent(inout), optional :: errmsg
+      character(len=:), intent(inout), allocatable, optional :: errmsg_alloc
+    end subroutine
+
+    module subroutine prif_co_max(a, result_image, stat, errmsg, errmsg_alloc)
+      implicit none
+      type(*), intent(inout), contiguous, target :: a(..)
+      integer(c_int), intent(in), optional :: result_image
+      integer(c_int), intent(out), optional :: stat
+      character(len=*), intent(inout), optional :: errmsg
+      character(len=:), intent(inout), allocatable, optional :: errmsg_alloc
+    end subroutine
+
+    module subroutine prif_co_min(a, result_image, stat, errmsg, errmsg_alloc)
+      implicit none
+      type(*), intent(inout), contiguous, target :: a(..)
+      integer(c_int), intent(in), optional :: result_image
+      integer(c_int), intent(out), optional :: stat
+      character(len=*), intent(inout), optional :: errmsg
+      character(len=:), intent(inout), allocatable, optional :: errmsg_alloc
+    end subroutine
+
+    module subroutine prif_co_reduce(a, operation, result_image, stat, errmsg, errmsg_alloc)
+      implicit none
+      type(*), intent(inout), contiguous, target :: a(..)
+      type(c_funptr), value :: operation
+      integer(c_int), intent(in), optional :: result_image
+      integer(c_int), intent(out), optional :: stat
+      character(len=*), intent(inout), optional :: errmsg
+      character(len=:), intent(inout), allocatable, optional :: errmsg_alloc
+    end subroutine
+
+    module subroutine prif_co_broadcast(a, source_image, stat, errmsg, errmsg_alloc)
+      implicit none
+      type(*), intent(inout), contiguous, target :: a(..)
+      integer(c_int), intent(in) :: source_image
+      integer(c_int), intent(out), optional :: stat
+      character(len=*), intent(inout), optional :: errmsg
+      character(len=:), intent(inout), allocatable, optional :: errmsg_alloc
     end subroutine
 
     module subroutine prif_sync_all(stat, errmsg, errmsg_alloc)

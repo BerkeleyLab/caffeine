@@ -1,7 +1,7 @@
 module caf_co_reduce_test
   use prif, only : prif_co_reduce, prif_num_images, prif_this_image
   use veggies, only : result_t, test_item_t, assert_equals, describe, it, assert_that, assert_equals
-  use collective_subroutines_m, only : &
+  use collective_helpers_m, only : &
      c_int32_t_operation, c_int64_t_operation, c_float_operation, c_double_operation, c_char_operation, c_bool_operation &
     ,c_float_complex_operation, c_double_complex_operation
   use caffeine_assert_m, only : assert
