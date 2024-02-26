@@ -1,6 +1,6 @@
 ! Copyright (c), The Regents of the University of California
 ! Terms of use are as specified in LICENSE.txt
-submodule(synchronization_m) sychronization_s
+submodule(prif:prif_private_s) sychronization_s
   use caffeine_h_m, only : caf_sync_all
   implicit none
 

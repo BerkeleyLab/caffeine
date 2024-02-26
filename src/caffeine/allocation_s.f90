@@ -13,8 +13,7 @@ submodule(allocation_m) allocation_s
       c_ptrdiff_t
   use caffeine_h_m, only: caf_allocate, caf_deallocate, caf_this_image, as_int, as_c_ptr
   use collective_subroutines_m, only: prif_co_sum
-  use prif, only: prif_error_stop
-  use synchronization_m, only: prif_sync_all
+  use prif, only: prif_error_stop, prif_sync_all
   use teams_m, only: prif_team_type, current_team
 
   implicit none

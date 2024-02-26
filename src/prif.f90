@@ -15,7 +15,6 @@ module prif
   use prif_queries_m, only: prif_set_context_data, prif_get_context_data, prif_base_pointer, prif_local_data_size
   use collective_subroutines_m, only : prif_co_sum, prif_co_max, prif_co_min, prif_co_reduce, prif_co_broadcast
   use teams_m, only: prif_form_team, prif_change_team, prif_end_team, prif_team_type, prif_get_team, prif_team_number
-  use synchronization_m, only : prif_sync_all, prif_sync_images, prif_sync_team, prif_sync_memory
 
   implicit none
 
@@ -75,6 +74,36 @@ module prif
 
     module subroutine prif_fail_image()
       implicit none
+    end subroutine
+
+    module subroutine prif_sync_all(stat, errmsg, errmsg_alloc)
+      implicit none
+      integer(c_int), intent(out), optional :: stat
+      character(len=*), intent(inout), optional :: errmsg
+      character(len=:), intent(inout), allocatable, optional :: errmsg_alloc
+    end subroutine
+
+    module subroutine prif_sync_images(image_set, stat, errmsg, errmsg_alloc)
+      implicit none
+      integer(c_int), intent(in), optional :: image_set(:)
+      integer(c_int), intent(out), optional :: stat
+      character(len=*), intent(inout), optional :: errmsg
+      character(len=:), intent(inout), allocatable, optional :: errmsg_alloc
+    end subroutine
+
+    module subroutine prif_sync_team(team, stat, errmsg, errmsg_alloc)
+      implicit none
+      type(prif_team_type), intent(in) :: team
+      integer(c_int), intent(out), optional :: stat
+      character(len=*), intent(inout), optional :: errmsg
+      character(len=:), intent(inout), allocatable, optional :: errmsg_alloc
+    end subroutine
+
+    module subroutine prif_sync_memory(stat, errmsg, errmsg_alloc)
+      implicit none
+      integer(c_int), intent(out), optional :: stat
+      character(len=*), intent(inout), optional :: errmsg
+      character(len=:), intent(inout), allocatable, optional :: errmsg_alloc
     end subroutine
 
     module subroutine prif_lock(image_num, lock_var_ptr, acquired_lock, stat, errmsg, errmsg_alloc)
