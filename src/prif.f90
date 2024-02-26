@@ -16,7 +16,6 @@ module prif
   use collective_subroutines_m, only : prif_co_sum, prif_co_max, prif_co_min, prif_co_reduce, prif_co_broadcast
   use teams_m, only: prif_form_team, prif_change_team, prif_end_team, prif_team_type, prif_get_team, prif_team_number
   use synchronization_m, only : prif_sync_all, prif_sync_images, prif_sync_team, prif_sync_memory
-  use locks_m, only: prif_lock_type, prif_lock, prif_unlock
 
   implicit none
 
@@ -32,7 +31,7 @@ module prif
   public :: prif_co_sum, prif_co_max, prif_co_min, prif_co_reduce, prif_co_broadcast
   public :: prif_form_team, prif_change_team, prif_end_team, prif_team_type, prif_get_team, prif_team_number
   public :: prif_sync_all, prif_sync_images, prif_sync_team, prif_sync_memory
-  public :: prif_lock_type, prif_lock, prif_unlock
+  public :: prif_lock, prif_unlock
   public :: prif_critical, prif_end_critical
   public :: prif_event_post, prif_event_wait, prif_event_query
   public :: prif_notify_wait
@@ -76,6 +75,25 @@ module prif
 
     module subroutine prif_fail_image()
       implicit none
+    end subroutine
+
+    module subroutine prif_lock(image_num, lock_var_ptr, acquired_lock, stat, errmsg, errmsg_alloc)
+      implicit none
+      integer(c_int), intent(in) :: image_num
+      integer(c_intptr_t), intent(in) :: lock_var_ptr
+      logical(c_bool), intent(out), optional :: acquired_lock
+      integer(c_int), intent(out), optional :: stat
+      character(len=*), intent(inout), optional :: errmsg
+      character(len=:), intent(inout), allocatable, optional :: errmsg_alloc
+    end subroutine
+
+    module subroutine prif_unlock(image_num, lock_var_ptr, stat, errmsg, errmsg_alloc)
+      implicit none
+      integer(c_int), intent(in) :: image_num
+      integer(c_intptr_t), intent(in) :: lock_var_ptr
+      integer(c_int), intent(out), optional :: stat
+      character(len=*), intent(inout), optional :: errmsg
+      character(len=:), intent(inout), allocatable, optional :: errmsg_alloc
     end subroutine
 
     module subroutine prif_critical(critical_coarray, stat, errmsg, errmsg_alloc)
