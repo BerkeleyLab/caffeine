@@ -18,7 +18,6 @@ module prif
   use synchronization_m, only : prif_sync_all, prif_sync_images, prif_sync_team, prif_sync_memory
   use locks_m, only: prif_lock_type, prif_lock, prif_unlock
   use critical_m, only: prif_critical_type, prif_critical, prif_end_critical
-  use events_m, only: prif_event_post, prif_event_wait, prif_event_query
 
   implicit none
 
@@ -78,6 +77,31 @@ module prif
 
     module subroutine prif_fail_image()
       implicit none
+    end subroutine
+
+    module subroutine prif_event_post(image_num, event_var_ptr, stat, errmsg, errmsg_alloc)
+      implicit none
+      integer(c_int), intent(in) :: image_num
+      integer(c_intptr_t), intent(in) :: event_var_ptr
+      integer(c_int), intent(out), optional :: stat
+      character(len=*), intent(inout), optional :: errmsg
+      character(len=:), intent(inout), allocatable, optional :: errmsg_alloc
+    end subroutine
+
+    module subroutine prif_event_wait(event_var_ptr, until_count, stat, errmsg, errmsg_alloc)
+      implicit none
+      type(c_ptr), intent(in) :: event_var_ptr
+      integer(c_intmax_t), intent(in), optional :: until_count
+      integer(c_int), intent(out), optional :: stat
+      character(len=*), intent(inout), optional :: errmsg
+      character(len=:), intent(inout), allocatable, optional :: errmsg_alloc
+    end subroutine
+
+    module subroutine prif_event_query(event_var_ptr, count, stat)
+      implicit none
+      type(c_ptr), intent(in) :: event_var_ptr
+      integer(c_intmax_t), intent(out) :: count
+      integer(c_int), intent(out), optional :: stat
     end subroutine
 
     module subroutine prif_notify_wait(notify_var_ptr, until_count, stat, errmsg, errmsg_alloc)
