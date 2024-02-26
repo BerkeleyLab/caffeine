@@ -1,7 +1,7 @@
 ! Copyright (c), The Regents of the University of California
 ! Terms of use are as specified in LICENSE.txt
 submodule(prif:prif_private_s) co_max_s
-  use iso_c_binding, only : c_size_t, c_null_char, c_f_pointer, c_funloc, c_null_ptr
+  use iso_c_binding, only : c_null_char, c_f_pointer, c_funloc, c_null_ptr
   use utilities_m, only : get_c_ptr, get_c_ptr_character, optional_value
   use caffeine_h_m, only : caf_co_max, caf_same_cfi_type, caf_numeric_type, caf_is_f_string
   use caffeine_assert_m, only : assert

@@ -2,7 +2,7 @@
 ! Terms of use are as specified in LICENSE.txt
 submodule(prif:prif_private_s) co_reduce_s
   use iso_c_binding, only : &
-    c_size_t, c_loc, c_null_ptr, c_funloc, c_associated, c_f_pointer, c_f_procpointer, c_char, c_int64_t, c_double, &
+    c_loc, c_null_ptr, c_funloc, c_associated, c_f_pointer, c_f_procpointer, c_char, c_int64_t, c_double, &
     c_float, c_int32_t
   use caffeine_assert_m, only : assert
   use caffeine_intrinsic_array_m, only : intrinsic_array_t

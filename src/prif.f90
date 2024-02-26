@@ -2,7 +2,7 @@
 ! Terms of use are as specified in LICENSE.txt
 module prif
 
-  use iso_c_binding, only: c_int, c_bool, c_intptr_t, c_intmax_t, c_ptr, c_funptr
+  use iso_c_binding, only: c_int, c_bool, c_intptr_t, c_intmax_t, c_ptr, c_funptr, c_size_t
   use iso_fortran_env, only: atomic_int_kind, atomic_logical_kind
 
   use allocation_m, only: &
@@ -12,7 +12,6 @@ module prif
   use alias_m, only: prif_alias_create, prif_alias_destroy
   use coarray_queries_m, only: prif_lcobound, prif_ucobound, prif_coshape, prif_image_index
   use image_queries_m, only : prif_this_image, prif_num_images, prif_failed_images, prif_stopped_images, prif_image_status
-  use prif_queries_m, only: prif_set_context_data, prif_get_context_data, prif_base_pointer, prif_local_data_size
   use teams_m, only: prif_form_team, prif_change_team, prif_end_team, prif_team_type, prif_get_team, prif_team_number
 
   implicit none
@@ -73,6 +72,31 @@ module prif
 
     module subroutine prif_fail_image()
       implicit none
+    end subroutine
+
+    module subroutine prif_set_context_data(coarray_handle, context_data)
+      implicit none
+      type(prif_coarray_handle), intent(in) :: coarray_handle
+      type(c_ptr), intent(in) :: context_data
+    end subroutine
+
+    module subroutine prif_get_context_data(coarray_handle, context_data)
+      implicit none
+      type(prif_coarray_handle), intent(in) :: coarray_handle
+      type(c_ptr), intent(out) :: context_data
+    end subroutine
+
+    module subroutine prif_base_pointer(coarray_handle, image_num, ptr)
+      implicit none
+      type(prif_coarray_handle), intent(in) :: coarray_handle
+      integer(c_int), intent(in) :: image_num
+      integer(c_intptr_t), intent(out) :: ptr
+    end subroutine
+
+    module subroutine prif_local_data_size(coarray_handle, data_size)
+      implicit none
+      type(prif_coarray_handle), intent(in) :: coarray_handle
+      integer(c_size_t), intent(out) :: data_size
     end subroutine
 
     module subroutine prif_co_sum(a, result_image, stat, errmsg, errmsg_alloc)
