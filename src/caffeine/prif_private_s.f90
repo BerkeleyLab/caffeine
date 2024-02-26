@@ -2,6 +2,7 @@
 ! Terms of use are as specified in LICENSE.txt
 submodule(prif) prif_private_s
   use teams_m, only: prif_team_type
+  use locks_m, only: prif_critical_type => prif_lock_type
   implicit none
 
   type(prif_team_type), target :: default_team

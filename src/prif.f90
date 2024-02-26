@@ -17,7 +17,6 @@ module prif
   use teams_m, only: prif_form_team, prif_change_team, prif_end_team, prif_team_type, prif_get_team, prif_team_number
   use synchronization_m, only : prif_sync_all, prif_sync_images, prif_sync_team, prif_sync_memory
   use locks_m, only: prif_lock_type, prif_lock, prif_unlock
-  use critical_m, only: prif_critical_type, prif_critical, prif_end_critical
 
   implicit none
 
@@ -34,7 +33,7 @@ module prif
   public :: prif_form_team, prif_change_team, prif_end_team, prif_team_type, prif_get_team, prif_team_number
   public :: prif_sync_all, prif_sync_images, prif_sync_team, prif_sync_memory
   public :: prif_lock_type, prif_lock, prif_unlock
-  public :: prif_critical_type, prif_critical, prif_end_critical
+  public :: prif_critical, prif_end_critical
   public :: prif_event_post, prif_event_wait, prif_event_query
   public :: prif_notify_wait
   public :: prif_atomic_add, prif_atomic_and, prif_atomic_or, prif_atomic_xor, prif_atomic_cas, prif_atomic_fetch_add
@@ -77,6 +76,19 @@ module prif
 
     module subroutine prif_fail_image()
       implicit none
+    end subroutine
+
+    module subroutine prif_critical(critical_coarray, stat, errmsg, errmsg_alloc)
+      implicit none
+      type(prif_coarray_handle), intent(in) :: critical_coarray
+      integer(c_int), intent(out), optional :: stat
+      character(len=*), intent(inout), optional :: errmsg
+      character(len=:), intent(inout), allocatable, optional :: errmsg_alloc
+    end subroutine
+
+    module subroutine prif_end_critical(critical_coarray)
+      implicit none
+      type(prif_coarray_handle), intent(in) :: critical_coarray
     end subroutine
 
     module subroutine prif_event_post(image_num, event_var_ptr, stat, errmsg, errmsg_alloc)
