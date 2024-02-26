@@ -6,4 +6,7 @@ submodule(prif) prif_private_s
 
   type(prif_team_type), target :: default_team
 
+  type :: prif_notify_type
+  end type
+
 end submodule prif_private_s

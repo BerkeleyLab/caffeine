@@ -2,7 +2,7 @@
 ! Terms of use are as specified in LICENSE.txt
 module prif
 
-  use iso_c_binding, only: c_int, c_bool, c_intptr_t
+  use iso_c_binding, only: c_int, c_bool, c_intptr_t, c_intmax_t, c_ptr
   use iso_fortran_env, only: atomic_int_kind, atomic_logical_kind
 
   use allocation_m, only: &
@@ -19,7 +19,6 @@ module prif
   use locks_m, only: prif_lock_type, prif_lock, prif_unlock
   use critical_m, only: prif_critical_type, prif_critical, prif_end_critical
   use events_m, only: prif_event_post, prif_event_wait, prif_event_query
-  use notify_m, only: prif_notify_type, prif_notify_wait
 
   implicit none
 
@@ -38,7 +37,7 @@ module prif
   public :: prif_lock_type, prif_lock, prif_unlock
   public :: prif_critical_type, prif_critical, prif_end_critical
   public :: prif_event_post, prif_event_wait, prif_event_query
-  public :: prif_notify_type, prif_notify_wait
+  public :: prif_notify_wait
   public :: prif_atomic_add, prif_atomic_and, prif_atomic_or, prif_atomic_xor, prif_atomic_cas, prif_atomic_fetch_add
   public :: prif_atomic_fetch_and, prif_atomic_fetch_or, prif_atomic_fetch_xor, prif_atomic_define, prif_atomic_ref
 
@@ -79,6 +78,15 @@ module prif
 
     module subroutine prif_fail_image()
       implicit none
+    end subroutine
+
+    module subroutine prif_notify_wait(notify_var_ptr, until_count, stat, errmsg, errmsg_alloc)
+      implicit none
+      type(c_ptr), intent(in) :: notify_var_ptr
+      integer(c_intmax_t), intent(in), optional :: until_count
+      integer(c_int), intent(out), optional :: stat
+      character(len=*), intent(inout), optional :: errmsg
+      character(len=:), intent(inout), allocatable, optional :: errmsg_alloc
     end subroutine
 
     module subroutine prif_atomic_add(atom_remote_ptr, image_num, value, stat)
