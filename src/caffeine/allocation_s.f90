@@ -1,6 +1,6 @@
 ! Copyright (c), The Regents of the University of California
 ! Terms of use are as specified in LICENSE.txt
-submodule(allocation_m) allocation_s
+submodule(prif:prif_private_s) allocation_s
   use iso_c_binding, only: &
       c_sizeof, &
       c_f_pointer, &
@@ -8,12 +8,8 @@ submodule(allocation_m) allocation_s
       c_loc, &
       c_associated, &
       c_null_ptr, &
-      c_null_funptr, &
-      c_bool, &
-      c_ptrdiff_t
+      c_null_funptr
   use caffeine_h_m, only: caf_allocate, caf_deallocate, caf_this_image, as_int, as_c_ptr
-  use prif, only: prif_error_stop, prif_sync_all, prif_co_sum
-  use teams_m, only: prif_team_type, current_team
 
   implicit none
 

@@ -1,7 +1,6 @@
 submodule(prif:prif_private_s)  co_broadcast_s
   use utilities_m, only : get_c_ptr
   use caffeine_h_m, only : caf_co_broadcast
-  use teams_m, only: current_team
 
   implicit none
 

@@ -5,10 +5,6 @@ module prif
   use iso_c_binding, only: c_int, c_bool, c_intptr_t, c_intmax_t, c_ptr, c_funptr, c_size_t, c_ptrdiff_t
   use iso_fortran_env, only: atomic_int_kind, atomic_logical_kind
 
-  use allocation_m, only: &
-    prif_coarray_handle, prif_allocate, prif_allocate_non_symmetric, prif_deallocate, prif_deallocate_non_symmetric
-  use teams_m, only: prif_form_team, prif_change_team, prif_end_team, prif_team_type, prif_get_team, prif_team_number
-
   implicit none
 
   private
@@ -34,6 +30,28 @@ module prif
      module procedure prif_atomic_cas_int
      module procedure prif_atomic_cas_logical
   end interface
+
+  type, bind(C) :: handle_data
+    type(c_ptr) :: coarray_data
+    integer(c_int) :: corank
+    integer(c_size_t) :: coarray_size
+    integer(c_size_t) :: element_length
+    type(c_funptr) :: final_func
+    type(c_ptr) :: previous_handle, next_handle
+    integer(c_intmax_t) :: lcobounds(15), ucobounds(15)
+  end type
+
+  type :: prif_coarray_handle
+    type(handle_data), pointer :: info
+  end type
+
+  type :: prif_team_type
+    type(c_ptr) :: gex_team
+    type(c_ptr) :: heap_mspace
+    integer(c_intptr_t) :: heap_start
+    type(prif_team_type), pointer :: parent_team
+    type(handle_data), pointer :: coarrays
+  end type
 
   interface prif_atomic_define
      module procedure prif_atomic_define_int
@@ -102,6 +120,46 @@ module prif
 
     module subroutine prif_fail_image()
       implicit none
+    end subroutine
+
+    module subroutine prif_allocate( &
+        lcobounds, ucobounds, lbounds, ubounds, element_length, final_func, coarray_handle, &
+        allocated_memory, stat, errmsg, errmsg_alloc)
+      implicit none
+      integer(kind=c_intmax_t), dimension(:), intent(in) :: lcobounds, ucobounds
+      integer(kind=c_intmax_t), dimension(:), intent(in) :: lbounds, ubounds
+      integer(kind=c_size_t), intent(in) :: element_length
+      type(c_funptr), intent(in) :: final_func
+      type(prif_coarray_handle), intent(out) :: coarray_handle
+      type(c_ptr), intent(out) :: allocated_memory
+      integer(c_int), intent(out), optional :: stat
+      character(len=*), intent(inout), optional :: errmsg
+      character(len=:), intent(inout), allocatable, optional :: errmsg_alloc
+    end subroutine
+
+    module subroutine prif_allocate_non_symmetric(size_in_bytes, allocated_memory, stat, errmsg, errmsg_alloc)
+      implicit none
+      integer(kind=c_size_t) :: size_in_bytes
+      type(c_ptr), intent(out) :: allocated_memory
+      integer(c_int), intent(out), optional :: stat
+      character(len=*), intent(inout), optional :: errmsg
+      character(len=:), intent(inout), allocatable, optional :: errmsg_alloc
+    end subroutine
+
+    module subroutine prif_deallocate(coarray_handles, stat, errmsg, errmsg_alloc)
+      implicit none
+      type(prif_coarray_handle), target, intent(in) :: coarray_handles(:)
+      integer(c_int), intent(out), optional :: stat
+      character(len=*), intent(inout), optional :: errmsg
+      character(len=:), intent(inout), allocatable, optional :: errmsg_alloc
+    end subroutine
+
+    module subroutine prif_deallocate_non_symmetric(mem, stat, errmsg, errmsg_alloc)
+      implicit none
+      type(c_ptr), intent(in) :: mem
+      integer(c_int), intent(out), optional :: stat
+      character(len=*), intent(inout), optional :: errmsg
+      character(len=:), intent(inout), allocatable, optional :: errmsg_alloc
     end subroutine
 
     module subroutine prif_put( &
@@ -334,6 +392,43 @@ module prif
       integer(c_int), intent(out), optional :: stat
       character(len=*), intent(inout), optional :: errmsg
       character(len=:), intent(inout), allocatable, optional :: errmsg_alloc
+    end subroutine
+
+    module subroutine prif_form_team(team_number, team, new_index, stat, errmsg, errmsg_alloc)
+      implicit none
+      integer(c_intmax_t), intent(in) :: team_number
+      type(prif_team_type), intent(out) :: team
+      integer(c_int), intent(in), optional :: new_index
+      integer(c_int), intent(out), optional :: stat
+      character(len=*), intent(inout), optional :: errmsg
+      character(len=:), intent(inout), allocatable, optional :: errmsg_alloc
+    end subroutine
+
+    module subroutine prif_change_team(team, stat, errmsg, errmsg_alloc)
+      implicit none
+      type(prif_team_type), intent(in) :: team
+      integer(c_int), intent(out), optional :: stat
+      character(len=*), intent(inout), optional :: errmsg
+      character(len=:), intent(inout), allocatable, optional :: errmsg_alloc
+    end subroutine
+
+    module subroutine prif_end_team(stat, errmsg, errmsg_alloc)
+      implicit none
+      integer(c_int), intent(out), optional :: stat
+      character(len=*), intent(inout), optional :: errmsg
+      character(len=:), intent(inout), allocatable, optional :: errmsg_alloc
+    end subroutine
+
+    module subroutine prif_get_team(level, team)
+      implicit none
+      integer(c_int), intent(in), optional :: level
+      type(prif_team_type), intent(out) :: team
+    end subroutine
+
+    module subroutine prif_team_number(team, team_number)
+      implicit none
+      type(prif_team_type), intent(in), optional :: team
+      integer(c_intmax_t), intent(out) :: team_number
     end subroutine
 
     module subroutine prif_sync_all(stat, errmsg, errmsg_alloc)

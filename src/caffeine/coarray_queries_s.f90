@@ -1,7 +1,6 @@
 ! Copyright (c), The Regents of the University of California
 ! Terms of use are as specified in LICENSE.txt
 submodule(prif:prif_private_s) coarray_queries_s
-  use prif, only: prif_num_images
 
   implicit none
 

@@ -11,8 +11,7 @@ submodule(prif:prif_private_s) co_reduce_s
     c_float_operation, c_int32_t_operation, c_int64_t_operation
   use utilities_m, only : get_c_ptr, get_c_ptr_character, optional_value
   use caffeine_h_m, only : caf_co_reduce, caf_same_cfi_type, caf_elem_len, caf_is_f_string
-  use prif, only: prif_error_stop
-  use teams_m, only: current_team
+
   implicit none
 
   character(kind=c_char,len=5), parameter :: dummy = "     "
