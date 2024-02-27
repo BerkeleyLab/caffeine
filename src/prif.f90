@@ -19,14 +19,23 @@ module prif
   public :: prif_co_sum, prif_co_max, prif_co_min, prif_co_reduce, prif_co_broadcast
   public :: prif_form_team, prif_change_team, prif_end_team, prif_team_type, prif_get_team, prif_team_number
   public :: prif_sync_all, prif_sync_images, prif_sync_team, prif_sync_memory
-  public :: prif_lock, prif_unlock
-  public :: prif_critical, prif_end_critical
+  public :: prif_lock_type, prif_lock, prif_unlock
+  public :: prif_critical_type, prif_critical, prif_end_critical
   public :: prif_event_post, prif_event_wait, prif_event_query
-  public :: prif_notify_wait
+  public :: prif_notify_type, prif_notify_wait
   public :: prif_atomic_add, prif_atomic_and, prif_atomic_or, prif_atomic_xor, prif_atomic_cas, prif_atomic_fetch_add
   public :: prif_atomic_fetch_and, prif_atomic_fetch_or, prif_atomic_fetch_xor, prif_atomic_define, prif_atomic_ref
 
-  type, bind(C) :: handle_data
+  type, public :: prif_lock_type
+  end type
+
+  type, public :: prif_critical_type
+  end type
+
+  type, public :: prif_notify_type
+  end type
+
+  type, private, bind(C) :: handle_data
     private
     type(c_ptr) :: coarray_data
     integer(c_int) :: corank
@@ -37,12 +46,12 @@ module prif
     integer(c_intmax_t) :: lcobounds(15), ucobounds(15)
   end type
 
-  type :: prif_coarray_handle
+  type, public :: prif_coarray_handle
     private
     type(handle_data), pointer :: info
   end type
 
-  type :: prif_team_type
+  type, public :: prif_team_type
     private
     type(c_ptr) :: gex_team
     type(c_ptr) :: heap_mspace
