@@ -32,6 +32,7 @@ module prif
   end interface
 
   type, bind(C) :: handle_data
+    private
     type(c_ptr) :: coarray_data
     integer(c_int) :: corank
     integer(c_size_t) :: coarray_size
@@ -42,10 +43,12 @@ module prif
   end type
 
   type :: prif_coarray_handle
+    private
     type(handle_data), pointer :: info
   end type
 
   type :: prif_team_type
+    private
     type(c_ptr) :: gex_team
     type(c_ptr) :: heap_mspace
     integer(c_intptr_t) :: heap_start
