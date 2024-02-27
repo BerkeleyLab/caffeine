@@ -26,11 +26,6 @@ module prif
   public :: prif_atomic_add, prif_atomic_and, prif_atomic_or, prif_atomic_xor, prif_atomic_cas, prif_atomic_fetch_add
   public :: prif_atomic_fetch_and, prif_atomic_fetch_or, prif_atomic_fetch_xor, prif_atomic_define, prif_atomic_ref
 
-  interface prif_atomic_cas
-     module procedure prif_atomic_cas_int
-     module procedure prif_atomic_cas_logical
-  end interface
-
   type, bind(C) :: handle_data
     private
     type(c_ptr) :: coarray_data
@@ -55,6 +50,11 @@ module prif
     type(prif_team_type), pointer :: parent_team
     type(handle_data), pointer :: coarrays
   end type
+
+  interface prif_atomic_cas
+     module procedure prif_atomic_cas_int
+     module procedure prif_atomic_cas_logical
+  end interface
 
   interface prif_atomic_define
      module procedure prif_atomic_define_int
