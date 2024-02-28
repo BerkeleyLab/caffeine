@@ -35,17 +35,6 @@ module prif
   type, public :: prif_notify_type
   end type
 
-  type, private, bind(C) :: handle_data
-    private
-    type(c_ptr) :: coarray_data
-    integer(c_int) :: corank
-    integer(c_size_t) :: coarray_size
-    integer(c_size_t) :: element_length
-    type(c_funptr) :: final_func
-    type(c_ptr) :: previous_handle, next_handle
-    integer(c_intmax_t) :: lcobounds(15), ucobounds(15)
-  end type
-
   type, public :: prif_coarray_handle
     private
     type(handle_data), pointer :: info
@@ -660,5 +649,18 @@ module prif
     end subroutine
 
   end interface
+
+! Type definitions only relevant to Caffeine internals
+
+  type, private, bind(C) :: handle_data
+    private
+    type(c_ptr) :: coarray_data
+    integer(c_int) :: corank
+    integer(c_size_t) :: coarray_size
+    integer(c_size_t) :: element_length
+    type(c_funptr) :: final_func
+    type(c_ptr) :: previous_handle, next_handle
+    integer(c_intmax_t) :: lcobounds(15), ucobounds(15)
+  end type
 
 end module prif
