@@ -9,7 +9,7 @@ submodule(prif:prif_private_s) allocation_s
       c_associated, &
       c_null_ptr, &
       c_null_funptr
-  use caffeine_h_m, only: caf_allocate, caf_deallocate, caf_this_image, as_int, as_c_ptr
+  use caffeine_h_m, only: caf_allocate, caf_deallocate, caf_this_image, caf_as_int, caf_as_c_ptr
 
   implicit none
 
@@ -33,12 +33,12 @@ contains
       handle_size = c_sizeof(unused)
       total_size = handle_size + coarray_size
       whole_block = caf_allocate(current_team%heap_mspace, total_size)
-      block_offset = as_int(whole_block) - current_team%heap_start
+      block_offset = caf_as_int(whole_block) - current_team%heap_start
     else
       block_offset = 0
     end if
     call prif_co_sum(block_offset)
-    if (me /= 1) whole_block = as_c_ptr(current_team%heap_start + block_offset)
+    if (me /= 1) whole_block = caf_as_c_ptr(current_team%heap_start + block_offset)
 
     call c_f_pointer(whole_block, coarray_handle%info)
     call c_f_pointer(whole_block, unused2, [2])

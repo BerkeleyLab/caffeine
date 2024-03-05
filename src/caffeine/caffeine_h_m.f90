@@ -14,7 +14,7 @@ module caffeine_h_m
   public :: caf_sync_all
   public :: caf_co_broadcast, caf_co_sum, caf_co_min, caf_co_max, caf_co_reduce
   public :: caf_same_cfi_type, caf_elem_len, caf_numeric_type, caf_is_f_string
-  public :: as_int, as_c_ptr
+  public :: caf_as_int, caf_as_c_ptr
 
   interface
 
@@ -191,18 +191,18 @@ module caffeine_h_m
        integer(c_size_t), target :: a_elem_len
      end function
 
-     pure function as_int(ptr) bind(C)
-       !! intptr_t as_int(void* ptr);
+     pure function caf_as_int(ptr) bind(C)
+       !! intptr_t caf_as_int(void* ptr);
        import c_ptr, c_intptr_t
        type(c_ptr), intent(in), value :: ptr
-       integer(c_intptr_t) :: as_int
+       integer(c_intptr_t) :: caf_as_int
      end function
 
-     pure function as_c_ptr(i) bind(C)
-       !! void* as_c_ptr(intptr_t i);
+     pure function caf_as_c_ptr(i) bind(C)
+       !! void* caf_as_c_ptr(intptr_t i);
        import c_ptr, c_intptr_t
        integer(c_intptr_t), intent(in), value :: i
-       type(c_ptr) :: as_c_ptr
+       type(c_ptr) :: caf_as_c_ptr
      end function
   end interface
 
