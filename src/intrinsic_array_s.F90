@@ -1,6 +1,6 @@
 submodule(caffeine_intrinsic_array_m) caffeine_intrinsic_array_s
   use iso_c_binding, only: c_bool
-  use program_termination_m, only: prif_error_stop
+  use prif, only: prif_error_stop
   implicit none
 
 contains

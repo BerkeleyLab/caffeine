@@ -1,9 +1,7 @@
 ! Copyright (c), The Regents of the University of California
 ! Terms of use are as specified in LICENSE.txt
-submodule(program_startup_m) program_startup_s
-  use allocation_m, only: non_symmetric_heap_mspace
+submodule(prif:prif_private_s) program_startup_s
   use caffeine_h_m, only : caf_caffeinate
-  use teams_m, only: current_team
 
   implicit none
 contains
