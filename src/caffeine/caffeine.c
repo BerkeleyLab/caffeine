@@ -1,13 +1,22 @@
 // Copyright (c), The Regents of the University of California
 // Terms of use are as specified in LICENSE.txt
 
-#include "caffeine.h"
 #include <stdint.h>
 #include <stdio.h>
 #include <stdbool.h>
 #include <assert.h>
+#include <gasnetex.h>
+#include <gasnet_coll.h>
 #include "gasnet_safe.h"
 #include <gasnet_tools.h>
+#include <ISO_Fortran_binding.h>
+#include "../dlmalloc/dl_malloc_caf.h"
+#include "../dlmalloc/dl_malloc.h"
+
+enum {
+  UNRECOGNIZED_TYPE,
+  ERRMSG_TOO_SHORT
+};
 
 static gex_Client_t myclient;
 static gex_EP_t myep;
@@ -15,6 +24,7 @@ static gex_Rank_t rank, size;
 static gex_Segment_t mysegment;
 static gex_TM_t myworldteam;
 
+typedef void(*final_func_ptr)(void*, size_t) ;
 typedef uint8_t byte;
 
 #if __GNUC__ >= 12
