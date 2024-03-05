@@ -1,8 +1,8 @@
 ! Copyright (c), The Regents of the University of California
 ! Terms of use are as specified in LICENSE.txt
-submodule(image_queries_m) image_queries_s
+submodule(prif:prif_private_s) image_queries_s
   use caffeine_h_m, only : caf_num_images, caf_this_image
-  use teams_m, only: current_team
+
   implicit none
 
 contains

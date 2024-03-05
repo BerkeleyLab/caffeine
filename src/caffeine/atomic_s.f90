@@ -1,6 +1,6 @@
 ! Copyright (c), The Regents of the University of California
 ! Terms of use are as specified in LICENSE.txt
-submodule(atomic_m) atomic_s
+submodule(prif:prif_private_s) atomic_s
 
   implicit none
 

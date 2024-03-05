@@ -1,6 +1,6 @@
 ! Copyright (c), The Regents of the University of California
 ! Terms of use are as specified in LICENSE.txt
-submodule(teams_m) teams_s
+submodule(prif:prif_private_s) teams_s
   implicit none
 
 contains

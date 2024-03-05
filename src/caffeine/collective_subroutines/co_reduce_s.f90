@@ -1,17 +1,77 @@
 ! Copyright (c), The Regents of the University of California
 ! Terms of use are as specified in LICENSE.txt
-submodule(collective_subroutines_m) co_reduce_s
+submodule(prif:prif_private_s) co_reduce_s
   use iso_c_binding, only : &
-    c_ptr, c_size_t, c_loc, c_null_ptr, c_funloc, c_associated, c_f_pointer, c_f_procpointer
+    c_loc, c_null_ptr, c_funloc, c_associated, c_f_pointer, c_f_procpointer, c_char, c_int64_t, c_double, &
+    c_float, c_int32_t
   use caffeine_assert_m, only : assert
   use caffeine_intrinsic_array_m, only : intrinsic_array_t
   use utilities_m, only : get_c_ptr, get_c_ptr_character, optional_value
   use caffeine_h_m, only : caf_co_reduce, caf_same_cfi_type, caf_elem_len, caf_is_f_string
-  use program_termination_m, only: prif_error_stop
-  use teams_m, only: current_team
+
   implicit none
 
   character(kind=c_char,len=5), parameter :: dummy = "     "
+
+  abstract interface
+
+    pure function c_int32_t_operation(lhs, rhs) result(lhs_op_rhs)
+      import c_int32_t
+      implicit none
+      integer(c_int32_t), intent(in) :: lhs, rhs
+      integer(c_int32_t) lhs_op_rhs
+    end function
+
+    pure function c_int64_t_operation(lhs, rhs) result(lhs_op_rhs)
+      import c_int64_t
+      implicit none
+      integer(c_int64_t), intent(in) :: lhs, rhs
+      integer(c_int64_t) lhs_op_rhs
+    end function
+
+    pure function c_float_operation(lhs, rhs) result(lhs_op_rhs)
+      import c_float
+      implicit none
+      real(c_float), intent(in) :: lhs, rhs
+      real(c_float) lhs_op_rhs
+    end function
+
+    pure function c_double_operation(lhs, rhs) result(lhs_op_rhs)
+      import c_double
+      implicit none
+      real(c_double), intent(in) :: lhs, rhs
+      real(c_double) lhs_op_rhs
+    end function
+
+    pure function c_bool_operation(lhs, rhs) result(lhs_op_rhs)
+      import c_bool
+      implicit none
+      logical(c_bool), intent(in) :: lhs, rhs
+      logical(c_bool) lhs_op_rhs
+    end function
+
+    function c_char_operation(lhs, rhs) result(lhs_op_rhs)
+      import c_char
+      implicit none
+      character(kind=c_char,len=*), intent(in) :: lhs, rhs
+      character(kind=c_char,len=:), allocatable :: lhs_op_rhs
+    end function
+
+    pure function c_float_complex_operation(lhs, rhs) result(lhs_op_rhs)
+      import c_float
+      implicit none
+      complex(c_float), intent(in) :: lhs, rhs
+      complex(c_float) lhs_op_rhs
+    end function
+
+    pure function c_double_complex_operation(lhs, rhs) result(lhs_op_rhs)
+      import c_double
+      implicit none
+      complex(c_double), intent(in) :: lhs, rhs
+      complex(c_double) lhs_op_rhs
+    end function
+
+  end interface
 
 contains
 

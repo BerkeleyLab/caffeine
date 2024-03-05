@@ -1,5 +1,5 @@
 module a00_caffeinate_test
-    use program_startup_m, only : prif_init
+    use prif, only : prif_init
     use veggies, only: test_item_t, describe, result_t, it, assert_that
 
     implicit none

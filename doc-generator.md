@@ -62,9 +62,8 @@ example/
   |-- hello.f90 - a Caffeinated "Hello, world!" program
   |-- support-test/ - programs invoked by the test suite
 src/
-  |-- caffeine_m.f90 - the Big Kahuna: one module that exports all Caffeine functionality
+  |-- prif.f90 - Module that defines all interfaces in PRIF
   |-- caffeine/
-        |-- *_m.f90 - modules containing procedure interface bodies
         |-- *_s.f90 - submodules containing procedure definitions
         |-- *.c - thin C functions wrapping networking middleware
         |-- *.h - corresponding C header files

@@ -1,7 +1,6 @@
 module caf_co_max_test
-    use prif, only : prif_co_max
+    use prif, only : prif_co_max, prif_this_image, prif_num_images
     use veggies, only: result_t, test_item_t, assert_equals, describe, it, assert_that, assert_equals
-    use image_queries_m, only : prif_this_image, prif_num_images
 
     implicit none
     private
