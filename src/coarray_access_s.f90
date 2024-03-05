@@ -1,7 +1,7 @@
 ! Copyright (c), The Regents of the University of California
 ! Terms of use are as specified in LICENSE.txt
 submodule(prif:prif_private_s) coarray_access_s
-  use caffeine_h_m, only: caf_put, caf_get, as_int
+  use caffeine_h_m, only: caf_put, caf_get, caf_as_int
   use iso_c_binding, only: c_loc
 
   implicit none
@@ -16,8 +16,8 @@ contains
     call prif_base_pointer(coarray_handle, image, remote_base)
     remote_ptr = &
         remote_base &
-        + (as_int(first_element_addr) &
-        - as_int(coarray_handle%info%coarray_data))
+        + (caf_as_int(first_element_addr) &
+        - caf_as_int(coarray_handle%info%coarray_data))
     call prif_put_raw( &
         image_num = image, &
         local_buffer = c_loc(value), &
@@ -44,8 +44,8 @@ contains
     call prif_base_pointer(coarray_handle, image, remote_base)
     remote_ptr = &
         remote_base &
-        + (as_int(first_element_addr) &
-        - as_int(coarray_handle%info%coarray_data))
+        + (caf_as_int(first_element_addr) &
+        - caf_as_int(coarray_handle%info%coarray_data))
     call prif_get_raw( &
         image_num = image, &
         local_buffer = c_loc(value), &
