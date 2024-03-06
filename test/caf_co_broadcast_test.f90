@@ -15,7 +15,12 @@ module caf_co_broadcast_test
 
   interface operator(==)
     module procedure equals
+    module procedure equals_with_allocatable
   end interface
+  
+  type with_allocatable
+    integer, allocatable :: i
+  end type
 
 contains
 
@@ -26,6 +31,7 @@ contains
       "The prif_co_broadcast subroutine", &
       [ it("broadcasts a default integer scalar with no optional arguments present", broadcast_default_integer_scalar) &
        ,it("broadcasts a derived type scalar with no allocatable components", broadcast_derived_type) &
+       , it("broadcasts a derived type with an allocatable component", broadcast_with_allocatable) &
     ])
   end function
 
@@ -37,6 +43,19 @@ contains
      ,lhs%actor == rhs%actor &
      ,lhs%issues == rhs%issues &
     ])
+  end function
+  
+  logical pure function equals_with_allocatable(lhs, rhs)
+    type(with_allocatable), intent(in) :: lhs, rhs
+    if (allocated(lhs%i)) then
+      if (allocated(rhs%i)) then
+        equals_with_allocatable = lhs%i == rhs%i
+      else
+        equals_with_allocatable = .false.
+      end if
+    else
+      equals_with_allocatable = .not.allocated(rhs%i)
+    end if
   end function
 
   function broadcast_default_integer_scalar() result(result_)
@@ -63,6 +82,20 @@ contains
       result_ = assert_that(expected_object == object, "co_broadcast derived type")
     end associate
 
+  end function
+  
+  function broadcast_with_allocatable() result(result_)
+    type(result_t) :: result_
+    
+    integer, parameter :: expected_val = 42
+    integer :: me
+    type(with_allocatable) :: obj, expected
+    
+    expected%i = expected_val
+    call prif_this_image(image_index=me)
+    if (me == 1) obj%i = expected_val
+    call prif_co_broadcast(obj, source_image=1)
+    result_ = assert_that(expected == obj, "co_broadcast with allocatable component")
   end function
 
 end module caf_co_broadcast_test
