@@ -344,13 +344,15 @@ echo "Version: 0.1.0"                                             >> $CAFFEINE_P
 exit_if_pkg_config_pc_file_missing "caffeine"
 
 RUN_FPM_SH="build/run-fpm.sh"
-echo "#!/bin/sh"                                                              >  $RUN_FPM_SH
-echo "#-- DO NOT EDIT -- created by caffeine/install.sh"                      >> $RUN_FPM_SH
-echo "\"${FPM}\" \"\$@\" \\"                                                  >> $RUN_FPM_SH
-echo "--compiler \"`$PKG_CONFIG caffeine --variable=CAFFEINE_FPM_FC`\"   \\"  >> $RUN_FPM_SH
-echo "--c-compiler \"`$PKG_CONFIG caffeine --variable=CAFFEINE_FPM_CC`\" \\"  >> $RUN_FPM_SH
-echo "--c-flag \"`$PKG_CONFIG caffeine --variable=CAFFEINE_FPM_CFLAGS`\" \\"  >> $RUN_FPM_SH
-echo "--link-flag \"`$PKG_CONFIG caffeine --variable=CAFFEINE_FPM_LDFLAGS`\"" >> $RUN_FPM_SH
+echo "#!/bin/sh"                                                                 >  $RUN_FPM_SH
+echo "#-- DO NOT EDIT -- created by caffeine/install.sh"                         >> $RUN_FPM_SH
+echo "fpm_sub_cmd=\$1; shift"                                                    >> $RUN_FPM_SH
+echo "\"${FPM}\" \"\$fpm_sub_cmd\" \\"                                           >> $RUN_FPM_SH
+echo "--compiler \"`$PKG_CONFIG caffeine --variable=CAFFEINE_FPM_FC`\"   \\"     >> $RUN_FPM_SH
+echo "--c-compiler \"`$PKG_CONFIG caffeine --variable=CAFFEINE_FPM_CC`\" \\"     >> $RUN_FPM_SH
+echo "--c-flag \"`$PKG_CONFIG caffeine --variable=CAFFEINE_FPM_CFLAGS`\" \\"     >> $RUN_FPM_SH
+echo "--link-flag \"`$PKG_CONFIG caffeine --variable=CAFFEINE_FPM_LDFLAGS`\" \\" >> $RUN_FPM_SH
+echo "\"\$@\""                                                                   >> $RUN_FPM_SH
 chmod u+x $RUN_FPM_SH
 
 ./$RUN_FPM_SH build

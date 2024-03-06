@@ -8,6 +8,9 @@ module caf_co_reduce_test
   private
   public :: test_prif_co_reduce
 
+  type my_int
+    integer :: val
+  end type
 contains
 
   function test_prif_co_reduce() result(tests)
@@ -24,6 +27,7 @@ contains
        ,it("sums default complex scalars with a stat-variable present", sum_default_complex_scalars) &
        ,it("sums complex(c_double) scalars with a stat-variable present", sum_complex_c_double_scalars) &
        ,it("sums default integer elements of a 2D array across images", sum_integer_array_elements) &
+       ,it("can reduce derived types", sum_derived_types) &
     ])
   end function
 
@@ -246,5 +250,24 @@ contains
       product_ = lhs * rhs
     end function
 
+  end function
+  
+  pure function add_my_ints(lhs, rhs) result(sum_)
+    type(my_int), intent(in) :: lhs, rhs
+    type(my_int) :: sum_
+    
+    sum_%val = lhs%val + rhs%val
+  end function
+  
+  function sum_derived_types() result(result_)
+    type(result_t) :: result_
+    
+    type(my_int) :: var
+    integer :: num_imgs, i
+    
+    call prif_this_image(image_index=var%val)
+    call prif_num_images(image_count=num_imgs)
+    call prif_co_reduce(var, c_funloc(add_my_ints))
+    result_ = assert_equals(sum([(i, i = 1, num_imgs)]), var%val)
   end function
 end module caf_co_reduce_test
