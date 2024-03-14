@@ -12,12 +12,15 @@ contains
   end procedure
 
   module procedure prif_sync_images
+    call unimplemented("prif_sync_images")
   end procedure
 
   module procedure prif_sync_team
+    call unimplemented("prif_sync_team")
   end procedure
 
   module procedure prif_sync_memory
+    call unimplemented("prif_sync_memory")
   end procedure
 
 end submodule

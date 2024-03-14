@@ -7,9 +7,11 @@ submodule(prif:prif_private_s) alias_s
 contains
 
   module procedure prif_alias_create
+    call unimplemented("prif_alias_create")
   end procedure
 
   module procedure prif_alias_destroy
+    call unimplemented("prif_alias_destroy")
   end procedure
 
 end submodule alias_s
