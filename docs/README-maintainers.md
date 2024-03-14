@@ -6,6 +6,7 @@ Conventions for code in Caffeine
 [TODO: Improve wording of below bullets]
 * Procedures with `prif_` prefix are public facing procedures
 * Procedures with `caf_` prefix are private procedures internal to Caffeine
+* C functions and global variables lacking a `caf_` prefix must be `static`
 * Identifiers named `image` and `rank` refer to processes. Any identifier named `image` represents
 the process as 1-based number (Fortran-style), while `rank` represents the process as 0-based
 number (C-style) (i.e. rank = image -1)
