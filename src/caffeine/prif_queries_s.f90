@@ -9,9 +9,11 @@ submodule(prif:prif_private_s) prif_queries_s
 contains
 
   module procedure prif_set_context_data
+    call unimplemented("prif_set_context_data")
   end procedure
 
   module procedure prif_get_context_data
+    call unimplemented("prif_get_context_data")
   end procedure
 
   module procedure prif_base_pointer
@@ -27,6 +29,7 @@ contains
   end procedure
 
   module procedure prif_local_data_size
+    call unimplemented("prif_local_data_size")
   end procedure
 
 end submodule prif_queries_s

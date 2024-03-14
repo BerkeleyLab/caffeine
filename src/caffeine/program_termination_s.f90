@@ -152,6 +152,7 @@ contains
   end function
 
   module procedure prif_fail_image
+    call unimplemented("prif_fail_image")
   end procedure
 
 end submodule program_termination_s
