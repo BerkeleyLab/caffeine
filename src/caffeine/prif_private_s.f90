@@ -11,7 +11,7 @@ contains
 
   subroutine unimplemented(proc_name)
     character(len=*), intent(in) ::  proc_name
-    error stop proc_name // " is not yet implemented"
+    call prif_error_stop(quiet=.false._c_bool, stop_code_char=proc_name // " is not yet implemented")
   end subroutine
 
 end submodule prif_private_s
