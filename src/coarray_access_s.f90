@@ -34,6 +34,7 @@ contains
   end procedure
 
   module procedure prif_put_raw_strided
+    call unimplemented("prif_put_raw_strided")
   end procedure
 
   module procedure prif_get
@@ -62,6 +63,7 @@ contains
   end procedure
 
   module procedure prif_get_raw_strided
+    call unimplemented("prif_get_raw_strided")
   end procedure
 
 end submodule coarray_access_s

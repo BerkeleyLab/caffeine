@@ -18,18 +18,23 @@ contains
   end procedure
 
   module procedure prif_this_image_with_coarray
+    call unimplemented("prif_this_image_with_coarray")
   end procedure
 
   module procedure prif_this_image_with_dim
+    call unimplemented("prif_this_image_with_dim")
   end procedure
 
   module procedure prif_failed_images
+    call unimplemented("prif_failed_images")
   end procedure
 
   module procedure prif_stopped_images
+    call unimplemented("prif_stopped_images")
   end procedure
 
   module procedure prif_image_status
+    call unimplemented("prif_image_status")
   end procedure
 
 end submodule image_queries_s

@@ -89,7 +89,7 @@
      <li><i class="fa fa-list-ol"></i>
        <a data-toggle="tooltip"
     data-placement="bottom" data-html="true"
-    title=" 1.2% of total for source files.">21 statements</a>
+    title=" 1.4% of total for source files.">26 statements</a>
      </li> 
     <li><i class="fa fa-code"></i><a href="../src/image_queries_s.f90"> Source File</a></li>
   </ul>
@@ -281,21 +281,26 @@
 <a id="ln-18" name="ln-18" href="#ln-18"></a><span class="w">  </span><span class="k">end procedure</span>
 <a id="ln-19" name="ln-19" href="#ln-19"></a>
 <a id="ln-20" name="ln-20" href="#ln-20"></a><span class="k">  module procedure </span><span class="n">prif_this_image_with_coarray</span><span class="w"></span>
-<a id="ln-21" name="ln-21" href="#ln-21"></a><span class="w">  </span><span class="k">end procedure</span>
-<a id="ln-22" name="ln-22" href="#ln-22"></a>
-<a id="ln-23" name="ln-23" href="#ln-23"></a><span class="k">  module procedure </span><span class="n">prif_this_image_with_dim</span><span class="w"></span>
-<a id="ln-24" name="ln-24" href="#ln-24"></a><span class="w">  </span><span class="k">end procedure</span>
-<a id="ln-25" name="ln-25" href="#ln-25"></a>
-<a id="ln-26" name="ln-26" href="#ln-26"></a><span class="k">  module procedure </span><span class="n">prif_failed_images</span><span class="w"></span>
-<a id="ln-27" name="ln-27" href="#ln-27"></a><span class="w">  </span><span class="k">end procedure</span>
-<a id="ln-28" name="ln-28" href="#ln-28"></a>
-<a id="ln-29" name="ln-29" href="#ln-29"></a><span class="k">  module procedure </span><span class="n">prif_stopped_images</span><span class="w"></span>
+<a id="ln-21" name="ln-21" href="#ln-21"></a><span class="w">    </span><span class="k">call </span><span class="n">unimplemented</span><span class="p">(</span><span class="s2">&quot;prif_this_image_with_coarray&quot;</span><span class="p">)</span><span class="w"></span>
+<a id="ln-22" name="ln-22" href="#ln-22"></a><span class="w">  </span><span class="k">end procedure</span>
+<a id="ln-23" name="ln-23" href="#ln-23"></a>
+<a id="ln-24" name="ln-24" href="#ln-24"></a><span class="k">  module procedure </span><span class="n">prif_this_image_with_dim</span><span class="w"></span>
+<a id="ln-25" name="ln-25" href="#ln-25"></a><span class="w">    </span><span class="k">call </span><span class="n">unimplemented</span><span class="p">(</span><span class="s2">&quot;prif_this_image_with_dim&quot;</span><span class="p">)</span><span class="w"></span>
+<a id="ln-26" name="ln-26" href="#ln-26"></a><span class="w">  </span><span class="k">end procedure</span>
+<a id="ln-27" name="ln-27" href="#ln-27"></a>
+<a id="ln-28" name="ln-28" href="#ln-28"></a><span class="k">  module procedure </span><span class="n">prif_failed_images</span><span class="w"></span>
+<a id="ln-29" name="ln-29" href="#ln-29"></a><span class="w">    </span><span class="k">call </span><span class="n">unimplemented</span><span class="p">(</span><span class="s2">&quot;prif_failed_images&quot;</span><span class="p">)</span><span class="w"></span>
 <a id="ln-30" name="ln-30" href="#ln-30"></a><span class="w">  </span><span class="k">end procedure</span>
 <a id="ln-31" name="ln-31" href="#ln-31"></a>
-<a id="ln-32" name="ln-32" href="#ln-32"></a><span class="k">  module procedure </span><span class="n">prif_image_status</span><span class="w"></span>
-<a id="ln-33" name="ln-33" href="#ln-33"></a><span class="w">  </span><span class="k">end procedure</span>
-<a id="ln-34" name="ln-34" href="#ln-34"></a>
-<a id="ln-35" name="ln-35" href="#ln-35"></a><span class="k">end submodule </span><span class="n">image_queries_s</span><span class="w"></span>
+<a id="ln-32" name="ln-32" href="#ln-32"></a><span class="k">  module procedure </span><span class="n">prif_stopped_images</span><span class="w"></span>
+<a id="ln-33" name="ln-33" href="#ln-33"></a><span class="w">    </span><span class="k">call </span><span class="n">unimplemented</span><span class="p">(</span><span class="s2">&quot;prif_stopped_images&quot;</span><span class="p">)</span><span class="w"></span>
+<a id="ln-34" name="ln-34" href="#ln-34"></a><span class="w">  </span><span class="k">end procedure</span>
+<a id="ln-35" name="ln-35" href="#ln-35"></a>
+<a id="ln-36" name="ln-36" href="#ln-36"></a><span class="k">  module procedure </span><span class="n">prif_image_status</span><span class="w"></span>
+<a id="ln-37" name="ln-37" href="#ln-37"></a><span class="w">    </span><span class="k">call </span><span class="n">unimplemented</span><span class="p">(</span><span class="s2">&quot;prif_image_status&quot;</span><span class="p">)</span><span class="w"></span>
+<a id="ln-38" name="ln-38" href="#ln-38"></a><span class="w">  </span><span class="k">end procedure</span>
+<a id="ln-39" name="ln-39" href="#ln-39"></a>
+<a id="ln-40" name="ln-40" href="#ln-40"></a><span class="k">end submodule </span><span class="n">image_queries_s</span><span class="w"></span>
 </pre></div>
 
     </section>
@@ -314,7 +319,7 @@
           <p class="text-right">
             Documentation generated by 
             <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
- on 2024-03-14 20:26            </p>
+ on 2024-03-18 18:12            </p>
         </div>
       </div>
       <br>

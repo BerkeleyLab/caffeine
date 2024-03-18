@@ -7,6 +7,7 @@ submodule(prif:prif_private_s) notify_s
 contains
 
   module procedure prif_notify_wait
+    call unimplemented("prif_notify_wait")
   end procedure
 
 end submodule notify_s
