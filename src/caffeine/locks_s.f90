@@ -7,9 +7,11 @@ submodule(prif:prif_private_s) locks_s
 contains
 
   module procedure prif_lock
+    call unimplemented("prif_lock")
   end procedure
 
   module procedure prif_unlock
+    call unimplemented("prif_unlock")
   end procedure
 
 end submodule locks_s

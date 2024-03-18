@@ -7,18 +7,23 @@ submodule(prif:prif_private_s) coarray_queries_s
 contains
 
   module procedure prif_lcobound_with_dim
+    call unimplemented("prif_lcobound_with_dim")
   end procedure
 
   module procedure prif_lcobound_no_dim
+    call unimplemented("prif_lcobound_no_dim")
   end procedure
 
   module procedure prif_ucobound_with_dim
+    call unimplemented("prif_ucobound_with_dim")
   end procedure
 
   module procedure prif_ucobound_no_dim
-  end procedure prif_ucobound_no_dim
+    call unimplemented("prif_ucobound_no_dim")
+  end procedure
 
   module procedure prif_coshape
+    call unimplemented("prif_coshape")
   end procedure
 
   module procedure prif_image_index
