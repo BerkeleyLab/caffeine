@@ -6,13 +6,14 @@ module caffeine_assert_m
   private
   public :: assert
 
-#ifndef ASSERTIONS
-#define ASSERTIONS .true.
+#if CAF_ASSERTIONS || !defined(CAF_ASSERTIONS)
+  logical, parameter :: assertions_=.true.
+#else  
+  logical, parameter :: assertions_=.false.
 #endif
 
-  logical, parameter :: assertions_=ASSERTIONS
-   !! Turn off assertions with
-   !! fpm test --flag "-DASSERTIONS=.false."
+   !! Disable assertions with
+   !! fpm test --flag "-DCAF_ASSERTIONS=0"
  
   interface
 
