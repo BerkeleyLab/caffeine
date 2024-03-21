@@ -1,6 +1,21 @@
 README-maintainers.md
 ========
 
+
+Conventions for Git and Pull Requests
+-------------
+This repository aims to maintain a mostly linear history. In order to achieve this, please
+observe the following workflow:
+* Checkout a feature branch and open a PR when the changes are ready for review
+* After your PR has been approved, make sure to rebase your feature branch with `origin/main`.
+(Please only rebase as the last step before the merge).
+* Only after your feature branch is up-to-date with `origin/main`, then you may merge the branch
+into `main` with a merge commit.
+
+Additional git policies:
+* Never force push to `main`
+
+
 Conventions for code in Caffeine
 -------------
 [TODO: Improve wording of below bullets]
