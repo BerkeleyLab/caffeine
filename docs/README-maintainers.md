@@ -28,3 +28,4 @@ number (C-style) (i.e. rank = image -1)
 * When writing or making changes to BIND(C) interfaces, be vigilant when checking that the types
 and attributes of the arguments and return values are equivalent across the Fortran and
 C declarations
+* Tab characters should NOT be used in source code
