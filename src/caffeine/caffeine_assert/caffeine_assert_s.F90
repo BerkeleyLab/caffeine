@@ -1,9 +1,16 @@
 ! Copyright (c), The Regents of the University of California
 ! Terms of use are as specified in LICENSE.txt
-submodule(caffeine_assert_m) caffeine_assert_s
-  use prif, only : prif_error_stop
-  use iso_c_binding, only : c_bool
+submodule(prif:prif_private_s) caffeine_assert_s
   implicit none
+
+#if CAF_ASSERTIONS || !defined(CAF_ASSERTIONS)
+  logical, parameter :: assertions_=.true.
+#else
+  logical, parameter :: assertions_=.false.
+#endif
+
+   !! Disable assertions with
+   !! fpm test --flag "-DCAF_ASSERTIONS=0"
 
 contains
 

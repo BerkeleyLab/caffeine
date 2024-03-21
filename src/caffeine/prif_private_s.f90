@@ -7,6 +7,17 @@ submodule(prif) prif_private_s
   type(prif_team_type), pointer :: current_team => null()
   type(c_ptr) :: non_symmetric_heap_mspace
 
+  interface
+
+    pure module subroutine assert(assertion, description, diagnostics)
+      implicit none
+      logical, intent(in) :: assertion
+      character(len=*), intent(in) :: description
+      class(*), intent(in), optional :: diagnostics
+    end subroutine
+
+  end interface
+
 contains
 
   subroutine unimplemented(proc_name)
