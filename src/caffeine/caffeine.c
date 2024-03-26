@@ -149,7 +149,7 @@ void caf_co_reduce(
   gex_Event_Wait(ev);
 }
 
-void caf_co_broadcast(CFI_cdesc_t * a_desc, int source_image, int* stat, int num_elements, gex_TM_t team)
+void caf_co_broadcast(CFI_cdesc_t * a_desc, int source_image, int num_elements, gex_TM_t team)
 {
   char* c_loc_a = (char*) a_desc->base_addr;
   size_t c_sizeof_a = a_desc->elem_len;
@@ -160,8 +160,6 @@ void caf_co_broadcast(CFI_cdesc_t * a_desc, int source_image, int* stat, int num
   gex_Event_t ev
     = gex_Coll_BroadcastNB(team, source_image-1, c_loc_a, c_loc_a, nbytes, 0);
   gex_Event_Wait(ev);
-
-  if (stat != NULL) *stat = 0;
 }
 
 static void set_stat_errmsg_or_abort(int* stat, char* errmsg, const int return_stat, const char* return_message)

@@ -111,12 +111,11 @@ module caffeine_h_m
 
     ! ______________ Collective Subroutines __________________
 
-     subroutine caf_co_broadcast(a, source_image, stat, Nelem, team) bind(C)
-       !! void c_co_broadcast(CFI_cdesc_t * a_desc, int source_image, int* stat, int num_elements);
+     subroutine caf_co_broadcast(a, source_image, Nelem, team) bind(C)
+       !! void c_co_broadcast(CFI_cdesc_t * a_desc, int source_image, int num_elements, gex_TM_t team);
        import c_int, c_ptr
        implicit none
        type(*) a(..)
-       type(c_ptr), value :: stat
        integer(c_int), value :: source_image, Nelem
        type(c_ptr), value :: team
      end subroutine
