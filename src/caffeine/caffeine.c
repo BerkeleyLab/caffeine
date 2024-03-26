@@ -179,9 +179,11 @@ static void set_stat_errmsg_or_abort(int* stat, char* errmsg, const int return_s
   }
 }
 
-void caf_co_max(CFI_cdesc_t* a_desc, int result_image, int* stat, char* errmsg, size_t num_elements, gex_TM_t team)
+void caf_co_max(CFI_cdesc_t* a_desc, int result_image, size_t num_elements, gex_TM_t team)
 {
   gex_DT_t a_type;
+  int* stat;
+  char* errmsg;
 
   switch (a_desc->type)
   {
