@@ -9,8 +9,7 @@ submodule(prif:prif_private_s) caffeine_assert_s
   logical, parameter :: assertions_=.false.
 #endif
 
-   !! Disable assertions with
-   !! fpm test --flag "-DCAF_ASSERTIONS=0"
+   !! Disable assertions by compiling with preprocessor setting: -DCAF_ASSERTIONS=0
 
 contains
 
