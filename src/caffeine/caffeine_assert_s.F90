@@ -18,18 +18,21 @@ contains
     character(len=:), allocatable :: tail
 
     if (assertions_) then 
-      if (.not. present(diagnostics)) then
-        tail = "."
-      else
-        tail = " with diagnostics " 
-        select type(diagnostics)
-          type is(character(len=*))
-            tail = tail // diagnostics
-          class default
-            tail = tail // "of unsupported type."
-        end select
+      if (.not. assertion) then
+        if (.not. present(diagnostics)) then
+          tail = "."
+        else
+          tail = " with diagnostics "
+          select type(diagnostics)
+            type is(character(len=*))
+              tail = tail // diagnostics
+            class default
+              tail = tail // "of unsupported type."
+          end select
+        end if
+
+        call prif_error_stop(.false._c_bool, stop_code_char='Assertion "'// description // '" failed' // tail)
       end if
-      if (.not. assertion) call prif_error_stop(.false._c_bool, stop_code_char='Assertion "'// description // '" failed' // tail)
     end if
   end procedure
 
