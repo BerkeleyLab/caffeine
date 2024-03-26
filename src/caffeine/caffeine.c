@@ -130,7 +130,7 @@ void caf_sync_all()
 }
 
 void caf_co_reduce(
-  CFI_cdesc_t* a_desc, int result_image, int* stat, char* errmsg, int num_elements, gex_Coll_ReduceFn_t* user_op, void* client_data, gex_TM_t team
+  CFI_cdesc_t* a_desc, int result_image, int num_elements, gex_Coll_ReduceFn_t* user_op, void* client_data, gex_TM_t team
 )
 {
   char* a_address = (char*) a_desc->base_addr;
@@ -147,8 +147,6 @@ void caf_co_reduce(
     );
   }
   gex_Event_Wait(ev);
-
-  if (stat != NULL) *stat = 0;
 }
 
 void caf_co_broadcast(CFI_cdesc_t * a_desc, int source_image, int* stat, int num_elements, gex_TM_t team)
