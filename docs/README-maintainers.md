@@ -8,7 +8,7 @@ This repository aims to maintain a mostly linear history. In order to achieve th
 observe the following workflow:
 * Checkout a feature branch and open a PR when the changes are ready for review
 * After your PR has been approved, make sure to rebase your feature branch with `origin/main`.
-(Please only rebase as the last step before the merge).
+* In general you should try to avoid rebasing a non-draft PR with pending approvals until the last step before merge, because it complicates iterative review. 
 * Only after your feature branch is up-to-date with `origin/main`, then you may merge the branch
 into `main` with a merge commit.
 
