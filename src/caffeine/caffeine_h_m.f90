@@ -143,13 +143,12 @@ module caffeine_h_m
        type(c_ptr), value :: team
      end subroutine
 
-     subroutine caf_co_min(a, result_image, c_loc_stat, c_loc_errmsg, num_elements, team) bind(C)
-       !! void c_co_min(CFI_cdesc_t* a_desc, int result_image, int* stat, char* errmsg, size_t num_elements);
+     subroutine caf_co_min(a, result_image, num_elements, team) bind(C)
+       !! void c_co_min(CFI_cdesc_t* a_desc, int result_image, size_t num_elements, gex_TM_t team);
        import c_int, c_ptr, c_size_t
        implicit none 
        type(*) a(..)
        integer(c_int), value :: result_image
-       type(c_ptr), value :: c_loc_stat, c_loc_errmsg
        integer(c_size_t), value :: num_elements
        type(c_ptr), value :: team
      end subroutine
