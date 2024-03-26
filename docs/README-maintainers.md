@@ -17,7 +17,7 @@ Additional git policies:
 * Never force push to `main`
 
 
-Conventions for code in Caffeine
+Conventions for code and commits in Caffeine
 -------------
 [TODO: Improve wording of below bullets]
 * Procedures with `prif_` prefix are public facing procedures
