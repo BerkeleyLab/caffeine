@@ -31,4 +31,10 @@ Conventions for code in Caffeine
   C declarations
 * Avoid committing whitespace-only changes to source lines distant from meaningful PR changes. In
   particular disable source editor features that automatically reformat entire files.
+* If you absolutely must make whitespace-only changes to otherwise unmodified lines
+  (for example, rewrapping the lines in documentation), please isolate those changes
+  in a separate commit with a commit message explaining the lack of meaningful change.
+* Similarly if you need to move blocks of lines unchanged between distant locations,
+  please also isolate those changes in a separate commit with a commit message 
+  explaining the lack of meaningful change.
 * Tab characters should NOT be used in source code
