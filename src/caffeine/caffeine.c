@@ -182,8 +182,8 @@ static void set_stat_errmsg_or_abort(int* stat, char* errmsg, const int return_s
 void caf_co_max(CFI_cdesc_t* a_desc, int result_image, size_t num_elements, gex_TM_t team)
 {
   gex_DT_t a_type;
-  int* stat;
-  char* errmsg;
+  int* stat = NULL;
+  char* errmsg = NULL;
 
   switch (a_desc->type)
   {
@@ -207,8 +207,6 @@ void caf_co_max(CFI_cdesc_t* a_desc, int result_image, size_t num_elements, gex_
     ev = gex_Coll_ReduceToAllNB(team,                 a_address, a_address, a_type, c_sizeof_a, num_elements, GEX_OP_MAX, NULL, NULL, 0);
   }
   gex_Event_Wait(ev);
-
-  if (stat != NULL) *stat = 0;
 }
 
 void caf_co_min(CFI_cdesc_t* a_desc, int result_image, int* stat, char* errmsg, size_t num_elements, gex_TM_t team)
