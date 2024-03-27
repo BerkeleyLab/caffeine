@@ -1,7 +1,6 @@
 ! Copyright (c), The Regents of the University of California
 ! Terms of use are as specified in LICENSE.txt
 submodule(prif:prif_private_s) prif_queries_s
-  use caffeine_assert_m, only: assert
   use caffeine_h_m, only: caf_convert_base_addr
 
   implicit none

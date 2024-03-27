@@ -1,7 +1,6 @@
 module caf_co_reduce_test
-  use prif, only : prif_co_reduce, prif_num_images, prif_this_image
+  use prif, only : prif_co_reduce, prif_num_images, prif_this_image, prif_error_stop
   use veggies, only : result_t, test_item_t, assert_equals, describe, it, assert_that, assert_equals
-  use caffeine_assert_m, only : assert
   use iso_c_binding, only : c_bool, c_funloc, c_char, c_double, c_int64_t
 
   implicit none
@@ -49,7 +48,11 @@ contains
     function alphabetize(lhs, rhs) result(first_alphabetically)
       character(len=*), intent(in) :: lhs, rhs
       character(len=:), allocatable :: first_alphabetically
-      call assert(len(lhs)==len(rhs), "co_reduce_s alphabetize: LHS/RHS length match", lhs//" , "//rhs)
+
+      if (len(lhs).ne.len(rhs)) then
+        call prif_error_stop(quiet=.false._c_bool, &
+          stop_code_char="co_reduce_s alphabetize: LHS(" // lhs // ")/RHS(" // rhs // ") length don't match")
+      end if
       first_alphabetically = min(lhs,rhs)
     end function
 
