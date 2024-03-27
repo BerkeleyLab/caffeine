@@ -111,57 +111,53 @@ module caffeine_h_m
 
     ! ______________ Collective Subroutines __________________
 
-     subroutine caf_co_broadcast(a, source_image, stat, Nelem, team) bind(C)
-       !! void c_co_broadcast(CFI_cdesc_t * a_desc, int source_image, int* stat, int num_elements);
+     subroutine caf_co_broadcast(a, source_image, Nelem, team) bind(C)
+       !! void c_co_broadcast(CFI_cdesc_t * a_desc, int source_image, int num_elements, gex_TM_t team);
        import c_int, c_ptr
        implicit none
        type(*) a(..)
-       type(c_ptr), value :: stat
        integer(c_int), value :: source_image, Nelem
        type(c_ptr), value :: team
      end subroutine
 
-     subroutine caf_co_reduce(a, result_image, c_loc_stat, c_loc_errmsg, num_elements, Coll_ReduceSub, client_data, team) bind(C)
-       !! void caf_co_reduce(CFI_cdesc_t* a_desc, int result_image, int* stat, char* errmsg, int num_elements, gex_Coll_ReduceFn_t* user_op, void* client_data)
+     subroutine caf_co_reduce(a, result_image, num_elements, Coll_ReduceSub, client_data, team) bind(C)
+       !! void caf_co_reduce(CFI_cdesc_t* a_desc, int result_image, int num_elements, gex_Coll_ReduceFn_t* user_op, void* client_data)
        import c_int, c_ptr, c_size_t, c_funptr
        implicit none 
        type(*) a(..)
        integer(c_int), value :: result_image
-       type(c_ptr), value :: c_loc_stat, c_loc_errmsg, client_data
+       type(c_ptr), value :: client_data
        type(c_funptr), value :: Coll_ReduceSub
        integer(c_size_t), value :: num_elements
        type(c_ptr), value :: team
      end subroutine
 
-     subroutine caf_co_sum(a, result_image, c_loc_stat, c_loc_errmsg, num_elements, team) bind(C)
-       !! void c_co_sum(CFI_cdesc_t* a_desc, int result_image, int* stat, char* errmsg, size_t num_elements);
+     subroutine caf_co_sum(a, result_image, num_elements, team) bind(C)
+       !! void c_co_sum(CFI_cdesc_t* a_desc, int result_image, size_t num_elements, gex_TM_t team);
        import c_int, c_ptr, c_size_t
        implicit none 
        type(*) a(..)
        integer(c_int), value :: result_image
-       type(c_ptr), value :: c_loc_stat, c_loc_errmsg
        integer(c_size_t), value :: num_elements
        type(c_ptr), value :: team
      end subroutine
 
-     subroutine caf_co_min(a, result_image, c_loc_stat, c_loc_errmsg, num_elements, team) bind(C)
-       !! void c_co_min(CFI_cdesc_t* a_desc, int result_image, int* stat, char* errmsg, size_t num_elements);
+     subroutine caf_co_min(a, result_image, num_elements, team) bind(C)
+       !! void c_co_min(CFI_cdesc_t* a_desc, int result_image, size_t num_elements, gex_TM_t team);
        import c_int, c_ptr, c_size_t
        implicit none 
        type(*) a(..)
        integer(c_int), value :: result_image
-       type(c_ptr), value :: c_loc_stat, c_loc_errmsg
        integer(c_size_t), value :: num_elements
        type(c_ptr), value :: team
      end subroutine
 
-     subroutine caf_co_max(a, result_image, c_loc_stat, c_loc_errmsg, num_elements, team) bind(C)
-       !! void c_co_max(CFI_cdesc_t* a_desc, int result_image, int* stat, char* errmsg, size_t num_elements);
+     subroutine caf_co_max(a, result_image, num_elements, team) bind(C)
+       !! void c_co_max(CFI_cdesc_t* a_desc, int result_image, size_t num_elements, gex_TM_t team);
        import c_int, c_ptr, c_size_t
        implicit none 
        type(*) a(..)
        integer(c_int), value :: result_image
-       type(c_ptr), value :: c_loc_stat, c_loc_errmsg
        integer(c_size_t), value :: num_elements
        type(c_ptr), value :: team
      end subroutine

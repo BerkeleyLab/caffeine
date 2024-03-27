@@ -4,7 +4,7 @@ submodule(prif:prif_private_s) co_reduce_s
   use iso_c_binding, only : &
     c_loc, c_null_ptr, c_funloc, c_associated, c_f_pointer, c_f_procpointer, c_char, c_int64_t, c_double, &
     c_float, c_int32_t
-  use utilities_m, only : get_c_ptr, get_c_ptr_character, optional_value
+  use utilities_m, only : optional_value
   use caffeine_h_m, only : caf_co_reduce, caf_same_cfi_type, caf_elem_len, caf_is_f_string
 
   implicit none
@@ -75,8 +75,6 @@ contains
 
   module procedure prif_co_reduce
 
-    type(c_ptr) :: stat_ptr = c_null_ptr, errmsg_ptr = c_null_ptr
-
     procedure(c_int32_t_operation), pointer :: int32_op => null()
     procedure(c_int64_t_operation), pointer :: int64_op => null()
     procedure(c_float_operation), pointer :: float_op => null()
@@ -86,46 +84,44 @@ contains
     procedure(c_float_complex_operation), pointer :: float_complex_op => null()
     procedure(c_double_complex_operation), pointer :: double_complex_op => null()
 
+    if (present(stat)) stat=0
     call assert(c_associated(operation), "caf_co_reduce: c_associated(operation)")
-
-    stat_ptr = get_c_ptr(stat)
-    errmsg_ptr = get_c_ptr_character(errmsg)
 
     if (caf_same_cfi_type(a, 0)) then
       call c_f_procpointer(operation, int32_op)
-      call caf_co_reduce(a, optional_value(result_image), stat_ptr, errmsg_ptr, &
+      call caf_co_reduce(a, optional_value(result_image), &
         int(product(shape(a)), c_size_t), c_funloc(Coll_ReduceSub_c_int32_t), c_null_ptr, current_team%gex_team)
     else if (caf_same_cfi_type(a, 0_c_int64_t)) then
       call c_f_procpointer(operation, int64_op)
-      call caf_co_reduce(a, optional_value(result_image), stat_ptr, errmsg_ptr, &
+      call caf_co_reduce(a, optional_value(result_image), &
         int(product(shape(a)), c_size_t), c_funloc(Coll_ReduceSub_c_int64_t), c_null_ptr, current_team%gex_team)
     else if (caf_same_cfi_type(a, 1._c_double)) then
       call c_f_procpointer(operation, double_op)
-      call caf_co_reduce(a, optional_value(result_image), stat_ptr, errmsg_ptr, &
+      call caf_co_reduce(a, optional_value(result_image), &
         int(product(shape(a)), c_size_t), c_funloc(Coll_ReduceSub_c_double), c_null_ptr, current_team%gex_team)
     else if (caf_same_cfi_type(a, 1._c_float)) then
       call c_f_procpointer(operation, float_op)
-      call caf_co_reduce(a, optional_value(result_image), stat_ptr, errmsg_ptr, &
+      call caf_co_reduce(a, optional_value(result_image), &
         int(product(shape(a)), c_size_t), c_funloc(Coll_ReduceSub_c_float), c_null_ptr, current_team%gex_team)
     else if (caf_same_cfi_type(a, .true._c_bool)) then
       call c_f_procpointer(operation, bool_op)
-      call caf_co_reduce(a, optional_value(result_image), stat_ptr, errmsg_ptr, &
+      call caf_co_reduce(a, optional_value(result_image), &
         int(product(shape(a)), c_size_t), c_funloc(Coll_ReduceSub_c_bool), c_null_ptr, current_team%gex_team)
     else if (caf_is_f_string(a)) then
       block
         integer(c_size_t), target :: len_a
         len_a = caf_elem_len(a)
         call c_f_procpointer(operation, char_op)
-        call caf_co_reduce(a, optional_value(result_image), stat_ptr, errmsg_ptr, &
+        call caf_co_reduce(a, optional_value(result_image), &
           int(product(shape(a)), c_size_t), c_funloc(Coll_ReduceSub_c_char), c_loc(len_a), current_team%gex_team)
       end block
     else if (caf_same_cfi_type(a, (0._c_float, 0._c_float))) then
       call c_f_procpointer(operation, float_complex_op)
-      call caf_co_reduce(a, optional_value(result_image), stat_ptr, errmsg_ptr, &
+      call caf_co_reduce(a, optional_value(result_image), &
         int(product(shape(a)), c_size_t), c_funloc(Coll_ReduceSub_c_float_complex), c_null_ptr, current_team%gex_team)
     else if (caf_same_cfi_type(a, (0._c_double, 0._c_double))) then
       call c_f_procpointer(operation, double_complex_op)
-      call caf_co_reduce(a, optional_value(result_image), stat_ptr, errmsg_ptr, &
+      call caf_co_reduce(a, optional_value(result_image), &
         int(product(shape(a)), c_size_t), c_funloc(Coll_ReduceSub_c_double_complex), c_null_ptr, current_team%gex_team)
     else
       call prif_error_stop(.false._c_bool, stop_code_char="caf_co_reduce: unsupported type")

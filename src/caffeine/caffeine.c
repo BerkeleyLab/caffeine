@@ -130,7 +130,7 @@ void caf_sync_all()
 }
 
 void caf_co_reduce(
-  CFI_cdesc_t* a_desc, int result_image, int* stat, char* errmsg, int num_elements, gex_Coll_ReduceFn_t* user_op, void* client_data, gex_TM_t team
+  CFI_cdesc_t* a_desc, int result_image, int num_elements, gex_Coll_ReduceFn_t* user_op, void* client_data, gex_TM_t team
 )
 {
   char* a_address = (char*) a_desc->base_addr;
@@ -147,11 +147,9 @@ void caf_co_reduce(
     );
   }
   gex_Event_Wait(ev);
-
-  if (stat != NULL) *stat = 0;
 }
 
-void caf_co_broadcast(CFI_cdesc_t * a_desc, int source_image, int* stat, int num_elements, gex_TM_t team)
+void caf_co_broadcast(CFI_cdesc_t * a_desc, int source_image, int num_elements, gex_TM_t team)
 {
   char* c_loc_a = (char*) a_desc->base_addr;
   size_t c_sizeof_a = a_desc->elem_len;
@@ -162,28 +160,9 @@ void caf_co_broadcast(CFI_cdesc_t * a_desc, int source_image, int* stat, int num
   gex_Event_t ev
     = gex_Coll_BroadcastNB(team, source_image-1, c_loc_a, c_loc_a, nbytes, 0);
   gex_Event_Wait(ev);
-
-  if (stat != NULL) *stat = 0;
 }
 
-static void set_stat_errmsg_or_abort(int* stat, char* errmsg, const int return_stat, const char* return_message)
-{
-  if (stat == NULL && errmsg == NULL) gasnett_fatalerror("%s", return_message);
-
-  if (stat != NULL) *stat = return_stat;
-
-  if (errmsg != NULL) {
-    if (strlen(errmsg) >= strlen(return_message)) {
-      // TODO: Figure out how/whether to handle repositioning of the null terminator.
-      errmsg = return_message;
-    } else {
-      // TODO: Figure out how to replace this with an assignment of a truncated error message.
-      gasnett_fatalerror("%s", "caffeine.c: strlen(errmsg) too small");
-    }
-  }
-}
-
-void caf_co_max(CFI_cdesc_t* a_desc, int result_image, int* stat, char* errmsg, size_t num_elements, gex_TM_t team)
+void caf_co_max(CFI_cdesc_t* a_desc, int result_image, size_t num_elements, gex_TM_t team)
 {
   gex_DT_t a_type;
 
@@ -194,7 +173,7 @@ void caf_co_max(CFI_cdesc_t* a_desc, int result_image, int* stat, char* errmsg, 
     case CFI_type_float:            a_type = GEX_DT_FLT; break;
     case CFI_type_double:           a_type = GEX_DT_DBL; break;
     default:
-      set_stat_errmsg_or_abort(stat, errmsg, UNRECOGNIZED_TYPE, "");
+      gasnett_fatalerror("Unrecognized type: %d", (int)a_desc->type);
   }
 
   char* a_address = (char*) a_desc->base_addr;
@@ -209,11 +188,9 @@ void caf_co_max(CFI_cdesc_t* a_desc, int result_image, int* stat, char* errmsg, 
     ev = gex_Coll_ReduceToAllNB(team,                 a_address, a_address, a_type, c_sizeof_a, num_elements, GEX_OP_MAX, NULL, NULL, 0);
   }
   gex_Event_Wait(ev);
-
-  if (stat != NULL) *stat = 0;
 }
 
-void caf_co_min(CFI_cdesc_t* a_desc, int result_image, int* stat, char* errmsg, size_t num_elements, gex_TM_t team)
+void caf_co_min(CFI_cdesc_t* a_desc, int result_image, size_t num_elements, gex_TM_t team)
 {
   gex_DT_t a_type;
 
@@ -224,7 +201,7 @@ void caf_co_min(CFI_cdesc_t* a_desc, int result_image, int* stat, char* errmsg, 
     case CFI_type_float:            a_type = GEX_DT_FLT; break;
     case CFI_type_double:           a_type = GEX_DT_DBL; break;
     default:
-      set_stat_errmsg_or_abort(stat, errmsg, UNRECOGNIZED_TYPE, "");
+      gasnett_fatalerror("Unrecognized type: %d", (int)a_desc->type);
   }
 
   char* a_address = (char*) a_desc->base_addr;
@@ -239,11 +216,9 @@ void caf_co_min(CFI_cdesc_t* a_desc, int result_image, int* stat, char* errmsg, 
     ev = gex_Coll_ReduceToAllNB(team,                 a_address, a_address, a_type, c_sizeof_a, num_elements, GEX_OP_MIN, NULL, NULL, 0);
   }
   gex_Event_Wait(ev);
-
-  if (stat != NULL) *stat = 0;
 }
 
-void caf_co_sum(CFI_cdesc_t* a_desc, int result_image, int* stat, char* errmsg, size_t num_elements, gex_TM_t team)
+void caf_co_sum(CFI_cdesc_t* a_desc, int result_image, size_t num_elements, gex_TM_t team)
 {
   gex_DT_t a_type;
 
@@ -258,7 +233,7 @@ void caf_co_sum(CFI_cdesc_t* a_desc, int result_image, int* stat, char* errmsg, 
     case float_Complex_workaround:  a_type = GEX_DT_FLT; num_elements *= 2; c_sizeof_a /= 2; break;
     case double_Complex_workaround: a_type = GEX_DT_DBL; num_elements *= 2; c_sizeof_a /= 2; break;
     default:
-      set_stat_errmsg_or_abort(stat, errmsg, UNRECOGNIZED_TYPE, "");
+      gasnett_fatalerror("Unrecognized type: %d", (int)a_desc->type);
   }
 
   char* a_address = (char*) a_desc->base_addr;
@@ -271,8 +246,6 @@ void caf_co_sum(CFI_cdesc_t* a_desc, int result_image, int* stat, char* errmsg, 
     ev = gex_Coll_ReduceToAllNB(team,                 a_address, a_address, a_type, c_sizeof_a, num_elements, GEX_OP_ADD, NULL, NULL, 0);
   }
   gex_Event_Wait(ev);
-
-  if (stat != NULL) *stat = 0;
 }
 
 bool caf_same_cfi_type(CFI_cdesc_t* a_desc, CFI_cdesc_t* b_desc)
