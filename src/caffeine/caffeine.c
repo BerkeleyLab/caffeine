@@ -182,8 +182,6 @@ static void set_stat_errmsg_or_abort(int* stat, char* errmsg, const int return_s
 void caf_co_max(CFI_cdesc_t* a_desc, int result_image, size_t num_elements, gex_TM_t team)
 {
   gex_DT_t a_type;
-  int* stat = NULL;
-  char* errmsg = NULL;
 
   switch (a_desc->type)
   {
@@ -192,7 +190,7 @@ void caf_co_max(CFI_cdesc_t* a_desc, int result_image, size_t num_elements, gex_
     case CFI_type_float:            a_type = GEX_DT_FLT; break;
     case CFI_type_double:           a_type = GEX_DT_DBL; break;
     default:
-      set_stat_errmsg_or_abort(stat, errmsg, UNRECOGNIZED_TYPE, "");
+      set_stat_errmsg_or_abort(NULL, NULL, UNRECOGNIZED_TYPE, "");
   }
 
   char* a_address = (char*) a_desc->base_addr;
@@ -212,8 +210,6 @@ void caf_co_max(CFI_cdesc_t* a_desc, int result_image, size_t num_elements, gex_
 void caf_co_min(CFI_cdesc_t* a_desc, int result_image, size_t num_elements, gex_TM_t team)
 {
   gex_DT_t a_type;
-  int* stat = NULL;
-  char* errmsg = NULL;
 
   switch (a_desc->type)
   {
@@ -222,7 +218,7 @@ void caf_co_min(CFI_cdesc_t* a_desc, int result_image, size_t num_elements, gex_
     case CFI_type_float:            a_type = GEX_DT_FLT; break;
     case CFI_type_double:           a_type = GEX_DT_DBL; break;
     default:
-      set_stat_errmsg_or_abort(stat, errmsg, UNRECOGNIZED_TYPE, "");
+      set_stat_errmsg_or_abort(NULL, NULL, UNRECOGNIZED_TYPE, "");
   }
 
   char* a_address = (char*) a_desc->base_addr;
@@ -242,8 +238,6 @@ void caf_co_min(CFI_cdesc_t* a_desc, int result_image, size_t num_elements, gex_
 void caf_co_sum(CFI_cdesc_t* a_desc, int result_image, size_t num_elements, gex_TM_t team)
 {
   gex_DT_t a_type;
-  int* stat = NULL;
-  char* errmsg = NULL;
 
   size_t c_sizeof_a = a_desc->elem_len;
 
@@ -256,7 +250,7 @@ void caf_co_sum(CFI_cdesc_t* a_desc, int result_image, size_t num_elements, gex_
     case float_Complex_workaround:  a_type = GEX_DT_FLT; num_elements *= 2; c_sizeof_a /= 2; break;
     case double_Complex_workaround: a_type = GEX_DT_DBL; num_elements *= 2; c_sizeof_a /= 2; break;
     default:
-      set_stat_errmsg_or_abort(stat, errmsg, UNRECOGNIZED_TYPE, "");
+      set_stat_errmsg_or_abort(NULL, NULL, UNRECOGNIZED_TYPE, "");
   }
 
   char* a_address = (char*) a_desc->base_addr;
