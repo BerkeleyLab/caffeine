@@ -10,11 +10,11 @@ Conventions for Caffeine Releases
    versions of external dependencies
 4. Update all instances of the copyright year embedded in: [LICENSE.txt](../LICENSE.txt),
    [fpm.toml (created by install.sh)](../install.sh)
-5. Update all instances of the release package version number embedded in: [fpm.toml (created by install.sh)](../install.sh),
-   [install.sh](../install.sh)
+5. Update all instances of the release package version number embedded in:
+   [fpm.toml (created by install.sh)](../install.sh), [install.sh](../install.sh)
 6. Update the author list embedded in: [fpm.toml(created by install.sh)](../install.sh)
-7. Review top-level [README.md](../README.md) and other user-facing documentation for any necessary
-   changes
+7. Review top-level [README.md](../README.md) and other user-facing documentation for any
+   necessary changes
 8. Produce the ChangeLog
     1. Create draft release on GitHub
     2. Review/edit the automated ChangeLog
