@@ -190,7 +190,7 @@ void caf_co_max(CFI_cdesc_t* a_desc, int result_image, size_t num_elements, gex_
     case CFI_type_float:            a_type = GEX_DT_FLT; break;
     case CFI_type_double:           a_type = GEX_DT_DBL; break;
     default:
-      set_stat_errmsg_or_abort(NULL, NULL, UNRECOGNIZED_TYPE, "");
+      gasnett_fatalerror("Unrecognized type: %d", (int)a_desc->type);
   }
 
   char* a_address = (char*) a_desc->base_addr;
