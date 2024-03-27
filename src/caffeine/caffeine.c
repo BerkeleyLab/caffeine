@@ -162,23 +162,6 @@ void caf_co_broadcast(CFI_cdesc_t * a_desc, int source_image, int num_elements, 
   gex_Event_Wait(ev);
 }
 
-static void set_stat_errmsg_or_abort(int* stat, char* errmsg, const int return_stat, const char* return_message)
-{
-  if (stat == NULL && errmsg == NULL) gasnett_fatalerror("%s", return_message);
-
-  if (stat != NULL) *stat = return_stat;
-
-  if (errmsg != NULL) {
-    if (strlen(errmsg) >= strlen(return_message)) {
-      // TODO: Figure out how/whether to handle repositioning of the null terminator.
-      errmsg = return_message;
-    } else {
-      // TODO: Figure out how to replace this with an assignment of a truncated error message.
-      gasnett_fatalerror("%s", "caffeine.c: strlen(errmsg) too small");
-    }
-  }
-}
-
 void caf_co_max(CFI_cdesc_t* a_desc, int result_image, size_t num_elements, gex_TM_t team)
 {
   gex_DT_t a_type;
