@@ -9,10 +9,10 @@ Conventions for Caffeine Releases
 3. Validate correctness testing has been performed across all supported systems and supported
    versions of external dependencies
 4. Update all instances of the copyright year embedded in: [LICENSE.txt](../LICENSE.txt),
-   [fpm.toml](../fpm.toml)
-5. Update all instances of the release package version number embedded in: [fpm.toml](../fpm.toml),
+   [fpm.toml (created by install.sh)](../install.sh)
+5. Update all instances of the release package version number embedded in: [fpm.toml (created by install.sh)](../install.sh),
    [install.sh](../install.sh)
-6. Update the author list embedded in: [fpm.toml](../fpm.toml)
+6. Update the author list embedded in: [fpm.toml(created by install.sh)](../install.sh)
 7. Review top-level [README.md](../README.md) and other user-facing documentation for any necessary
    changes
 8. Produce the ChangeLog
