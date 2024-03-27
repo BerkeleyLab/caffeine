@@ -16,7 +16,7 @@ contains
       call caf_co_max( &
           a, optional_value(result_image), int(product(shape(a)), c_size_t), current_team%gex_team)
     else if (caf_is_f_string(a)) then
-      call prif_co_reduce(a, c_funloc(reverse_alphabetize), optional_value(result_image), stat, errmsg)
+      call prif_co_reduce(a, c_funloc(reverse_alphabetize), optional_value(result_image), stat, errmsg, errmsg_alloc)
     else
       call prif_error_stop(.false._c_bool, stop_code_char="caf_co_max: unsupported type")
     end if
