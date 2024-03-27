@@ -250,7 +250,7 @@ void caf_co_sum(CFI_cdesc_t* a_desc, int result_image, size_t num_elements, gex_
     case float_Complex_workaround:  a_type = GEX_DT_FLT; num_elements *= 2; c_sizeof_a /= 2; break;
     case double_Complex_workaround: a_type = GEX_DT_DBL; num_elements *= 2; c_sizeof_a /= 2; break;
     default:
-      set_stat_errmsg_or_abort(NULL, NULL, UNRECOGNIZED_TYPE, "");
+      gasnett_fatalerror("Unrecognized type: %d", (int)a_desc->type);
   }
 
   char* a_address = (char*) a_desc->base_addr;
