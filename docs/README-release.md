@@ -1,7 +1,7 @@
 README-release.md
 ========
 
-Conventions for Caffeine Releases
+Release Procedure for Caffeine
 -------------
 1. Nominate a Release Manager with primary responsibility for ensuring each step in this
    procedure is followed
