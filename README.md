@@ -9,6 +9,18 @@ Caffeine is a parallel runtime library that aims to support Fortran compilers wi
 
 Prerequisites
 -------------
+### Build prerequisites
+The `install.sh` script uses the following packages:
+* [GNU Compiler Collection] (GCC)
+* [GASNet-EX] exascale networking middleware
+* [Fortran package manager] `fpm`
+* [pkg-config]
+* [realpath]
+* [make]
+
+The script will invoke these if present in a user's `PATH`.
+If not present, the script will ask permission to use [Homebrew] to install the relevant package.
+
 Caffeine leverages the following non-parallel features of Fortran to simplify the writing of a portable, compact runtime-library that supports Fortran's parallel features:
 
 | Feature                                   | Introduced in |
@@ -22,7 +34,7 @@ Caffeine leverages the following non-parallel features of Fortran to simplify th
 | Assumed-rank dummy arguments: `array(..)` | Fortran 2018  |
 
 
-[1] This features simplifies development but is not essential to the package
+[1] This feature simplifies development but is not essential to the package
 
 [2] This feature is used to support only `co_reduce` and might become optional in a future release.
 
@@ -33,7 +45,7 @@ git clone https://github.com/BerkeleyLab/caffeine.git
 cd caffeine
 ./install.sh
 export GASNET_PSHM_NODES=8
-./build/run-fpm.sh run --example hello
+FC=<Fortran-compiler-path> CC=<C-compiler-path> CXX=<C++-compiler-path> ./build/run-fpm.sh run --example hello
 ```
 
 Run tests
@@ -72,7 +84,7 @@ Open `doc/html/index.html` in a web browser.
 
 Funding
 -------
-The Computer Languages and Systems Software ([CLaSS]) Group at [Berkeley Lab] leads Caffeine development under funding from the Exascale Computing Project ([ECP]).
+The Computer Languages and Systems Software ([CLaSS]) Group at [Berkeley Lab] has developed Caffeine development on funding from the Exascale Computing Project ([ECP]) and the Stewardship for Programming Systems and Tools ([S4PST]) project. 
 
 License
 -------
@@ -84,5 +96,12 @@ See [LICENSE.txt](LICENSE.txt) for usage terms and conditions.
 [ECP]: https://www.exascaleproject.org
 [ford]: https://github.com/Fortran-FOSS-Programmers/ford
 [MPI]: https://www.mpi-forum.org
-[ascii.co.uk]: https://ascii.co.uk/art/cup
 [site]: https://berkeleylab.github.io/caffeine
+[S4PST]: https://ornl.github.io/events/s4pst2023/
+[Homebrew]: https://brew.sh
+[GNU Compiler Collection]: https://gcc.gnu.org
+[GASNet-EX]: https://gasnet.lbl.gov
+[Fortran package manager]: https://github.com/fortran-lang/fpm
+[pkg-config]: https://www.freedesktop.org/wiki/Software/pkg-config/
+[realpath]: https://man7.org/linux/man-pages/man3/realpath.3.html
+[make]: https://www.gnu.org/software/make/
