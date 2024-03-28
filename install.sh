@@ -23,18 +23,17 @@ GASNET_VERSION="stable"
 
 list_prerequisites()
 {
-    echo "Caffeine and this installer were developed with the following prerequisite package" 
-    echo "versions, which also indicate the versions that the installer will install if"
-    echo "missing and if granted permission:"
+    echo "Caffeine and this installer were developed with the following prerequisites. "
+    echo "If any are missing and if permission is granted, the installer will install "
+    echo "the latest versions using Homebrew:"
     echo ""
     echo "  GCC $GCC_VERSION"
     echo "  GASNet-EX $GASNET_VERSION"
-    echo "  fpm 0.5.0"
-    echo "  pkg-config 0.29.2"
-    echo "  realpath 9.0 (Homebrew coreutils 9.0)"
-    echo "  GNU Make 3.1 (Homebrew coreutils 9.0)"
+    echo "  fpm"
+    echo "  pkg-config"
+    echo "  realpath (Homebrew coreutils)"
+    echo "  GNU Make (Homebrew coreutils)"
     echo ""
-    echo "In some cases, earlier versions might also work."
 }
 
 while [ "$1" != "" ]; do
@@ -337,7 +336,7 @@ echo "CAFFEINE_FPM_CFLAGS=$GASNET_CFLAGS $GASNET_CPPFLAGS"        >> $CAFFEINE_P
 echo "Name: caffeine"                                             >> $CAFFEINE_PC
 echo "Description: Coarray Fortran parallel runtime library"      >> $CAFFEINE_PC
 echo "URL: https://gitlab.lbl.gov/berkeleylab/caffeine"           >> $CAFFEINE_PC
-echo "Version: 0.1.0"                                             >> $CAFFEINE_PC
+echo "Version: 0.2.0"                                             >> $CAFFEINE_PC
 
 exit_if_pkg_config_pc_file_missing "caffeine"
 
