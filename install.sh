@@ -10,7 +10,7 @@ print_usage_info()
     echo "./install.sh [--help | [--prefix=PREFIX]"
     echo ""
     echo " --help             Display this help text"
-    echo " --prefix=PREFIX    Install binary in 'PREFIX/bin'"
+    echo " --prefix=PREFIX    Install library into 'PREFIX' directory"
     echo " --prereqs          Display a list of prerequisite software."
     echo "                    Default prefix='\$HOME/.local/bin'"
     echo ""
