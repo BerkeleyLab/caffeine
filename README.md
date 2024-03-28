@@ -11,7 +11,7 @@ Prerequisites
 -------------
 ### Build prerequisites
 The `install.sh` script uses the following packages:
-* [GNU Compiler Collection] (GCC)
+* Fortran and C compilers
 * [GASNet-EX] exascale networking middleware
 * [Fortran package manager] `fpm`
 * [pkg-config]
