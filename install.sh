@@ -29,10 +29,10 @@ list_prerequisites()
     echo ""
     echo "  GCC $GCC_VERSION"
     echo "  GASNet-EX $GASNET_VERSION"
-    echo "  fpm 0.5.0"
+    echo "  fpm 0.9.0"
     echo "  pkg-config 0.29.2"
-    echo "  realpath 9.0 (Homebrew coreutils 9.0)"
-    echo "  GNU Make 3.1 (Homebrew coreutils 9.0)"
+    echo "  realpath 9.4 (Homebrew coreutils 9.4)"
+    echo "  GNU Make 3.1 (Homebrew coreutils 9.4)"
     echo ""
     echo "In some cases, earlier versions might also work."
 }
@@ -337,7 +337,7 @@ echo "CAFFEINE_FPM_CFLAGS=$GASNET_CFLAGS $GASNET_CPPFLAGS"        >> $CAFFEINE_P
 echo "Name: caffeine"                                             >> $CAFFEINE_PC
 echo "Description: Coarray Fortran parallel runtime library"      >> $CAFFEINE_PC
 echo "URL: https://gitlab.lbl.gov/berkeleylab/caffeine"           >> $CAFFEINE_PC
-echo "Version: 0.1.0"                                             >> $CAFFEINE_PC
+echo "Version: 0.2.0"                                             >> $CAFFEINE_PC
 
 exit_if_pkg_config_pc_file_missing "caffeine"
 
