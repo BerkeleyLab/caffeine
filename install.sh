@@ -336,7 +336,7 @@ echo "CAFFEINE_FPM_CFLAGS=$GASNET_CFLAGS $GASNET_CPPFLAGS"        >> $CAFFEINE_P
 echo "Name: caffeine"                                             >> $CAFFEINE_PC
 echo "Description: Coarray Fortran parallel runtime library"      >> $CAFFEINE_PC
 echo "URL: https://gitlab.lbl.gov/berkeleylab/caffeine"           >> $CAFFEINE_PC
-echo "Version: 0.2.0"                                             >> $CAFFEINE_PC
+echo "Version: 0.2.1"                                             >> $CAFFEINE_PC
 
 exit_if_pkg_config_pc_file_missing "caffeine"
 
