@@ -229,7 +229,9 @@ if [ -z ${FC+x} ] || [ -z ${CC+x} ] || [ -z ${CXX+x} ] || [ -z ${PKG_CONFIG+x} ]
   FPM=`which fpm`
 fi
 
-PREFIX=`$REALPATH ${PREFIX:-"${HOME}/.local"}`
+PREFIX=${PREFIX:-"${HOME}/.local"}
+mkdir -p $PREFIX
+PREFIX=`$REALPATH $PREFIX`
 echo "PREFIX=$PREFIX"
 
 if [ -z ${PKG_CONFIG_PATH+x} ]; then
