@@ -99,7 +99,6 @@ See [LICENSE.txt](LICENSE.txt) for usage terms and conditions.
 [site]: https://berkeleylab.github.io/caffeine
 [S4PST]: https://ornl.github.io/events/s4pst2023/
 [Homebrew]: https://brew.sh
-[GNU Compiler Collection]: https://gcc.gnu.org
 [GASNet-EX]: https://gasnet.lbl.gov
 [Fortran package manager]: https://github.com/fortran-lang/fpm
 [pkg-config]: https://www.freedesktop.org/wiki/Software/pkg-config/
