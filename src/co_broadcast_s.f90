@@ -1,5 +1,4 @@
 submodule(prif:prif_private_s)  co_broadcast_s
-  use caffeine_h_m, only : caf_co_broadcast
 
   implicit none
 

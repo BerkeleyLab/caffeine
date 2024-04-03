@@ -9,7 +9,6 @@ submodule(prif:prif_private_s) allocation_s
       c_associated, &
       c_null_ptr, &
       c_null_funptr
-  use caffeine_h_m, only: caf_allocate, caf_deallocate, caf_this_image, caf_as_int, caf_as_c_ptr
 
   implicit none
 
