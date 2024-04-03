@@ -25,4 +25,14 @@ contains
     call prif_error_stop(quiet=.false._c_bool, stop_code_char=proc_name // " is not yet implemented")
   end subroutine
 
+  pure function optional_value(var) result(c_val)
+    integer, intent(in), optional :: var
+    integer(c_int) c_val
+    if (present(var)) then
+      c_val = var
+    else
+      c_val = 0_c_int
+    end if
+  end function
+
 end submodule prif_private_s
