@@ -1,7 +1,6 @@
 module caf_prif_queries_test
   use prif, only : &
       prif_allocate, prif_deallocate, prif_coarray_handle, prif_num_images, prif_this_image, prif_base_pointer
-  use caffeine_h_m, only: caf_as_int
   use veggies, only: result_t, test_item_t, assert_that, describe, it
   use iso_c_binding, only: c_ptr, c_int, c_intmax_t, c_size_t, c_null_funptr, c_intptr_t
 
@@ -69,7 +68,7 @@ contains
 
     call prif_base_pointer(coarray_handle, this_img, ptr)
 
-    result_ = assert_that(caf_as_int(allocated_mem) .eq. ptr)
+    result_ = assert_that(transfer(allocated_mem,ptr) .eq. ptr)
 
     call prif_deallocate([coarray_handle])
   end function

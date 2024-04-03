@@ -1,7 +1,6 @@
 ! Copyright (c), The Regents of the University of California
 ! Terms of use are as specified in LICENSE.txt
 submodule(prif:prif_private_s) coarray_access_s
-  use caffeine_h_m, only: caf_put, caf_get, caf_as_int
   use iso_c_binding, only: c_loc
 
   implicit none

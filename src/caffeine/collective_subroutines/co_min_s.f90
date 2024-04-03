@@ -2,8 +2,6 @@
 ! Terms of use are as specified in LICENSE.txt
 submodule(prif:prif_private_s) co_min_s
   use iso_c_binding, only : c_funloc
-  use utilities_m, only : optional_value
-  use caffeine_h_m, only : caf_co_min, caf_numeric_type, caf_is_f_string
 
   implicit none
 
