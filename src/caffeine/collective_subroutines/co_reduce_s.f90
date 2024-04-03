@@ -4,7 +4,6 @@ submodule(prif:prif_private_s) co_reduce_s
   use iso_c_binding, only : &
     c_loc, c_null_ptr, c_funloc, c_associated, c_f_pointer, c_f_procpointer, c_char, c_int64_t, c_double, &
     c_float, c_int32_t
-  use caffeine_h_m, only : caf_co_reduce, caf_same_cfi_type, caf_elem_len, caf_is_f_string
 
   implicit none
 
