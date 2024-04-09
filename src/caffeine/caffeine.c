@@ -71,10 +71,10 @@ void caf_caffeinate(mspace* symmetric_heap, intptr_t* symmetric_heap_start, mspa
   intptr_t non_symmetric_heap_start = *symmetric_heap_start + symmetric_heap_size;
 
   if (caf_this_image(myworldteam) == 1) {
-    *symmetric_heap = create_mspace_with_base(*symmetric_heap_start, symmetric_heap_size, 0);
+     *symmetric_heap = create_mspace_with_base((void*)*symmetric_heap_start, symmetric_heap_size, 0);
     mspace_set_footprint_limit(*symmetric_heap, symmetric_heap_size);
   }
-  *non_symmetric_heap = create_mspace_with_base(non_symmetric_heap_start, non_symmetric_heap_size, 0);
+  *non_symmetric_heap = create_mspace_with_base((void*)non_symmetric_heap_start, non_symmetric_heap_size, 0);
   mspace_set_footprint_limit(*non_symmetric_heap, non_symmetric_heap_size);
   *initial_team = myworldteam;
 }
