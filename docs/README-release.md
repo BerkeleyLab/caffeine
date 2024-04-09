@@ -21,8 +21,17 @@ Release Procedure for Caffeine
     3. Add/update list of supported features/platforms
     4. Add/update list of high-level changes since last release
     5. Add/update list of known defects/limitations
-    6. spell-check and proofread
-9. Produce a release candidate tarball and compel several people to manually validate it on
-   systems of interest
-10. Publish the release
-11. Update the release procedure with any new steps or changes
+    6. Spell-check and proofread
+9. Temporarily hardcode version of gasnet installer in [install.sh](../install.sh) as the
+   last commit in the release. Set GASNET_VERSION flag to the latest gasnet release
+10. Tag a release candidate and compel several people to manually validate it on
+    systems of interest. For example `git tag #.#.#-rc1`, then `git push origin #.#.#-rc1`
+11. Create annotated tag (only after release candidate has been checked by team members)
+    For example `git tag -a #.#.# -m "release version #.#.#"`, then `git push origin #.#.#`
+12. Publish the release
+13. Git revert the commit that hardcoded the gasnet version
+14. Update patch number of the version number embedded in:
+    [manifest/fpm.toml.template](../manifest/fpm.toml.template), [install.sh](../install.sh)
+    Update to an odd number to indicate that the `main` branch is currently a snapshot of something
+    that is beyond the offical release
+15. Update the release procedure with any new steps or changes
