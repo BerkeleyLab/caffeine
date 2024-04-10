@@ -130,7 +130,7 @@ void caf_sync_all()
 }
 
 void caf_co_reduce(
-  CFI_cdesc_t* a_desc, int result_image, int num_elements, gex_Coll_ReduceFn_t* user_op, void* client_data, gex_TM_t team
+  CFI_cdesc_t* a_desc, int result_image, int num_elements, gex_Coll_ReduceFn_t user_op, void* client_data, gex_TM_t team
 )
 {
   char* a_address = (char*) a_desc->base_addr;
