@@ -35,6 +35,11 @@ typedef uint8_t byte;
   const int double_Complex_workaround =4100;
 #endif
 
+int caf_this_image(gex_TM_t team)
+{
+  return gex_TM_QueryRank(team) + 1;
+}
+
 // NOTE: gex_TM_T is a typedef to a C pointer, so the `gex_TM_t* initial_team` arg in the C signature matches the BIND(C) interface of an `intent(out)` arg of type `c_ptr` for the same argument
 void caf_caffeinate(mspace* symmetric_heap, intptr_t* symmetric_heap_start, mspace* non_symmetric_heap, gex_TM_t* initial_team)
 {
@@ -71,10 +76,10 @@ void caf_caffeinate(mspace* symmetric_heap, intptr_t* symmetric_heap_start, mspa
   intptr_t non_symmetric_heap_start = *symmetric_heap_start + symmetric_heap_size;
 
   if (caf_this_image(myworldteam) == 1) {
-    *symmetric_heap = create_mspace_with_base(*symmetric_heap_start, symmetric_heap_size, 0);
+    *symmetric_heap = create_mspace_with_base((void*)*symmetric_heap_start, symmetric_heap_size, 0);
     mspace_set_footprint_limit(*symmetric_heap, symmetric_heap_size);
   }
-  *non_symmetric_heap = create_mspace_with_base(non_symmetric_heap_start, non_symmetric_heap_size, 0);
+  *non_symmetric_heap = create_mspace_with_base((void*)non_symmetric_heap_start, non_symmetric_heap_size, 0);
   mspace_set_footprint_limit(*non_symmetric_heap, non_symmetric_heap_size);
   *initial_team = myworldteam;
 }
@@ -82,11 +87,6 @@ void caf_caffeinate(mspace* symmetric_heap, intptr_t* symmetric_heap_start, mspa
 void caf_decaffeinate(int exit_code)
 {
   gasnet_exit(exit_code);
-}
-
-int caf_this_image(gex_TM_t team)
-{
-  return gex_TM_QueryRank(team) + 1;
 }
 
 int caf_num_images(gex_TM_t team)
@@ -130,7 +130,7 @@ void caf_sync_all()
 }
 
 void caf_co_reduce(
-  CFI_cdesc_t* a_desc, int result_image, int num_elements, gex_Coll_ReduceFn_t* user_op, void* client_data, gex_TM_t team
+  CFI_cdesc_t* a_desc, int result_image, int num_elements, gex_Coll_ReduceFn_t user_op, void* client_data, gex_TM_t team
 )
 {
   char* a_address = (char*) a_desc->base_addr;
