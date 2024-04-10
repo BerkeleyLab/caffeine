@@ -4,18 +4,20 @@ set -e # exit on error
 
 print_usage_info()
 {
-    echo "Caffeine Installation Script"
-    echo ""
-    echo "USAGE:"
-    echo "./install.sh [--help | [--prefix=PREFIX]"
-    echo ""
-    echo " --help             Display this help text"
-    echo " --prefix=PREFIX    Install library into 'PREFIX' directory"
-    echo " --prereqs          Display a list of prerequisite software."
-    echo "                    Default prefix='\$HOME/.local/bin'"
-    echo ""
-    echo "For a non-interactive build with the 'yes' utility installed, execute"
-    echo "yes | ./install.sh"
+    cat << EOF
+Caffeine Installation Script
+
+USAGE:
+./install.sh [--help | [--prefix=PREFIX]
+
+ --help             Display this help text
+ --prefix=PREFIX    Install library into 'PREFIX' directory
+ --prereqs          Display a list of prerequisite software.
+                    Default prefix='\$HOME/.local/bin'
+
+For a non-interactive build with the 'yes' utility installed, execute
+yes | ./install.sh
+EOF
 }
 
 GCC_VERSION=13
@@ -23,17 +25,19 @@ GASNET_VERSION="stable"
 
 list_prerequisites()
 {
-    echo "Caffeine and this installer were developed with the following prerequisites. "
-    echo "If any are missing and if permission is granted, the installer will install "
-    echo "the latest versions using Homebrew:"
-    echo ""
-    echo "  GCC $GCC_VERSION"
-    echo "  GASNet-EX $GASNET_VERSION"
-    echo "  fpm"
-    echo "  pkg-config"
-    echo "  realpath (Homebrew coreutils)"
-    echo "  GNU Make (Homebrew coreutils)"
-    echo ""
+    cat << EOF
+Caffeine and this installer were developed with the following prerequisites.
+If any are missing and if permission is granted, the installer will install
+the latest versions using Homebrew:
+
+  GCC $GCC_VERSION
+  GASNet-EX $GASNET_VERSION
+  fpm
+  pkg-config
+  realpath (Homebrew coreutils)
+  GNU Make (Homebrew coreutils)
+
+EOF
 }
 
 while [ "$1" != "" ]; do
@@ -95,22 +99,26 @@ fi
 
 ask_permission_to_use_homebrew()
 {
-  echo ""
-  echo "Either one or more of the environment variables FC, CC, and CXX are unset or"
-  echo "one or more of the following packages are not in the PATH: pkg-config, realpath, make, fpm."
-  echo "If you grant permission to install prerequisites, you will be prompted before each installation." 
-  echo ""
-  echo "Press 'Enter' to choose the square-bracketed default answer:"
+  cat << EOF
+
+Either one or more of the environment variables FC, CC, and CXX are unset or
+one or more of the following packages are not in the PATH: pkg-config, realpath, make, fpm.
+If you grant permission to install prerequisites, you will be prompted before each installation.
+
+Press 'Enter' to choose the square-bracketed default answer:
+EOF
   printf "Is it ok to use Homebrew to install prerequisite packages? [yes] "
 }
 
 ask_permission_to_install_homebrew()
 {
-  echo ""
-  echo "Homebrew not found. Installing Homebrew requires sudo privileges."
-  echo "If you grant permission to install Homebrew, you may be prompted to enter your password." 
-  echo ""
-  echo "Press 'Enter' to choose the square-bracketed default answer:"
+  cat << EOF
+
+Homebrew not found. Installing Homebrew requires sudo privileges.
+If you grant permission to install Homebrew, you may be prompted to enter your password.
+
+Press 'Enter' to choose the square-bracketed default answer:
+EOF
   printf "Is it ok to download and install Homebrew? [yes] "
 }
 
@@ -174,13 +182,15 @@ if [ -z ${FC+x} ] || [ -z ${CC+x} ] || [ -z ${CXX+x} ] || [ -z ${PKG_CONFIG+x} ]
     curl -L https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh -o $DEPENDENCIES_DIR/install-homebrew.sh --create-dirs
     chmod u+x $DEPENDENCIES_DIR/install-homebrew.sh
 
-    if [ -p /dev/stdin ] && [ $CI = false ]; then 
-       echo ""
-       echo "Pipe detected.  Installing Homebrew requires sudo privileges, which most likely will"
-       echo "not work if you are installing non-interactively, e.g., via 'yes | ./install.sh'."
-       echo "To install Caffeine non-interactiely, please rerun the Caffeine installer after" 
-       echo "executing the following command to install Homebrew:"
-       echo "\"./$DEPENDENCIES_DIR/install-homebrew.sh\""
+    if [ -p /dev/stdin ] && [ $CI = false ]; then
+	   cat << EOF
+
+Pipe detected.  Installing Homebrew requires sudo privileges, which most likely will
+not work if you are installing non-interactively, e.g., via 'yes | ./install.sh'.
+To install Caffeine non-interactiely, please rerun the Caffeine installer after
+executing the following command to install Homebrew:
+"./$DEPENDENCIES_DIR/install-homebrew.sh"
+EOF
        exit 1
     else
       ./$DEPENDENCIES_DIR/install-homebrew.sh
@@ -245,10 +255,12 @@ FPM_CC="$($REALPATH $(command -v $CC))"
 
 ask_package_permission()
 {
-  echo ""
-  echo "$1 not found in $2"
-  echo ""
-  echo "Press 'Enter' for the square-bracketed default answer:"
+  cat << EOF
+
+$1 not found in $2
+
+Press 'Enter' for the square-bracketed default answer:
+EOF
   printf "Is it ok to download and install $1? [yes] "
 }
 
@@ -299,11 +311,13 @@ GASNET_CPPFLAGS="`$PKG_CONFIG $pkg --variable=GASNET_CPPFLAGS`"
 GASNET_LIBDIR="$(echo $GASNET_LIBS | awk '{print $1};')"
 case "$GASNET_LIBDIR" in
   *spack* )
-    echo "***NOTICE***: The GASNet library built by Spack is ONLY intended for"
-    echo "unit-testing purposes, and is generally UNSUITABLE FOR PRODUCTION USE."
-    echo "The RECOMMENDED way to build GASNet is as an embedded library as configured"
-    echo "by the higher-level client runtime package (i.e. Caffeine), including"
-    echo "system-specific configuration. Exiting install.sh"
+	cat << EOF
+***NOTICE***: The GASNet library built by Spack is ONLY intended for
+unit-testing purposes, and is generally UNSUITABLE FOR PRODUCTION USE.
+The RECOMMENDED way to build GASNet is as an embedded library as configured
+by the higher-level client runtime package (i.e. Caffeine), including
+system-specific configuration. Exiting install.sh
+EOF
     exit 1
     ;;
   * )
@@ -329,35 +343,41 @@ echo "${FPM_TOML_LINK_ENTRY}" >> build/fpm.toml
 ln -f -s build/fpm.toml
 
 CAFFEINE_PC="$PREFIX/lib/pkgconfig/caffeine.pc"
-echo "CAFFEINE_FPM_LDFLAGS=$GASNET_LDFLAGS $GASNET_LIB_LOCATIONS" >  $CAFFEINE_PC
-echo "CAFFEINE_FPM_FC=$FPM_FC"                                    >> $CAFFEINE_PC
-echo "CAFFEINE_FPM_CC=$GASNET_CC"                                 >> $CAFFEINE_PC
-echo "CAFFEINE_FPM_CFLAGS=$GASNET_CFLAGS $GASNET_CPPFLAGS"        >> $CAFFEINE_PC
-echo "Name: caffeine"                                             >> $CAFFEINE_PC
-echo "Description: Coarray Fortran parallel runtime library"      >> $CAFFEINE_PC
-echo "URL: https://gitlab.lbl.gov/berkeleylab/caffeine"           >> $CAFFEINE_PC
-echo "Version: 0.2.1"                                             >> $CAFFEINE_PC
+cat << EOF > $CAFFEINE_PC
+CAFFEINE_FPM_LDFLAGS=$GASNET_LDFLAGS $GASNET_LIB_LOCATIONS
+CAFFEINE_FPM_FC=$FPM_FC
+CAFFEINE_FPM_CC=$GASNET_CC
+CAFFEINE_FPM_CFLAGS=$GASNET_CFLAGS $GASNET_CPPFLAGS
+Name: caffeine
+Description: Coarray Fortran parallel runtime library
+URL: https://gitlab.lbl.gov/berkeleylab/caffeine
+Version: 0.2.1
+EOF
 
 exit_if_pkg_config_pc_file_missing "caffeine"
 
 RUN_FPM_SH="build/run-fpm.sh"
-echo "#!/bin/sh"                                                              >  $RUN_FPM_SH
-echo "#-- DO NOT EDIT -- created by caffeine/install.sh"                      >> $RUN_FPM_SH
-echo "\"${FPM}\" \"\$@\" \\"                                                  >> $RUN_FPM_SH
-echo "--compiler \"`$PKG_CONFIG caffeine --variable=CAFFEINE_FPM_FC`\"   \\"  >> $RUN_FPM_SH
-echo "--c-compiler \"`$PKG_CONFIG caffeine --variable=CAFFEINE_FPM_CC`\" \\"  >> $RUN_FPM_SH
-echo "--c-flag \"`$PKG_CONFIG caffeine --variable=CAFFEINE_FPM_CFLAGS`\" \\"  >> $RUN_FPM_SH
-echo "--link-flag \"`$PKG_CONFIG caffeine --variable=CAFFEINE_FPM_LDFLAGS`\"" >> $RUN_FPM_SH
+cat << EOF > $RUN_FPM_SH
+#!/bin/sh
+#-- DO NOT EDIT -- created by caffeine/install.sh
+"${FPM}" "\$@" \
+--compiler "`$PKG_CONFIG caffeine --variable=CAFFEINE_FPM_FC`"   \
+--c-compiler "`$PKG_CONFIG caffeine --variable=CAFFEINE_FPM_CC`" \
+--c-flag "`$PKG_CONFIG caffeine --variable=CAFFEINE_FPM_CFLAGS`" \
+--link-flag "`$PKG_CONFIG caffeine --variable=CAFFEINE_FPM_LDFLAGS`"
+EOF
 chmod u+x $RUN_FPM_SH
 
 ./$RUN_FPM_SH build
 
-echo ""
-echo "________________ Caffeine has been dispensed! ________________"
-echo ""
-echo "To rebuild or to run tests or examples via the Fortran Package"
-echo "Manager (fpm) with the required compiler/linker flags, pass a"
-echo "fpm command to the build/run-fpm.sh script. For example, run"
-echo "the program example/hello.f90 as follows:"
-echo ""
-echo "./$RUN_FPM_SH run --example hello"
+cat << EOF
+
+________________ Caffeine has been dispensed! ________________
+
+To rebuild or to run tests or examples via the Fortran Package
+Manager (fpm) with the required compiler/linker flags, pass a
+fpm command to the build/run-fpm.sh script. For example, run
+the program example/hello.f90 as follows:
+
+./$RUN_FPM_SH run --example hello
+EOF
