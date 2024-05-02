@@ -26,8 +26,8 @@ contains
     end if
   end procedure
 
-  module procedure prif_local_data_size
-    call unimplemented("prif_local_data_size")
+  module procedure prif_size_bytes
+    call unimplemented("prif_size_bytes")
   end procedure
 
 end submodule prif_queries_s
