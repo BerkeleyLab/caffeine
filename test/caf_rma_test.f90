@@ -3,8 +3,8 @@ module caf_rma_test
             c_ptr, c_intmax_t, c_intptr_t, c_size_t, c_null_funptr, c_f_pointer, c_loc
     use prif, only: &
             prif_coarray_handle, &
-            prif_allocate, &
-            prif_deallocate, &
+            prif_allocate_coarray, &
+            prif_deallocate_coarray, &
             prif_base_pointer, &
             prif_num_images, &
             prif_put, &
@@ -43,7 +43,7 @@ contains
         call prif_num_images(image_count=num_imgs)
         lcobounds(1) = 1
         ucobounds(1) = num_imgs
-        call prif_allocate( &
+        call prif_allocate_coarray( &
                 lcobounds = lcobounds, &
                 ucobounds = ucobounds, &
                 lbounds = [integer(c_intmax_t)::], &
@@ -67,7 +67,7 @@ contains
 
         result_ = assert_equals(expected, local_slice)
 
-        call prif_deallocate([coarray_handle])
+        call prif_deallocate_coarray([coarray_handle])
     end function
 
     function check_put_raw() result(result_)
@@ -84,7 +84,7 @@ contains
         call prif_num_images(image_count=num_imgs)
         lcobounds(1) = 1
         ucobounds(1) = num_imgs
-        call prif_allocate( &
+        call prif_allocate_coarray( &
                 lcobounds = lcobounds, &
                 ucobounds = ucobounds, &
                 lbounds = [integer(c_intmax_t)::], &
@@ -109,7 +109,7 @@ contains
 
         result_ = assert_equals(expected, local_slice)
 
-        call prif_deallocate([coarray_handle])
+        call prif_deallocate_coarray([coarray_handle])
     end function
 
     function check_get() result(result_)
@@ -124,7 +124,7 @@ contains
         call prif_num_images(image_count=num_imgs)
         lcobounds(1) = 1
         ucobounds(1) = num_imgs
-        call prif_allocate( &
+        call prif_allocate_coarray( &
                 lcobounds = lcobounds, &
                 ucobounds = ucobounds, &
                 lbounds = [integer(c_intmax_t)::], &
@@ -149,7 +149,7 @@ contains
 
         result_ = assert_equals(expected, retrieved)
 
-        call prif_deallocate([coarray_handle])
+        call prif_deallocate_coarray([coarray_handle])
     end function
 
     function check_get_raw() result(result_)
@@ -166,7 +166,7 @@ contains
         call prif_num_images(image_count=num_imgs)
         lcobounds(1) = 1
         ucobounds(1) = num_imgs
-        call prif_allocate( &
+        call prif_allocate_coarray( &
                 lcobounds = lcobounds, &
                 ucobounds = ucobounds, &
                 lbounds = [integer(c_intmax_t)::], &
@@ -192,6 +192,6 @@ contains
 
         result_ = assert_equals(expected, retrieved)
 
-        call prif_deallocate([coarray_handle])
+        call prif_deallocate_coarray([coarray_handle])
     end function
 end module

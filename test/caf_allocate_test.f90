@@ -1,6 +1,6 @@
 module caf_allocate_test
   use prif, only : &
-      prif_allocate, prif_deallocate, &
+      prif_allocate_coarray, prif_deallocate_coarray, &
       prif_allocate_non_symmetric, prif_deallocate_non_symmetric, &
       prif_coarray_handle, prif_num_images
   use veggies, only: result_t, test_item_t, assert_that, assert_equals, describe, it
@@ -48,7 +48,7 @@ contains
     local_slice => null()
     result_ = assert_that(.not.associated(local_slice))
 
-    call prif_allocate( &
+    call prif_allocate_coarray( &
       lcobounds, ucobounds, lbounds, ubounds, int(storage_size(dummy_element)/8, c_size_t), c_null_funptr, &
       coarray_handle, allocated_memory)
 
@@ -58,7 +58,7 @@ contains
     local_slice = 42
     result_ = result_ .and. assert_equals(42, local_slice)
 
-    call prif_deallocate([coarray_handle])
+    call prif_deallocate_coarray([coarray_handle])
 
   end function
 
