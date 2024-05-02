@@ -10,7 +10,7 @@ module prif
   private
   public :: prif_init
   public :: prif_stop, prif_error_stop, prif_fail_image
-  public :: prif_allocate_coarray, prif_allocate_non_symmetric, prif_deallocate_coarray, prif_deallocate_non_symmetric
+  public :: prif_allocate_coarray, prif_allocate, prif_deallocate_coarray, prif_deallocate
   public :: prif_put, prif_put_raw, prif_put_raw_strided, prif_get, prif_get_raw, prif_get_raw_strided
   public :: prif_alias_create, prif_alias_destroy
   public :: prif_lcobound, prif_ucobound, prif_coshape, prif_image_index
@@ -139,7 +139,7 @@ module prif
       character(len=:), intent(inout), allocatable, optional :: errmsg_alloc
     end subroutine
 
-    module subroutine prif_allocate_non_symmetric(size_in_bytes, allocated_memory, stat, errmsg, errmsg_alloc)
+    module subroutine prif_allocate(size_in_bytes, allocated_memory, stat, errmsg, errmsg_alloc)
       implicit none
       integer(kind=c_size_t) :: size_in_bytes
       type(c_ptr), intent(out) :: allocated_memory
@@ -156,7 +156,7 @@ module prif
       character(len=:), intent(inout), allocatable, optional :: errmsg_alloc
     end subroutine
 
-    module subroutine prif_deallocate_non_symmetric(mem, stat, errmsg, errmsg_alloc)
+    module subroutine prif_deallocate(mem, stat, errmsg, errmsg_alloc)
       implicit none
       type(c_ptr), intent(in) :: mem
       integer(c_int), intent(out), optional :: stat

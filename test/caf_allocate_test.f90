@@ -1,7 +1,7 @@
 module caf_allocate_test
   use prif, only : &
       prif_allocate_coarray, prif_deallocate_coarray, &
-      prif_allocate_non_symmetric, prif_deallocate_non_symmetric, &
+      prif_allocate, prif_deallocate, &
       prif_coarray_handle, prif_num_images
   use veggies, only: result_t, test_item_t, assert_that, assert_equals, describe, it
   use iso_c_binding, only: &
@@ -68,13 +68,13 @@ contains
     type(c_ptr) :: allocated_memory
     integer(c_int), pointer :: local_slice
 
-    call prif_allocate_non_symmetric(sizeof(local_slice), allocated_memory)
+    call prif_allocate(sizeof(local_slice), allocated_memory)
     call c_f_pointer(allocated_memory, local_slice)
 
     local_slice = 42
     result_ = assert_equals(42, local_slice)
 
-    call prif_deallocate_non_symmetric(c_loc(local_slice))
+    call prif_deallocate(c_loc(local_slice))
   end function
 
 end module caf_allocate_test

@@ -54,7 +54,7 @@ contains
     allocated_memory = coarray_handle%info%coarray_data
   end procedure
 
-  module procedure prif_allocate_non_symmetric
+  module procedure prif_allocate
     allocated_memory = caf_allocate(non_symmetric_heap_mspace, size_in_bytes)
   end procedure
 
@@ -120,7 +120,7 @@ contains
     if (present(stat)) stat = 0
   end procedure
 
-  module procedure prif_deallocate_non_symmetric
+  module procedure prif_deallocate
     call caf_deallocate(non_symmetric_heap_mspace, mem)
   end procedure
 
