@@ -11,7 +11,7 @@ contains
     integer(c_int) :: image
     integer(c_intptr_t) :: remote_base, remote_ptr
 
-    call prif_image_index(coarray_handle, coindices, image_index=image)
+    call prif_image_index(coarray_handle, cosubscripts, image_index=image)
     call prif_base_pointer(coarray_handle, image, remote_base)
     remote_ptr = &
         remote_base &
@@ -40,7 +40,7 @@ contains
     integer(c_int) :: image
     integer(c_intptr_t) :: remote_base, remote_ptr
 
-    call prif_image_index(coarray_handle, coindices, image_index=image)
+    call prif_image_index(coarray_handle, cosubscripts, image_index=image)
     call prif_base_pointer(coarray_handle, image, remote_base)
     remote_ptr = &
         remote_base &

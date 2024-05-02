@@ -164,10 +164,10 @@ module prif
     end subroutine
 
     module subroutine prif_put( &
-        coarray_handle, coindices, value, first_element_addr, team, team_number, notify_ptr, stat, errmsg, errmsg_alloc)
+        coarray_handle, cosubscripts, value, first_element_addr, team, team_number, notify_ptr, stat, errmsg, errmsg_alloc)
       implicit none
       type(prif_coarray_handle), intent(in) :: coarray_handle
-      integer(c_intmax_t), intent(in) :: coindices(:)
+      integer(c_intmax_t), intent(in) :: cosubscripts(:)
       type(*), intent(in), contiguous, target :: value(..)
       type(c_ptr), intent(in) :: first_element_addr
       type(prif_team_type), optional, intent(in) :: team
@@ -208,10 +208,10 @@ module prif
     end subroutine
 
     module subroutine prif_get( &
-        coarray_handle, coindices, first_element_addr, value, team, team_number, stat, errmsg, errmsg_alloc)
+        coarray_handle, cosubscripts, first_element_addr, value, team, team_number, stat, errmsg, errmsg_alloc)
       implicit none
       type(prif_coarray_handle), intent(in) :: coarray_handle
-      integer(c_intmax_t), intent(in) :: coindices(:)
+      integer(c_intmax_t), intent(in) :: cosubscripts(:)
       type(c_ptr), intent(in) :: first_element_addr
       type(*), intent(inout), contiguous, target :: value(..)
       type(prif_team_type), optional, intent(in) :: team

@@ -60,7 +60,7 @@ contains
 
         call prif_put( &
                 coarray_handle = coarray_handle, &
-                coindices = [neighbor], &
+                cosubscripts = [neighbor], &
                 value = me, &
                 first_element_addr = allocated_memory)
         call prif_sync_all
@@ -143,7 +143,7 @@ contains
 
         call prif_get( &
                 coarray_handle = coarray_handle, &
-                coindices = [neighbor], &
+                cosubscripts = [neighbor], &
                 first_element_addr = allocated_memory, &
                 value = retrieved)
 
