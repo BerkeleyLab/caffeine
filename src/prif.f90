@@ -114,6 +114,7 @@ module prif
     end subroutine
 
     module pure subroutine prif_error_stop(quiet, stop_code_int, stop_code_char)
+      implicit none
       logical(c_bool), intent(in) :: quiet
       integer(c_int), intent(in), optional :: stop_code_int
       character(len=*), intent(in), optional :: stop_code_char
