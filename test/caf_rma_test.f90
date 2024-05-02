@@ -102,7 +102,7 @@ contains
         call prif_base_pointer(coarray_handle, neighbor, base_addr)
         call prif_put_raw( &
                 image_num = neighbor, &
-                local_buffer = c_loc(me), &
+                current_image_buffer = c_loc(me), &
                 remote_ptr = base_addr, &
                 size = int(storage_size(me)/8, c_size_t))
         call prif_sync_all
@@ -186,7 +186,7 @@ contains
 
         call prif_get_raw( &
                 image_num = neighbor, &
-                local_buffer = c_loc(retrieved), &
+                current_image_buffer = c_loc(retrieved), &
                 remote_ptr = base_addr, &
                 size = int(storage_size(retrieved)/8, c_size_t))
 
