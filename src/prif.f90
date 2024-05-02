@@ -263,23 +263,27 @@ module prif
     end subroutine
 
     module subroutine prif_lcobound_with_dim(coarray_handle, dim, lcobound)
+      implicit none
       type(prif_coarray_handle), intent(in) :: coarray_handle
       integer(kind=c_int), intent(in) :: dim
       integer(kind=c_intmax_t), intent(out) :: lcobound
     end subroutine
 
     module subroutine prif_lcobound_no_dim(coarray_handle, lcobounds)
+      implicit none
       type(prif_coarray_handle), intent(in) :: coarray_handle
       integer(kind=c_intmax_t), intent(out) :: lcobounds(:)
     end subroutine
 
     module subroutine prif_ucobound_with_dim(coarray_handle, dim, ucobound)
+      implicit none
       type(prif_coarray_handle), intent(in) :: coarray_handle
       integer(kind=c_int), intent(in) :: dim
       integer(kind=c_intmax_t), intent(out) :: ucobound
     end subroutine
 
     module subroutine prif_ucobound_no_dim(coarray_handle, ucobounds)
+      implicit none
       type(prif_coarray_handle), intent(in) :: coarray_handle
       integer(kind=c_intmax_t), intent(out) :: ucobounds(:)
     end subroutine
