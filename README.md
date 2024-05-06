@@ -67,11 +67,10 @@ Paper: <https://doi.org/10.25344/S4459B>
 
 ### Caffeine is an implementation of the Parallel Runtime Interface for Fortran (PRIF):
 
-Damian Rouson, Brad Richardson, Dan Bonachea, Katherine Rasmussen.    
-"[**Parallel Runtime Interface for Fortran (PRIF) Design Document, Revision 0.2**](https://github.com/BerkeleyLab/caffeine/wiki/pubs/PRIF_0.2.pdf)",     
-Lawrence Berkeley National Laboratory Technical Report (LBNL-2001563), December 2023.    
-<https://doi.org/10.25344/S4DG6S>
-
+Dan Bonachea, Katherine Rasmussen, Brad Richardson, Damian Rouson.    
+"[**Parallel Runtime Interface for Fortran (PRIF) Specification, Revision 0.3**](https://github.com/BerkeleyLab/caffeine/wiki/pubs/PRIF_0.3.pdf)",     
+Lawrence Berkeley National Laboratory Technical Report (LBNL-2001590), May 2024.    
+<https://doi.org/10.25344/S4501W>
 
 Documentation
 -------------
