@@ -7,7 +7,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [macOS-11, ubuntu-22.04]
+        os: [macOS-11, ubuntu-24.04]
 
     env:
       PREFIX: install
@@ -24,7 +24,7 @@ jobs:
       if: contains(matrix.os, 'ubuntu')
       run: |
         sudo apt update
-        sudo apt install -y build-essential gfortran-13 g++-13 pkg-config make
+        sudo apt install -y build-essential gfortran-14 g++-14 pkg-config make
         ./install.sh --prefix=${PREFIX}
 
     - name: Install on macOS
