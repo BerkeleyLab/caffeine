@@ -7,7 +7,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [macOS-11, ubuntu-24.04]
+        os: [macos-12, ubuntu-24.04]
 
     env:
       PREFIX: install
