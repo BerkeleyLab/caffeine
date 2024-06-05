@@ -20,7 +20,7 @@ yes | ./install.sh
 EOF
 }
 
-GCC_VERSION=13
+GCC_VERSION=14
 GASNET_VERSION="stable"
 
 list_prerequisites()
