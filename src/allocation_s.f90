@@ -14,7 +14,7 @@ submodule(prif:prif_private_s) allocation_s
 
 contains
 
-  module procedure prif_allocate
+  module procedure prif_allocate_coarray
     ! TODO: determining the size of the handle and where the coarray begins
     !       becomes a bit more complicated if we don't allocate space for
     !       15 cobounds
@@ -54,11 +54,11 @@ contains
     allocated_memory = coarray_handle%info%coarray_data
   end procedure
 
-  module procedure prif_allocate_non_symmetric
+  module procedure prif_allocate
     allocated_memory = caf_allocate(non_symmetric_heap_mspace, size_in_bytes)
   end procedure
 
-  module procedure prif_deallocate
+  module procedure prif_deallocate_coarray
     ! gfortran is yelling that this isn't valid for bind(C)
     ! https://gcc.gnu.org/bugzilla/show_bug.cgi?id=113338
     ! abstract interface
@@ -120,7 +120,7 @@ contains
     if (present(stat)) stat = 0
   end procedure
 
-  module procedure prif_deallocate_non_symmetric
+  module procedure prif_deallocate
     call caf_deallocate(non_symmetric_heap_mspace, mem)
   end procedure
 

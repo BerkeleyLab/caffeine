@@ -10,12 +10,12 @@ module prif
   private
   public :: prif_init
   public :: prif_stop, prif_error_stop, prif_fail_image
-  public :: prif_allocate, prif_allocate_non_symmetric, prif_deallocate, prif_deallocate_non_symmetric
+  public :: prif_allocate_coarray, prif_allocate, prif_deallocate_coarray, prif_deallocate
   public :: prif_put, prif_put_raw, prif_put_raw_strided, prif_get, prif_get_raw, prif_get_raw_strided
   public :: prif_alias_create, prif_alias_destroy
   public :: prif_lcobound, prif_ucobound, prif_coshape, prif_image_index
   public :: prif_this_image, prif_num_images, prif_failed_images, prif_stopped_images, prif_image_status
-  public :: prif_set_context_data, prif_get_context_data, prif_base_pointer, prif_local_data_size
+  public :: prif_set_context_data, prif_get_context_data, prif_base_pointer, prif_size_bytes
   public :: prif_co_sum, prif_co_max, prif_co_min, prif_co_reduce, prif_co_broadcast
   public :: prif_form_team, prif_change_team, prif_end_team, prif_get_team, prif_team_number
   public :: prif_sync_all, prif_sync_images, prif_sync_team, prif_sync_memory
@@ -114,6 +114,7 @@ module prif
     end subroutine
 
     module pure subroutine prif_error_stop(quiet, stop_code_int, stop_code_char)
+      implicit none
       logical(c_bool), intent(in) :: quiet
       integer(c_int), intent(in), optional :: stop_code_int
       character(len=*), intent(in), optional :: stop_code_char
@@ -123,7 +124,7 @@ module prif
       implicit none
     end subroutine
 
-    module subroutine prif_allocate( &
+    module subroutine prif_allocate_coarray( &
         lcobounds, ucobounds, lbounds, ubounds, element_length, final_func, coarray_handle, &
         allocated_memory, stat, errmsg, errmsg_alloc)
       implicit none
@@ -138,7 +139,7 @@ module prif
       character(len=:), intent(inout), allocatable, optional :: errmsg_alloc
     end subroutine
 
-    module subroutine prif_allocate_non_symmetric(size_in_bytes, allocated_memory, stat, errmsg, errmsg_alloc)
+    module subroutine prif_allocate(size_in_bytes, allocated_memory, stat, errmsg, errmsg_alloc)
       implicit none
       integer(kind=c_size_t) :: size_in_bytes
       type(c_ptr), intent(out) :: allocated_memory
@@ -147,7 +148,7 @@ module prif
       character(len=:), intent(inout), allocatable, optional :: errmsg_alloc
     end subroutine
 
-    module subroutine prif_deallocate(coarray_handles, stat, errmsg, errmsg_alloc)
+    module subroutine prif_deallocate_coarray(coarray_handles, stat, errmsg, errmsg_alloc)
       implicit none
       type(prif_coarray_handle), target, intent(in) :: coarray_handles(:)
       integer(c_int), intent(out), optional :: stat
@@ -155,7 +156,7 @@ module prif
       character(len=:), intent(inout), allocatable, optional :: errmsg_alloc
     end subroutine
 
-    module subroutine prif_deallocate_non_symmetric(mem, stat, errmsg, errmsg_alloc)
+    module subroutine prif_deallocate(mem, stat, errmsg, errmsg_alloc)
       implicit none
       type(c_ptr), intent(in) :: mem
       integer(c_int), intent(out), optional :: stat
@@ -164,10 +165,10 @@ module prif
     end subroutine
 
     module subroutine prif_put( &
-        coarray_handle, coindices, value, first_element_addr, team, team_number, notify_ptr, stat, errmsg, errmsg_alloc)
+        coarray_handle, cosubscripts, value, first_element_addr, team, team_number, notify_ptr, stat, errmsg, errmsg_alloc)
       implicit none
       type(prif_coarray_handle), intent(in) :: coarray_handle
-      integer(c_intmax_t), intent(in) :: coindices(:)
+      integer(c_intmax_t), intent(in) :: cosubscripts(:)
       type(*), intent(in), contiguous, target :: value(..)
       type(c_ptr), intent(in) :: first_element_addr
       type(prif_team_type), optional, intent(in) :: team
@@ -178,10 +179,10 @@ module prif
       character(len=:), intent(inout), allocatable, optional :: errmsg_alloc
     end subroutine
 
-    module subroutine prif_put_raw(image_num, local_buffer, remote_ptr, notify_ptr, size, stat, errmsg, errmsg_alloc)
+    module subroutine prif_put_raw(image_num, current_image_buffer, remote_ptr, notify_ptr, size, stat, errmsg, errmsg_alloc)
       implicit none
       integer(c_int), intent(in) :: image_num
-      type(c_ptr), intent(in) :: local_buffer
+      type(c_ptr), intent(in) :: current_image_buffer
       integer(c_intptr_t), intent(in) :: remote_ptr
       integer(c_intptr_t), optional, intent(in) :: notify_ptr
       integer(c_size_t), intent(in) :: size
@@ -191,16 +192,16 @@ module prif
     end subroutine
 
     module subroutine prif_put_raw_strided( &
-        image_num, local_buffer, remote_ptr, element_size, extent, remote_ptr_stride, &
-        local_buffer_stride, notify_ptr, stat, errmsg, errmsg_alloc)
+        image_num, current_image_buffer, remote_ptr, element_size, extent, remote_ptr_stride, &
+        current_image_buffer_stride, notify_ptr, stat, errmsg, errmsg_alloc)
       implicit none
       integer(c_int), intent(in) :: image_num
-      type(c_ptr), intent(in) :: local_buffer
+      type(c_ptr), intent(in) :: current_image_buffer
       integer(c_intptr_t), intent(in) :: remote_ptr
       integer(c_size_t), intent(in) :: element_size
       integer(c_size_t), intent(in) :: extent(:)
       integer(c_ptrdiff_t), intent(in) :: remote_ptr_stride(:)
-      integer(c_ptrdiff_t), intent(in) :: local_buffer_stride(:)
+      integer(c_ptrdiff_t), intent(in) :: current_image_buffer_stride(:)
       integer(c_intptr_t), optional, intent(in) :: notify_ptr
       integer(c_int), intent(out), optional :: stat
       character(len=*), intent(inout), optional :: errmsg
@@ -208,10 +209,10 @@ module prif
     end subroutine
 
     module subroutine prif_get( &
-        coarray_handle, coindices, first_element_addr, value, team, team_number, stat, errmsg, errmsg_alloc)
+        coarray_handle, cosubscripts, first_element_addr, value, team, team_number, stat, errmsg, errmsg_alloc)
       implicit none
       type(prif_coarray_handle), intent(in) :: coarray_handle
-      integer(c_intmax_t), intent(in) :: coindices(:)
+      integer(c_intmax_t), intent(in) :: cosubscripts(:)
       type(c_ptr), intent(in) :: first_element_addr
       type(*), intent(inout), contiguous, target :: value(..)
       type(prif_team_type), optional, intent(in) :: team
@@ -221,10 +222,10 @@ module prif
       character(len=:), intent(inout), allocatable, optional :: errmsg_alloc
     end subroutine
 
-    module subroutine prif_get_raw(image_num, local_buffer, remote_ptr, size, stat, errmsg, errmsg_alloc)
+    module subroutine prif_get_raw(image_num, current_image_buffer, remote_ptr, size, stat, errmsg, errmsg_alloc)
       implicit none
       integer(c_int), intent(in) :: image_num
-      type(c_ptr), intent(in) :: local_buffer
+      type(c_ptr), intent(in) :: current_image_buffer
       integer(c_intptr_t), intent(in) :: remote_ptr
       integer(c_size_t), intent(in) :: size
       integer(c_int), intent(out), optional :: stat
@@ -233,16 +234,16 @@ module prif
     end subroutine
 
     module subroutine prif_get_raw_strided( &
-        image_num, local_buffer, remote_ptr, element_size, extent, remote_ptr_stride, local_buffer_stride, &
+        image_num, current_image_buffer, remote_ptr, element_size, extent, remote_ptr_stride, current_image_buffer_stride, &
         stat, errmsg, errmsg_alloc)
       implicit none
       integer(c_int), intent(in) :: image_num
-      type(c_ptr), intent(in) :: local_buffer
+      type(c_ptr), intent(in) :: current_image_buffer
       integer(c_intptr_t), intent(in) :: remote_ptr
       integer(c_size_t), intent(in) :: element_size
       integer(c_size_t), intent(in) :: extent(:)
       integer(c_ptrdiff_t), intent(in) :: remote_ptr_stride(:)
-      integer(c_ptrdiff_t), intent(in) :: local_buffer_stride(:)
+      integer(c_ptrdiff_t), intent(in) :: current_image_buffer_stride(:)
       integer(c_int), intent(out), optional :: stat
       character(len=*), intent(inout), optional :: errmsg
       character(len=:), intent(inout), allocatable, optional :: errmsg_alloc
@@ -262,23 +263,27 @@ module prif
     end subroutine
 
     module subroutine prif_lcobound_with_dim(coarray_handle, dim, lcobound)
+      implicit none
       type(prif_coarray_handle), intent(in) :: coarray_handle
       integer(kind=c_int), intent(in) :: dim
       integer(kind=c_intmax_t), intent(out) :: lcobound
     end subroutine
 
     module subroutine prif_lcobound_no_dim(coarray_handle, lcobounds)
+      implicit none
       type(prif_coarray_handle), intent(in) :: coarray_handle
       integer(kind=c_intmax_t), intent(out) :: lcobounds(:)
     end subroutine
 
     module subroutine prif_ucobound_with_dim(coarray_handle, dim, ucobound)
+      implicit none
       type(prif_coarray_handle), intent(in) :: coarray_handle
       integer(kind=c_int), intent(in) :: dim
       integer(kind=c_intmax_t), intent(out) :: ucobound
     end subroutine
 
     module subroutine prif_ucobound_no_dim(coarray_handle, ucobounds)
+      implicit none
       type(prif_coarray_handle), intent(in) :: coarray_handle
       integer(kind=c_intmax_t), intent(out) :: ucobounds(:)
     end subroutine
@@ -343,7 +348,7 @@ module prif
       integer(c_intptr_t), intent(out) :: ptr
     end subroutine
 
-    module subroutine prif_local_data_size(coarray_handle, data_size)
+    module subroutine prif_size_bytes(coarray_handle, data_size)
       implicit none
       type(prif_coarray_handle), intent(in) :: coarray_handle
       integer(c_size_t), intent(out) :: data_size

@@ -121,7 +121,7 @@
     </div>
     
     <div class="col-md-9" id='text'>
-    <h2>module procedure prif_get <small>module module subroutine prif_get(coarray_handle, coindices, first_element_addr, value, team, team_number, stat, errmsg, errmsg_alloc)</small>   <a href='../interface/prif_get.html'><button type="button" class="btn btn-info depwarn">Interface &rarr;</button></a>
+    <h2>module procedure prif_get <small>module module subroutine prif_get(coarray_handle, cosubscripts, first_element_addr, value, team, team_number, stat, errmsg, errmsg_alloc)</small>   <a href='../interface/prif_get.html'><button type="button" class="btn btn-info depwarn">Interface &rarr;</button></a>
 </h2>
     
 
@@ -137,10 +137,10 @@
   <td><strong>coarray_handle</strong></td><td></td>
 </tr>
 <tr>
-  <td><span class="anchor" id="variable-coindices"></span>integer(kind=c_intmax_t),</td>
+  <td><span class="anchor" id="variable-cosubscripts"></span>integer(kind=c_intmax_t),</td>
 <td>intent(in)</td>
   <td></td>  <td></td><td>::</td>
-  <td><strong>coindices</strong>(:)</td><td></td>
+  <td><strong>cosubscripts</strong>(:)</td><td></td>
 </tr>
 <tr>
   <td><span class="anchor" id="variable-first_element_addr"></span>type(c_ptr),</td>
@@ -240,35 +240,35 @@
 <path fill="none" stroke="#ff0000" d="M54.04,-79.82C61.83,-81.26 70.72,-82.9 79.78,-84.58"/>
 <polygon fill="#ff0000" stroke="#ff0000" points="79.16,-88.03 89.63,-86.4 80.43,-81.14 79.16,-88.03"/>
 </g>
-<!-- interface~prif_get_raw -->
-<g id="proc~~prif_get~~CallsGraph_node4" class="node">
-<title>interface~prif_get_raw</title>
-<g id="a_proc~~prif_get~~CallsGraph_node4"><a xlink:href=".././interface/prif_get_raw.html" xlink:title="prif_get_raw">
-<polygon fill="#a7506f" stroke="#a7506f" points="181.5,-66 103.5,-66 103.5,-42 181.5,-42 181.5,-66"/>
-<text text-anchor="middle" x="142.5" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">prif_get_raw</text>
-</a>
-</g>
-</g>
-<!-- proc~prif_get&#45;&gt;interface~prif_get_raw -->
-<g id="proc~~prif_get~~CallsGraph_edge3" class="edge">
-<title>proc~prif_get&#45;&gt;interface~prif_get_raw</title>
-<path fill="none" stroke="#ff0000" d="M54.04,-70.18C65.62,-68.04 79.64,-65.45 93.03,-62.97"/>
-<polygon fill="#ff0000" stroke="#ff0000" points="93.9,-66.37 103.09,-61.11 92.62,-59.48 93.9,-66.37"/>
-</g>
 <!-- interface~caf_as_int -->
-<g id="proc~~prif_get~~CallsGraph_node5" class="node">
+<g id="proc~~prif_get~~CallsGraph_node4" class="node">
 <title>interface~caf_as_int</title>
-<g id="a_proc~~prif_get~~CallsGraph_node5"><a xlink:href=".././interface/caf_as_int.html" xlink:title="caf_as_int">
-<polygon fill="#a7506f" stroke="#a7506f" points="175,-24 110,-24 110,0 175,0 175,-24"/>
-<text text-anchor="middle" x="142.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">caf_as_int</text>
+<g id="a_proc~~prif_get~~CallsGraph_node4"><a xlink:href=".././interface/caf_as_int.html" xlink:title="caf_as_int">
+<polygon fill="#a7506f" stroke="#a7506f" points="175,-66 110,-66 110,-42 175,-42 175,-66"/>
+<text text-anchor="middle" x="142.5" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">caf_as_int</text>
 </a>
 </g>
 </g>
 <!-- proc~prif_get&#45;&gt;interface~caf_as_int -->
-<g id="proc~~prif_get~~CallsGraph_edge4" class="edge">
+<g id="proc~~prif_get~~CallsGraph_edge3" class="edge">
 <title>proc~prif_get&#45;&gt;interface~caf_as_int</title>
-<path fill="none" stroke="#ff0000" d="M43.74,-62.99C55.94,-54.02 73.49,-41.83 90,-33 93.45,-31.16 97.09,-29.37 100.78,-27.67"/>
-<polygon fill="#ff0000" stroke="#ff0000" points="102.22,-30.86 109.97,-23.64 99.41,-24.45 102.22,-30.86"/>
+<path fill="none" stroke="#ff0000" d="M54.04,-70.18C67.55,-67.68 84.37,-64.57 99.65,-61.74"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="100.72,-65.1 109.92,-59.84 99.45,-58.22 100.72,-65.1"/>
+</g>
+<!-- interface~prif_get_raw -->
+<g id="proc~~prif_get~~CallsGraph_node5" class="node">
+<title>interface~prif_get_raw</title>
+<g id="a_proc~~prif_get~~CallsGraph_node5"><a xlink:href=".././interface/prif_get_raw.html" xlink:title="prif_get_raw">
+<polygon fill="#a7506f" stroke="#a7506f" points="181.5,-24 103.5,-24 103.5,0 181.5,0 181.5,-24"/>
+<text text-anchor="middle" x="142.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">prif_get_raw</text>
+</a>
+</g>
+</g>
+<!-- proc~prif_get&#45;&gt;interface~prif_get_raw -->
+<g id="proc~~prif_get~~CallsGraph_edge4" class="edge">
+<title>proc~prif_get&#45;&gt;interface~prif_get_raw</title>
+<path fill="none" stroke="#ff0000" d="M43.74,-62.99C55.94,-54.02 73.49,-41.83 90,-33 93.07,-31.36 96.3,-29.76 99.58,-28.23"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="101.16,-31.35 108.88,-24.1 98.32,-24.96 101.16,-31.35"/>
 </g>
 <!-- proc~prif_image_index -->
 <g id="proc~~prif_get~~CallsGraph_node6" class="node">
@@ -286,9 +286,9 @@
 <polygon fill="#ff0000" stroke="#ff0000" points="221.73,-141.5 231.73,-138 221.73,-134.5 221.73,-141.5"/>
 </g>
 <!-- proc~prif_base_pointer -->
-<g id="proc~~prif_get~~CallsGraph_node7" class="node">
+<g id="proc~~prif_get~~CallsGraph_node8" class="node">
 <title>proc~prif_base_pointer</title>
-<g id="a_proc~~prif_get~~CallsGraph_node7"><a xlink:href=".././proc/prif_base_pointer.html" xlink:title="prif_base_pointer">
+<g id="a_proc~~prif_get~~CallsGraph_node8"><a xlink:href=".././proc/prif_base_pointer.html" xlink:title="prif_base_pointer">
 <polygon fill="#d9534f" stroke="#d9534f" points="336,-108 231,-108 231,-84 336,-84 336,-108"/>
 <text text-anchor="middle" x="283.5" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">prif_base_pointer</text>
 </a>
@@ -301,19 +301,19 @@
 <polygon fill="#7fff00" stroke="#7fff00" points="220.7,-99.5 230.7,-96 220.7,-92.5 220.7,-99.5"/>
 </g>
 <!-- proc~prif_get_raw -->
-<g id="proc~~prif_get~~CallsGraph_node8" class="node">
+<g id="proc~~prif_get~~CallsGraph_node7" class="node">
 <title>proc~prif_get_raw</title>
-<g id="a_proc~~prif_get~~CallsGraph_node8"><a xlink:href=".././proc/prif_get_raw.html" xlink:title="prif_get_raw">
-<polygon fill="#d9534f" stroke="#d9534f" points="322.5,-45 244.5,-45 244.5,-21 322.5,-21 322.5,-45"/>
-<text text-anchor="middle" x="283.5" y="-30.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">prif_get_raw</text>
+<g id="a_proc~~prif_get~~CallsGraph_node7"><a xlink:href=".././proc/prif_get_raw.html" xlink:title="prif_get_raw">
+<polygon fill="#d9534f" stroke="#d9534f" points="322.5,-24 244.5,-24 244.5,0 322.5,0 322.5,-24"/>
+<text text-anchor="middle" x="283.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">prif_get_raw</text>
 </a>
 </g>
 </g>
 <!-- interface~prif_get_raw&#45;&gt;proc~prif_get_raw -->
 <g id="proc~~prif_get~~CallsGraph_edge7" class="edge">
 <title>interface~prif_get_raw&#45;&gt;proc~prif_get_raw</title>
-<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M181.85,-48.21C197.95,-45.77 216.87,-42.92 233.93,-40.34"/>
-<polygon fill="#00ffff" stroke="#00ffff" points="234.91,-43.73 244.27,-38.78 233.86,-36.81 234.91,-43.73"/>
+<path fill="none" stroke="#7f00ff" stroke-dasharray="5,2" d="M181.85,-12C197.95,-12 216.87,-12 233.93,-12"/>
+<polygon fill="#7f00ff" stroke="#7f00ff" points="234.27,-15.5 244.27,-12 234.27,-8.5 234.27,-15.5"/>
 </g>
 <!-- interface~prif_num_images -->
 <g id="proc~~prif_get~~CallsGraph_node9" class="node">
@@ -330,26 +330,41 @@
 <path fill="none" stroke="#ff0000" d="M335.09,-138C348.69,-138 363.54,-138 377.65,-138"/>
 <polygon fill="#ff0000" stroke="#ff0000" points="377.77,-141.5 387.77,-138 377.77,-134.5 377.77,-141.5"/>
 </g>
-<!-- proc~prif_base_pointer&#45;&gt;interface~prif_num_images -->
+<!-- interface~caf_get -->
+<g id="proc~~prif_get~~CallsGraph_node10" class="node">
+<title>interface~caf_get</title>
+<g id="a_proc~~prif_get~~CallsGraph_node10"><a xlink:href=".././interface/caf_get.html" xlink:title="caf_get">
+<polygon fill="#a7506f" stroke="#a7506f" points="467,-24 413,-24 413,0 467,0 467,-24"/>
+<text text-anchor="middle" x="440" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">caf_get</text>
+</a>
+</g>
+</g>
+<!-- proc~prif_get_raw&#45;&gt;interface~caf_get -->
 <g id="proc~~prif_get~~CallsGraph_edge9" class="edge">
+<title>proc~prif_get_raw&#45;&gt;interface~caf_get</title>
+<path fill="none" stroke="#00ff00" d="M322.69,-12C347.13,-12 378.65,-12 402.71,-12"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="402.86,-15.5 412.86,-12 402.86,-8.5 402.86,-15.5"/>
+</g>
+<!-- proc~prif_base_pointer&#45;&gt;interface~prif_num_images -->
+<g id="proc~~prif_get~~CallsGraph_edge10" class="edge">
 <title>proc~prif_base_pointer&#45;&gt;interface~prif_num_images</title>
-<path fill="none" stroke="#00ff00" d="M328.77,-108.04C346.31,-112.8 366.64,-118.33 385.02,-123.33"/>
-<polygon fill="#00ff00" stroke="#00ff00" points="384.15,-126.72 394.72,-125.96 385.99,-119.96 384.15,-126.72"/>
+<path fill="none" stroke="#0000ff" d="M328.77,-108.04C346.31,-112.8 366.64,-118.33 385.02,-123.33"/>
+<polygon fill="#0000ff" stroke="#0000ff" points="384.15,-126.72 394.72,-125.96 385.99,-119.96 384.15,-126.72"/>
 </g>
 <!-- interface~assert -->
-<g id="proc~~prif_get~~CallsGraph_node10" class="node">
+<g id="proc~~prif_get~~CallsGraph_node11" class="node">
 <title>interface~assert</title>
-<g id="a_proc~~prif_get~~CallsGraph_node10"><a xlink:href=".././interface/assert.html" xlink:title="assert">
+<g id="a_proc~~prif_get~~CallsGraph_node11"><a xlink:href=".././interface/assert.html" xlink:title="assert">
 <polygon fill="#a7506f" stroke="#a7506f" points="467,-108 413,-108 413,-84 467,-84 467,-108"/>
 <text text-anchor="middle" x="440" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">assert</text>
 </a>
 </g>
 </g>
 <!-- proc~prif_base_pointer&#45;&gt;interface~assert -->
-<g id="proc~~prif_get~~CallsGraph_edge10" class="edge">
+<g id="proc~~prif_get~~CallsGraph_edge11" class="edge">
 <title>proc~prif_base_pointer&#45;&gt;interface~assert</title>
-<path fill="none" stroke="#00ff00" d="M336.38,-96C358.07,-96 382.78,-96 402.51,-96"/>
-<polygon fill="#00ff00" stroke="#00ff00" points="402.62,-99.5 412.62,-96 402.62,-92.5 402.62,-99.5"/>
+<path fill="none" stroke="#0000ff" d="M336.38,-96C358.07,-96 382.78,-96 402.51,-96"/>
+<polygon fill="#0000ff" stroke="#0000ff" points="402.62,-99.5 412.62,-96 402.62,-92.5 402.62,-99.5"/>
 </g>
 <!-- interface~caf_convert_base_addr -->
 <g id="proc~~prif_get~~CallsGraph_node12" class="node">
@@ -361,25 +376,10 @@
 </g>
 </g>
 <!-- proc~prif_base_pointer&#45;&gt;interface~caf_convert_base_addr -->
-<g id="proc~~prif_get~~CallsGraph_edge11" class="edge">
-<title>proc~prif_base_pointer&#45;&gt;interface~caf_convert_base_addr</title>
-<path fill="none" stroke="#00ff00" d="M328.77,-83.96C346.31,-79.2 366.64,-73.67 385.02,-68.67"/>
-<polygon fill="#00ff00" stroke="#00ff00" points="385.99,-72.04 394.72,-66.04 384.15,-65.28 385.99,-72.04"/>
-</g>
-<!-- interface~caf_get -->
-<g id="proc~~prif_get~~CallsGraph_node11" class="node">
-<title>interface~caf_get</title>
-<g id="a_proc~~prif_get~~CallsGraph_node11"><a xlink:href=".././interface/caf_get.html" xlink:title="caf_get">
-<polygon fill="#a7506f" stroke="#a7506f" points="467,-24 413,-24 413,0 467,0 467,-24"/>
-<text text-anchor="middle" x="440" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">caf_get</text>
-</a>
-</g>
-</g>
-<!-- proc~prif_get_raw&#45;&gt;interface~caf_get -->
 <g id="proc~~prif_get~~CallsGraph_edge12" class="edge">
-<title>proc~prif_get_raw&#45;&gt;interface~caf_get</title>
-<path fill="none" stroke="#0000ff" d="M322.69,-27.81C347.13,-24.49 378.65,-20.2 402.71,-16.93"/>
-<polygon fill="#0000ff" stroke="#0000ff" points="403.42,-20.37 412.86,-15.55 402.48,-13.43 403.42,-20.37"/>
+<title>proc~prif_base_pointer&#45;&gt;interface~caf_convert_base_addr</title>
+<path fill="none" stroke="#0000ff" d="M328.77,-83.96C346.31,-79.2 366.64,-73.67 385.02,-68.67"/>
+<polygon fill="#0000ff" stroke="#0000ff" points="385.99,-72.04 394.72,-66.04 384.15,-65.28 385.99,-72.04"/>
 </g>
 <!-- proc~prif_num_images -->
 <g id="proc~~prif_get~~CallsGraph_node13" class="node">
@@ -408,8 +408,8 @@
 <!-- interface~assert&#45;&gt;proc~assert -->
 <g id="proc~~prif_get~~CallsGraph_edge14" class="edge">
 <title>interface~assert&#45;&gt;proc~assert</title>
-<path fill="none" stroke="#7fff00" stroke-dasharray="5,2" d="M467.12,-96C492.23,-96 530.41,-96 558.52,-96"/>
-<polygon fill="#7fff00" stroke="#7fff00" points="558.75,-99.5 568.75,-96 558.75,-92.5 558.75,-99.5"/>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M467.12,-96C492.23,-96 530.41,-96 558.52,-96"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="558.75,-99.5 568.75,-96 558.75,-92.5 558.75,-99.5"/>
 </g>
 <!-- interface~caf_num_images -->
 <g id="proc~~prif_get~~CallsGraph_node15" class="node">
@@ -699,7 +699,7 @@
           <p class="text-right">
             Documentation generated by 
             <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
- on 2024-06-10 23:40            </p>
+ on 2024-06-10 23:46            </p>
         </div>
       </div>
       <br>
