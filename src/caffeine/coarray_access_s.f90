@@ -11,7 +11,7 @@ contains
     integer(c_int) :: image
     integer(c_intptr_t) :: remote_base, remote_ptr
 
-    call prif_image_index(coarray_handle, coindices, image_index=image)
+    call prif_image_index(coarray_handle, cosubscripts, image_index=image)
     call prif_base_pointer(coarray_handle, image, remote_base)
     remote_ptr = &
         remote_base &
@@ -19,7 +19,7 @@ contains
         - caf_as_int(coarray_handle%info%coarray_data))
     call prif_put_raw( &
         image_num = image, &
-        local_buffer = c_loc(value), &
+        current_image_buffer = c_loc(value), &
         remote_ptr = remote_ptr, &
         size = size(value) * coarray_handle%info%element_length)
   end procedure
@@ -28,7 +28,7 @@ contains
     call caf_put( &
         image = image_num, &
         dest = remote_ptr, &
-        src = local_buffer, &
+        src = current_image_buffer, &
         size = size)
   end procedure
 
@@ -40,7 +40,7 @@ contains
     integer(c_int) :: image
     integer(c_intptr_t) :: remote_base, remote_ptr
 
-    call prif_image_index(coarray_handle, coindices, image_index=image)
+    call prif_image_index(coarray_handle, cosubscripts, image_index=image)
     call prif_base_pointer(coarray_handle, image, remote_base)
     remote_ptr = &
         remote_base &
@@ -48,7 +48,7 @@ contains
         - caf_as_int(coarray_handle%info%coarray_data))
     call prif_get_raw( &
         image_num = image, &
-        local_buffer = c_loc(value), &
+        current_image_buffer = c_loc(value), &
         remote_ptr = remote_ptr, &
         size = size(value) * coarray_handle%info%element_length)
   end procedure
@@ -56,7 +56,7 @@ contains
   module procedure prif_get_raw
     call caf_get( &
         image = image_num, &
-        dest = local_buffer, &
+        dest = current_image_buffer, &
         src = remote_ptr, &
         size = size)
   end procedure

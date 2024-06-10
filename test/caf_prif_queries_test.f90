@@ -1,6 +1,6 @@
 module caf_prif_queries_test
   use prif, only : &
-      prif_allocate, prif_deallocate, prif_coarray_handle, prif_num_images, prif_this_image, prif_base_pointer
+      prif_allocate_coarray, prif_deallocate_coarray, prif_coarray_handle, prif_num_images, prif_this_image, prif_base_pointer
   use veggies, only: result_t, test_item_t, assert_that, describe, it
   use iso_c_binding, only: c_ptr, c_int, c_intmax_t, c_size_t, c_null_funptr, c_intptr_t
 
@@ -37,14 +37,14 @@ contains
     call prif_num_images(image_count=num_imgs)
     ucobounds(1) = num_imgs
 
-    call prif_allocate( &
+    call prif_allocate_coarray( &
       [1_c_intmax_t], ucobounds, [integer(kind=c_intmax_t) ::], [integer(kind=c_intmax_t) ::], 1_c_size_t, c_null_funptr, &
       coarray_handle, allocated_mem)
 
     call prif_base_pointer(coarray_handle, num_imgs, ptr)
     result_ = assert_that(ptr .ne. 0)
 
-    call prif_deallocate([coarray_handle])
+    call prif_deallocate_coarray([coarray_handle])
 
   end function
 
@@ -62,7 +62,7 @@ contains
     ucobounds(1) = num_imgs
     call prif_this_image(image_index=this_img)
 
-    call prif_allocate( &
+    call prif_allocate_coarray( &
       [1_c_intmax_t], ucobounds, [integer(kind=c_intmax_t) ::], [integer(kind=c_intmax_t) ::], 1_c_size_t, c_null_funptr, &
       coarray_handle, allocated_mem)
 
@@ -70,7 +70,7 @@ contains
 
     result_ = assert_that(transfer(allocated_mem,ptr) .eq. ptr)
 
-    call prif_deallocate([coarray_handle])
+    call prif_deallocate_coarray([coarray_handle])
   end function
 
   function check_base_pointer_returns_zero() result(result_)
@@ -87,7 +87,7 @@ contains
     ucobounds(1) = num_imgs
     call prif_this_image(image_index=this_img)
 
-    call prif_allocate( &
+    call prif_allocate_coarray( &
       [1_c_intmax_t], ucobounds, [integer(kind=c_intmax_t) ::], [integer(kind=c_intmax_t) ::], 1_c_size_t, c_null_funptr, &
       coarray_handle, allocated_mem)
 
@@ -95,7 +95,7 @@ contains
 
     result_ = assert_that(ptr .eq. 0)
 
-    call prif_deallocate([coarray_handle])
+    call prif_deallocate_coarray([coarray_handle])
   end function
 
 end module caf_prif_queries_test

@@ -1,6 +1,6 @@
 module caf_image_index_test
     use iso_c_binding, only: c_int, c_intmax_t, c_ptr, c_size_t, c_null_funptr
-    use prif, only: prif_coarray_handle, prif_allocate, prif_deallocate, prif_image_index, prif_num_images
+    use prif, only: prif_coarray_handle, prif_allocate_coarray, prif_deallocate_coarray, prif_image_index, prif_num_images
     use veggies, only: result_t, test_item_t, assert_equals, describe, it
 
     implicit none
@@ -26,7 +26,7 @@ contains
         type(c_ptr) :: allocated_memory
         integer(c_int) :: answer
 
-        call prif_allocate( &
+        call prif_allocate_coarray( &
                 lcobounds = [1_c_intmax_t], &
                 ucobounds = [2_c_intmax_t], &
                 lbounds = [integer(c_intmax_t)::], &
@@ -37,7 +37,7 @@ contains
                 allocated_memory = allocated_memory)
         call prif_image_index(coarray_handle, [1_c_intmax_t], image_index=answer)
         result_ = assert_equals(1_c_int, answer)
-        call prif_deallocate([coarray_handle])
+        call prif_deallocate_coarray([coarray_handle])
     end function
 
     function check_lower_bounds() result(result_)
@@ -47,7 +47,7 @@ contains
         type(c_ptr) :: allocated_memory
         integer(c_int) :: answer
 
-        call prif_allocate( &
+        call prif_allocate_coarray( &
                 lcobounds = [2_c_intmax_t, 3_c_intmax_t], &
                 ucobounds = [3_c_intmax_t, 4_c_intmax_t], &
                 lbounds = [integer(c_intmax_t)::], &
@@ -58,7 +58,7 @@ contains
                 allocated_memory = allocated_memory)
         call prif_image_index(coarray_handle, [2_c_intmax_t, 3_c_intmax_t], image_index=answer)
         result_ = assert_equals(1_c_int, answer)
-        call prif_deallocate([coarray_handle])
+        call prif_deallocate_coarray([coarray_handle])
     end function
 
     function check_invalid_subscripts() result(result_)
@@ -68,7 +68,7 @@ contains
         type(c_ptr) :: allocated_memory
         integer(c_int) :: answer
 
-        call prif_allocate( &
+        call prif_allocate_coarray( &
                 lcobounds = [-2_c_intmax_t, 2_c_intmax_t], &
                 ucobounds = [2_c_intmax_t, 6_c_intmax_t], &
                 lbounds = [integer(c_intmax_t)::], &
@@ -79,7 +79,7 @@ contains
                 allocated_memory = allocated_memory)
         call prif_image_index(coarray_handle, [-1_c_intmax_t, 1_c_intmax_t], image_index=answer)
         result_ = assert_equals(0_c_int, answer)
-        call prif_deallocate([coarray_handle])
+        call prif_deallocate_coarray([coarray_handle])
     end function
 
     function check_complicated() result(result_)
@@ -90,7 +90,7 @@ contains
         integer(c_int) :: answer, ni
 
         call prif_num_images(image_count=ni)
-        call prif_allocate( &
+        call prif_allocate_coarray( &
                 lcobounds = [1_c_intmax_t, 2_c_intmax_t], &
                 ucobounds = [2_c_intmax_t, 3_c_intmax_t], &
                 lbounds = [integer(c_intmax_t)::], &
@@ -101,6 +101,6 @@ contains
                 allocated_memory = allocated_memory)
         call prif_image_index(coarray_handle, [1_c_intmax_t, 3_c_intmax_t], image_index=answer)
         result_ = assert_equals(merge(3_c_int,0_c_int,ni >= 3), answer)
-        call prif_deallocate([coarray_handle])
+        call prif_deallocate_coarray([coarray_handle])
     end function
 end module
