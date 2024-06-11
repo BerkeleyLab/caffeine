@@ -668,4 +668,17 @@ module prif
     integer(c_intmax_t) :: lcobounds(15), ucobounds(15)
   end type
 
+  integer(c_int), parameter, public :: &
+    PRIF_CURRENT_TEAM               = 101, &
+    PRIF_INITIAL_TEAM               = 102, &
+    PRIF_PARENT_TEAM                = 103, &
+    PRIF_STAT_FAILED_IMAGE          = 201, &
+    PRIF_STAT_LOCKED                = 202, &
+    PRIF_STAT_LOCKED_OTHER_IMAGE    = 203, &
+    PRIF_STAT_STOPPED_IMAGE         = 204, &
+    PRIF_STAT_UNLOCKED              = 205, &
+    PRIF_STAT_UNLOCKED_FAILED_IMAGE = 206, &
+    PRIF_STAT_OUT_OF_MEMORY         = 301, &
+    PRIF_STAT_ALREADY_INIT          = 302
+
 end module prif
