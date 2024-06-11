@@ -1,5 +1,5 @@
 module a00_caffeinate_test
-    use prif, only : prif_init
+    use prif, only : prif_init, PRIF_STAT_ALREADY_INIT
     use veggies, only: test_item_t, describe, result_t, it, assert_that
 
     implicit none
@@ -13,7 +13,9 @@ contains
 
         tests = describe( &
            "A caffeinated beverage", &
-           [ it("is served: the caffeinate() initiation function completes successfully.", check_caffeination) &
+           [ it("is served: the prif_init() function completes successfully.", check_caffeination) &
+           , it("a subsequent prif_init call returns PRIF_STAT_ALREADY_INIT", &
+              check_subsequent_prif_init_call) &
         ])
     end function
 
@@ -25,6 +27,16 @@ contains
 
         call prif_init(init_exit_code)
         result_ = assert_that(init_exit_code == successful_initiation)
+    end function
+
+    function check_subsequent_prif_init_call() result(result_)
+        type(result_t) :: result_
+
+        integer :: stat
+
+        call prif_init(stat)
+        call prif_init(stat)
+        result_ = assert_that(stat == PRIF_STAT_ALREADY_INIT)
     end function
 
 end module a00_caffeinate_test
