@@ -101,9 +101,9 @@ module prif
 
   interface
 
-    module subroutine prif_init(exit_code)
+    module subroutine prif_init(stat)
       implicit none
-      integer(c_int), intent(out) :: exit_code
+      integer(c_int), intent(out) :: stat
     end subroutine
 
     module subroutine prif_stop(quiet, stop_code_int, stop_code_char)
