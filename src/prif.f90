@@ -15,7 +15,8 @@ module prif
   public :: prif_alias_create, prif_alias_destroy
   public :: prif_lcobound, prif_ucobound, prif_coshape, prif_image_index
   public :: prif_this_image_no_coarray, prif_this_image_with_coarray, prif_this_image_with_dim
-  public :: prif_num_images, prif_failed_images, prif_stopped_images, prif_image_status
+  public :: prif_num_images, prif_num_images_with_team, prif_num_images_with_team_number
+  public :: prif_failed_images, prif_stopped_images, prif_image_status
   public :: prif_set_context_data, prif_get_context_data, prif_base_pointer, prif_size_bytes
   public :: prif_co_sum, prif_co_max, prif_co_min, prif_co_reduce, prif_co_broadcast
   public :: prif_form_team, prif_change_team, prif_end_team, prif_get_team, prif_team_number
