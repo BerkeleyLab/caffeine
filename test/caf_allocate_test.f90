@@ -40,7 +40,7 @@ contains
     type(c_ptr) :: allocated_memory
     integer, pointer :: local_slice
 
-    call prif_num_images(image_count=num_imgs)
+    call prif_num_images(num_images=num_imgs)
     lcobounds(1) = 1
     ucobounds(1) = num_imgs
 

@@ -89,7 +89,7 @@ contains
         type(c_ptr) :: allocated_memory
         integer(c_int) :: answer, ni
 
-        call prif_num_images(image_count=ni)
+        call prif_num_images(num_images=ni)
         call prif_allocate_coarray( &
                 lcobounds = [1_c_intmax_t, 2_c_intmax_t], &
                 ucobounds = [2_c_intmax_t, 3_c_intmax_t], &

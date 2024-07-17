@@ -56,7 +56,7 @@ contains
     integer :: me, ni
 
     call prif_this_image(image_index=me)
-    call prif_num_images(image_count=ni)
+    call prif_num_images(num_images=ni)
     object = object_t(me, .false., "gooey", me*(1.,0.))
     call prif_co_broadcast(object, source_image=ni)
     associate(expected_object => object_t(ni, .false., "gooey", ni*(1.,0.)))

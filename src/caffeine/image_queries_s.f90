@@ -7,8 +7,15 @@ submodule(prif:prif_private_s) image_queries_s
 contains
 
   module procedure prif_num_images
-    ! TODO: handle optional args `team` and `team_number`
-    image_count = caf_num_images(current_team%gex_team)
+    num_images = caf_num_images(current_team%gex_team)
+  end procedure
+
+  module procedure prif_num_images_with_team
+    call unimplemented("prif_num_images_with_team")
+  end procedure
+
+  module procedure prif_num_images_with_team_number
+    call unimplemented("prif_num_images_with_team_number")
   end procedure
 
   module procedure prif_this_image_no_coarray

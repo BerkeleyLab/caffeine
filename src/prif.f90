@@ -303,11 +303,21 @@ module prif
       integer(c_int), intent(out) :: image_index
     end subroutine
 
-    module subroutine prif_num_images(team, team_number, image_count)
+    module subroutine prif_num_images(num_images)
       implicit none
-      type(prif_team_type), intent(in), optional :: team
-      integer(c_intmax_t), intent(in), optional :: team_number
-      integer(c_int), intent(out) :: image_count
+      integer(c_int), intent(out) :: num_images
+    end subroutine
+
+    module subroutine prif_num_images_with_team(team, num_images)
+      implicit none
+      type(prif_team_type), intent(in) :: team
+      integer(c_int), intent(out) :: num_images
+    end subroutine
+
+    module subroutine prif_num_images_with_team_number(team_number, num_images)
+      implicit none
+      integer(c_intmax_t), intent(in) :: team_number
+      integer(c_int), intent(out) :: num_images
     end subroutine
 
     module subroutine prif_failed_images(team, failed_images)

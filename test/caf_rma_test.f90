@@ -40,7 +40,7 @@ contains
         integer, pointer :: local_slice
         integer(c_intmax_t) :: lcobounds(1), ucobounds(1), neighbor
 
-        call prif_num_images(image_count=num_imgs)
+        call prif_num_images(num_images=num_imgs)
         lcobounds(1) = 1
         ucobounds(1) = num_imgs
         call prif_allocate_coarray( &
@@ -81,7 +81,7 @@ contains
         integer(c_intmax_t) :: lcobounds(1), ucobounds(1)
         integer(c_intptr_t) :: base_addr
 
-        call prif_num_images(image_count=num_imgs)
+        call prif_num_images(num_images=num_imgs)
         lcobounds(1) = 1
         ucobounds(1) = num_imgs
         call prif_allocate_coarray( &
@@ -121,7 +121,7 @@ contains
         integer, pointer :: local_slice
         integer(c_intmax_t) :: lcobounds(1), ucobounds(1), neighbor
 
-        call prif_num_images(image_count=num_imgs)
+        call prif_num_images(num_images=num_imgs)
         lcobounds(1) = 1
         ucobounds(1) = num_imgs
         call prif_allocate_coarray( &
@@ -163,7 +163,7 @@ contains
         integer(c_intmax_t) :: lcobounds(1), ucobounds(1)
         integer(c_intptr_t) :: base_addr
 
-        call prif_num_images(image_count=num_imgs)
+        call prif_num_images(num_images=num_imgs)
         lcobounds(1) = 1
         ucobounds(1) = num_imgs
         call prif_allocate_coarray( &

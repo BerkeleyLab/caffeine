@@ -24,7 +24,7 @@ contains
         integer i, me, ni
 
         call prif_this_image(image_index=me)
-        call prif_num_images(image_count=ni)
+        call prif_num_images(num_images=ni)
         image_numbers = [(merge(0, me, me/=i), i = 1, ni)]
         call prif_co_sum(image_numbers)
         result_ = assert_that(all(image_numbers == [(i, i = 1, ni)]) .and. size(image_numbers)>0, "correct image set")

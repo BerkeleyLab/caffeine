@@ -53,7 +53,7 @@ contains
        end do
     end if
 
-    call prif_num_images(image_count=num_img)
+    call prif_num_images(num_images=num_img)
     if (invalid_cosubscripts .or. image_index .gt. num_img) then
        image_index = 0
     end if

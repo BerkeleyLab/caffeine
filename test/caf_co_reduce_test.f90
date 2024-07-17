@@ -38,7 +38,7 @@ contains
       call prif_co_reduce(my_name, c_funloc(alphabetize))
     end associate
 
-    call prif_num_images(image_count=num_imgs)
+    call prif_num_images(num_images=num_imgs)
     associate(expected_name => minval(names(1:min(num_imgs, size(names)))))
       result_ = assert_that(all(expected_name == my_name))
     end associate
@@ -66,7 +66,7 @@ contains
 
     array = input_array
     call prif_co_reduce(array, c_funloc(add_integers))
-    call prif_num_images(image_count=num_imgs)
+    call prif_num_images(num_images=num_imgs)
     result_ = assert_that(all(num_imgs*input_array==array))
 
   contains
@@ -87,7 +87,7 @@ contains
 
     z = z_input
     call prif_co_reduce(z, c_funloc(add_complex), stat=status_)
-    call prif_num_images(image_count=num_imgs)
+    call prif_num_images(num_images=num_imgs)
     result_ = assert_equals(real(num_imgs*z_input, c_double), real(z, c_double)) .and. assert_equals(0, status_)
 
   contains
@@ -108,7 +108,7 @@ contains
 
     z = z_input
     call prif_co_reduce(z, c_funloc(add_complex), stat=status_)
-    call prif_num_images(image_count=num_imgs)
+    call prif_num_images(num_images=num_imgs)
     result_ = assert_equals(dble(num_imgs*z_input), dble(z)) .and. assert_equals(0, status_)
 
   contains
@@ -127,7 +127,7 @@ contains
 
     i = 1
     call prif_co_reduce(i, c_funloc(add))
-    call prif_num_images(image_count=num_imgs)
+    call prif_num_images(num_images=num_imgs)
     result_ = assert_equals(num_imgs, i)
 
   contains
@@ -147,7 +147,7 @@ contains
 
     i = 1_c_int64_t
     call prif_co_reduce(i, c_funloc(add))
-    call prif_num_images(image_count=num_imgs)
+    call prif_num_images(num_images=num_imgs)
     result_ = assert_that(int(num_imgs, c_int64_t)==i)
 
   contains
@@ -177,7 +177,7 @@ contains
 
     all_true = c_true
     call prif_co_reduce(all_true, c_funloc(logical_and))
-    call prif_num_images(image_count=num_imgs)
+    call prif_num_images(num_images=num_imgs)
 
     ans1 = one_false .eqv. c_false
     ans2 = one_true  .eqv. merge(c_true,c_false,num_imgs==1)
@@ -205,7 +205,7 @@ contains
     call prif_this_image(image_index=me)
     p = real(me,c_double)
     call prif_co_reduce(p, c_funloc(multiply_doubles), result_image=1, stat=status_, errmsg=error_message)
-    call prif_num_images(image_count=num_imgs)
+    call prif_num_images(num_images=num_imgs)
     associate(expected_result => merge( product([(real(j,c_double), j = 1, num_imgs)]), real(me,c_double), me==1 ))
       result_ = &
         assert_equals(expected_result, real(p,c_double)) .and. &
@@ -233,7 +233,7 @@ contains
     call prif_this_image(image_index=me)
     p = real(me)
     call prif_co_reduce(p, c_funloc(multiply), result_image=1, stat=status_, errmsg=error_message)
-    call prif_num_images(image_count=num_imgs)
+    call prif_num_images(num_images=num_imgs)
     associate(expected_result => merge( product([(dble(j), j = 1, num_imgs)]), dble(me), me==1 ))
       result_ = &
         assert_equals(expected_result, dble(p)) .and. &

@@ -30,7 +30,7 @@ contains
 
         i = 1
         call prif_co_sum(i)
-        call prif_num_images(image_count=num_imgs)
+        call prif_num_images(num_images=num_imgs)
         result_ = assert_equals(num_imgs, i)
     end function
 
@@ -46,7 +46,7 @@ contains
         error_message = whitespace
 
         call prif_this_image(image_index=me)
-        call prif_num_images(image_count=num_imgs)
+        call prif_num_images(num_images=num_imgs)
         associate(expected_i => merge(num_imgs*i, i, me==result_image_))
           call prif_co_sum(i, result_image_, status_, error_message)
           result_ = assert_equals(expected_i, i) .and. assert_equals(0, status_) .and. assert_equals(whitespace, error_message)
@@ -63,7 +63,7 @@ contains
         i = 2_c_int64_t
         call prif_co_sum(i, stat=status_)
         i_default_kind = i
-        call prif_num_images(image_count=num_imgs)
+        call prif_num_images(num_images=num_imgs)
         result_ = assert_equals(2*num_imgs, int(i)) .and. assert_equals(0, status_)
     end function
 
@@ -72,7 +72,7 @@ contains
         integer i, images
         integer, allocatable :: array(:)
 
-        call prif_num_images(image_count=images)
+        call prif_num_images(num_images=images)
         associate(sequence_ => [(i,i=1,images)])
           array = sequence_
           call prif_co_sum(array)
@@ -88,7 +88,7 @@ contains
         status_ = -1
         array = 3
         call prif_co_sum(array, stat=status_)
-        call prif_num_images(image_count=num_imgs)
+        call prif_num_images(num_images=num_imgs)
         result_ = assert_that(all(3*num_imgs == array)) .and.  assert_equals(0, status_)
     end function
 
@@ -102,7 +102,7 @@ contains
         scalar = e
         call prif_co_sum(scalar, result_image=result_image_)
         call prif_this_image(image_index=me)
-        call prif_num_images(image_count=num_imgs)
+        call prif_num_images(num_images=num_imgs)
         associate(expected_result => merge(num_imgs*e, e, me==result_image_))
           result_ = assert_equals(dble(expected_result), dble(scalar))
         end associate
@@ -116,7 +116,7 @@ contains
 
         array = input
         call prif_co_sum(array)
-        call prif_num_images(image_count=num_imgs)
+        call prif_num_images(num_images=num_imgs)
         result_ = assert_equals(product(num_imgs*input), product(array))
     end function
 
@@ -130,7 +130,7 @@ contains
         status_ = -1
         z = i
         call prif_co_sum(z, stat=status_)
-        call prif_num_images(image_count=num_imgs)
+        call prif_num_images(num_images=num_imgs)
         result_ = assert_equals(dble(abs(i*num_imgs)), dble(abs(z)) ) .and. assert_equals(0, status_)
     end function
 
@@ -143,7 +143,7 @@ contains
 
         array = [(1.D0,1.D0)]
         call prif_co_sum(array)
-        call prif_num_images(image_count=num_imgs)
+        call prif_num_images(num_images=num_imgs)
         result_ = assert_that(all([input*num_imgs] == array))
     end function
 

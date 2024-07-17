@@ -9,7 +9,7 @@ program hello_world
   if (init_exit_code /= 0) error stop "caffeinate returned a non-zero exit code"
 
   call this_image(image_index=me)
-  call num_images(image_count=num_imgs)
+  call num_images(num_images=num_imgs)
   print *, "Hello from image", me, "of", num_imgs
 
   call prif_stop(.false._c_bool, stop_code_int=0) ! normal termination

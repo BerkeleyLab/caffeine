@@ -34,7 +34,7 @@ contains
     type(prif_coarray_handle) :: coarray_handle
     type(c_ptr) :: allocated_mem
 
-    call prif_num_images(image_count=num_imgs)
+    call prif_num_images(num_images=num_imgs)
     ucobounds(1) = num_imgs
 
     call prif_allocate_coarray( &
@@ -58,7 +58,7 @@ contains
     type(prif_coarray_handle) :: coarray_handle
     type(c_ptr) :: allocated_mem
 
-    call prif_num_images(image_count=num_imgs)
+    call prif_num_images(num_images=num_imgs)
     ucobounds(1) = num_imgs
     call prif_this_image(image_index=this_img)
 
@@ -83,7 +83,7 @@ contains
     type(prif_coarray_handle) :: coarray_handle
     type(c_ptr) :: allocated_mem
 
-    call prif_num_images(image_count=num_imgs)
+    call prif_num_images(num_images=num_imgs)
     ucobounds(1) = num_imgs
     call prif_this_image(image_index=this_img)
 

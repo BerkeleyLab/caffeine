@@ -32,7 +32,7 @@ contains
         call prif_this_image(image_index=me)
         i = -me
         call prif_co_min(i, stat=status_)
-        call prif_num_images(image_count=num_imgs)
+        call prif_num_images(num_images=num_imgs)
         result_ = assert_equals(-num_imgs, i) .and. assert_equals(0, status_)
     end function
 
@@ -54,7 +54,7 @@ contains
         integer, allocatable :: array(:)
 
         call prif_this_image(image_index=me)
-        call prif_num_images(image_count=num_imgs)
+        call prif_num_images(num_images=num_imgs)
         associate(sequence_ => me*[(i, i=1, num_imgs)])
           array = sequence_
           call prif_co_min(array)
@@ -72,7 +72,7 @@ contains
         call prif_this_image(image_index=me)
         array = 3 - me
         call prif_co_min(array, stat=status_)
-        call prif_num_images(image_count=num_imgs)
+        call prif_num_images(num_images=num_imgs)
         result_ = assert_that(all(array == 3 - num_imgs)) .and. assert_equals(0, status_)
     end function
 
@@ -86,7 +86,7 @@ contains
         call prif_this_image(image_index=me)
         scalar = -pi*me
         call prif_co_min(scalar, stat=status_)
-        call prif_num_images(image_count=num_imgs)
+        call prif_num_images(num_images=num_imgs)
         result_ = assert_equals(-dble(pi*num_imgs), dble(scalar) ) .and. assert_equals(0, status_)
     end function
 
@@ -99,7 +99,7 @@ contains
         call prif_this_image(image_index=me)
         array = tent*dble(me)
         call prif_co_min(array)
-        call prif_num_images(image_count=num_imgs)
+        call prif_num_images(num_images=num_imgs)
         result_ = assert_that(all(array==tent*num_imgs))
     end function
 
@@ -123,7 +123,7 @@ contains
         integer j, delta_j, num_imgs
         character(len=len(script)) expected_script(size(script)), expected_scramlet(size(scramlet,1),size(scramlet,2))
 
-        call prif_num_images(image_count=num_imgs)
+        call prif_num_images(num_images=num_imgs)
         do j=1, size(script)
           expected_script(j) = script(j)
           do delta_j = 1, min(num_imgs-1, size(script))
@@ -151,7 +151,7 @@ contains
         call prif_co_min(my_word)
       end associate
 
-      call prif_num_images(image_count=num_imgs)
+      call prif_num_images(num_images=num_imgs)
       associate(expected_word => minval(words(1:min(num_imgs, size(words)))))
         result_ = assert_equals(expected_word, my_word)
       end associate
