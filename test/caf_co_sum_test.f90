@@ -1,5 +1,5 @@
 module caf_co_sum_test
-    use prif, only : prif_co_sum, prif_num_images, prif_this_image
+    use prif, only : prif_co_sum, prif_num_images, prif_this_image_no_coarray
     use veggies, only: result_t, test_item_t, assert_equals, describe, it, assert_that, assert_equals, succeed
 
     implicit none
@@ -45,7 +45,7 @@ contains
         status_ = -1
         error_message = whitespace
 
-        call prif_this_image(image_index=me)
+        call prif_this_image_no_coarray(this_image=me)
         call prif_num_images(num_images=num_imgs)
         associate(expected_i => merge(num_imgs*i, i, me==result_image_))
           call prif_co_sum(i, result_image_, status_, error_message)
@@ -101,7 +101,7 @@ contains
         result_image_ = 1
         scalar = e
         call prif_co_sum(scalar, result_image=result_image_)
-        call prif_this_image(image_index=me)
+        call prif_this_image_no_coarray(this_image=me)
         call prif_num_images(num_images=num_imgs)
         associate(expected_result => merge(num_imgs*e, e, me==result_image_))
           result_ = assert_equals(dble(expected_result), dble(scalar))

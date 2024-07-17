@@ -46,7 +46,7 @@ contains
                     test_prif_this_image
         use caf_this_image_test, only: &
                 caf_this_image_prif_this_image => &
-                    test_prif_this_image
+                    test_prif_this_image_no_coarray
         use veggies, only: test_item_t, test_that, run_tests
 
 

@@ -1,19 +1,19 @@
 module caf_this_image_test
-    use prif, only : prif_this_image, prif_num_images, prif_co_sum
+    use prif, only : prif_this_image_no_coarray, prif_num_images, prif_co_sum
     use veggies, only: result_t, test_item_t, assert_that, describe, it, succeed
 
     implicit none
     private
-    public :: test_prif_this_image
+    public :: test_prif_this_image_no_coarray
 
 contains
-    function test_prif_this_image() result(tests)
+    function test_prif_this_image_no_coarray() result(tests)
         type(test_item_t) :: tests
     
         integer, parameter :: initiation_success = 0
 
         tests = describe( &
-          "The prif_this_image function result", &
+          "The prif_this_image_no_coarray function result", &
           [ it("is the proper member of the set {1,2,...,num_images()} when invoked as this_image()", check_this_image_set) &
         ])
     end function
@@ -23,7 +23,7 @@ contains
         integer, allocatable :: image_numbers(:)
         integer i, me, ni
 
-        call prif_this_image(image_index=me)
+        call prif_this_image_no_coarray(this_image=me)
         call prif_num_images(num_images=ni)
         image_numbers = [(merge(0, me, me/=i), i = 1, ni)]
         call prif_co_sum(image_numbers)

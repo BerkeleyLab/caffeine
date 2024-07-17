@@ -1,5 +1,5 @@
 module caf_co_reduce_test
-  use prif, only : prif_co_reduce, prif_num_images, prif_this_image, prif_error_stop
+  use prif, only : prif_co_reduce, prif_num_images, prif_this_image_no_coarray, prif_error_stop
   use veggies, only : result_t, test_item_t, assert_equals, describe, it, assert_that, assert_equals
   use iso_c_binding, only : c_bool, c_funloc, c_char, c_double, c_int64_t
 
@@ -32,7 +32,7 @@ contains
     character(len=:, kind=c_char), allocatable :: my_name(:)
     integer :: me, num_imgs
 
-    call prif_this_image(image_index=me)
+    call prif_this_image_no_coarray(this_image=me)
     associate(periodic_index => 1 + mod(me-1,size(names)))
       my_name = [names(periodic_index)]
       call prif_co_reduce(my_name, c_funloc(alphabetize))
@@ -167,11 +167,11 @@ contains
     logical ans1, ans2, ans3
     integer :: me, num_imgs
 
-    call prif_this_image(image_index=me)
+    call prif_this_image_no_coarray(this_image=me)
     one_false = merge(c_false, c_true, me==1)
     call prif_co_reduce(one_false, c_funloc(logical_and))
 
-    call prif_this_image(image_index=me)
+    call prif_this_image_no_coarray(this_image=me)
     one_true = merge(c_true, c_false, me==1)
     call prif_co_reduce(one_true, c_funloc(logical_and))
 
@@ -202,7 +202,7 @@ contains
     character(len=:), allocatable :: error_message
 
     error_message = "unused"
-    call prif_this_image(image_index=me)
+    call prif_this_image_no_coarray(this_image=me)
     p = real(me,c_double)
     call prif_co_reduce(p, c_funloc(multiply_doubles), result_image=1, stat=status_, errmsg=error_message)
     call prif_num_images(num_images=num_imgs)
@@ -230,7 +230,7 @@ contains
     character(len=:), allocatable :: error_message
 
     error_message = "unused"
-    call prif_this_image(image_index=me)
+    call prif_this_image_no_coarray(this_image=me)
     p = real(me)
     call prif_co_reduce(p, c_funloc(multiply), result_image=1, stat=status_, errmsg=error_message)
     call prif_num_images(num_images=num_imgs)

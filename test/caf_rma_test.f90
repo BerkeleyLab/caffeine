@@ -12,7 +12,7 @@ module caf_rma_test
             prif_get, &
             prif_get_raw, &
             prif_sync_all, &
-            prif_this_image
+            prif_this_image_no_coarray
     use veggies, only: result_t, test_item_t, assert_equals, describe, it
 
     implicit none
@@ -54,7 +54,7 @@ contains
                 allocated_memory = allocated_memory)
         call c_f_pointer(allocated_memory, local_slice)
 
-        call prif_this_image(image_index=me)
+        call prif_this_image_no_coarray(this_image=me)
         neighbor = merge(me+1, 1, me < num_imgs)
         expected = merge(me-1, num_imgs, me > 1)
 
@@ -95,7 +95,7 @@ contains
                 allocated_memory = allocated_memory)
         call c_f_pointer(allocated_memory, local_slice)
 
-        call prif_this_image(image_index=me)
+        call prif_this_image_no_coarray(this_image=me)
         neighbor = merge(me+1, 1, me < num_imgs)
         expected = merge(me-1, num_imgs, me > 1)
 
@@ -135,7 +135,7 @@ contains
                 allocated_memory = allocated_memory)
         call c_f_pointer(allocated_memory, local_slice)
 
-        call prif_this_image(image_index=me)
+        call prif_this_image_no_coarray(this_image=me)
         neighbor = merge(me+1, 1, me < num_imgs)
         expected = neighbor
         local_slice = me
@@ -177,7 +177,7 @@ contains
                 allocated_memory = allocated_memory)
         call c_f_pointer(allocated_memory, local_slice)
 
-        call prif_this_image(image_index=me)
+        call prif_this_image_no_coarray(this_image=me)
         neighbor = merge(me+1, 1, me < num_imgs)
         expected = neighbor
         local_slice = me

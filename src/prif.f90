@@ -297,10 +297,10 @@ module prif
       integer(c_int), intent(out) :: num_images
     end subroutine
 
-    module subroutine prif_this_image_no_coarray(team, image_index)
+    module subroutine prif_this_image_no_coarray(team, this_image)
       implicit none
       type(prif_team_type), intent(in), optional :: team
-      integer(c_int), intent(out) :: image_index
+      integer(c_int), intent(out) :: this_image
     end subroutine
 
     module subroutine prif_this_image_with_coarray(coarray_handle, team, cosubscripts)

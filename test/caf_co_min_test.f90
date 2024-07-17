@@ -1,5 +1,5 @@
 module caf_co_min_test
-    use prif, only : prif_co_min, prif_num_images, prif_this_image, prif_num_images
+    use prif, only : prif_co_min, prif_num_images, prif_this_image_no_coarray, prif_num_images
     use veggies, only: result_t, test_item_t, assert_equals, describe, it, assert_that, assert_equals, succeed
 
     implicit none
@@ -29,7 +29,7 @@ contains
         integer i, status_, me, num_imgs
 
         status_ = -1
-        call prif_this_image(image_index=me)
+        call prif_this_image_no_coarray(this_image=me)
         i = -me
         call prif_co_min(i, stat=status_)
         call prif_num_images(num_images=num_imgs)
@@ -42,7 +42,7 @@ contains
         integer(c_int64_t) i
         integer :: me
 
-        call prif_this_image(image_index=me)
+        call prif_this_image_no_coarray(this_image=me)
         i = me
         call prif_co_min(i)
         result_ = assert_equals(1, int(i))
@@ -53,7 +53,7 @@ contains
         integer i, me, num_imgs
         integer, allocatable :: array(:)
 
-        call prif_this_image(image_index=me)
+        call prif_this_image_no_coarray(this_image=me)
         call prif_num_images(num_images=num_imgs)
         associate(sequence_ => me*[(i, i=1, num_imgs)])
           array = sequence_
@@ -69,7 +69,7 @@ contains
         integer array(2,1,1, 1,1,1, 2), status_, me, num_imgs
 
         status_ = -1
-        call prif_this_image(image_index=me)
+        call prif_this_image_no_coarray(this_image=me)
         array = 3 - me
         call prif_co_min(array, stat=status_)
         call prif_num_images(num_images=num_imgs)
@@ -83,7 +83,7 @@ contains
         integer status_, me, num_imgs
 
         status_ = -1
-        call prif_this_image(image_index=me)
+        call prif_this_image_no_coarray(this_image=me)
         scalar = -pi*me
         call prif_co_min(scalar, stat=status_)
         call prif_num_images(num_images=num_imgs)
@@ -96,7 +96,7 @@ contains
         double precision, parameter :: tent(*,*) = dble(reshape(-[0,1,2,3,2,1], [3,2]))
         integer :: me, num_imgs
 
-        call prif_this_image(image_index=me)
+        call prif_this_image_no_coarray(this_image=me)
         array = tent*dble(me)
         call prif_co_min(array)
         call prif_num_images(num_images=num_imgs)
@@ -145,7 +145,7 @@ contains
       character(len=:), allocatable :: my_word
       integer :: me, num_imgs
 
-      call prif_this_image(image_index=me)
+      call prif_this_image_no_coarray(this_image=me)
       associate(periodic_index => 1 + mod(me-1,size(words)))
         my_word = words(periodic_index)
         call prif_co_min(my_word)

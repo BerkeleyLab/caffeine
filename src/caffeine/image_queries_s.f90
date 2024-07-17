@@ -20,7 +20,7 @@ contains
 
   module procedure prif_this_image_no_coarray
     ! TODO: handle optional arg `team`
-    image_index = caf_this_image(current_team%gex_team)
+    this_image = caf_this_image(current_team%gex_team)
   end procedure
 
   module procedure prif_this_image_with_coarray
