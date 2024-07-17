@@ -14,7 +14,8 @@ module prif
   public :: prif_put, prif_put_raw, prif_put_raw_strided, prif_get, prif_get_raw, prif_get_raw_strided
   public :: prif_alias_create, prif_alias_destroy
   public :: prif_lcobound, prif_ucobound, prif_coshape, prif_image_index
-  public :: prif_this_image, prif_num_images, prif_failed_images, prif_stopped_images, prif_image_status
+  public :: prif_this_image_no_coarray, prif_this_image_with_coarray, prif_this_image_with_dim
+  public :: prif_num_images, prif_failed_images, prif_stopped_images, prif_image_status
   public :: prif_set_context_data, prif_get_context_data, prif_base_pointer, prif_size_bytes
   public :: prif_co_sum, prif_co_max, prif_co_min, prif_co_reduce, prif_co_broadcast
   public :: prif_form_team, prif_change_team, prif_end_team, prif_get_team, prif_team_number
@@ -72,31 +73,6 @@ module prif
   interface prif_ucobound
      module procedure prif_ucobound_with_dim
      module procedure prif_ucobound_no_dim
-  end interface
-
-  interface prif_this_image
-
-    module subroutine prif_this_image_no_coarray(team, image_index)
-      implicit none
-      type(prif_team_type), intent(in), optional :: team
-      integer(c_int), intent(out) :: image_index
-    end subroutine
-
-    module subroutine prif_this_image_with_coarray(coarray_handle, team, cosubscripts)
-      implicit none
-      type(prif_coarray_handle), intent(in) :: coarray_handle
-      type(prif_team_type), intent(in), optional :: team
-      integer(c_intmax_t), intent(out) :: cosubscripts(:)
-    end subroutine
-
-    module subroutine prif_this_image_with_dim(coarray_handle, dim, team, cosubscript)
-      implicit none
-      type(prif_coarray_handle), intent(in) :: coarray_handle
-      integer(c_int), intent(in) :: dim
-      type(prif_team_type), intent(in), optional :: team
-      integer(c_intmax_t), intent(out) :: cosubscript
-    end subroutine
-
   end interface
 
   interface
@@ -318,6 +294,27 @@ module prif
       implicit none
       integer(c_intmax_t), intent(in) :: team_number
       integer(c_int), intent(out) :: num_images
+    end subroutine
+
+    module subroutine prif_this_image_no_coarray(team, image_index)
+      implicit none
+      type(prif_team_type), intent(in), optional :: team
+      integer(c_int), intent(out) :: image_index
+    end subroutine
+
+    module subroutine prif_this_image_with_coarray(coarray_handle, team, cosubscripts)
+      implicit none
+      type(prif_coarray_handle), intent(in) :: coarray_handle
+      type(prif_team_type), intent(in), optional :: team
+      integer(c_intmax_t), intent(out) :: cosubscripts(:)
+    end subroutine
+
+    module subroutine prif_this_image_with_dim(coarray_handle, dim, team, cosubscript)
+      implicit none
+      type(prif_coarray_handle), intent(in) :: coarray_handle
+      integer(c_int), intent(in) :: dim
+      type(prif_team_type), intent(in), optional :: team
+      integer(c_intmax_t), intent(out) :: cosubscript
     end subroutine
 
     module subroutine prif_failed_images(team, failed_images)
