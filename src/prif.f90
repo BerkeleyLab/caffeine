@@ -54,6 +54,9 @@ module prif
     type(handle_data), pointer :: coarrays
   end type
 
+  integer(c_int), parameter, public :: PRIF_ATOMIC_INT_KIND = selected_int_kind(18)
+  integer(c_int), parameter, public :: PRIF_ATOMIC_LOGICAL_KIND = PRIF_ATOMIC_INT_KIND
+
   interface prif_lcobound
      module procedure prif_lcobound_with_dim
      module procedure prif_lcobound_no_dim
@@ -529,123 +532,123 @@ module prif
       character(len=:), intent(inout), allocatable, optional :: errmsg_alloc
     end subroutine
 
-    module subroutine prif_atomic_add_indirect(atom_remote_ptr, image_num, value, stat)
+    module subroutine prif_atomic_add_indirect(image_num, atom_remote_ptr, value, stat)
       implicit none
-      integer(c_intptr_t), intent(in) :: atom_remote_ptr
       integer(c_int), intent(in) :: image_num
-      integer(atomic_int_kind), intent(in) :: value
+      integer(c_intptr_t), intent(in) :: atom_remote_ptr
+      integer(PRIF_ATOMIC_INT_KIND), intent(in) :: value
       integer(c_int), intent(out), optional :: stat
     end subroutine
 
-    module subroutine prif_atomic_and_indirect(atom_remote_ptr, image_num, value, stat)
+    module subroutine prif_atomic_and_indirect(image_num, atom_remote_ptr, value, stat)
       implicit none
-      integer(c_intptr_t), intent(in) :: atom_remote_ptr
       integer(c_int), intent(in) :: image_num
-      integer(atomic_int_kind), intent(in) :: value
+      integer(c_intptr_t), intent(in) :: atom_remote_ptr
+      integer(PRIF_ATOMIC_INT_KIND), intent(in) :: value
       integer(c_int), intent(out), optional :: stat
     end subroutine
 
-    module subroutine prif_atomic_or_indirect(atom_remote_ptr, image_num, value, stat)
+    module subroutine prif_atomic_or_indirect(image_num, atom_remote_ptr, value, stat)
       implicit none
-      integer(c_intptr_t), intent(in) :: atom_remote_ptr
       integer(c_int), intent(in) :: image_num
-      integer(atomic_int_kind), intent(in) :: value
+      integer(c_intptr_t), intent(in) :: atom_remote_ptr
+      integer(PRIF_ATOMIC_INT_KIND), intent(in) :: value
       integer(c_int), intent(out), optional :: stat
     end subroutine
 
-    module subroutine prif_atomic_xor_indirect(atom_remote_ptr, image_num, value, stat)
+    module subroutine prif_atomic_xor_indirect(image_num, atom_remote_ptr, value, stat)
       implicit none
-      integer(c_intptr_t), intent(in) :: atom_remote_ptr
       integer(c_int), intent(in) :: image_num
-      integer(atomic_int_kind), intent(in) :: value
+      integer(c_intptr_t), intent(in) :: atom_remote_ptr
+      integer(PRIF_ATOMIC_INT_KIND), intent(in) :: value
       integer(c_int), intent(out), optional :: stat
     end subroutine
 
-    module subroutine prif_atomic_cas_int_indirect(atom_remote_ptr, image_num, old, compare, new, stat)
+    module subroutine prif_atomic_cas_int_indirect(image_num, atom_remote_ptr, old, compare, new, stat)
       implicit none
-      integer(c_intptr_t), intent(in) :: atom_remote_ptr
       integer(c_int), intent(in) :: image_num
-      integer(atomic_int_kind), intent(out) :: old
-      integer(atomic_int_kind), intent(in) :: compare
-      integer(atomic_int_kind), intent(in) :: new
+      integer(c_intptr_t), intent(in) :: atom_remote_ptr
+      integer(PRIF_ATOMIC_INT_KIND), intent(out) :: old
+      integer(PRIF_ATOMIC_INT_KIND), intent(in) :: compare
+      integer(PRIF_ATOMIC_INT_KIND), intent(in) :: new
       integer(c_int), intent(out), optional :: stat
     end subroutine
 
-    module subroutine prif_atomic_cas_logical_indirect(atom_remote_ptr, image_num, old, compare, new, stat)
+    module subroutine prif_atomic_cas_logical_indirect(image_num, atom_remote_ptr, old, compare, new, stat)
       implicit none
-      integer(c_intptr_t), intent(in) :: atom_remote_ptr
       integer(c_int), intent(in) :: image_num
-      logical(atomic_logical_kind), intent(out) :: old
-      logical(atomic_logical_kind), intent(in) :: compare
-      logical(atomic_logical_kind), intent(in) :: new
+      integer(c_intptr_t), intent(in) :: atom_remote_ptr
+      logical(PRIF_ATOMIC_LOGICAL_KIND), intent(out) :: old
+      logical(PRIF_ATOMIC_LOGICAL_KIND), intent(in) :: compare
+      logical(PRIF_ATOMIC_LOGICAL_KIND), intent(in) :: new
       integer(c_int), intent(out), optional :: stat
     end subroutine
 
-    module subroutine prif_atomic_fetch_add_indirect(atom_remote_ptr, image_num, value, old, stat)
+    module subroutine prif_atomic_fetch_add_indirect(image_num, atom_remote_ptr, value, old, stat)
       implicit none
-      integer(c_intptr_t), intent(in) :: atom_remote_ptr
       integer(c_int), intent(in) :: image_num
-      integer(atomic_int_kind), intent(in) :: value
-      integer(atomic_int_kind), intent(out) :: old
+      integer(c_intptr_t), intent(in) :: atom_remote_ptr
+      integer(PRIF_ATOMIC_INT_KIND), intent(in) :: value
+      integer(PRIF_ATOMIC_INT_KIND), intent(out) :: old
       integer(c_int), intent(out), optional :: stat
     end subroutine
 
-    module subroutine prif_atomic_fetch_and_indirect(atom_remote_ptr, image_num, value, old, stat)
+    module subroutine prif_atomic_fetch_and_indirect(image_num, atom_remote_ptr, value, old, stat)
       implicit none
-      integer(c_intptr_t), intent(in) :: atom_remote_ptr
       integer(c_int), intent(in) :: image_num
-      integer(atomic_int_kind), intent(in) :: value
-      integer(atomic_int_kind), intent(out) :: old
+      integer(c_intptr_t), intent(in) :: atom_remote_ptr
+      integer(PRIF_ATOMIC_INT_KIND), intent(in) :: value
+      integer(PRIF_ATOMIC_INT_KIND), intent(out) :: old
       integer(c_int), intent(out), optional :: stat
     end subroutine
 
-    module subroutine prif_atomic_fetch_or_indirect(atom_remote_ptr, image_num, value, old, stat)
+    module subroutine prif_atomic_fetch_or_indirect(image_num, atom_remote_ptr, value, old, stat)
       implicit none
-      integer(c_intptr_t), intent(in) :: atom_remote_ptr
       integer(c_int), intent(in) :: image_num
-      integer(atomic_int_kind), intent(in) :: value
-      integer(atomic_int_kind), intent(out) :: old
+      integer(c_intptr_t), intent(in) :: atom_remote_ptr
+      integer(PRIF_ATOMIC_INT_KIND), intent(in) :: value
+      integer(PRIF_ATOMIC_INT_KIND), intent(out) :: old
       integer(c_int), intent(out), optional :: stat
     end subroutine
 
-    module subroutine prif_atomic_fetch_xor_indirect(atom_remote_ptr, image_num, value, old, stat)
+    module subroutine prif_atomic_fetch_xor_indirect(image_num, atom_remote_ptr, value, old, stat)
       implicit none
-      integer(c_intptr_t), intent(in) :: atom_remote_ptr
       integer(c_int), intent(in) :: image_num
-      integer(atomic_int_kind), intent(in) :: value
-      integer(atomic_int_kind), intent(out) :: old
+      integer(c_intptr_t), intent(in) :: atom_remote_ptr
+      integer(PRIF_ATOMIC_INT_KIND), intent(in) :: value
+      integer(PRIF_ATOMIC_INT_KIND), intent(out) :: old
       integer(c_int), intent(out), optional :: stat
     end subroutine
 
-    module subroutine prif_atomic_define_int_indirect(atom_remote_ptr, image_num, value, stat)
+    module subroutine prif_atomic_define_int_indirect(image_num, atom_remote_ptr, value, stat)
       implicit none
-      integer(c_intptr_t), intent(in) :: atom_remote_ptr
       integer(c_int), intent(in) :: image_num
-      integer(atomic_int_kind), intent(in) :: value
+      integer(c_intptr_t), intent(in) :: atom_remote_ptr
+      integer(PRIF_ATOMIC_INT_KIND), intent(in) :: value
       integer(c_int), intent(out), optional :: stat
     end subroutine
 
-    module subroutine prif_atomic_define_logical_indirect(atom_remote_ptr, image_num, value, stat)
+    module subroutine prif_atomic_define_logical_indirect(image_num, atom_remote_ptr, value, stat)
       implicit none
-      integer(c_intptr_t), intent(in) :: atom_remote_ptr
       integer(c_int), intent(in) :: image_num
-      logical(atomic_logical_kind), intent(in) :: value
+      integer(c_intptr_t), intent(in) :: atom_remote_ptr
+      logical(PRIF_ATOMIC_LOGICAL_KIND), intent(in) :: value
       integer(c_int), intent(out), optional :: stat
     end subroutine
 
-    module subroutine prif_atomic_ref_int_indirect(value, atom_remote_ptr, image_num, stat)
+    module subroutine prif_atomic_ref_int_indirect(image_num, atom_remote_ptr, value, stat)
       implicit none
-      integer(atomic_int_kind), intent(out) :: value
-      integer(c_intptr_t), intent(in) :: atom_remote_ptr
       integer(c_int), intent(in) :: image_num
+      integer(c_intptr_t), intent(in) :: atom_remote_ptr
+      integer(PRIF_ATOMIC_INT_KIND), intent(out) :: value
       integer(c_int), intent(out), optional :: stat
     end subroutine
 
-    module subroutine prif_atomic_ref_logical_indirect(value, atom_remote_ptr, image_num, stat)
+    module subroutine prif_atomic_ref_logical_indirect(image_num, atom_remote_ptr, value, stat)
       implicit none
-      logical(atomic_logical_kind), intent(out) :: value
-      integer(c_intptr_t), intent(in) :: atom_remote_ptr
       integer(c_int), intent(in) :: image_num
+      integer(c_intptr_t), intent(in) :: atom_remote_ptr
+      logical(PRIF_ATOMIC_LOGICAL_KIND), intent(out) :: value
       integer(c_int), intent(out), optional :: stat
     end subroutine
 
