@@ -488,6 +488,16 @@ module prif
       type(prif_coarray_handle), intent(in) :: critical_coarray
     end subroutine
 
+    module subroutine prif_event_post(image_num, coarray_handle, offset, stat, errmsg, errmsg_alloc)
+      implicit none
+      integer(c_int), intent(in) :: image_num
+      type(prif_coarray_handle), intent(in) :: coarray_handle
+      integer(c_size_t), intent(in) :: offset
+      integer(c_int), intent(out), optional :: stat
+      character(len=*), intent(inout), optional :: errmsg
+      character(len=:), intent(inout), allocatable, optional :: errmsg_alloc
+    end subroutine
+
     module subroutine prif_event_post_indirect(image_num, event_var_ptr, stat, errmsg, errmsg_alloc)
       implicit none
       integer(c_int), intent(in) :: image_num
