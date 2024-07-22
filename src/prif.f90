@@ -217,11 +217,11 @@ module prif
       character(len=:), intent(inout), allocatable, optional :: errmsg_alloc
     end subroutine
 
-    module subroutine prif_alias_create(source_handle, alias_co_lbounds, alias_co_ubounds, alias_handle)
+    module subroutine prif_alias_create(source_handle, alias_lcobounds, alias_ucobounds, alias_handle)
       implicit none
       type(prif_coarray_handle), intent(in) :: source_handle
-      integer(c_intmax_t), intent(in) :: alias_co_lbounds(:)
-      integer(c_intmax_t), intent(in) :: alias_co_ubounds(:)
+      integer(c_intmax_t), intent(in) :: alias_lcobounds(:)
+      integer(c_intmax_t), intent(in) :: alias_ucobounds(:)
       type(prif_coarray_handle), intent(out) :: alias_handle
     end subroutine
 
