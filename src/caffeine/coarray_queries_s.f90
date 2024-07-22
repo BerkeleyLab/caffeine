@@ -59,4 +59,12 @@ contains
     end if
   end procedure
 
+  module procedure prif_image_index_with_team
+    call unimplemented("prif_image_index_with_team")
+  end procedure
+
+  module procedure prif_image_index_with_team_number
+    call unimplemented("prif_image_index_with_team_number")
+  end procedure
+
 end submodule coarray_queries_s

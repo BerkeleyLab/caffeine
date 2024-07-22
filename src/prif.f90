@@ -13,7 +13,8 @@ module prif
   public :: prif_allocate_coarray, prif_allocate, prif_deallocate_coarray, prif_deallocate
   public :: prif_put, prif_put_raw, prif_put_raw_strided, prif_get, prif_get_raw, prif_get_raw_strided
   public :: prif_alias_create, prif_alias_destroy
-  public :: prif_lcobound_with_dim, prif_lcobound_no_dim, prif_ucobound_with_dim, prif_ucobound_no_dim, prif_coshape, prif_image_index
+  public :: prif_lcobound_with_dim, prif_lcobound_no_dim, prif_ucobound_with_dim, prif_ucobound_no_dim, prif_coshape
+  public :: prif_image_index, prif_image_index_with_team, prif_image_index_with_team_number
   public :: prif_this_image_no_coarray, prif_this_image_with_coarray, prif_this_image_with_dim
   public :: prif_num_images, prif_num_images_with_team, prif_num_images_with_team_number
   public :: prif_failed_images, prif_stopped_images, prif_image_status
@@ -259,6 +260,22 @@ module prif
       implicit none
       type(prif_coarray_handle), intent(in) :: coarray_handle
       integer(c_intmax_t), intent(in) :: sub(:)
+      integer(c_int), intent(out) :: image_index
+    end subroutine
+
+    module subroutine prif_image_index_with_team(coarray_handle, sub, team, image_index)
+      implicit none
+      type(prif_coarray_handle), intent(in) :: coarray_handle
+      integer(c_intmax_t), intent(in) :: sub(:)
+      type(prif_team_type), intent(in) :: team
+      integer(c_int), intent(out) :: image_index
+    end subroutine
+
+    module subroutine prif_image_index_with_team_number(coarray_handle, sub, team_number, image_index)
+      implicit none
+      type(prif_coarray_handle), intent(in) :: coarray_handle
+      integer(c_intmax_t), intent(in) :: sub(:)
+      integer(c_int), intent(in) :: team_number
       integer(c_int), intent(out) :: image_index
     end subroutine
 
