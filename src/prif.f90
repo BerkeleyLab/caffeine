@@ -13,7 +13,7 @@ module prif
   public :: prif_allocate_coarray, prif_allocate, prif_deallocate_coarray, prif_deallocate
   public :: prif_put, prif_put_raw, prif_put_raw_strided, prif_get, prif_get_raw, prif_get_raw_strided
   public :: prif_alias_create, prif_alias_destroy
-  public :: prif_lcobound, prif_ucobound, prif_coshape, prif_image_index
+  public :: prif_lcobound_with_dim, prif_lcobound_no_dim, prif_ucobound_with_dim, prif_ucobound_no_dim, prif_coshape, prif_image_index
   public :: prif_this_image_no_coarray, prif_this_image_with_coarray, prif_this_image_with_dim
   public :: prif_num_images, prif_num_images_with_team, prif_num_images_with_team_number
   public :: prif_failed_images, prif_stopped_images, prif_image_status
@@ -56,16 +56,6 @@ module prif
 
   integer(c_int), parameter, public :: PRIF_ATOMIC_INT_KIND = selected_int_kind(18)
   integer(c_int), parameter, public :: PRIF_ATOMIC_LOGICAL_KIND = PRIF_ATOMIC_INT_KIND
-
-  interface prif_lcobound
-     module procedure prif_lcobound_with_dim
-     module procedure prif_lcobound_no_dim
-  end interface
-
-  interface prif_ucobound
-     module procedure prif_ucobound_with_dim
-     module procedure prif_ucobound_no_dim
-  end interface
 
   interface
 
