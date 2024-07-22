@@ -23,13 +23,16 @@ module prif
   public :: prif_sync_all, prif_sync_images, prif_sync_team, prif_sync_memory
   public :: prif_lock, prif_unlock
   public :: prif_critical, prif_end_critical
-  public :: prif_event_post_indirect, prif_event_wait, prif_event_query
+  public :: prif_event_post, prif_event_post_indirect, prif_event_wait, prif_event_query
   public :: prif_notify_wait
-  public :: prif_atomic_add_indirect, prif_atomic_and_indirect, prif_atomic_or_indirect, prif_atomic_xor_indirect
-  public :: prif_atomic_cas_int_indirect, prif_atomic_cas_logical_indirect, prif_atomic_fetch_add_indirect
-  public :: prif_atomic_fetch_and_indirect, prif_atomic_fetch_or_indirect, prif_atomic_fetch_xor_indirect
-  public :: prif_atomic_define_int_indirect, prif_atomic_define_logical_indirect
-  public :: prif_atomic_ref_int_indirect, prif_atomic_ref_logical_indirect
+  public :: prif_atomic_add, prif_atomic_add_indirect, prif_atomic_and, prif_atomic_and_indirect
+  public :: prif_atomic_or, prif_atomic_or_indirect, prif_atomic_xor, prif_atomic_xor_indirect
+  public :: prif_atomic_cas_int, prif_atomic_cas_int_indirect, prif_atomic_cas_logical, prif_atomic_cas_logical_indirect
+  public :: prif_atomic_fetch_add, prif_atomic_fetch_add_indirect
+  public :: prif_atomic_fetch_and, prif_atomic_fetch_and_indirect, prif_atomic_fetch_or, prif_atomic_fetch_or_indirect
+  public :: prif_atomic_fetch_xor, prif_atomic_fetch_xor_indirect
+  public :: prif_atomic_define_int, prif_atomic_define_int_indirect, prif_atomic_define_logical, prif_atomic_define_logical_indirect
+  public :: prif_atomic_ref_int, prif_atomic_ref_int_indirect, prif_atomic_ref_logical, prif_atomic_ref_logical_indirect
 
   type, public :: prif_lock_type
   end type
