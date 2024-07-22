@@ -21,7 +21,7 @@ module prif
   public :: prif_co_sum, prif_co_max, prif_co_min, prif_co_reduce, prif_co_broadcast
   public :: prif_form_team, prif_change_team, prif_end_team, prif_get_team, prif_team_number
   public :: prif_sync_all, prif_sync_images, prif_sync_team, prif_sync_memory
-  public :: prif_lock, prif_unlock
+  public :: prif_lock_indirect, prif_unlock_indirect
   public :: prif_critical, prif_end_critical
   public :: prif_event_post, prif_event_post_indirect, prif_event_wait, prif_event_query
   public :: prif_notify_wait
@@ -459,7 +459,7 @@ module prif
       character(len=:), intent(inout), allocatable, optional :: errmsg_alloc
     end subroutine
 
-    module subroutine prif_lock(image_num, lock_var_ptr, acquired_lock, stat, errmsg, errmsg_alloc)
+    module subroutine prif_lock_indirect(image_num, lock_var_ptr, acquired_lock, stat, errmsg, errmsg_alloc)
       implicit none
       integer(c_int), intent(in) :: image_num
       integer(c_intptr_t), intent(in) :: lock_var_ptr
@@ -469,7 +469,7 @@ module prif
       character(len=:), intent(inout), allocatable, optional :: errmsg_alloc
     end subroutine
 
-    module subroutine prif_unlock(image_num, lock_var_ptr, stat, errmsg, errmsg_alloc)
+    module subroutine prif_unlock_indirect(image_num, lock_var_ptr, stat, errmsg, errmsg_alloc)
       implicit none
       integer(c_int), intent(in) :: image_num
       integer(c_intptr_t), intent(in) :: lock_var_ptr
