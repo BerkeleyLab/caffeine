@@ -23,7 +23,7 @@ module prif
   public :: prif_sync_all, prif_sync_images, prif_sync_team, prif_sync_memory
   public :: prif_lock, prif_unlock
   public :: prif_critical, prif_end_critical
-  public :: prif_event_post, prif_event_wait, prif_event_query
+  public :: prif_event_post_indirect, prif_event_wait, prif_event_query
   public :: prif_notify_wait
   public :: prif_atomic_add_indirect, prif_atomic_and_indirect, prif_atomic_or_indirect, prif_atomic_xor_indirect
   public :: prif_atomic_cas_int_indirect, prif_atomic_cas_logical_indirect, prif_atomic_fetch_add_indirect
@@ -488,7 +488,7 @@ module prif
       type(prif_coarray_handle), intent(in) :: critical_coarray
     end subroutine
 
-    module subroutine prif_event_post(image_num, event_var_ptr, stat, errmsg, errmsg_alloc)
+    module subroutine prif_event_post_indirect(image_num, event_var_ptr, stat, errmsg, errmsg_alloc)
       implicit none
       integer(c_int), intent(in) :: image_num
       integer(c_intptr_t), intent(in) :: event_var_ptr

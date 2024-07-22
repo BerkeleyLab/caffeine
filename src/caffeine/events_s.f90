@@ -6,8 +6,8 @@ submodule(prif:prif_private_s) events_s
 
 contains
 
-  module procedure prif_event_post
-    call unimplemented("prif_event_post")
+  module procedure prif_event_post_indirect
+    call unimplemented("prif_event_post_indirect")
   end procedure
 
   module procedure prif_event_wait
