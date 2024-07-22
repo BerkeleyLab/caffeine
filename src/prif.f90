@@ -459,11 +459,32 @@ module prif
       character(len=:), intent(inout), allocatable, optional :: errmsg_alloc
     end subroutine
 
+    module subroutine prif_lock(image_num, coarray_handle, offset, acquired_lock, stat, errmsg, errmsg_alloc)
+      implicit none
+      integer(c_int), intent(in) :: image_num
+      type(prif_coarray_handle), intent(in) :: coarray_handle
+      integer(c_size_t), intent(in) :: offset
+      logical(c_bool), intent(out), optional :: acquired_lock
+      integer(c_int), intent(out), optional :: stat
+      character(len=*), intent(inout), optional :: errmsg
+      character(len=:), intent(inout), allocatable, optional :: errmsg_alloc
+    end subroutine
+
     module subroutine prif_lock_indirect(image_num, lock_var_ptr, acquired_lock, stat, errmsg, errmsg_alloc)
       implicit none
       integer(c_int), intent(in) :: image_num
       integer(c_intptr_t), intent(in) :: lock_var_ptr
       logical(c_bool), intent(out), optional :: acquired_lock
+      integer(c_int), intent(out), optional :: stat
+      character(len=*), intent(inout), optional :: errmsg
+      character(len=:), intent(inout), allocatable, optional :: errmsg_alloc
+    end subroutine
+
+    module subroutine prif_unlock(image_num, coarray_handle, offset, stat, errmsg, errmsg_alloc)
+      implicit none
+      integer(c_int), intent(in) :: image_num
+      type(prif_coarray_handle), intent(in) :: coarray_handle
+      integer(c_size_t), intent(in) :: offset
       integer(c_int), intent(out), optional :: stat
       character(len=*), intent(inout), optional :: errmsg
       character(len=:), intent(inout), allocatable, optional :: errmsg_alloc
