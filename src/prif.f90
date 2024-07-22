@@ -255,12 +255,10 @@ module prif
       integer(c_size_t), intent(out) :: sizes(:)
     end subroutine
 
-    module subroutine prif_image_index(coarray_handle, sub, team, team_number, image_index)
+    module subroutine prif_image_index(coarray_handle, sub, image_index)
       implicit none
       type(prif_coarray_handle), intent(in) :: coarray_handle
       integer(c_intmax_t), intent(in) :: sub(:)
-      type(prif_team_type), intent(in), optional :: team
-      integer(c_int), intent(in), optional :: team_number
       integer(c_int), intent(out) :: image_index
     end subroutine
 
