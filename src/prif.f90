@@ -532,10 +532,28 @@ module prif
       character(len=:), intent(inout), allocatable, optional :: errmsg_alloc
     end subroutine
 
+    module subroutine prif_atomic_add(image_num, coarray_handle, offset, value, stat)
+      implicit none
+      integer(c_int), intent(in) :: image_num
+      type(prif_coarray_handle), intent(in) :: coarray_handle
+      integer(c_size_t), intent(in) :: offset
+      integer(PRIF_ATOMIC_INT_KIND), intent(in) :: value
+      integer(c_int), intent(out), optional :: stat
+    end subroutine
+
     module subroutine prif_atomic_add_indirect(image_num, atom_remote_ptr, value, stat)
       implicit none
       integer(c_int), intent(in) :: image_num
       integer(c_intptr_t), intent(in) :: atom_remote_ptr
+      integer(PRIF_ATOMIC_INT_KIND), intent(in) :: value
+      integer(c_int), intent(out), optional :: stat
+    end subroutine
+
+    module subroutine prif_atomic_and(image_num, coarray_handle, offset, value, stat)
+      implicit none
+      integer(c_int), intent(in) :: image_num
+      type(prif_coarray_handle), intent(in) :: coarray_handle
+      integer(c_size_t), intent(in) :: offset
       integer(PRIF_ATOMIC_INT_KIND), intent(in) :: value
       integer(c_int), intent(out), optional :: stat
     end subroutine
@@ -548,10 +566,28 @@ module prif
       integer(c_int), intent(out), optional :: stat
     end subroutine
 
+    module subroutine prif_atomic_or(image_num, coarray_handle, offset, value, stat)
+      implicit none
+      integer(c_int), intent(in) :: image_num
+      type(prif_coarray_handle), intent(in) :: coarray_handle
+      integer(c_size_t), intent(in) :: offset
+      integer(PRIF_ATOMIC_INT_KIND), intent(in) :: value
+      integer(c_int), intent(out), optional :: stat
+    end subroutine
+
     module subroutine prif_atomic_or_indirect(image_num, atom_remote_ptr, value, stat)
       implicit none
       integer(c_int), intent(in) :: image_num
       integer(c_intptr_t), intent(in) :: atom_remote_ptr
+      integer(PRIF_ATOMIC_INT_KIND), intent(in) :: value
+      integer(c_int), intent(out), optional :: stat
+    end subroutine
+
+    module subroutine prif_atomic_xor(image_num, coarray_handle, offset, value, stat)
+      implicit none
+      integer(c_int), intent(in) :: image_num
+      type(prif_coarray_handle), intent(in) :: coarray_handle
+      integer(c_size_t), intent(in) :: offset
       integer(PRIF_ATOMIC_INT_KIND), intent(in) :: value
       integer(c_int), intent(out), optional :: stat
     end subroutine
@@ -561,6 +597,17 @@ module prif
       integer(c_int), intent(in) :: image_num
       integer(c_intptr_t), intent(in) :: atom_remote_ptr
       integer(PRIF_ATOMIC_INT_KIND), intent(in) :: value
+      integer(c_int), intent(out), optional :: stat
+    end subroutine
+
+    module subroutine prif_atomic_cas_int(image_num, coarray_handle, offset, old, compare, new, stat)
+      implicit none
+      integer(c_int), intent(in) :: image_num
+      type(prif_coarray_handle), intent(in) :: coarray_handle
+      integer(c_size_t), intent(in) :: offset
+      integer(PRIF_ATOMIC_INT_KIND), intent(out) :: old
+      integer(PRIF_ATOMIC_INT_KIND), intent(in) :: compare
+      integer(PRIF_ATOMIC_INT_KIND), intent(in) :: new
       integer(c_int), intent(out), optional :: stat
     end subroutine
 
@@ -574,6 +621,17 @@ module prif
       integer(c_int), intent(out), optional :: stat
     end subroutine
 
+    module subroutine prif_atomic_cas_logical(image_num, coarray_handle, offset, old, compare, new, stat)
+      implicit none
+      integer(c_int), intent(in) :: image_num
+      type(prif_coarray_handle), intent(in) :: coarray_handle
+      integer(c_size_t), intent(in) :: offset
+      logical(PRIF_ATOMIC_LOGICAL_KIND), intent(out) :: old
+      logical(PRIF_ATOMIC_LOGICAL_KIND), intent(in) :: compare
+      logical(PRIF_ATOMIC_LOGICAL_KIND), intent(in) :: new
+      integer(c_int), intent(out), optional :: stat
+    end subroutine
+
     module subroutine prif_atomic_cas_logical_indirect(image_num, atom_remote_ptr, old, compare, new, stat)
       implicit none
       integer(c_int), intent(in) :: image_num
@@ -584,10 +642,30 @@ module prif
       integer(c_int), intent(out), optional :: stat
     end subroutine
 
+    module subroutine prif_atomic_fetch_add(image_num, coarray_handle, offset, value, old, stat)
+      implicit none
+      integer(c_int), intent(in) :: image_num
+      type(prif_coarray_handle), intent(in) :: coarray_handle
+      integer(c_size_t), intent(in) :: offset
+      integer(PRIF_ATOMIC_INT_KIND), intent(in) :: value
+      integer(PRIF_ATOMIC_INT_KIND), intent(out) :: old
+      integer(c_int), intent(out), optional :: stat
+    end subroutine
+
     module subroutine prif_atomic_fetch_add_indirect(image_num, atom_remote_ptr, value, old, stat)
       implicit none
       integer(c_int), intent(in) :: image_num
       integer(c_intptr_t), intent(in) :: atom_remote_ptr
+      integer(PRIF_ATOMIC_INT_KIND), intent(in) :: value
+      integer(PRIF_ATOMIC_INT_KIND), intent(out) :: old
+      integer(c_int), intent(out), optional :: stat
+    end subroutine
+
+    module subroutine prif_atomic_fetch_and(image_num, coarray_handle, offset, value, old, stat)
+      implicit none
+      integer(c_int), intent(in) :: image_num
+      type(prif_coarray_handle), intent(in) :: coarray_handle
+      integer(c_size_t), intent(in) :: offset
       integer(PRIF_ATOMIC_INT_KIND), intent(in) :: value
       integer(PRIF_ATOMIC_INT_KIND), intent(out) :: old
       integer(c_int), intent(out), optional :: stat
@@ -602,10 +680,30 @@ module prif
       integer(c_int), intent(out), optional :: stat
     end subroutine
 
+    module subroutine prif_atomic_fetch_or(image_num, coarray_handle, offset, value, old, stat)
+      implicit none
+      integer(c_int), intent(in) :: image_num
+      type(prif_coarray_handle), intent(in) :: coarray_handle
+      integer(c_size_t), intent(in) :: offset
+      integer(PRIF_ATOMIC_INT_KIND), intent(in) :: value
+      integer(PRIF_ATOMIC_INT_KIND), intent(out) :: old
+      integer(c_int), intent(out), optional :: stat
+    end subroutine
+
     module subroutine prif_atomic_fetch_or_indirect(image_num, atom_remote_ptr, value, old, stat)
       implicit none
       integer(c_int), intent(in) :: image_num
       integer(c_intptr_t), intent(in) :: atom_remote_ptr
+      integer(PRIF_ATOMIC_INT_KIND), intent(in) :: value
+      integer(PRIF_ATOMIC_INT_KIND), intent(out) :: old
+      integer(c_int), intent(out), optional :: stat
+    end subroutine
+
+    module subroutine prif_atomic_fetch_xor(image_num, coarray_handle, offset, value, old, stat)
+      implicit none
+      integer(c_int), intent(in) :: image_num
+      type(prif_coarray_handle), intent(in) :: coarray_handle
+      integer(c_size_t), intent(in) :: offset
       integer(PRIF_ATOMIC_INT_KIND), intent(in) :: value
       integer(PRIF_ATOMIC_INT_KIND), intent(out) :: old
       integer(c_int), intent(out), optional :: stat
@@ -620,11 +718,29 @@ module prif
       integer(c_int), intent(out), optional :: stat
     end subroutine
 
+    module subroutine prif_atomic_define_int(image_num, coarray_handle, offset, value, stat)
+      implicit none
+      integer(c_int), intent(in) :: image_num
+      type(prif_coarray_handle), intent(in) :: coarray_handle
+      integer(c_size_t), intent(in) :: offset
+      integer(PRIF_ATOMIC_INT_KIND), intent(in) :: value
+      integer(c_int), intent(out), optional :: stat
+    end subroutine
+
     module subroutine prif_atomic_define_int_indirect(image_num, atom_remote_ptr, value, stat)
       implicit none
       integer(c_int), intent(in) :: image_num
       integer(c_intptr_t), intent(in) :: atom_remote_ptr
       integer(PRIF_ATOMIC_INT_KIND), intent(in) :: value
+      integer(c_int), intent(out), optional :: stat
+    end subroutine
+
+    module subroutine prif_atomic_define_logical(image_num, coarray_handle, offset, value, stat)
+      implicit none
+      integer(c_int), intent(in) :: image_num
+      type(prif_coarray_handle), intent(in) :: coarray_handle
+      integer(c_size_t), intent(in) :: offset
+      logical(PRIF_ATOMIC_LOGICAL_KIND), intent(in) :: value
       integer(c_int), intent(out), optional :: stat
     end subroutine
 
@@ -636,11 +752,29 @@ module prif
       integer(c_int), intent(out), optional :: stat
     end subroutine
 
+    module subroutine prif_atomic_ref_int(image_num, coarray_handle, offset, value, stat)
+      implicit none
+      integer(c_int), intent(in) :: image_num
+      type(prif_coarray_handle), intent(in) :: coarray_handle
+      integer(c_size_t), intent(in) :: offset
+      integer(PRIF_ATOMIC_INT_KIND), intent(out) :: value
+      integer(c_int), intent(out), optional :: stat
+    end subroutine
+
     module subroutine prif_atomic_ref_int_indirect(image_num, atom_remote_ptr, value, stat)
       implicit none
       integer(c_int), intent(in) :: image_num
       integer(c_intptr_t), intent(in) :: atom_remote_ptr
       integer(PRIF_ATOMIC_INT_KIND), intent(out) :: value
+      integer(c_int), intent(out), optional :: stat
+    end subroutine
+
+    module subroutine prif_atomic_ref_logical(image_num, coarray_handle, offset, value, stat)
+      implicit none
+      integer(c_int), intent(in) :: image_num
+      type(prif_coarray_handle), intent(in) :: coarray_handle
+      integer(c_size_t), intent(in) :: offset
+      logical(PRIF_ATOMIC_LOGICAL_KIND), intent(out) :: value
       integer(c_int), intent(out), optional :: stat
     end subroutine
 
