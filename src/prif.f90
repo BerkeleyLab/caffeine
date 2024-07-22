@@ -96,9 +96,9 @@ module prif
         lcobounds, ucobounds, lbounds, ubounds, element_length, final_func, coarray_handle, &
         allocated_memory, stat, errmsg, errmsg_alloc)
       implicit none
-      integer(kind=c_intmax_t), dimension(:), intent(in) :: lcobounds, ucobounds
-      integer(kind=c_intmax_t), dimension(:), intent(in) :: lbounds, ubounds
-      integer(kind=c_size_t), intent(in) :: element_length
+      integer(c_intmax_t), dimension(:), intent(in) :: lcobounds, ucobounds
+      integer(c_intmax_t), dimension(:), intent(in) :: lbounds, ubounds
+      integer(c_size_t), intent(in) :: element_length
       type(c_funptr), intent(in) :: final_func
       type(prif_coarray_handle), intent(out) :: coarray_handle
       type(c_ptr), intent(out) :: allocated_memory
@@ -109,7 +109,7 @@ module prif
 
     module subroutine prif_allocate(size_in_bytes, allocated_memory, stat, errmsg, errmsg_alloc)
       implicit none
-      integer(kind=c_size_t) :: size_in_bytes
+      integer(c_size_t) :: size_in_bytes
       type(c_ptr), intent(out) :: allocated_memory
       integer(c_int), intent(out), optional :: stat
       character(len=*), intent(inout), optional :: errmsg
@@ -233,27 +233,27 @@ module prif
     module subroutine prif_lcobound_with_dim(coarray_handle, dim, lcobound)
       implicit none
       type(prif_coarray_handle), intent(in) :: coarray_handle
-      integer(kind=c_int), intent(in) :: dim
-      integer(kind=c_intmax_t), intent(out) :: lcobound
+      integer(c_int), intent(in) :: dim
+      integer(c_intmax_t), intent(out) :: lcobound
     end subroutine
 
     module subroutine prif_lcobound_no_dim(coarray_handle, lcobounds)
       implicit none
       type(prif_coarray_handle), intent(in) :: coarray_handle
-      integer(kind=c_intmax_t), intent(out) :: lcobounds(:)
+      integer(c_intmax_t), intent(out) :: lcobounds(:)
     end subroutine
 
     module subroutine prif_ucobound_with_dim(coarray_handle, dim, ucobound)
       implicit none
       type(prif_coarray_handle), intent(in) :: coarray_handle
-      integer(kind=c_int), intent(in) :: dim
-      integer(kind=c_intmax_t), intent(out) :: ucobound
+      integer(c_int), intent(in) :: dim
+      integer(c_intmax_t), intent(out) :: ucobound
     end subroutine
 
     module subroutine prif_ucobound_no_dim(coarray_handle, ucobounds)
       implicit none
       type(prif_coarray_handle), intent(in) :: coarray_handle
-      integer(kind=c_intmax_t), intent(out) :: ucobounds(:)
+      integer(c_intmax_t), intent(out) :: ucobounds(:)
     end subroutine
 
     module subroutine prif_coshape(coarray_handle, sizes)
