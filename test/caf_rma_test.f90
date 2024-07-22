@@ -48,7 +48,7 @@ contains
                 ucobounds = ucobounds, &
                 lbounds = [integer(c_intmax_t)::], &
                 ubounds = [integer(c_intmax_t)::], &
-                element_length = int(storage_size(dummy_element)/8, c_size_t), &
+                element_size = int(storage_size(dummy_element)/8, c_size_t), &
                 final_func = c_null_funptr, &
                 coarray_handle = coarray_handle, &
                 allocated_memory = allocated_memory)
@@ -89,7 +89,7 @@ contains
                 ucobounds = ucobounds, &
                 lbounds = [integer(c_intmax_t)::], &
                 ubounds = [integer(c_intmax_t)::], &
-                element_length = int(storage_size(dummy_element)/8, c_size_t), &
+                element_size = int(storage_size(dummy_element)/8, c_size_t), &
                 final_func = c_null_funptr, &
                 coarray_handle = coarray_handle, &
                 allocated_memory = allocated_memory)
@@ -129,7 +129,7 @@ contains
                 ucobounds = ucobounds, &
                 lbounds = [integer(c_intmax_t)::], &
                 ubounds = [integer(c_intmax_t)::], &
-                element_length = int(storage_size(dummy_element)/8, c_size_t), &
+                element_size = int(storage_size(dummy_element)/8, c_size_t), &
                 final_func = c_null_funptr, &
                 coarray_handle = coarray_handle, &
                 allocated_memory = allocated_memory)
@@ -171,7 +171,7 @@ contains
                 ucobounds = ucobounds, &
                 lbounds = [integer(c_intmax_t)::], &
                 ubounds = [integer(c_intmax_t)::], &
-                element_length = int(storage_size(dummy_element)/8, c_size_t), &
+                element_size = int(storage_size(dummy_element)/8, c_size_t), &
                 final_func = c_null_funptr, &
                 coarray_handle = coarray_handle, &
                 allocated_memory = allocated_memory)

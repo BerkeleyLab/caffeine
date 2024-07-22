@@ -87,12 +87,12 @@ module prif
     end subroutine
 
     module subroutine prif_allocate_coarray( &
-        lcobounds, ucobounds, lbounds, ubounds, element_length, final_func, coarray_handle, &
+        lcobounds, ucobounds, lbounds, ubounds, element_size, final_func, coarray_handle, &
         allocated_memory, stat, errmsg, errmsg_alloc)
       implicit none
       integer(c_intmax_t), dimension(:), intent(in) :: lcobounds, ucobounds
       integer(c_intmax_t), dimension(:), intent(in) :: lbounds, ubounds
-      integer(c_size_t), intent(in) :: element_length
+      integer(c_size_t), intent(in) :: element_size
       type(c_funptr), intent(in) :: final_func
       type(prif_coarray_handle), intent(out) :: coarray_handle
       type(c_ptr), intent(out) :: allocated_memory
@@ -834,7 +834,7 @@ module prif
     type(c_ptr) :: coarray_data
     integer(c_int) :: corank
     integer(c_size_t) :: coarray_size
-    integer(c_size_t) :: element_length
+    integer(c_size_t) :: element_size
     type(c_funptr) :: final_func
     type(c_ptr) :: previous_handle, next_handle
     integer(c_intmax_t) :: lcobounds(15), ucobounds(15)

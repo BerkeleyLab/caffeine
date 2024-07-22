@@ -31,7 +31,7 @@ contains
                 ucobounds = [2_c_intmax_t], &
                 lbounds = [integer(c_intmax_t)::], &
                 ubounds = [integer(c_intmax_t)::], &
-                element_length = 1_c_size_t, &
+                element_size = 1_c_size_t, &
                 final_func = c_null_funptr, &
                 coarray_handle = coarray_handle, &
                 allocated_memory = allocated_memory)
@@ -52,7 +52,7 @@ contains
                 ucobounds = [3_c_intmax_t, 4_c_intmax_t], &
                 lbounds = [integer(c_intmax_t)::], &
                 ubounds = [integer(c_intmax_t)::], &
-                element_length = 1_c_size_t, &
+                element_size = 1_c_size_t, &
                 final_func = c_null_funptr, &
                 coarray_handle = coarray_handle, &
                 allocated_memory = allocated_memory)
@@ -73,7 +73,7 @@ contains
                 ucobounds = [2_c_intmax_t, 6_c_intmax_t], &
                 lbounds = [integer(c_intmax_t)::], &
                 ubounds = [integer(c_intmax_t)::], &
-                element_length = 1_c_size_t, &
+                element_size = 1_c_size_t, &
                 final_func = c_null_funptr, &
                 coarray_handle = coarray_handle, &
                 allocated_memory = allocated_memory)
@@ -95,7 +95,7 @@ contains
                 ucobounds = [2_c_intmax_t, 3_c_intmax_t], &
                 lbounds = [integer(c_intmax_t)::], &
                 ubounds = [integer(c_intmax_t)::], &
-                element_length = 1_c_size_t, &
+                element_size = 1_c_size_t, &
                 final_func = c_null_funptr, &
                 coarray_handle = coarray_handle, &
                 allocated_memory = allocated_memory)
