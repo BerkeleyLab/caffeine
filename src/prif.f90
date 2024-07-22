@@ -112,7 +112,7 @@ module prif
 
     module subroutine prif_deallocate_coarray(coarray_handles, stat, errmsg, errmsg_alloc)
       implicit none
-      type(prif_coarray_handle), target, intent(in) :: coarray_handles(:)
+      type(prif_coarray_handle), intent(in) :: coarray_handles(:)
       integer(c_int), intent(out), optional :: stat
       character(len=*), intent(inout), optional :: errmsg
       character(len=:), intent(inout), allocatable, optional :: errmsg_alloc
