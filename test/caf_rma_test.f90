@@ -10,7 +10,7 @@ module caf_rma_test
             prif_put, &
             prif_put_raw, &
             prif_get, &
-            prif_get_raw, &
+            prif_get_indirect, &
             prif_sync_all, &
             prif_this_image_no_coarray
     use veggies, only: result_t, test_item_t, assert_equals, describe, it
@@ -27,7 +27,7 @@ contains
             [ it("can send a value to another image", check_put) &
             , it("can send a value with raw interface", check_put_raw) &
             , it("can get a value from another image", check_get) &
-            , it("can get a value with raw interface", check_get_raw) &
+            , it("can get a value with indirect interface", check_get_indirect) &
             ])
     end function
 
@@ -152,7 +152,7 @@ contains
         call prif_deallocate_coarray([coarray_handle])
     end function
 
-    function check_get_raw() result(result_)
+    function check_get_indirect() result(result_)
         type(result_t) :: result_
 
         integer :: dummy_element, num_imgs, me, expected, neighbor
@@ -184,11 +184,11 @@ contains
         call prif_base_pointer(coarray_handle, neighbor, base_addr)
         call prif_sync_all
 
-        call prif_get_raw( &
+        call prif_get_indirect( &
                 image_num = neighbor, &
                 current_image_buffer = c_loc(retrieved), &
                 remote_ptr = base_addr, &
-                size = int(storage_size(retrieved)/8, c_size_t))
+                size_in_bytes = int(storage_size(retrieved)/8, c_size_t))
 
         result_ = assert_equals(expected, retrieved)
 

@@ -46,19 +46,19 @@ contains
         remote_base &
         + (caf_as_int(first_element_addr) &
         - caf_as_int(coarray_handle%info%coarray_data))
-    call prif_get_raw( &
+    call prif_get_indirect( &
         image_num = image, &
         current_image_buffer = c_loc(value), &
         remote_ptr = remote_ptr, &
-        size = size(value) * coarray_handle%info%element_size)
+        size_in_bytes = size(value) * coarray_handle%info%element_size)
   end procedure
 
-  module procedure prif_get_raw
+  module procedure prif_get_indirect
     call caf_get( &
         image = image_num, &
         dest = current_image_buffer, &
         src = remote_ptr, &
-        size = size)
+        size = size_in_bytes)
   end procedure
 
   module procedure prif_get_raw_strided
