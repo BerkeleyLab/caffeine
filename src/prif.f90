@@ -3,7 +3,6 @@
 module prif
 
   use iso_c_binding, only: c_int, c_bool, c_intptr_t, c_intmax_t, c_ptr, c_funptr, c_size_t, c_ptrdiff_t
-  use iso_fortran_env, only: atomic_int_kind, atomic_logical_kind
 
   implicit none
 
