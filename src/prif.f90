@@ -175,14 +175,13 @@ module prif
     end subroutine
 
     module subroutine prif_get( &
-        coarray_handle, cosubscripts, first_element_addr, value, team, team_number, stat, errmsg, errmsg_alloc)
+        image_num, coarray_handle, offset, current_image_buffer, size_in_bytes, stat, errmsg, errmsg_alloc)
       implicit none
+      integer(c_int), intent(in) :: image_num
       type(prif_coarray_handle), intent(in) :: coarray_handle
-      integer(c_intmax_t), intent(in) :: cosubscripts(:)
-      type(c_ptr), intent(in) :: first_element_addr
-      type(*), intent(inout), contiguous, target :: value(..)
-      type(prif_team_type), optional, intent(in) :: team
-      integer(c_intmax_t), optional, intent(in) :: team_number
+      integer(c_size_t), intent(in) :: offset
+      type(c_ptr), intent(in) :: current_image_buffer
+      integer(c_size_t), intent(in) :: size_in_bytes
       integer(c_int), intent(out), optional :: stat
       character(len=*), intent(inout), optional :: errmsg
       character(len=:), intent(inout), allocatable, optional :: errmsg_alloc

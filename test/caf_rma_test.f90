@@ -1,6 +1,6 @@
 module caf_rma_test
     use iso_c_binding, only: &
-            c_ptr, c_intmax_t, c_intptr_t, c_size_t, c_null_funptr, c_f_pointer, c_loc
+            c_ptr, c_intmax_t, c_intptr_t, c_size_t, c_null_funptr, c_f_pointer, c_loc, c_sizeof
     use prif, only: &
             prif_coarray_handle, &
             prif_allocate_coarray, &
@@ -115,11 +115,12 @@ contains
     function check_get() result(result_)
         type(result_t) :: result_
 
-        integer :: dummy_element, num_imgs, me, expected, retrieved
+        integer :: dummy_element, num_imgs, me, neighbor, expected
+        integer, target :: retrieved
         type(prif_coarray_handle) :: coarray_handle
         type(c_ptr) :: allocated_memory
         integer, pointer :: local_slice
-        integer(c_intmax_t) :: lcobounds(1), ucobounds(1), neighbor
+        integer(c_intmax_t) :: lcobounds(1), ucobounds(1)
 
         call prif_num_images(num_images=num_imgs)
         lcobounds(1) = 1
@@ -142,10 +143,11 @@ contains
         call prif_sync_all
 
         call prif_get( &
+                image_num = neighbor, &
                 coarray_handle = coarray_handle, &
-                cosubscripts = [neighbor], &
-                first_element_addr = allocated_memory, &
-                value = retrieved)
+                offset = 0_c_size_t, &
+                current_image_buffer = c_loc(retrieved), &
+                size_in_bytes = c_sizeof(retrieved))
 
         result_ = assert_equals(expected, retrieved)
 

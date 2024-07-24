@@ -37,20 +37,17 @@ contains
   end procedure
 
   module procedure prif_get
-    integer(c_int) :: image
-    integer(c_intptr_t) :: remote_base, remote_ptr
+    integer(c_intptr_t) :: remote_base
 
-    call prif_image_index(coarray_handle, cosubscripts, image_index=image)
-    call prif_base_pointer(coarray_handle, image, remote_base)
-    remote_ptr = &
-        remote_base &
-        + (caf_as_int(first_element_addr) &
-        - caf_as_int(coarray_handle%info%coarray_data))
+    call prif_base_pointer(coarray_handle, image_num, remote_base)
     call prif_get_indirect( &
-        image_num = image, &
-        current_image_buffer = c_loc(value), &
-        remote_ptr = remote_ptr, &
-        size_in_bytes = size(value) * coarray_handle%info%element_size)
+        image_num = image_num, &
+        remote_ptr = remote_base + offset, &
+        current_image_buffer = current_image_buffer, &
+        size_in_bytes = size_in_bytes, &
+        stat = stat, &
+        errmsg = errmsg, &
+        errmsg_alloc = errmsg_alloc)
   end procedure
 
   module procedure prif_get_indirect
