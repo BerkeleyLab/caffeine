@@ -17,19 +17,19 @@ contains
         remote_base &
         + (caf_as_int(first_element_addr) &
         - caf_as_int(coarray_handle%info%coarray_data))
-    call prif_put_raw( &
+    call prif_put_indirect( &
         image_num = image, &
         current_image_buffer = c_loc(value), &
         remote_ptr = remote_ptr, &
-        size = size(value) * coarray_handle%info%element_size)
+        size_in_bytes = size(value) * coarray_handle%info%element_size)
   end procedure
 
-  module procedure prif_put_raw
+  module procedure prif_put_indirect
     call caf_put( &
         image = image_num, &
         dest = remote_ptr, &
         src = current_image_buffer, &
-        size = size)
+        size = size_in_bytes)
   end procedure
 
   module procedure prif_put_raw_strided

@@ -8,7 +8,7 @@ module caf_rma_test
             prif_base_pointer, &
             prif_num_images, &
             prif_put, &
-            prif_put_raw, &
+            prif_put_indirect, &
             prif_get, &
             prif_get_indirect, &
             prif_sync_all, &
@@ -25,7 +25,7 @@ contains
         tests = describe( &
             "PRIF RMA", &
             [ it("can send a value to another image", check_put) &
-            , it("can send a value with raw interface", check_put_raw) &
+            , it("can send a value with indirect interface", check_put_indirect) &
             , it("can get a value from another image", check_get) &
             , it("can get a value with indirect interface", check_get_indirect) &
             ])
@@ -70,7 +70,7 @@ contains
         call prif_deallocate_coarray([coarray_handle])
     end function
 
-    function check_put_raw() result(result_)
+    function check_put_indirect() result(result_)
         type(result_t) :: result_
 
         integer :: dummy_element, num_imgs, expected, neighbor
@@ -100,11 +100,11 @@ contains
         expected = merge(me-1, num_imgs, me > 1)
 
         call prif_base_pointer(coarray_handle, neighbor, base_addr)
-        call prif_put_raw( &
+        call prif_put_indirect( &
                 image_num = neighbor, &
-                current_image_buffer = c_loc(me), &
                 remote_ptr = base_addr, &
-                size = int(storage_size(me)/8, c_size_t))
+                current_image_buffer = c_loc(me), &
+                size_in_bytes = int(storage_size(me)/8, c_size_t))
         call prif_sync_all
 
         result_ = assert_equals(expected, local_slice)
@@ -188,8 +188,8 @@ contains
 
         call prif_get_indirect( &
                 image_num = neighbor, &
-                current_image_buffer = c_loc(retrieved), &
                 remote_ptr = base_addr, &
+                current_image_buffer = c_loc(retrieved), &
                 size_in_bytes = int(storage_size(retrieved)/8, c_size_t))
 
         result_ = assert_equals(expected, retrieved)
