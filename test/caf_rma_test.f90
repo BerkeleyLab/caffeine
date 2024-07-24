@@ -34,11 +34,12 @@ contains
     function check_put() result(result_)
         type(result_t) :: result_
 
-        integer :: dummy_element, num_imgs, me, expected
+        integer :: dummy_element, num_imgs, expected, neighbor
+        integer, target :: me
         type(prif_coarray_handle) :: coarray_handle
         type(c_ptr) :: allocated_memory
         integer, pointer :: local_slice
-        integer(c_intmax_t) :: lcobounds(1), ucobounds(1), neighbor
+        integer(c_intmax_t) :: lcobounds(1), ucobounds(1)
 
         call prif_num_images(num_images=num_imgs)
         lcobounds(1) = 1
@@ -59,10 +60,11 @@ contains
         expected = merge(me-1, num_imgs, me > 1)
 
         call prif_put( &
+                image_num = neighbor, &
                 coarray_handle = coarray_handle, &
-                cosubscripts = [neighbor], &
-                value = me, &
-                first_element_addr = allocated_memory)
+                offset = 0_c_size_t, &
+                current_image_buffer = c_loc(me), &
+                size_in_bytes = c_sizeof(me))
         call prif_sync_all
 
         result_ = assert_equals(expected, local_slice)
