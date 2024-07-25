@@ -10,7 +10,7 @@ module prif
   public :: prif_init
   public :: prif_stop, prif_error_stop, prif_fail_image
   public :: prif_allocate_coarray, prif_allocate, prif_deallocate_coarray, prif_deallocate
-  public :: prif_put, prif_put_indirect, prif_put_raw_strided, prif_get, prif_get_indirect, prif_get_raw_strided
+  public :: prif_put, prif_put_indirect, prif_get, prif_get_indirect
   public :: prif_alias_create, prif_alias_destroy
   public :: prif_lcobound_with_dim, prif_lcobound_no_dim, prif_ucobound_with_dim, prif_ucobound_no_dim, prif_coshape
   public :: prif_image_index, prif_image_index_with_team, prif_image_index_with_team_number
@@ -155,23 +155,6 @@ module prif
       character(len=:), intent(inout), allocatable, optional :: errmsg_alloc
     end subroutine
 
-    module subroutine prif_put_raw_strided( &
-        image_num, current_image_buffer, remote_ptr, element_size, extent, remote_ptr_stride, &
-        current_image_buffer_stride, notify_ptr, stat, errmsg, errmsg_alloc)
-      implicit none
-      integer(c_int), intent(in) :: image_num
-      type(c_ptr), intent(in) :: current_image_buffer
-      integer(c_intptr_t), intent(in) :: remote_ptr
-      integer(c_size_t), intent(in) :: element_size
-      integer(c_size_t), intent(in) :: extent(:)
-      integer(c_ptrdiff_t), intent(in) :: remote_ptr_stride(:)
-      integer(c_ptrdiff_t), intent(in) :: current_image_buffer_stride(:)
-      integer(c_intptr_t), optional, intent(in) :: notify_ptr
-      integer(c_int), intent(out), optional :: stat
-      character(len=*), intent(inout), optional :: errmsg
-      character(len=:), intent(inout), allocatable, optional :: errmsg_alloc
-    end subroutine
-
     module subroutine prif_get( &
         image_num, coarray_handle, offset, current_image_buffer, size_in_bytes, stat, errmsg, errmsg_alloc)
       implicit none
@@ -191,22 +174,6 @@ module prif
       integer(c_intptr_t), intent(in) :: remote_ptr
       type(c_ptr), intent(in) :: current_image_buffer
       integer(c_size_t), intent(in) :: size_in_bytes
-      integer(c_int), intent(out), optional :: stat
-      character(len=*), intent(inout), optional :: errmsg
-      character(len=:), intent(inout), allocatable, optional :: errmsg_alloc
-    end subroutine
-
-    module subroutine prif_get_raw_strided( &
-        image_num, current_image_buffer, remote_ptr, element_size, extent, remote_ptr_stride, current_image_buffer_stride, &
-        stat, errmsg, errmsg_alloc)
-      implicit none
-      integer(c_int), intent(in) :: image_num
-      type(c_ptr), intent(in) :: current_image_buffer
-      integer(c_intptr_t), intent(in) :: remote_ptr
-      integer(c_size_t), intent(in) :: element_size
-      integer(c_size_t), intent(in) :: extent(:)
-      integer(c_ptrdiff_t), intent(in) :: remote_ptr_stride(:)
-      integer(c_ptrdiff_t), intent(in) :: current_image_buffer_stride(:)
       integer(c_int), intent(out), optional :: stat
       character(len=*), intent(inout), optional :: errmsg
       character(len=:), intent(inout), allocatable, optional :: errmsg_alloc

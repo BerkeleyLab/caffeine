@@ -26,10 +26,6 @@ contains
         size = size_in_bytes)
   end procedure
 
-  module procedure prif_put_raw_strided
-    call unimplemented("prif_put_raw_strided")
-  end procedure
-
   module procedure prif_get
     integer(c_intptr_t) :: remote_base
 
@@ -50,10 +46,6 @@ contains
         dest = current_image_buffer, &
         src = remote_ptr, &
         size = size_in_bytes)
-  end procedure
-
-  module procedure prif_get_raw_strided
-    call unimplemented("prif_get_raw_strided")
   end procedure
 
 end submodule coarray_access_s
