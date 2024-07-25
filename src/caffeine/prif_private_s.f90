@@ -185,23 +185,28 @@ submodule(prif) prif_private_s
        integer(c_size_t), target :: a_elem_len
      end function
 
-     pure function caf_as_int(ptr) bind(C)
-       !! intptr_t caf_as_int(void* ptr);
-       import c_ptr, c_intptr_t
-       type(c_ptr), intent(in), value :: ptr
-       integer(c_intptr_t) :: caf_as_int
-     end function
-
-     pure function caf_as_c_ptr(i) bind(C)
-       !! void* caf_as_c_ptr(intptr_t i);
-       import c_ptr, c_intptr_t
-       integer(c_intptr_t), intent(in), value :: i
-       type(c_ptr) :: caf_as_c_ptr
-     end function
-
   end interface
 
 contains
+
+  pure function caf_as_int(ptr)
+    type(c_ptr), intent(in) :: ptr
+    integer(c_intptr_t) :: caf_as_int
+
+    ! the following snippet ensures at compile time that c_ptr and
+    ! c_intptr_t are actually the same size
+    integer, parameter :: caf_int_ptr_check = merge(c_intptr_t, 0, storage_size(ptr) == storage_size(caf_as_int))
+    integer(caf_int_ptr_check), parameter :: unused = 0_caf_int_ptr_check
+
+    caf_as_int = transfer(ptr, caf_as_int)
+  end function
+
+  pure function caf_as_c_ptr(i)
+    integer(c_intptr_t), intent(in) :: i
+    type(c_ptr) :: caf_as_c_ptr
+
+    caf_as_c_ptr = transfer(i, caf_as_c_ptr)
+  end function
 
   subroutine caf_base_pointer(coarray_handle, image_num, ptr)
     type(prif_coarray_handle), intent(in) :: coarray_handle

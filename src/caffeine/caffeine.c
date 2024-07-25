@@ -284,11 +284,3 @@ bool caf_is_f_string(CFI_cdesc_t* a_desc){
   return false;
 }
 #endif
-
-intptr_t caf_as_int(void* ptr) {
-  return (intptr_t)ptr;
-}
-
-void* caf_as_c_ptr(intptr_t i) {
-  return (void*)i;
-}
