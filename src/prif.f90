@@ -58,6 +58,11 @@ module prif
   end type
 
   integer(c_int), parameter, public :: PRIF_ATOMIC_INT_KIND = selected_int_kind(18)
+
+  ! gfortran-14 doesn't currently support the intrinsic selected_logical_kind
+  ! The following commented-out definition is the desired definition and should replace
+  ! the temporary definition when possible
+  ! integer(c_int), parameter, public :: PRIF_ATOMIC_LOGICAL_KIND = selected_logical_kind(32)
   integer(c_int), parameter, public :: PRIF_ATOMIC_LOGICAL_KIND = PRIF_ATOMIC_INT_KIND
 
   interface
