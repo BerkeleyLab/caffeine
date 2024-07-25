@@ -25,7 +25,7 @@ contains
     type(handle_data) :: unused
     type(handle_data), pointer :: unused2(:)
 
-    coarray_size = product(ubounds-lbounds+1)*element_length
+    coarray_size = product(ubounds-lbounds+1)*element_size
 
     me = caf_this_image(current_team%gex_team)
     if (me == 1) then
@@ -45,7 +45,7 @@ contains
     coarray_handle%info%coarray_data = c_loc(unused2(2))
     coarray_handle%info%corank = size(lcobounds)
     coarray_handle%info%coarray_size = coarray_size
-    coarray_handle%info%element_length = element_length
+    coarray_handle%info%element_size = element_size
     coarray_handle%info%final_func = final_func
     coarray_handle%info%lcobounds(1:size(lcobounds)) = lcobounds
     coarray_handle%info%ucobounds(1:size(ucobounds)) = ucobounds

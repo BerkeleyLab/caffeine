@@ -10,6 +10,10 @@ contains
     call unimplemented("prif_event_post")
   end procedure
 
+  module procedure prif_event_post_indirect
+    call unimplemented("prif_event_post_indirect")
+  end procedure
+
   module procedure prif_event_wait
     call unimplemented("prif_event_wait")
   end procedure
