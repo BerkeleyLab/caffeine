@@ -203,6 +203,22 @@ submodule(prif) prif_private_s
 
 contains
 
+  subroutine caf_base_pointer(coarray_handle, image_num, ptr)
+    type(prif_coarray_handle), intent(in) :: coarray_handle
+    integer(c_int), intent(in) :: image_num
+    integer(c_intptr_t), intent(out) :: ptr
+
+    integer(c_int) :: num_img
+
+    call prif_num_images(num_images=num_img)
+    call assert(image_num .ge. 0 .and. image_num .le. num_img, "caf_base_pointer: image_num not within valid range")
+    if (image_num .eq. 0) then
+      ptr = 0
+    else
+      ptr = caf_convert_base_addr(coarray_handle%info%coarray_data, image_num)
+    end if
+  end subroutine
+
   subroutine unimplemented(proc_name)
     character(len=*), intent(in) ::  proc_name
     call prif_error_stop(quiet=.false._c_bool, stop_code_char=proc_name // " is not yet implemented")
