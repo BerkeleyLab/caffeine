@@ -21,7 +21,7 @@ contains
         image_num = image, &
         current_image_buffer = c_loc(value), &
         remote_ptr = remote_ptr, &
-        size = size(value) * coarray_handle%info%element_length)
+        size = size(value) * coarray_handle%info%element_size)
   end procedure
 
   module procedure prif_put_raw
@@ -50,7 +50,7 @@ contains
         image_num = image, &
         current_image_buffer = c_loc(value), &
         remote_ptr = remote_ptr, &
-        size = size(value) * coarray_handle%info%element_length)
+        size = size(value) * coarray_handle%info%element_size)
   end procedure
 
   module procedure prif_get_raw

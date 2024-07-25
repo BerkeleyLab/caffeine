@@ -53,10 +53,18 @@ contains
        end do
     end if
 
-    call prif_num_images(image_count=num_img)
+    call prif_num_images(num_images=num_img)
     if (invalid_cosubscripts .or. image_index .gt. num_img) then
        image_index = 0
     end if
+  end procedure
+
+  module procedure prif_image_index_with_team
+    call unimplemented("prif_image_index_with_team")
+  end procedure
+
+  module procedure prif_image_index_with_team_number
+    call unimplemented("prif_image_index_with_team_number")
   end procedure
 
 end submodule coarray_queries_s

@@ -1,5 +1,5 @@
 module caf_co_broadcast_test
-  use prif, only : prif_co_broadcast, prif_num_images, prif_this_image
+  use prif, only : prif_co_broadcast, prif_num_images, prif_this_image_no_coarray
   use veggies, only : result_t, test_item_t, describe, it, assert_equals, assert_that
 
   implicit none
@@ -44,7 +44,7 @@ contains
     integer iPhone, me
     integer, parameter :: source_value = 7779311, junk = -99
 
-    call prif_this_image(image_index=me)
+    call prif_this_image_no_coarray(this_image=me)
     iPhone = merge(source_value, junk, me==1)
     call prif_co_broadcast(iPhone, source_image=1)
     result_ = assert_equals(source_value, iPhone)
@@ -55,8 +55,8 @@ contains
     type(object_t) object
     integer :: me, ni
 
-    call prif_this_image(image_index=me)
-    call prif_num_images(image_count=ni)
+    call prif_this_image_no_coarray(this_image=me)
+    call prif_num_images(num_images=ni)
     object = object_t(me, .false., "gooey", me*(1.,0.))
     call prif_co_broadcast(object, source_image=ni)
     associate(expected_object => object_t(ni, .false., "gooey", ni*(1.,0.)))

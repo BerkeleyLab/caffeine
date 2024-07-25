@@ -20,7 +20,7 @@ contains
   function check_num_images_valid() result(result_)
     type(result_t) :: result_
     integer :: num_imgs
-    call prif_num_images(image_count=num_imgs)
+    call prif_num_images(num_images=num_imgs)
     result_ = assert_that(num_imgs>0, "positive number of images")
   end function
 

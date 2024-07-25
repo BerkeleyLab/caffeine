@@ -12,7 +12,7 @@ module caf_rma_test
             prif_get, &
             prif_get_raw, &
             prif_sync_all, &
-            prif_this_image
+            prif_this_image_no_coarray
     use veggies, only: result_t, test_item_t, assert_equals, describe, it
 
     implicit none
@@ -40,7 +40,7 @@ contains
         integer, pointer :: local_slice
         integer(c_intmax_t) :: lcobounds(1), ucobounds(1), neighbor
 
-        call prif_num_images(image_count=num_imgs)
+        call prif_num_images(num_images=num_imgs)
         lcobounds(1) = 1
         ucobounds(1) = num_imgs
         call prif_allocate_coarray( &
@@ -48,13 +48,13 @@ contains
                 ucobounds = ucobounds, &
                 lbounds = [integer(c_intmax_t)::], &
                 ubounds = [integer(c_intmax_t)::], &
-                element_length = int(storage_size(dummy_element)/8, c_size_t), &
+                element_size = int(storage_size(dummy_element)/8, c_size_t), &
                 final_func = c_null_funptr, &
                 coarray_handle = coarray_handle, &
                 allocated_memory = allocated_memory)
         call c_f_pointer(allocated_memory, local_slice)
 
-        call prif_this_image(image_index=me)
+        call prif_this_image_no_coarray(this_image=me)
         neighbor = merge(me+1, 1, me < num_imgs)
         expected = merge(me-1, num_imgs, me > 1)
 
@@ -81,7 +81,7 @@ contains
         integer(c_intmax_t) :: lcobounds(1), ucobounds(1)
         integer(c_intptr_t) :: base_addr
 
-        call prif_num_images(image_count=num_imgs)
+        call prif_num_images(num_images=num_imgs)
         lcobounds(1) = 1
         ucobounds(1) = num_imgs
         call prif_allocate_coarray( &
@@ -89,13 +89,13 @@ contains
                 ucobounds = ucobounds, &
                 lbounds = [integer(c_intmax_t)::], &
                 ubounds = [integer(c_intmax_t)::], &
-                element_length = int(storage_size(dummy_element)/8, c_size_t), &
+                element_size = int(storage_size(dummy_element)/8, c_size_t), &
                 final_func = c_null_funptr, &
                 coarray_handle = coarray_handle, &
                 allocated_memory = allocated_memory)
         call c_f_pointer(allocated_memory, local_slice)
 
-        call prif_this_image(image_index=me)
+        call prif_this_image_no_coarray(this_image=me)
         neighbor = merge(me+1, 1, me < num_imgs)
         expected = merge(me-1, num_imgs, me > 1)
 
@@ -121,7 +121,7 @@ contains
         integer, pointer :: local_slice
         integer(c_intmax_t) :: lcobounds(1), ucobounds(1), neighbor
 
-        call prif_num_images(image_count=num_imgs)
+        call prif_num_images(num_images=num_imgs)
         lcobounds(1) = 1
         ucobounds(1) = num_imgs
         call prif_allocate_coarray( &
@@ -129,13 +129,13 @@ contains
                 ucobounds = ucobounds, &
                 lbounds = [integer(c_intmax_t)::], &
                 ubounds = [integer(c_intmax_t)::], &
-                element_length = int(storage_size(dummy_element)/8, c_size_t), &
+                element_size = int(storage_size(dummy_element)/8, c_size_t), &
                 final_func = c_null_funptr, &
                 coarray_handle = coarray_handle, &
                 allocated_memory = allocated_memory)
         call c_f_pointer(allocated_memory, local_slice)
 
-        call prif_this_image(image_index=me)
+        call prif_this_image_no_coarray(this_image=me)
         neighbor = merge(me+1, 1, me < num_imgs)
         expected = neighbor
         local_slice = me
@@ -163,7 +163,7 @@ contains
         integer(c_intmax_t) :: lcobounds(1), ucobounds(1)
         integer(c_intptr_t) :: base_addr
 
-        call prif_num_images(image_count=num_imgs)
+        call prif_num_images(num_images=num_imgs)
         lcobounds(1) = 1
         ucobounds(1) = num_imgs
         call prif_allocate_coarray( &
@@ -171,13 +171,13 @@ contains
                 ucobounds = ucobounds, &
                 lbounds = [integer(c_intmax_t)::], &
                 ubounds = [integer(c_intmax_t)::], &
-                element_length = int(storage_size(dummy_element)/8, c_size_t), &
+                element_size = int(storage_size(dummy_element)/8, c_size_t), &
                 final_func = c_null_funptr, &
                 coarray_handle = coarray_handle, &
                 allocated_memory = allocated_memory)
         call c_f_pointer(allocated_memory, local_slice)
 
-        call prif_this_image(image_index=me)
+        call prif_this_image_no_coarray(this_image=me)
         neighbor = merge(me+1, 1, me < num_imgs)
         expected = neighbor
         local_slice = me
