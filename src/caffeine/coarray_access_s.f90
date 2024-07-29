@@ -10,7 +10,7 @@ contains
   module procedure prif_put
     integer(c_intptr_t) :: remote_base
 
-    call caf_base_pointer(coarray_handle, image_num, remote_base)
+    call base_pointer(coarray_handle, image_num, remote_base)
     call prif_put_indirect( &
         image_num = image_num, &
         remote_ptr = remote_base + offset, &
@@ -29,7 +29,7 @@ contains
   module procedure prif_get
     integer(c_intptr_t) :: remote_base
 
-    call caf_base_pointer(coarray_handle, image_num, remote_base)
+    call base_pointer(coarray_handle, image_num, remote_base)
     call prif_get_indirect( &
         image_num = image_num, &
         remote_ptr = remote_base + offset, &
