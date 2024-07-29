@@ -216,12 +216,8 @@ contains
     integer(c_int) :: num_img
 
     call prif_num_images(num_images=num_img)
-    call assert(image_num .ge. 0 .and. image_num .le. num_img, "base_pointer: image_num not within valid range")
-    if (image_num .eq. 0) then
-      ptr = 0
-    else
-      ptr = caf_convert_base_addr(coarray_handle%info%coarray_data, image_num)
-    end if
+    call assert(image_num > 0 .and. image_num <= num_img, "base_pointer: image_num not within valid range")
+    ptr = caf_convert_base_addr(coarray_handle%info%coarray_data, image_num)
   end subroutine
 
   subroutine unimplemented(proc_name)
