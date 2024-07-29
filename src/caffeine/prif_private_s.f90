@@ -189,26 +189,26 @@ submodule(prif) prif_private_s
 
 contains
 
-  pure function caf_as_int(ptr)
+  pure function as_int(ptr)
     type(c_ptr), intent(in) :: ptr
-    integer(c_intptr_t) :: caf_as_int
+    integer(c_intptr_t) :: as_int
 
     ! the following snippet ensures at compile time that c_ptr and
     ! c_intptr_t are actually the same size
-    integer, parameter :: caf_int_ptr_check = merge(c_intptr_t, 0, storage_size(ptr) == storage_size(caf_as_int))
-    integer(caf_int_ptr_check), parameter :: unused = 0_caf_int_ptr_check
+    integer, parameter :: int_ptr_check = merge(c_intptr_t, 0, storage_size(ptr) == storage_size(as_int))
+    integer(int_ptr_check), parameter :: unused = 0_int_ptr_check
 
-    caf_as_int = transfer(ptr, caf_as_int)
+    as_int = transfer(ptr, as_int)
   end function
 
-  pure function caf_as_c_ptr(i)
+  pure function as_c_ptr(i)
     integer(c_intptr_t), intent(in) :: i
-    type(c_ptr) :: caf_as_c_ptr
+    type(c_ptr) :: as_c_ptr
 
-    caf_as_c_ptr = transfer(i, caf_as_c_ptr)
+    as_c_ptr = transfer(i, as_c_ptr)
   end function
 
-  subroutine caf_base_pointer(coarray_handle, image_num, ptr)
+  subroutine base_pointer(coarray_handle, image_num, ptr)
     type(prif_coarray_handle), intent(in) :: coarray_handle
     integer(c_int), intent(in) :: image_num
     integer(c_intptr_t), intent(out) :: ptr
@@ -216,7 +216,7 @@ contains
     integer(c_int) :: num_img
 
     call prif_num_images(num_images=num_img)
-    call assert(image_num .ge. 0 .and. image_num .le. num_img, "caf_base_pointer: image_num not within valid range")
+    call assert(image_num .ge. 0 .and. image_num .le. num_img, "base_pointer: image_num not within valid range")
     if (image_num .eq. 0) then
       ptr = 0
     else
