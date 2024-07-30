@@ -185,23 +185,43 @@ submodule(prif) prif_private_s
        integer(c_size_t), target :: a_elem_len
      end function
 
-     pure function caf_as_int(ptr) bind(C)
-       !! intptr_t caf_as_int(void* ptr);
-       import c_ptr, c_intptr_t
-       type(c_ptr), intent(in), value :: ptr
-       integer(c_intptr_t) :: caf_as_int
-     end function
-
-     pure function caf_as_c_ptr(i) bind(C)
-       !! void* caf_as_c_ptr(intptr_t i);
-       import c_ptr, c_intptr_t
-       integer(c_intptr_t), intent(in), value :: i
-       type(c_ptr) :: caf_as_c_ptr
-     end function
-
   end interface
 
 contains
+
+  pure function as_int(ptr)
+    type(c_ptr), intent(in) :: ptr
+    integer(c_intptr_t) :: as_int
+
+    ! the following snippet ensures at compile time that c_ptr and
+    ! c_intptr_t are actually the same size
+    integer, parameter :: int_ptr_check = merge(c_intptr_t, 0, storage_size(ptr) == storage_size(as_int))
+    integer(int_ptr_check), parameter :: unused = 0_int_ptr_check
+
+    as_int = transfer(ptr, as_int)
+  end function
+
+  pure function as_c_ptr(i)
+    integer(c_intptr_t), intent(in) :: i
+    type(c_ptr) :: as_c_ptr
+
+    as_c_ptr = transfer(i, as_c_ptr)
+  end function
+
+  subroutine base_pointer(coarray_handle, image_num, ptr)
+    type(prif_coarray_handle), intent(in) :: coarray_handle
+    integer(c_int), intent(in) :: image_num
+    integer(c_intptr_t), intent(out) :: ptr
+
+    integer(c_int) :: num_img
+
+    ! TODO TEAMS: either move the assertion below into `caf_convert_base_addr()`
+    ! (avoiding the need to call prif_num_images here to fetch initial team size)
+    ! or cache the initial team size in a private module variable so we can just access it (issue #62)
+    call prif_num_images(num_images=num_img)
+    call assert(image_num > 0 .and. image_num <= num_img, "base_pointer: image_num not within valid range")
+    ptr = caf_convert_base_addr(coarray_handle%info%coarray_data, image_num)
+  end subroutine
 
   subroutine unimplemented(proc_name)
     character(len=*), intent(in) ::  proc_name
