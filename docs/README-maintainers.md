@@ -24,7 +24,7 @@ Conventions for code and commits in Caffeine
 * Procedures with `caf_` prefix are private procedures,
   internal to Caffeine, which are implemented in C
 * Procedures with neither of the above two prefixes are private procedures,
-  internal to Caffeine. which are implemented in Fortran
+  internal to Caffeine, which are implemented in Fortran
 * C functions and global variables lacking a `caf_` prefix must be `static`
 * Identifiers named `image` and `rank` refer to processes. Any identifier named `image` represents
   the process as 1-based number (Fortran-style), while `rank` represents the process as 0-based
