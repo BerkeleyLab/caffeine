@@ -34,6 +34,14 @@ contains
     call unimplemented("prif_put_with_notify_indirect")
   end procedure
 
+  module procedure prif_put_indirect_with_notify
+    call unimplemented("prif_put_indirect_with_notify")
+  end procedure
+
+  module procedure prif_put_indirect_with_notify_indirect
+    call unimplemented("prif_put_indirect_with_notify_indirect")
+  end procedure
+
   module procedure prif_get
     integer(c_intptr_t) :: remote_base
 

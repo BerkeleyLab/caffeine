@@ -11,6 +11,7 @@ module prif
   public :: prif_stop, prif_error_stop, prif_fail_image
   public :: prif_allocate_coarray, prif_allocate, prif_deallocate_coarray, prif_deallocate
   public :: prif_put, prif_put_indirect, prif_get, prif_get_indirect, prif_put_with_notify, prif_put_with_notify_indirect
+  public :: prif_put_indirect_with_notify, prif_put_indirect_with_notify_indirect
   public :: prif_alias_create, prif_alias_destroy
   public :: prif_lcobound_with_dim, prif_lcobound_no_dim, prif_ucobound_with_dim, prif_ucobound_no_dim, prif_coshape
   public :: prif_image_index, prif_image_index_with_team, prif_image_index_with_team_number
@@ -177,6 +178,34 @@ module prif
       integer(c_int), intent(in) :: image_num
       type(prif_coarray_handle), intent(in) :: coarray_handle
       integer(c_size_t), intent(in) :: offset
+      type(c_ptr), intent(in) :: current_image_buffer
+      integer(c_size_t), intent(in) :: size_in_bytes
+      integer(c_intptr_t), intent(in) :: notify_ptr
+      integer(c_int), intent(out), optional :: stat
+      character(len=*), intent(inout), optional :: errmsg
+      character(len=:), intent(inout), allocatable, optional :: errmsg_alloc
+    end subroutine
+
+    module subroutine prif_put_indirect_with_notify( &
+        image_num, remote_ptr, current_image_buffer, size_in_bytes, notify_coarray_handle, notify_offset, &
+        stat, errmsg, errmsg_alloc)
+      implicit none
+      integer(c_int), intent(in) :: image_num
+      integer(c_intptr_t), intent(in) :: remote_ptr
+      type(c_ptr), intent(in) :: current_image_buffer
+      integer(c_size_t), intent(in) :: size_in_bytes
+      type(prif_coarray_handle), intent(in) :: notify_coarray_handle
+      integer(c_size_t), intent(in) :: notify_offset
+      integer(c_int), intent(out), optional :: stat
+      character(len=*), intent(inout), optional :: errmsg
+      character(len=:), intent(inout), allocatable, optional :: errmsg_alloc
+    end subroutine
+
+    module subroutine prif_put_indirect_with_notify_indirect( &
+        image_num, remote_ptr, current_image_buffer, size_in_bytes, notify_ptr, stat, errmsg, errmsg_alloc)
+      implicit none
+      integer(c_int), intent(in) :: image_num
+      integer(c_intptr_t), intent(in) :: remote_ptr
       type(c_ptr), intent(in) :: current_image_buffer
       integer(c_size_t), intent(in) :: size_in_bytes
       integer(c_intptr_t), intent(in) :: notify_ptr
