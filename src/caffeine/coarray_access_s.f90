@@ -88,4 +88,12 @@ contains
     call unimplemented("prif_put_strided_with_notify_indirect")
   end procedure
 
+  module procedure prif_put_strided_indirect_with_notify
+    call unimplemented("prif_put_strided_indirect_with_notify")
+  end procedure
+
+  module procedure prif_put_strided_indirect_with_notify_indirect
+    call unimplemented("prif_put_strided_indirect_with_notify_indirect")
+  end procedure
+
 end submodule coarray_access_s
