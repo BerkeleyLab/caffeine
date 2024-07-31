@@ -38,6 +38,9 @@ module prif
   public :: prif_atomic_define_int, prif_atomic_define_int_indirect, prif_atomic_define_logical, prif_atomic_define_logical_indirect
   public :: prif_atomic_ref_int, prif_atomic_ref_int_indirect, prif_atomic_ref_logical, prif_atomic_ref_logical_indirect
 
+  type, public :: prif_event_type
+  end type
+
   type, public :: prif_lock_type
   end type
 
@@ -60,6 +63,9 @@ module prif
     type(prif_team_type), pointer :: parent_team
     type(handle_data), pointer :: coarrays
   end type
+
+  integer(c_int), parameter, public :: PRIF_VERSION_MAJOR = 0
+  integer(c_int), parameter, public :: PRIF_VERSION_MINOR = 4
 
   integer(c_int), parameter, public :: PRIF_ATOMIC_INT_KIND = selected_int_kind(18)
 
