@@ -64,4 +64,12 @@ contains
         size = size_in_bytes)
   end procedure
 
+  module procedure prif_get_strided
+    call unimplemented("prif_get_strided")
+  end procedure
+
+  module procedure prif_get_strided_indirect
+    call unimplemented("prif_get_strided_indirect")
+  end procedure
+
 end submodule coarray_access_s
