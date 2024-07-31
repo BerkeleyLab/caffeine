@@ -267,6 +267,7 @@ module prif
     module subroutine prif_get_strided_indirect( &
         image_num, remote_ptr, remote_stride, current_image_buffer, current_image_stride, element_size, extent, &
         stat, errmsg, errmsg_alloc)
+      implicit none
       integer(c_int), intent(in) :: image_num
       integer(c_intptr_t), intent(in) :: remote_ptr
       integer(c_ptrdiff_t), intent(in) :: remote_stride(:)
