@@ -72,4 +72,12 @@ contains
     call unimplemented("prif_get_strided_indirect")
   end procedure
 
+  module procedure prif_put_strided
+    call unimplemented("prif_put_strided")
+  end procedure
+
+  module procedure prif_put_strided_indirect
+    call unimplemented("prif_put_strided_indirect")
+  end procedure
+
 end submodule coarray_access_s
