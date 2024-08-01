@@ -38,6 +38,29 @@ module prif
   public :: prif_atomic_define_int, prif_atomic_define_int_indirect, prif_atomic_define_logical, prif_atomic_define_logical_indirect
   public :: prif_atomic_ref_int, prif_atomic_ref_int_indirect, prif_atomic_ref_logical, prif_atomic_ref_logical_indirect
 
+  integer(c_int), parameter, public :: PRIF_VERSION_MAJOR = 0
+  integer(c_int), parameter, public :: PRIF_VERSION_MINOR = 4
+
+  integer(c_int), parameter, public :: PRIF_ATOMIC_INT_KIND = selected_int_kind(18)
+  ! gfortran-14 doesn't currently support the intrinsic selected_logical_kind
+  ! The following commented-out definition is the desired definition and should replace
+  ! the temporary definition when possible
+  ! integer(c_int), parameter, public :: PRIF_ATOMIC_LOGICAL_KIND = selected_logical_kind(32)
+  integer(c_int), parameter, public :: PRIF_ATOMIC_LOGICAL_KIND = PRIF_ATOMIC_INT_KIND
+
+  integer(c_int), parameter, public :: &
+    PRIF_CURRENT_TEAM               = 101, &
+    PRIF_INITIAL_TEAM               = 102, &
+    PRIF_PARENT_TEAM                = 103, &
+    PRIF_STAT_FAILED_IMAGE          = 201, &
+    PRIF_STAT_LOCKED                = 202, &
+    PRIF_STAT_LOCKED_OTHER_IMAGE    = 203, &
+    PRIF_STAT_STOPPED_IMAGE         = 204, &
+    PRIF_STAT_UNLOCKED              = 205, &
+    PRIF_STAT_UNLOCKED_FAILED_IMAGE = 206, &
+    PRIF_STAT_OUT_OF_MEMORY         = 301, &
+    PRIF_STAT_ALREADY_INIT          = 302
+
   type, public :: prif_event_type
     private
     ! TODO: actual implementation
@@ -75,29 +98,6 @@ module prif
     type(prif_team_type), pointer :: parent_team
     type(handle_data), pointer :: coarrays
   end type
-
-  integer(c_int), parameter, public :: PRIF_VERSION_MAJOR = 0
-  integer(c_int), parameter, public :: PRIF_VERSION_MINOR = 4
-
-  integer(c_int), parameter, public :: &
-    PRIF_CURRENT_TEAM               = 101, &
-    PRIF_INITIAL_TEAM               = 102, &
-    PRIF_PARENT_TEAM                = 103, &
-    PRIF_STAT_FAILED_IMAGE          = 201, &
-    PRIF_STAT_LOCKED                = 202, &
-    PRIF_STAT_LOCKED_OTHER_IMAGE    = 203, &
-    PRIF_STAT_STOPPED_IMAGE         = 204, &
-    PRIF_STAT_UNLOCKED              = 205, &
-    PRIF_STAT_UNLOCKED_FAILED_IMAGE = 206, &
-    PRIF_STAT_OUT_OF_MEMORY         = 301, &
-    PRIF_STAT_ALREADY_INIT          = 302
-
-  integer(c_int), parameter, public :: PRIF_ATOMIC_INT_KIND = selected_int_kind(18)
-  ! gfortran-14 doesn't currently support the intrinsic selected_logical_kind
-  ! The following commented-out definition is the desired definition and should replace
-  ! the temporary definition when possible
-  ! integer(c_int), parameter, public :: PRIF_ATOMIC_LOGICAL_KIND = selected_logical_kind(32)
-  integer(c_int), parameter, public :: PRIF_ATOMIC_LOGICAL_KIND = PRIF_ATOMIC_INT_KIND
 
   interface
 
