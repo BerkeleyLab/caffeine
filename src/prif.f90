@@ -39,6 +39,9 @@ module prif
   public :: prif_atomic_ref_int, prif_atomic_ref_int_indirect, prif_atomic_ref_logical, prif_atomic_ref_logical_indirect
 
   type, public :: prif_event_type
+    private
+    ! TODO: actual implementation
+    integer :: unimplemented_feature_placeholder = 0
   end type
 
   type, public :: prif_lock_type
