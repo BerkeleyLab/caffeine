@@ -45,12 +45,21 @@ module prif
   end type
 
   type, public :: prif_lock_type
+    private
+    ! TODO: actual implementation
+    integer :: unimplemented_feature_placeholder = 0
   end type
 
   type, public :: prif_critical_type
+    private
+    ! TODO: actual implementation
+    integer :: unimplemented_feature_placeholder = 0
   end type
 
   type, public :: prif_notify_type
+    private
+    ! TODO: actual implementation
+    integer :: unimplemented_feature_placeholder = 0
   end type
 
   type, public :: prif_coarray_handle
