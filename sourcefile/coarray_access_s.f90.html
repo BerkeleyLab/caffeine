@@ -89,7 +89,7 @@
      <li><i class="fa fa-list-ol"></i>
        <a data-toggle="tooltip"
     data-placement="bottom" data-html="true"
-    title=" 1.2% of total for source files.">21 statements</a>
+    title=" 3.0% of total for source files.">57 statements</a>
      </li> 
     <li><i class="fa fa-code"></i><a href="../src/coarray_access_s.f90"> Source File</a></li>
   </ul>
@@ -274,29 +274,77 @@
 <a id="ln-26" name="ln-26" href="#ln-26"></a><span class="w">        </span><span class="n">size</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">size_in_bytes</span><span class="p">)</span><span class="w"></span>
 <a id="ln-27" name="ln-27" href="#ln-27"></a><span class="w">  </span><span class="k">end procedure</span>
 <a id="ln-28" name="ln-28" href="#ln-28"></a>
-<a id="ln-29" name="ln-29" href="#ln-29"></a><span class="k">  module procedure </span><span class="n">prif_get</span><span class="w"></span>
-<a id="ln-30" name="ln-30" href="#ln-30"></a><span class="w">    </span><span class="kt">integer</span><span class="p">(</span><span class="kt">c_intptr_t</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">remote_base</span><span class="w"></span>
-<a id="ln-31" name="ln-31" href="#ln-31"></a>
-<a id="ln-32" name="ln-32" href="#ln-32"></a><span class="w">    </span><span class="k">call </span><span class="n">base_pointer</span><span class="p">(</span><span class="n">coarray_handle</span><span class="p">,</span><span class="w"> </span><span class="n">image_num</span><span class="p">,</span><span class="w"> </span><span class="n">remote_base</span><span class="p">)</span><span class="w"></span>
-<a id="ln-33" name="ln-33" href="#ln-33"></a><span class="w">    </span><span class="k">call </span><span class="n">prif_get_indirect</span><span class="p">(</span><span class="w"> </span><span class="p">&amp;</span><span class="w"></span>
-<a id="ln-34" name="ln-34" href="#ln-34"></a><span class="w">        </span><span class="n">image_num</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">image_num</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span><span class="w"></span>
-<a id="ln-35" name="ln-35" href="#ln-35"></a><span class="w">        </span><span class="n">remote_ptr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">remote_base</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">offset</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span><span class="w"></span>
-<a id="ln-36" name="ln-36" href="#ln-36"></a><span class="w">        </span><span class="n">current_image_buffer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">current_image_buffer</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span><span class="w"></span>
-<a id="ln-37" name="ln-37" href="#ln-37"></a><span class="w">        </span><span class="n">size_in_bytes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">size_in_bytes</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span><span class="w"></span>
-<a id="ln-38" name="ln-38" href="#ln-38"></a><span class="w">        </span><span class="nb">stat</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">stat</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span><span class="w"></span>
-<a id="ln-39" name="ln-39" href="#ln-39"></a><span class="w">        </span><span class="n">errmsg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">errmsg</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span><span class="w"></span>
-<a id="ln-40" name="ln-40" href="#ln-40"></a><span class="w">        </span><span class="n">errmsg_alloc</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">errmsg_alloc</span><span class="p">)</span><span class="w"></span>
-<a id="ln-41" name="ln-41" href="#ln-41"></a><span class="w">  </span><span class="k">end procedure</span>
-<a id="ln-42" name="ln-42" href="#ln-42"></a>
-<a id="ln-43" name="ln-43" href="#ln-43"></a><span class="k">  module procedure </span><span class="n">prif_get_indirect</span><span class="w"></span>
-<a id="ln-44" name="ln-44" href="#ln-44"></a><span class="w">    </span><span class="k">call </span><span class="n">caf_get</span><span class="p">(</span><span class="w"> </span><span class="p">&amp;</span><span class="w"></span>
-<a id="ln-45" name="ln-45" href="#ln-45"></a><span class="w">        </span><span class="n">image</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">image_num</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span><span class="w"></span>
-<a id="ln-46" name="ln-46" href="#ln-46"></a><span class="w">        </span><span class="n">dest</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">current_image_buffer</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span><span class="w"></span>
-<a id="ln-47" name="ln-47" href="#ln-47"></a><span class="w">        </span><span class="n">src</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">remote_ptr</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span><span class="w"></span>
-<a id="ln-48" name="ln-48" href="#ln-48"></a><span class="w">        </span><span class="n">size</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">size_in_bytes</span><span class="p">)</span><span class="w"></span>
-<a id="ln-49" name="ln-49" href="#ln-49"></a><span class="w">  </span><span class="k">end procedure</span>
-<a id="ln-50" name="ln-50" href="#ln-50"></a>
-<a id="ln-51" name="ln-51" href="#ln-51"></a><span class="k">end submodule </span><span class="n">coarray_access_s</span><span class="w"></span>
+<a id="ln-29" name="ln-29" href="#ln-29"></a><span class="k">  module procedure </span><span class="n">prif_put_with_notify</span><span class="w"></span>
+<a id="ln-30" name="ln-30" href="#ln-30"></a><span class="w">    </span><span class="k">call </span><span class="n">unimplemented</span><span class="p">(</span><span class="s2">&quot;prif_put_with_notify&quot;</span><span class="p">)</span><span class="w"></span>
+<a id="ln-31" name="ln-31" href="#ln-31"></a><span class="w">  </span><span class="k">end procedure</span>
+<a id="ln-32" name="ln-32" href="#ln-32"></a>
+<a id="ln-33" name="ln-33" href="#ln-33"></a><span class="k">  module procedure </span><span class="n">prif_put_with_notify_indirect</span><span class="w"></span>
+<a id="ln-34" name="ln-34" href="#ln-34"></a><span class="w">    </span><span class="k">call </span><span class="n">unimplemented</span><span class="p">(</span><span class="s2">&quot;prif_put_with_notify_indirect&quot;</span><span class="p">)</span><span class="w"></span>
+<a id="ln-35" name="ln-35" href="#ln-35"></a><span class="w">  </span><span class="k">end procedure</span>
+<a id="ln-36" name="ln-36" href="#ln-36"></a>
+<a id="ln-37" name="ln-37" href="#ln-37"></a><span class="k">  module procedure </span><span class="n">prif_put_indirect_with_notify</span><span class="w"></span>
+<a id="ln-38" name="ln-38" href="#ln-38"></a><span class="w">    </span><span class="k">call </span><span class="n">unimplemented</span><span class="p">(</span><span class="s2">&quot;prif_put_indirect_with_notify&quot;</span><span class="p">)</span><span class="w"></span>
+<a id="ln-39" name="ln-39" href="#ln-39"></a><span class="w">  </span><span class="k">end procedure</span>
+<a id="ln-40" name="ln-40" href="#ln-40"></a>
+<a id="ln-41" name="ln-41" href="#ln-41"></a><span class="k">  module procedure </span><span class="n">prif_put_indirect_with_notify_indirect</span><span class="w"></span>
+<a id="ln-42" name="ln-42" href="#ln-42"></a><span class="w">    </span><span class="k">call </span><span class="n">unimplemented</span><span class="p">(</span><span class="s2">&quot;prif_put_indirect_with_notify_indirect&quot;</span><span class="p">)</span><span class="w"></span>
+<a id="ln-43" name="ln-43" href="#ln-43"></a><span class="w">  </span><span class="k">end procedure</span>
+<a id="ln-44" name="ln-44" href="#ln-44"></a>
+<a id="ln-45" name="ln-45" href="#ln-45"></a><span class="k">  module procedure </span><span class="n">prif_get</span><span class="w"></span>
+<a id="ln-46" name="ln-46" href="#ln-46"></a><span class="w">    </span><span class="kt">integer</span><span class="p">(</span><span class="kt">c_intptr_t</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">remote_base</span><span class="w"></span>
+<a id="ln-47" name="ln-47" href="#ln-47"></a>
+<a id="ln-48" name="ln-48" href="#ln-48"></a><span class="w">    </span><span class="k">call </span><span class="n">base_pointer</span><span class="p">(</span><span class="n">coarray_handle</span><span class="p">,</span><span class="w"> </span><span class="n">image_num</span><span class="p">,</span><span class="w"> </span><span class="n">remote_base</span><span class="p">)</span><span class="w"></span>
+<a id="ln-49" name="ln-49" href="#ln-49"></a><span class="w">    </span><span class="k">call </span><span class="n">prif_get_indirect</span><span class="p">(</span><span class="w"> </span><span class="p">&amp;</span><span class="w"></span>
+<a id="ln-50" name="ln-50" href="#ln-50"></a><span class="w">        </span><span class="n">image_num</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">image_num</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span><span class="w"></span>
+<a id="ln-51" name="ln-51" href="#ln-51"></a><span class="w">        </span><span class="n">remote_ptr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">remote_base</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">offset</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span><span class="w"></span>
+<a id="ln-52" name="ln-52" href="#ln-52"></a><span class="w">        </span><span class="n">current_image_buffer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">current_image_buffer</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span><span class="w"></span>
+<a id="ln-53" name="ln-53" href="#ln-53"></a><span class="w">        </span><span class="n">size_in_bytes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">size_in_bytes</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span><span class="w"></span>
+<a id="ln-54" name="ln-54" href="#ln-54"></a><span class="w">        </span><span class="nb">stat</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">stat</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span><span class="w"></span>
+<a id="ln-55" name="ln-55" href="#ln-55"></a><span class="w">        </span><span class="n">errmsg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">errmsg</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span><span class="w"></span>
+<a id="ln-56" name="ln-56" href="#ln-56"></a><span class="w">        </span><span class="n">errmsg_alloc</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">errmsg_alloc</span><span class="p">)</span><span class="w"></span>
+<a id="ln-57" name="ln-57" href="#ln-57"></a><span class="w">  </span><span class="k">end procedure</span>
+<a id="ln-58" name="ln-58" href="#ln-58"></a>
+<a id="ln-59" name="ln-59" href="#ln-59"></a><span class="k">  module procedure </span><span class="n">prif_get_indirect</span><span class="w"></span>
+<a id="ln-60" name="ln-60" href="#ln-60"></a><span class="w">    </span><span class="k">call </span><span class="n">caf_get</span><span class="p">(</span><span class="w"> </span><span class="p">&amp;</span><span class="w"></span>
+<a id="ln-61" name="ln-61" href="#ln-61"></a><span class="w">        </span><span class="n">image</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">image_num</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span><span class="w"></span>
+<a id="ln-62" name="ln-62" href="#ln-62"></a><span class="w">        </span><span class="n">dest</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">current_image_buffer</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span><span class="w"></span>
+<a id="ln-63" name="ln-63" href="#ln-63"></a><span class="w">        </span><span class="n">src</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">remote_ptr</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span><span class="w"></span>
+<a id="ln-64" name="ln-64" href="#ln-64"></a><span class="w">        </span><span class="n">size</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">size_in_bytes</span><span class="p">)</span><span class="w"></span>
+<a id="ln-65" name="ln-65" href="#ln-65"></a><span class="w">  </span><span class="k">end procedure</span>
+<a id="ln-66" name="ln-66" href="#ln-66"></a>
+<a id="ln-67" name="ln-67" href="#ln-67"></a><span class="k">  module procedure </span><span class="n">prif_get_strided</span><span class="w"></span>
+<a id="ln-68" name="ln-68" href="#ln-68"></a><span class="w">    </span><span class="k">call </span><span class="n">unimplemented</span><span class="p">(</span><span class="s2">&quot;prif_get_strided&quot;</span><span class="p">)</span><span class="w"></span>
+<a id="ln-69" name="ln-69" href="#ln-69"></a><span class="w">  </span><span class="k">end procedure</span>
+<a id="ln-70" name="ln-70" href="#ln-70"></a>
+<a id="ln-71" name="ln-71" href="#ln-71"></a><span class="k">  module procedure </span><span class="n">prif_get_strided_indirect</span><span class="w"></span>
+<a id="ln-72" name="ln-72" href="#ln-72"></a><span class="w">    </span><span class="k">call </span><span class="n">unimplemented</span><span class="p">(</span><span class="s2">&quot;prif_get_strided_indirect&quot;</span><span class="p">)</span><span class="w"></span>
+<a id="ln-73" name="ln-73" href="#ln-73"></a><span class="w">  </span><span class="k">end procedure</span>
+<a id="ln-74" name="ln-74" href="#ln-74"></a>
+<a id="ln-75" name="ln-75" href="#ln-75"></a><span class="k">  module procedure </span><span class="n">prif_put_strided</span><span class="w"></span>
+<a id="ln-76" name="ln-76" href="#ln-76"></a><span class="w">    </span><span class="k">call </span><span class="n">unimplemented</span><span class="p">(</span><span class="s2">&quot;prif_put_strided&quot;</span><span class="p">)</span><span class="w"></span>
+<a id="ln-77" name="ln-77" href="#ln-77"></a><span class="w">  </span><span class="k">end procedure</span>
+<a id="ln-78" name="ln-78" href="#ln-78"></a>
+<a id="ln-79" name="ln-79" href="#ln-79"></a><span class="k">  module procedure </span><span class="n">prif_put_strided_indirect</span><span class="w"></span>
+<a id="ln-80" name="ln-80" href="#ln-80"></a><span class="w">    </span><span class="k">call </span><span class="n">unimplemented</span><span class="p">(</span><span class="s2">&quot;prif_put_strided_indirect&quot;</span><span class="p">)</span><span class="w"></span>
+<a id="ln-81" name="ln-81" href="#ln-81"></a><span class="w">  </span><span class="k">end procedure</span>
+<a id="ln-82" name="ln-82" href="#ln-82"></a>
+<a id="ln-83" name="ln-83" href="#ln-83"></a><span class="k">  module procedure </span><span class="n">prif_put_strided_with_notify</span><span class="w"></span>
+<a id="ln-84" name="ln-84" href="#ln-84"></a><span class="w">    </span><span class="k">call </span><span class="n">unimplemented</span><span class="p">(</span><span class="s2">&quot;prif_put_strided_with_notify&quot;</span><span class="p">)</span><span class="w"></span>
+<a id="ln-85" name="ln-85" href="#ln-85"></a><span class="w">  </span><span class="k">end procedure</span>
+<a id="ln-86" name="ln-86" href="#ln-86"></a>
+<a id="ln-87" name="ln-87" href="#ln-87"></a><span class="k">  module procedure </span><span class="n">prif_put_strided_with_notify_indirect</span><span class="w"></span>
+<a id="ln-88" name="ln-88" href="#ln-88"></a><span class="w">    </span><span class="k">call </span><span class="n">unimplemented</span><span class="p">(</span><span class="s2">&quot;prif_put_strided_with_notify_indirect&quot;</span><span class="p">)</span><span class="w"></span>
+<a id="ln-89" name="ln-89" href="#ln-89"></a><span class="w">  </span><span class="k">end procedure</span>
+<a id="ln-90" name="ln-90" href="#ln-90"></a>
+<a id="ln-91" name="ln-91" href="#ln-91"></a><span class="k">  module procedure </span><span class="n">prif_put_strided_indirect_with_notify</span><span class="w"></span>
+<a id="ln-92" name="ln-92" href="#ln-92"></a><span class="w">    </span><span class="k">call </span><span class="n">unimplemented</span><span class="p">(</span><span class="s2">&quot;prif_put_strided_indirect_with_notify&quot;</span><span class="p">)</span><span class="w"></span>
+<a id="ln-93" name="ln-93" href="#ln-93"></a><span class="w">  </span><span class="k">end procedure</span>
+<a id="ln-94" name="ln-94" href="#ln-94"></a>
+<a id="ln-95" name="ln-95" href="#ln-95"></a><span class="k">  module procedure </span><span class="n">prif_put_strided_indirect_with_notify_indirect</span><span class="w"></span>
+<a id="ln-96" name="ln-96" href="#ln-96"></a><span class="w">    </span><span class="k">call </span><span class="n">unimplemented</span><span class="p">(</span><span class="s2">&quot;prif_put_strided_indirect_with_notify_indirect&quot;</span><span class="p">)</span><span class="w"></span>
+<a id="ln-97" name="ln-97" href="#ln-97"></a><span class="w">  </span><span class="k">end procedure</span>
+<a id="ln-98" name="ln-98" href="#ln-98"></a>
+<a id="ln-99" name="ln-99" href="#ln-99"></a><span class="k">end submodule </span><span class="n">coarray_access_s</span><span class="w"></span>
 </pre></div>
 
     </section>
@@ -315,7 +363,7 @@
           <p class="text-right">
             Documentation generated by 
             <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
- on 2024-07-30 21:35            </p>
+ on 2024-08-07 15:25            </p>
         </div>
       </div>
       <br>

@@ -26,6 +26,22 @@ contains
         size = size_in_bytes)
   end procedure
 
+  module procedure prif_put_with_notify
+    call unimplemented("prif_put_with_notify")
+  end procedure
+
+  module procedure prif_put_with_notify_indirect
+    call unimplemented("prif_put_with_notify_indirect")
+  end procedure
+
+  module procedure prif_put_indirect_with_notify
+    call unimplemented("prif_put_indirect_with_notify")
+  end procedure
+
+  module procedure prif_put_indirect_with_notify_indirect
+    call unimplemented("prif_put_indirect_with_notify_indirect")
+  end procedure
+
   module procedure prif_get
     integer(c_intptr_t) :: remote_base
 
@@ -46,6 +62,38 @@ contains
         dest = current_image_buffer, &
         src = remote_ptr, &
         size = size_in_bytes)
+  end procedure
+
+  module procedure prif_get_strided
+    call unimplemented("prif_get_strided")
+  end procedure
+
+  module procedure prif_get_strided_indirect
+    call unimplemented("prif_get_strided_indirect")
+  end procedure
+
+  module procedure prif_put_strided
+    call unimplemented("prif_put_strided")
+  end procedure
+
+  module procedure prif_put_strided_indirect
+    call unimplemented("prif_put_strided_indirect")
+  end procedure
+
+  module procedure prif_put_strided_with_notify
+    call unimplemented("prif_put_strided_with_notify")
+  end procedure
+
+  module procedure prif_put_strided_with_notify_indirect
+    call unimplemented("prif_put_strided_with_notify_indirect")
+  end procedure
+
+  module procedure prif_put_strided_indirect_with_notify
+    call unimplemented("prif_put_strided_indirect_with_notify")
+  end procedure
+
+  module procedure prif_put_strided_indirect_with_notify_indirect
+    call unimplemented("prif_put_strided_indirect_with_notify_indirect")
   end procedure
 
 end submodule coarray_access_s
