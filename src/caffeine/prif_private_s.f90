@@ -3,7 +3,7 @@
 submodule(prif) prif_private_s
   implicit none
 
-  type(prif_team_type), target :: default_team
+  type(prif_team_type), target :: initial_team
   type(prif_team_type), pointer :: current_team => null()
   type(c_ptr) :: non_symmetric_heap_mspace
 

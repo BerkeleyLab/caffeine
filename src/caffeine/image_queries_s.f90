@@ -7,7 +7,7 @@ submodule(prif:prif_private_s) image_queries_s
 contains
 
   module procedure prif_num_images
-    num_images = caf_num_images(current_team%gex_team)
+    num_images = caf_num_images(current_team%info%gex_team)
   end procedure
 
   module procedure prif_num_images_with_team
@@ -20,7 +20,7 @@ contains
 
   module procedure prif_this_image_no_coarray
     ! TODO: handle optional arg `team`
-    this_image = caf_this_image(current_team%gex_team)
+    this_image = caf_this_image(current_team%info%gex_team)
   end procedure
 
   module procedure prif_this_image_with_coarray

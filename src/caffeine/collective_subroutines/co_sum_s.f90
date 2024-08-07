@@ -10,7 +10,7 @@ contains
     if (present(stat)) stat=0
 
     call caf_co_sum( &
-        a, optional_value(result_image), int(product(shape(a)), c_size_t), current_team%gex_team)
+        a, optional_value(result_image), int(product(shape(a)), c_size_t), current_team%info%gex_team)
   end procedure
 
 end submodule co_sum_s

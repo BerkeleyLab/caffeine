@@ -88,39 +88,39 @@ contains
     if (caf_same_cfi_type(a, 0)) then
       call c_f_procpointer(operation, int32_op)
       call caf_co_reduce(a, optional_value(result_image), &
-        int(product(shape(a)), c_size_t), c_funloc(Coll_ReduceSub_c_int32_t), c_null_ptr, current_team%gex_team)
+        int(product(shape(a)), c_size_t), c_funloc(Coll_ReduceSub_c_int32_t), c_null_ptr, current_team%info%gex_team)
     else if (caf_same_cfi_type(a, 0_c_int64_t)) then
       call c_f_procpointer(operation, int64_op)
       call caf_co_reduce(a, optional_value(result_image), &
-        int(product(shape(a)), c_size_t), c_funloc(Coll_ReduceSub_c_int64_t), c_null_ptr, current_team%gex_team)
+        int(product(shape(a)), c_size_t), c_funloc(Coll_ReduceSub_c_int64_t), c_null_ptr, current_team%info%gex_team)
     else if (caf_same_cfi_type(a, 1._c_double)) then
       call c_f_procpointer(operation, double_op)
       call caf_co_reduce(a, optional_value(result_image), &
-        int(product(shape(a)), c_size_t), c_funloc(Coll_ReduceSub_c_double), c_null_ptr, current_team%gex_team)
+        int(product(shape(a)), c_size_t), c_funloc(Coll_ReduceSub_c_double), c_null_ptr, current_team%info%gex_team)
     else if (caf_same_cfi_type(a, 1._c_float)) then
       call c_f_procpointer(operation, float_op)
       call caf_co_reduce(a, optional_value(result_image), &
-        int(product(shape(a)), c_size_t), c_funloc(Coll_ReduceSub_c_float), c_null_ptr, current_team%gex_team)
+        int(product(shape(a)), c_size_t), c_funloc(Coll_ReduceSub_c_float), c_null_ptr, current_team%info%gex_team)
     else if (caf_same_cfi_type(a, .true._c_bool)) then
       call c_f_procpointer(operation, bool_op)
       call caf_co_reduce(a, optional_value(result_image), &
-        int(product(shape(a)), c_size_t), c_funloc(Coll_ReduceSub_c_bool), c_null_ptr, current_team%gex_team)
+        int(product(shape(a)), c_size_t), c_funloc(Coll_ReduceSub_c_bool), c_null_ptr, current_team%info%gex_team)
     else if (caf_is_f_string(a)) then
       block
         integer(c_size_t), target :: len_a
         len_a = caf_elem_len(a)
         call c_f_procpointer(operation, char_op)
         call caf_co_reduce(a, optional_value(result_image), &
-          int(product(shape(a)), c_size_t), c_funloc(Coll_ReduceSub_c_char), c_loc(len_a), current_team%gex_team)
+          int(product(shape(a)), c_size_t), c_funloc(Coll_ReduceSub_c_char), c_loc(len_a), current_team%info%gex_team)
       end block
     else if (caf_same_cfi_type(a, (0._c_float, 0._c_float))) then
       call c_f_procpointer(operation, float_complex_op)
       call caf_co_reduce(a, optional_value(result_image), &
-        int(product(shape(a)), c_size_t), c_funloc(Coll_ReduceSub_c_float_complex), c_null_ptr, current_team%gex_team)
+        int(product(shape(a)), c_size_t), c_funloc(Coll_ReduceSub_c_float_complex), c_null_ptr, current_team%info%gex_team)
     else if (caf_same_cfi_type(a, (0._c_double, 0._c_double))) then
       call c_f_procpointer(operation, double_complex_op)
       call caf_co_reduce(a, optional_value(result_image), &
-        int(product(shape(a)), c_size_t), c_funloc(Coll_ReduceSub_c_double_complex), c_null_ptr, current_team%gex_team)
+        int(product(shape(a)), c_size_t), c_funloc(Coll_ReduceSub_c_double_complex), c_null_ptr, current_team%info%gex_team)
     else
       call prif_error_stop(.false._c_bool, stop_code_char="caf_co_reduce: unsupported type")
     end if
