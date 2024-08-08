@@ -278,8 +278,7 @@ contains
       current_team%info%child_heap_info%offset = &
           as_int(current_team%info%child_heap_info%allocated_memory) - current_team%info%heap_start
     end if
-    call prif_co_broadcast(current_team%info%child_heap_info%offset, 1)
-    call prif_co_broadcast(current_team%info%child_heap_info%size, 1)
+    call prif_co_broadcast(current_team%info%child_heap_info, 1)
   end subroutine
 
   logical function caf_have_child_teams()
