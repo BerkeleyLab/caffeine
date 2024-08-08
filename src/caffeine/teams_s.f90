@@ -22,7 +22,29 @@ contains
   end procedure
 
   module procedure prif_end_team
-    call unimplemented("prif_end_team")
+    type(prif_coarray_handle), allocatable :: teams_coarrays(:)
+    integer :: num_coarrays_in_team, i
+    type(handle_data), pointer :: tmp_data
+
+    ! deallocate the teams coarrays
+    num_coarrays_in_team = 0
+    tmp_data => current_team%info%coarrays
+    do while (associated(tmp_data))
+      num_coarrays_in_team = num_coarrays_in_team + 1
+      call c_f_pointer(tmp_data%next_handle, tmp_data)
+    end do
+    if (num_coarrays_in_team > 0) then
+      allocate(teams_coarrays(num_coarrays_in_team))
+      tmp_data => current_team%info%coarrays
+      do i = 1, num_coarrays_in_team
+        teams_coarrays(i)%info => tmp_data
+        call c_f_pointer(tmp_data%next_handle, tmp_data)
+      end do
+      call prif_deallocate_coarray(teams_coarrays, stat, errmsg, errmsg_alloc)
+    end if
+
+    ! set the current team back to the parent team
+    current_team%info => current_team%info%parent_team
   end procedure
 
   module procedure prif_form_team
