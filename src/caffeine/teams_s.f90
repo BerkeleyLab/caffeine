@@ -28,6 +28,8 @@ contains
     type(handle_data), pointer :: tmp_data
 
     ! deallocate the teams coarrays
+    ! Currently we work to batch together all the deallocations into a single call
+    ! to prif_deallocate_coarray(), in the hope it can amortize some costs
     num_coarrays_in_team = 0
     tmp_data => current_team%info%coarrays
     do while (associated(tmp_data))
