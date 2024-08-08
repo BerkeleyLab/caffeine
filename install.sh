@@ -361,12 +361,12 @@ cat << EOF > $RUN_FPM_SH
 #!/bin/sh
 #-- DO NOT EDIT -- created by caffeine/install.sh
 fpm_sub_cmd=\$1; shift
-\"${FPM}\" \"\$fpm_sub_cmd\" \\
---compiler \"`$PKG_CONFIG caffeine --variable=CAFFEINE_FPM_FC`\"   \\
---c-compiler \"`$PKG_CONFIG caffeine --variable=CAFFEINE_FPM_CC`\" \\
---c-flag \"`$PKG_CONFIG caffeine --variable=CAFFEINE_FPM_CFLAGS`\" \\
---link-flag \"`$PKG_CONFIG caffeine --variable=CAFFEINE_FPM_LDFLAGS`\" \\
-\"\$@\"
+"${FPM}" "\$fpm_sub_cmd" \\
+--compiler "`$PKG_CONFIG caffeine --variable=CAFFEINE_FPM_FC`"   \\
+--c-compiler "`$PKG_CONFIG caffeine --variable=CAFFEINE_FPM_CC`" \\
+--c-flag "`$PKG_CONFIG caffeine --variable=CAFFEINE_FPM_CFLAGS`" \\
+--link-flag "`$PKG_CONFIG caffeine --variable=CAFFEINE_FPM_LDFLAGS`" \\
+"\$@"
 EOF
 chmod u+x $RUN_FPM_SH
 
