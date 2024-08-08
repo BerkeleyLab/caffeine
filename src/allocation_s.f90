@@ -27,17 +27,17 @@ contains
 
     coarray_size = product(ubounds-lbounds+1)*element_size
 
-    me = caf_this_image(current_team%gex_team)
+    me = caf_this_image(current_team%info%gex_team)
     if (me == 1) then
       handle_size = c_sizeof(unused)
       total_size = handle_size + coarray_size
-      whole_block = caf_allocate(current_team%heap_mspace, total_size)
-      block_offset = as_int(whole_block) - current_team%heap_start
+      whole_block = caf_allocate(current_team%info%heap_mspace, total_size)
+      block_offset = as_int(whole_block) - current_team%info%heap_start
     else
       block_offset = 0
     end if
     call prif_co_sum(block_offset)
-    if (me /= 1) whole_block = as_c_ptr(current_team%heap_start + block_offset)
+    if (me /= 1) whole_block = as_c_ptr(current_team%info%heap_start + block_offset)
 
     call c_f_pointer(whole_block, coarray_handle%info)
     call c_f_pointer(whole_block, unused2, [2])
@@ -114,8 +114,8 @@ contains
     ! end do
     do i = 1, num_handles
       call remove_from_team_list(coarray_handles(i))
-      if (caf_this_image(current_team%gex_team) == 1) &
-        call caf_deallocate(current_team%heap_mspace, c_loc(coarray_handles(i)%info))
+      if (caf_this_image(current_team%info%gex_team) == 1) &
+        call caf_deallocate(current_team%info%heap_mspace, c_loc(coarray_handles(i)%info))
     end do
     if (present(stat)) stat = 0
   end procedure
@@ -128,13 +128,13 @@ contains
     type(prif_team_type), intent(inout) :: current_team
     type(prif_coarray_handle), intent(inout) :: coarray_handle
 
-    if (associated(current_team%coarrays)) then
-      current_team%coarrays%previous_handle = c_loc(coarray_handle%info)
-      coarray_handle%info%next_handle = c_loc(current_team%coarrays)
+    if (associated(current_team%info%coarrays)) then
+      current_team%info%coarrays%previous_handle = c_loc(coarray_handle%info)
+      coarray_handle%info%next_handle = c_loc(current_team%info%coarrays)
       coarray_handle%info%previous_handle = c_null_ptr
-      current_team%coarrays => coarray_handle%info
+      current_team%info%coarrays => coarray_handle%info
     else
-      current_team%coarrays => coarray_handle%info
+      current_team%info%coarrays => coarray_handle%info
       coarray_handle%info%next_handle = c_null_ptr
       coarray_handle%info%previous_handle = c_null_ptr
     end if

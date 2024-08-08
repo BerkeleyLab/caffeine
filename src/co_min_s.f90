@@ -12,7 +12,7 @@ contains
 
     if (caf_numeric_type(a)) then
       call caf_co_min( &
-          a, optional_value(result_image), int(product(shape(a)), c_size_t), current_team%gex_team)
+          a, optional_value(result_image), int(product(shape(a)), c_size_t), current_team%info%gex_team)
     else if (caf_is_f_string(a)) then
       call prif_co_reduce(a, c_funloc(alphabetize), optional_value(result_image), stat, errmsg, errmsg_alloc)
     else
