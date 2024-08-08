@@ -83,7 +83,7 @@ submodule(prif) prif_private_s
       type(c_ptr), intent(in), value :: mem
     end subroutine
 
-    subroutine caf_establish_mspace(mspace, mem, mem_size)
+    subroutine caf_establish_mspace(mspace, mem, mem_size) bind(c)
       import c_size_t, c_ptr
       implicit none
       type(c_ptr), intent(out) :: mspace
@@ -210,7 +210,7 @@ submodule(prif) prif_private_s
      subroutine caf_form_team(current_team, new_team, team_number, new_index) bind(C)
       !! void caf_form_team(gex_TM_t* current_team, gex_TM_t* new_team, intmax_t team_number, int new_index);
       import c_ptr, c_int, c_intmax_t
-      type(c_ptr), intent(in) :: current_team
+      type(c_ptr), intent(in), value :: current_team
       type(c_ptr), intent(out) :: new_team
       integer(c_intmax_t), intent(in), value :: team_number
       integer(c_int), intent(in), value :: new_index

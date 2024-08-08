@@ -24,6 +24,7 @@ contains
   module procedure prif_end_team
     type(prif_coarray_handle), allocatable :: teams_coarrays(:)
     integer :: num_coarrays_in_team, i
+    type(c_ptr) :: tmp_c_ptr
     type(handle_data), pointer :: tmp_data
 
     ! deallocate the teams coarrays
@@ -42,6 +43,7 @@ contains
       end do
       call prif_deallocate_coarray(teams_coarrays, stat, errmsg, errmsg_alloc)
     end if
+    nullify(current_team%info%coarrays)
 
     ! set the current team back to the parent team
     current_team%info => current_team%info%parent_team
@@ -62,8 +64,9 @@ contains
         new_index_ = 1
       end if
 
+      allocate(team%info)
       team%info%parent_team => current_team%info
-      call caf_form_team(current_team%info%gex_team, team%info%gex_team, team_number, new_index)
+      call caf_form_team(current_team%info%gex_team, team%info%gex_team, team_number, new_index_)
     end block
   end procedure
 

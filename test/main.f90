@@ -41,6 +41,9 @@ contains
         use caf_stop_test, only: &
                 caf_stop_prif_this_image => &
                     test_prif_this_image
+        use caf_teams_test, only: &
+                caf_teams_caf_teams => &
+                    test_caf_teams
         use caf_this_image_test, only: &
                 caf_this_image_prif_this_image_no_coarray => &
                     test_prif_this_image_no_coarray
@@ -51,7 +54,7 @@ contains
         logical :: passed
 
         type(test_item_t) :: tests
-        type(test_item_t) :: individual_tests(13)
+        type(test_item_t) :: individual_tests(14)
 
         individual_tests(1) = a00_caffeinate_caffeinate()
         individual_tests(2) = caf_allocate_prif_allocate()
@@ -65,7 +68,8 @@ contains
         individual_tests(10) = caf_num_images_prif_num_images()
         individual_tests(11) = caf_rma_prif_rma()
         individual_tests(12) = caf_stop_prif_this_image()
-        individual_tests(13) = caf_this_image_prif_this_image_no_coarray()
+        individual_tests(13) = caf_teams_caf_teams()
+        individual_tests(14) = caf_this_image_prif_this_image_no_coarray()
         tests = test_that(individual_tests)
 
 

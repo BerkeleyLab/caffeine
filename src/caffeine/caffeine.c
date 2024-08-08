@@ -110,8 +110,7 @@ void* caf_allocate_remaining(mspace heap, void** allocated_space, size_t* alloca
   // nor necessarily the largest open space, but in practice is likely
   // to work out that way
   struct mallinfo heap_info = mspace_mallinfo(heap);
-  *allocated_size = heap_info.keepcost;
-
+  *allocated_size = heap_info.keepcost * 0.5f;
   *allocated_space = mspace_memalign(heap, 8, *allocated_size);
 }
 
@@ -281,9 +280,9 @@ size_t caf_elem_len(CFI_cdesc_t* a_desc)
   return a_desc->elem_len;
 }
 
-void caf_form_team(gex_TM_t* current_team, gex_TM_t* new_team, intmax_t team_number, int new_index)
+void caf_form_team(gex_TM_t current_team, gex_TM_t* new_team, intmax_t team_number, int new_index)
 {
-  gex_TM_Split(new_team, *current_team, team_number, new_index, NULL, 0, GEX_FLAG_TM_NO_SCRATCH);
+  gex_TM_Split(new_team, current_team, team_number, new_index, NULL, 0, GEX_FLAG_TM_NO_SCRATCH);
 }
 
 bool caf_numeric_type(CFI_cdesc_t* a_desc)

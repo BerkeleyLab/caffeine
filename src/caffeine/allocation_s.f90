@@ -7,7 +7,6 @@ submodule(prif:prif_private_s) allocation_s
       c_f_procpointer, &
       c_loc, &
       c_associated, &
-      c_null_ptr, &
       c_null_funptr
 
   implicit none
@@ -55,7 +54,7 @@ contains
     coarray_handle%info%final_func = final_func
     coarray_handle%info%lcobounds(1:size(lcobounds)) = lcobounds
     coarray_handle%info%ucobounds(1:size(ucobounds)) = ucobounds
-    call add_to_team_list(current_team, coarray_handle)
+    call add_to_team_list(coarray_handle)
 
     allocated_memory = coarray_handle%info%coarray_data
     if (caf_have_child_teams()) then
@@ -140,20 +139,14 @@ contains
     call caf_deallocate(non_symmetric_heap_mspace, mem)
   end procedure
 
-  subroutine add_to_team_list(current_team, coarray_handle)
-    type(prif_team_type), intent(inout) :: current_team
+  subroutine add_to_team_list(coarray_handle)
     type(prif_coarray_handle), intent(inout) :: coarray_handle
 
     if (associated(current_team%info%coarrays)) then
       current_team%info%coarrays%previous_handle = c_loc(coarray_handle%info)
       coarray_handle%info%next_handle = c_loc(current_team%info%coarrays)
-      coarray_handle%info%previous_handle = c_null_ptr
-      current_team%info%coarrays => coarray_handle%info
-    else
-      current_team%info%coarrays => coarray_handle%info
-      coarray_handle%info%next_handle = c_null_ptr
-      coarray_handle%info%previous_handle = c_null_ptr
     end if
+    current_team%info%coarrays => coarray_handle%info
   end subroutine
 
   subroutine remove_from_team_list(coarray_handle)
@@ -161,9 +154,17 @@ contains
 
     type(handle_data), pointer :: tmp_data
 
+    if (&
+        .not.c_associated(coarray_handle%info%previous_handle) &
+        .and. .not.c_associated(coarray_handle%info%next_handle)) then
+      nullify(current_team%info%coarrays)
+      return
+    end if
     if (c_associated(coarray_handle%info%previous_handle)) then
       call c_f_pointer(coarray_handle%info%previous_handle, tmp_data)
       tmp_data%next_handle = coarray_handle%info%next_handle
+    else
+      call c_f_pointer(coarray_handle%info%next_handle, current_team%info%coarrays)
     end if
     if (c_associated(coarray_handle%info%next_handle)) then
       call c_f_pointer(coarray_handle%info%next_handle, tmp_data)
