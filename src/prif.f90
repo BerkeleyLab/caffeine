@@ -92,11 +92,7 @@ module prif
 
   type, public :: prif_team_type
     private
-    type(c_ptr) :: gex_team
-    type(c_ptr) :: heap_mspace
-    integer(c_intptr_t) :: heap_start
-    type(prif_team_type), pointer :: parent_team
-    type(handle_data), pointer :: coarrays
+    type(team_data), pointer :: info => null()
   end type
 
   interface
@@ -1029,6 +1025,14 @@ module prif
     type(c_funptr) :: final_func
     type(c_ptr) :: previous_handle, next_handle
     integer(c_intmax_t) :: lcobounds(15), ucobounds(15)
+  end type
+
+  type, private :: team_data
+    type(c_ptr) :: gex_team
+    type(c_ptr) :: heap_mspace
+    integer(c_intptr_t) :: heap_start
+    type(team_data), pointer :: parent_team => null()
+    type(handle_data), pointer :: coarrays => null()
   end type
 
 end module prif
