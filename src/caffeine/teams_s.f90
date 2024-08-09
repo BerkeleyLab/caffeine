@@ -24,7 +24,6 @@ contains
   module procedure prif_end_team
     type(prif_coarray_handle), allocatable :: teams_coarrays(:)
     integer :: num_coarrays_in_team, i
-    type(c_ptr) :: tmp_c_ptr
     type(handle_data), pointer :: tmp_data
 
     ! deallocate the teams coarrays
