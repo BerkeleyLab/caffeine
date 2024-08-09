@@ -101,7 +101,11 @@ int caf_num_images(gex_TM_t team)
 
 void* caf_allocate(mspace heap, size_t bytes)
 {
-   return mspace_memalign(heap, 8, bytes);
+   void* allocated_space = mspace_memalign(heap, 8, bytes);
+   if (!allocated_space) // uh-oh, something went wrong..
+     gasnett_fatalerror("caf_allocate failed to mspace_memalign(%"PRIuSZ")", 
+                        bytes);
+   return allocated_space;
 }
 
 void* caf_allocate_remaining(mspace heap, void** allocated_space, size_t* allocated_size)
@@ -110,8 +114,11 @@ void* caf_allocate_remaining(mspace heap, void** allocated_space, size_t* alloca
   // nor necessarily the largest open space, but in practice is likely
   // to work out that way
   struct mallinfo heap_info = mspace_mallinfo(heap);
-  *allocated_size = heap_info.keepcost * 0.5f;
+  *allocated_size = heap_info.keepcost * 0.9f;
   *allocated_space = mspace_memalign(heap, 8, *allocated_size);
+  if (!*allocated_space) // uh-oh, something went wrong..
+    gasnett_fatalerror("caf_allocate_remaining failed to mspace_memalign(%"PRIuSZ")", 
+                       *allocated_size);
 }
 
 void caf_deallocate(mspace heap, void* mem)
