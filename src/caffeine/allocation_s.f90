@@ -140,7 +140,7 @@ contains
   end procedure
 
   subroutine add_to_team_list(coarray_handle)
-    type(prif_coarray_handle), intent(inout) :: coarray_handle
+    type(prif_coarray_handle), intent(in) :: coarray_handle
 
     if (associated(current_team%info%coarrays)) then
       current_team%info%coarrays%previous_handle = c_loc(coarray_handle%info)
