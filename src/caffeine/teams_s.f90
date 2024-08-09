@@ -7,9 +7,9 @@ submodule(prif:prif_private_s) teams_s
 contains
 
   module procedure prif_change_team
+    team%info%heap_start = current_team%info%child_heap_info%offset + current_team%info%heap_start
+    team%info%heap_size = current_team%info%child_heap_info%size
     if (caf_this_image(team%info%gex_team) == 1) then ! need to setup the heap for the team
-      team%info%heap_start = current_team%info%child_heap_info%offset + current_team%info%heap_start
-      team%info%heap_size = current_team%info%child_heap_info%size
       call caf_establish_mspace( &
           team%info%heap_mspace, &
           as_c_ptr(team%info%heap_start), &
