@@ -65,6 +65,11 @@ contains
         new_index_ = 1
       end if
 
+! DOB: The two allocates in this procedure do not have a corresponding deallocate, 
+! because Fortran lacks a destroy team operation. We consider this to represent
+! a defect in the Fortran design of teams.
+! As such, team-specific state such as these data structures and the corresponding 
+! team-related data structures in GASNet can never be reclaimed.
       allocate(team%info)
       team%info%parent_team => current_team%info
       call caf_form_team(current_team%info%gex_team, team%info%gex_team, team_number, new_index_)
