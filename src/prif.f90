@@ -2,7 +2,7 @@
 ! Terms of use are as specified in LICENSE.txt
 module prif
 
-  use iso_c_binding, only: c_int, c_bool, c_intptr_t, c_intmax_t, c_ptr, c_funptr, c_size_t, c_ptrdiff_t
+  use iso_c_binding, only: c_int, c_bool, c_intptr_t, c_intmax_t, c_ptr, c_funptr, c_size_t, c_ptrdiff_t, c_null_ptr
 
   implicit none
 
@@ -1023,7 +1023,7 @@ module prif
     integer(c_size_t) :: coarray_size
     integer(c_size_t) :: element_size
     type(c_funptr) :: final_func
-    type(c_ptr) :: previous_handle, next_handle
+    type(c_ptr) :: previous_handle = c_null_ptr, next_handle = c_null_ptr
     integer(c_intmax_t) :: lcobounds(15), ucobounds(15)
   end type
 
@@ -1031,8 +1031,15 @@ module prif
     type(c_ptr) :: gex_team
     type(c_ptr) :: heap_mspace
     integer(c_intptr_t) :: heap_start
+    integer(c_size_t) :: heap_size
     type(team_data), pointer :: parent_team => null()
     type(handle_data), pointer :: coarrays => null()
+    type(child_team_info), pointer :: child_heap_info => null()
   end type
 
+  type :: child_team_info
+    type(c_ptr) :: allocated_memory
+    integer(c_ptrdiff_t) :: offset
+    integer(c_size_t) :: size
+  end type
 end module prif
