@@ -7,7 +7,6 @@ submodule(prif:prif_private_s) allocation_s
       c_f_procpointer, &
       c_loc, &
       c_associated, &
-      c_null_ptr, &
       c_null_funptr
 
   implicit none
@@ -28,6 +27,12 @@ contains
     coarray_size = product(ubounds-lbounds+1)*element_size
 
     me = caf_this_image(current_team%info%gex_team)
+    if (caf_have_child_teams()) then
+      ! Free the child team space to make sure we have space to allocate the coarray
+      if (me == 1) then
+        call caf_deallocate(current_team%info%heap_mspace, current_team%info%child_heap_info%allocated_memory)
+      end if
+    end if
     if (me == 1) then
       handle_size = c_sizeof(unused)
       total_size = handle_size + coarray_size
@@ -49,9 +54,12 @@ contains
     coarray_handle%info%final_func = final_func
     coarray_handle%info%lcobounds(1:size(lcobounds)) = lcobounds
     coarray_handle%info%ucobounds(1:size(ucobounds)) = ucobounds
-    call add_to_team_list(current_team, coarray_handle)
+    call add_to_team_list(coarray_handle)
 
     allocated_memory = coarray_handle%info%coarray_data
+    if (caf_have_child_teams()) then
+      call caf_establish_child_heap
+    end if
   end procedure
 
   module procedure prif_allocate
@@ -118,26 +126,27 @@ contains
         call caf_deallocate(current_team%info%heap_mspace, c_loc(coarray_handles(i)%info))
     end do
     if (present(stat)) stat = 0
+    if (caf_have_child_teams()) then
+      ! reclaim any free space possible for the child teams to use
+      if (caf_this_image(current_team%info%gex_team) == 1) then
+        call caf_deallocate(current_team%info%heap_mspace, current_team%info%child_heap_info%allocated_memory)
+      end if
+      call caf_establish_child_heap
+    end if
   end procedure
 
   module procedure prif_deallocate
     call caf_deallocate(non_symmetric_heap_mspace, mem)
   end procedure
 
-  subroutine add_to_team_list(current_team, coarray_handle)
-    type(prif_team_type), intent(inout) :: current_team
-    type(prif_coarray_handle), intent(inout) :: coarray_handle
+  subroutine add_to_team_list(coarray_handle)
+    type(prif_coarray_handle), intent(in) :: coarray_handle
 
     if (associated(current_team%info%coarrays)) then
       current_team%info%coarrays%previous_handle = c_loc(coarray_handle%info)
       coarray_handle%info%next_handle = c_loc(current_team%info%coarrays)
-      coarray_handle%info%previous_handle = c_null_ptr
-      current_team%info%coarrays => coarray_handle%info
-    else
-      current_team%info%coarrays => coarray_handle%info
-      coarray_handle%info%next_handle = c_null_ptr
-      coarray_handle%info%previous_handle = c_null_ptr
     end if
+    current_team%info%coarrays => coarray_handle%info
   end subroutine
 
   subroutine remove_from_team_list(coarray_handle)
@@ -145,9 +154,17 @@ contains
 
     type(handle_data), pointer :: tmp_data
 
+    if (&
+        .not.c_associated(coarray_handle%info%previous_handle) &
+        .and. .not.c_associated(coarray_handle%info%next_handle)) then
+      nullify(current_team%info%coarrays)
+      return
+    end if
     if (c_associated(coarray_handle%info%previous_handle)) then
       call c_f_pointer(coarray_handle%info%previous_handle, tmp_data)
       tmp_data%next_handle = coarray_handle%info%next_handle
+    else
+      call c_f_pointer(coarray_handle%info%next_handle, current_team%info%coarrays)
     end if
     if (c_associated(coarray_handle%info%next_handle)) then
       call c_f_pointer(coarray_handle%info%next_handle, tmp_data)

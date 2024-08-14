@@ -41,9 +41,14 @@ int caf_this_image(gex_TM_t team)
 }
 
 // NOTE: gex_TM_T is a typedef to a C pointer, so the `gex_TM_t* initial_team` arg in the C signature matches the BIND(C) interface of an `intent(out)` arg of type `c_ptr` for the same argument
-void caf_caffeinate(mspace* symmetric_heap, intptr_t* symmetric_heap_start, mspace* non_symmetric_heap, gex_TM_t* initial_team)
-{
-  GASNET_SAFE(gex_Client_Init(&myclient, &myep, &myworldteam, "caffeine", NULL, NULL, 0));
+void caf_caffeinate(
+  mspace* symmetric_heap,
+  intptr_t* symmetric_heap_start,
+  intptr_t* symmetric_heap_size,
+  mspace* non_symmetric_heap,
+  gex_TM_t* initial_team
+) {
+  GASNET_SAFE(gex_Client_Init(&myclient, &myep, initial_team, "caffeine", NULL, NULL, 0));
 
   // query largest possible segment GASNet can give us of the same size across all processes:
   size_t max_seg = gasnet_getMaxGlobalSegmentSize();
@@ -59,7 +64,7 @@ void caf_caffeinate(mspace* symmetric_heap, intptr_t* symmetric_heap_start, mspa
   // TODO: issue a console warning here instead of silently capping
   segsz = MIN(segsz,max_seg);
 
-  GASNET_SAFE(gex_Segment_Attach(&mysegment, myworldteam, segsz));
+  GASNET_SAFE(gex_Segment_Attach(&mysegment, *initial_team, segsz));
 
   *symmetric_heap_start = (intptr_t)gex_Segment_QueryAddr(mysegment);
   size_t total_heap_size = gex_Segment_QuerySize(mysegment);
@@ -72,16 +77,16 @@ void caf_caffeinate(mspace* symmetric_heap, intptr_t* symmetric_heap_start, mspa
   assert(non_symmetric_fraction > 0 && non_symmetric_fraction < 1); // TODO: real error reporting
 
   size_t non_symmetric_heap_size = total_heap_size * non_symmetric_fraction;
-  size_t symmetric_heap_size = total_heap_size - non_symmetric_heap_size;
-  intptr_t non_symmetric_heap_start = *symmetric_heap_start + symmetric_heap_size;
+  *symmetric_heap_size = total_heap_size - non_symmetric_heap_size;
+  intptr_t non_symmetric_heap_start = *symmetric_heap_start + *symmetric_heap_size;
 
-  if (caf_this_image(myworldteam) == 1) {
-    *symmetric_heap = create_mspace_with_base((void*)*symmetric_heap_start, symmetric_heap_size, 0);
-    mspace_set_footprint_limit(*symmetric_heap, symmetric_heap_size);
+  if (caf_this_image(*initial_team) == 1) {
+    *symmetric_heap = create_mspace_with_base((void*)*symmetric_heap_start, *symmetric_heap_size, 0);
+    mspace_set_footprint_limit(*symmetric_heap, *symmetric_heap_size);
   }
   *non_symmetric_heap = create_mspace_with_base((void*)non_symmetric_heap_start, non_symmetric_heap_size, 0);
   mspace_set_footprint_limit(*non_symmetric_heap, non_symmetric_heap_size);
-  *initial_team = myworldteam;
+  myworldteam = *initial_team;
 }
 
 void caf_decaffeinate(int exit_code)
@@ -96,12 +101,35 @@ int caf_num_images(gex_TM_t team)
 
 void* caf_allocate(mspace heap, size_t bytes)
 {
-   return mspace_memalign(heap, 8, bytes);
+   void* allocated_space = mspace_memalign(heap, 8, bytes);
+   if (!allocated_space) // uh-oh, something went wrong..
+     gasnett_fatalerror("caf_allocate failed to mspace_memalign(%"PRIuSZ")", 
+                        bytes);
+   return allocated_space;
+}
+
+void* caf_allocate_remaining(mspace heap, void** allocated_space, size_t* allocated_size)
+{
+  // The following doesn't necessarily give us all remaining space
+  // nor necessarily the largest open space, but in practice is likely
+  // to work out that way
+  struct mallinfo heap_info = mspace_mallinfo(heap);
+  *allocated_size = heap_info.keepcost * 0.9f;
+  *allocated_space = mspace_memalign(heap, 8, *allocated_size);
+  if (!*allocated_space) // uh-oh, something went wrong..
+    gasnett_fatalerror("caf_allocate_remaining failed to mspace_memalign(%"PRIuSZ")", 
+                       *allocated_size);
 }
 
 void caf_deallocate(mspace heap, void* mem)
 {
   mspace_free(heap, mem);
+}
+
+void caf_establish_mspace(mspace* heap, void* heap_start, size_t heap_size)
+{
+  *heap = create_mspace_with_base(heap_start, heap_size, 0);
+  mspace_set_footprint_limit(*heap, heap_size);
 }
 
 // take address in a segment and convert to an address on given image
@@ -257,6 +285,11 @@ bool caf_same_cfi_type(CFI_cdesc_t* a_desc, CFI_cdesc_t* b_desc)
 size_t caf_elem_len(CFI_cdesc_t* a_desc)
 {
   return a_desc->elem_len;
+}
+
+void caf_form_team(gex_TM_t current_team, gex_TM_t* new_team, intmax_t team_number, int new_index)
+{
+  gex_TM_Split(new_team, current_team, team_number, new_index, NULL, 0, GEX_FLAG_TM_NO_SCRATCH);
 }
 
 bool caf_numeric_type(CFI_cdesc_t* a_desc)

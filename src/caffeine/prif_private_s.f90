@@ -18,11 +18,17 @@ submodule(prif) prif_private_s
 
     ! ________ Program initiation and finalization ___________
 
-    subroutine caf_caffeinate(symmetric_heap, symmetric_heap_start, non_symmetric_heap, initial_team) bind(C)
+    subroutine caf_caffeinate( &
+        symmetric_heap, &
+        symmetric_heap_start, &
+        symmetric_heap_size, &
+        non_symmetric_heap, &
+        initial_team) &
+        bind(C)
       import c_ptr, c_intptr_t
       implicit none
       type(c_ptr), intent(out) :: symmetric_heap
-      integer(c_intptr_t), intent(out) :: symmetric_heap_start
+      integer(c_intptr_t), intent(out) :: symmetric_heap_start, symmetric_heap_size
       type(c_ptr), intent(out) :: non_symmetric_heap
       type(c_ptr), intent(out) :: initial_team
     end subroutine
@@ -62,11 +68,27 @@ submodule(prif) prif_private_s
        type(c_ptr) :: ptr
     end function
 
+    subroutine caf_allocate_remaining(mspace, allocated_space, allocated_size) bind(c)
+      import c_size_t, c_ptr
+      implicit none
+      type(c_ptr), intent(in), value :: mspace
+      type(c_ptr), intent(out) :: allocated_space
+      integer(c_size_t), intent(out) :: allocated_size
+    end subroutine
+
     subroutine caf_deallocate(mspace, mem) bind(c)
       import c_ptr
       implicit none
       type(c_ptr), intent(in), value :: mspace
       type(c_ptr), intent(in), value :: mem
+    end subroutine
+
+    subroutine caf_establish_mspace(mspace, mem, mem_size) bind(c)
+      import c_size_t, c_ptr
+      implicit none
+      type(c_ptr), intent(out) :: mspace
+      type(c_ptr), intent(in), value :: mem
+      integer(c_size_t), intent(in), value :: mem_size
     end subroutine
 
     ! ___________________ PRIF Queries ______________________
@@ -185,6 +207,15 @@ submodule(prif) prif_private_s
        integer(c_size_t), target :: a_elem_len
      end function
 
+     subroutine caf_form_team(current_team, new_team, team_number, new_index) bind(C)
+      !! void caf_form_team(gex_TM_t* current_team, gex_TM_t* new_team, intmax_t team_number, int new_index);
+      import c_ptr, c_int, c_intmax_t
+      type(c_ptr), intent(in), value :: current_team
+      type(c_ptr), intent(out) :: new_team
+      integer(c_intmax_t), intent(in), value :: team_number
+      integer(c_int), intent(in), value :: new_index
+     end subroutine
+
   end interface
 
 contains
@@ -236,6 +267,22 @@ contains
     else
       c_val = 0_c_int
     end if
+  end function
+
+  subroutine caf_establish_child_heap
+    if (caf_this_image(current_team%info%gex_team) == 1) then
+      call caf_allocate_remaining( &
+          current_team%info%heap_mspace, &
+          current_team%info%child_heap_info%allocated_memory, &
+          current_team%info%child_heap_info%size)
+      current_team%info%child_heap_info%offset = &
+          as_int(current_team%info%child_heap_info%allocated_memory) - current_team%info%heap_start
+    end if
+    call prif_co_broadcast(current_team%info%child_heap_info, 1)
+  end subroutine
+
+  logical function caf_have_child_teams()
+    caf_have_child_teams = associated(current_team%info%child_heap_info)
   end function
 
 end submodule prif_private_s
