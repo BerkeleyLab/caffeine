@@ -107,12 +107,18 @@ No (update with verbage)
 ---
 
 ## Strided Coarray Access
-### Support = ...
+### Support = no
 
 | Procedure | Status | Notes |
 |-----------|--------|-------|
-| ......... | ...... | ..... |
-| ......... | ...... | ..... |
+| `prif_get_strided`                               | no  | n\a |
+| `prif_get_strided_indirect`                      | no  | n\a |
+| `prif_put_strided`                               | no  | n\a |
+| `prif_put_strided_indirect`                      | no  | n\a |
+| `prif_put_strided_with_notify`                   | no  | n\a |
+| `prif_put_strided_with_notify_indirect`          | no  | n\a |
+| `prif_put_strided_indirect_with_notify`          | no  | n\a |
+| `prif_put_strided_indirect_with_notify_indirect` | no  | n\a |
 
 ---
 
