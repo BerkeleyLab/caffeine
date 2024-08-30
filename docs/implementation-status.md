@@ -35,19 +35,18 @@ No (update with verbage)
 
 
 ## Program Startup and Shutdown
-### Support = ...
+### Support = partial
 
 | Procedure | Status | Notes |
 |-----------|--------|-------|
-| ......... | ...... | ..... |
-| ......... | ...... | ..... |
+| `prif_init` | yes | n/a |
+| `prif_stop`, `prif_error_stop` | partial | Missing support for `quiet=.true.` |
+| `prif_fail_image` | no | n/a |
 
 ---
 
 ## Image Queries
 ### Support = partial (no support for `team` and `team_number` arguments)
-
-TODO: Add notes to table
 
 | Procedure | Status | Notes |
 |-----------|--------|-------|
