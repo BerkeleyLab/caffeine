@@ -75,12 +75,18 @@ No (update with verbage)
 ---
 
 ## Coarray Queries
-### Support = ...
+### Support = partial (only support for `prif_image_index`)
 
 | Procedure | Status | Notes |
 |-----------|--------|-------|
-| ......... | ...... | ..... |
-| ......... | ...... | ..... |
+| `prif_set_context_data`, `prif_get_context_data` | no | n\a |
+| `prif_size_bytes` | no | n\a |
+| `prif_lcobound_no_dim`, `prif_lcobound_with_dim` | no | n\a |
+| `prif_ucobound_no_dim`, `prif_ucobound_with_dim` | no | n\a |
+| `prif_coshape` | no | n\a |
+| `prif_image_index` | yes | n\a |
+| `prif_image_index_with_team` | no | n\a |
+| `prif_image_index_with_team_number` | no | n\a |
 
 ---
 
