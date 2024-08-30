@@ -188,7 +188,11 @@ No (update with verbage)
 
 | Procedure | Status | Notes |
 |-----------|--------|-------|
-| `co_sum` | partial |  |
+| `prif_co_broadcast` | ... | ... |
+| `prif_co_max`       | ... | ... |
+| `prif_co_min`       | ... | ... |
+| `prif_co_sum`       | ... | ... |
+| `prif_co_reduce`    | ... | ... |
 
 ---
 
