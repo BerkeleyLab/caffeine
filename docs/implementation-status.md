@@ -201,7 +201,33 @@ No (update with verbage)
 
 | Procedure | Status | Notes |
 |-----------|--------|-------|
-| ......... | ...... | ..... |
-| ......... | ...... | ..... |
+| `prif_atomic_add`          | no  | n\a |
+| `prif_atomic_add_indirect` | no  | n\a |
+| `prif_atomic_and`          | no  | n\a |
+| `prif_atomic_and_indirect` | no  | n\a |
+| `prif_atomic_or`           | no  | n\a |
+| `prif_atomic_or_indirect`  | no  | n\a |
+| `prif_atomic_xor`          | no  | n\a |
+| `prif_atomic_xor_indirect` | no  | n\a |
+| `prif_atomic_cas_int`                 | no  | n\a |
+| `prif_atomic_cas_int_indirect`        | no  | n\a |
+| `prif_atomic_cas_logical`             | no  | n\a |
+| `prif_atomic_cas_logical_indirect`    | no  | n\a |
+| `prif_atomic_fetch_add`               | no  | n\a |
+| `prif_atomic_fetch_add_indirect`      | no  | n\a |
+| `prif_atomic_fetch_and`               | no  | n\a |
+| `prif_atomic_fetch_and_indirect`      | no  | n\a |
+| `prif_atomic_fetch_or`                | no  | n\a |
+| `prif_atomic_fetch_or_indirect`       | no  | n\a |
+| `prif_atomic_fetch_xor`               | no  | n\a |
+| `prif_atomic_fetch_xor_indirect`      | no  | n\a |
+| `prif_atomic_define_int`              | no  | n\a |
+| `prif_atomic_define_int_indirect`     | no  | n\a |
+| `prif_atomic_define_logical`          | no  | n\a |
+| `prif_atomic_define_logical_indirect` | no  | n\a |
+| `prif_atomic_ref_int`                 | no  | n\a |
+| `prif_atomic_ref_int_indirect`        | no  | n\a |
+| `prif_atomic_ref_logical`             | no  | n\a |
+| `prif_atomic_ref_logical_indirect`    | no  | n\a |
 
 ---
