@@ -123,12 +123,15 @@ No (update with verbage)
 ---
 
 ## SYNC Statements
-### Support = partial ( support ...)
+### Support = partial ( only support for `prif_sync_all`)
 
 | Procedure | Status | Notes |
 |-----------|--------|-------|
-| ......... | ...... | ..... |
-| ......... | ...... | ..... |
+
+| `prif_sync_memory` | no  | n\a |
+| `prif_sync_all`    | yes | n\a |
+| `prif_sync_images` | no  | n\a |
+| `prif_sync_team`   | no  | n\a |
 
 ---
 
