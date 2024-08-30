@@ -54,6 +54,11 @@ Run tests
 ./build/run-fpm.sh test
 ```
 
+Implementation Status
+--------------------
+
+For details on the PRIF features that are implemented, please see the [Implementation Status doc](docs/implementation-status.md).
+
 Publications
 ------------
 

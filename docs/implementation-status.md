@@ -1,6 +1,3 @@
-CHANGE NAME to implementation-status.md
-ADD link in README to this doc
-
 # Implementation Status
 
 - [Program Startup and Shutdown](Program-Startup-and-Shutdown)
