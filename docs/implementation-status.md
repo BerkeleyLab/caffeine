@@ -140,8 +140,10 @@ No (update with verbage)
 
 | Procedure | Status | Notes |
 |-----------|--------|-------|
-| ......... | ...... | ..... |
-| ......... | ...... | ..... |
+| `prif_lock`            | no  | n\a |
+| `prif_lock_indirect`   | no  | n\a |
+| `prif_unlock`          | no  | n\a |
+| `prif_unlock_indirect` | no  | n\a |
 
 ---
 
