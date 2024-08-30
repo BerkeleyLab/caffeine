@@ -46,13 +46,17 @@ No (update with verbage)
 ---
 
 ## Image Queries
-### Support = partial (no support for `team` and `team_number` arguments)
+### Support = partial
 
 | Procedure | Status | Notes |
 |-----------|--------|-------|
-| `prif_this_image`, `prif_num_images`    | yes |
-| `prif_this_image_team`, `prif_num_images_team`  | no |
-| `prif_this_image_team_number`, `prif_num_images_team_number`  | no |
+| `prif_num_images`    | yes | n\a |
+| `prif_num_images_with_team`, `prif_num_images_with_team_number`  | no | n\a |
+| `prif_this_image_no_coarray` | yes | n\a |
+| `prif_this_image_with_coarray`, `prif_this_image_with_dim`  | no | n\a |
+| `prif_failed_images` | no | n/a |
+| `prif_stopped_images` | no | n/a |
+| `prif_image_status` | no | n/a |
 
 ---
 
