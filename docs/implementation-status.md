@@ -152,8 +152,8 @@ No (update with verbage)
 
 | Procedure | Status | Notes |
 |-----------|--------|-------|
-| ......... | ...... | ..... |
-| ......... | ...... | ..... |
+| `prif_critical`     | no  | n\a |
+| `prif_end_critical` | no  | n\a |
 
 ---
 
