@@ -7,7 +7,9 @@ of the PRIF procedures and are callable, but some procedure definitions are unim
 more details about the implementation of the various PRIF features, please see the
 following sections:
 
-- [Program Startup and Shutdown](Program-Startup-and-Shutdown)
+- [PRIF-specific constants](#PRIF-specific-constants)
+- [`stat` and `errmsg` support](#`stat`-and-`errmsg`-support)
+- [Program Startup and Shutdown](#Program-Startup-and-Shutdown)
 - [Image Queries](#Image-Queries)
 - [Storage Management](#Storage-Management)
 - [Coarray Queries](#Coarray-Queries)
@@ -23,11 +25,11 @@ following sections:
 
 TODO: For features with all no support, flesh out table, but comment it out
 
-### PRIF-specific constants
+## PRIF-specific constants
 
 Yes (update with verbage)
 
-### `stat` and `errmsg` support
+## `stat` and `errmsg` support
 
 No (update with verbage)
 
@@ -42,7 +44,7 @@ No (update with verbage)
 
 ---
 
-## Image Queries - partial
+## Image Queries
 ### Support = partial (no support for `team` and `team_number` arguments)
 
 TODO: Add notes to table
