@@ -1,5 +1,12 @@
 # Implementation Status
 
+Caffeine is an implementation of the Parallel Runtime Interface for Fortran (PRIF). This document
+outlines the implementation status in Caffeine of the features defined in the
+[latest PRIF revision](https://dx.doi.org/10.25344/S4WG64). Caffeine contains interfaces for all
+of the PRIF procedures and are callable, but some procedure definitions are unimplemented. For
+more details about the implementation of the various PRIF features, please see the
+following sections:
+
 - [Program Startup and Shutdown](Program-Startup-and-Shutdown)
 - [Image Queries](#Image-Queries)
 - [Storage Management](#Storage-Management)
@@ -15,10 +22,6 @@
 - [Atomic Memory Operations](#Atomic-Memory-Operations)
 
 TODO: For features with all no support, flesh out table, but comment it out
-
-TODO: Add verbage that interfaces for all PRIF procedures exist and are callable but not all semantics of the procedures exist and the status is described below.
-
-TODO: Link latest version of spec here:
 
 ### PRIF-specific constants
 
