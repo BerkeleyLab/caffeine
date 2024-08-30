@@ -171,12 +171,15 @@ No (update with verbage)
 ---
 
 ## Teams
-### Support = partial (...)
+### Support = partial (No support for `prif_get_team` and `prif_team_number`)
 
 | Procedure | Status | Notes |
 |-----------|--------|-------|
-| ......... | ...... | ..... |
-| ......... | ...... | ..... |
+| `prif_form_team`   | yes | n\a |
+| `prif_get_team`    | no  | n\a |
+| `prif_team_number` | no  | n\a |
+| `prif_change_team` | yes | n\a |
+| `prif_end_team`    | yes | n\a |
 
 ---
 
