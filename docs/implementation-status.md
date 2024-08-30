@@ -162,8 +162,11 @@ No (update with verbage)
 
 | Procedure | Status | Notes |
 |-----------|--------|-------|
-| ......... | ...... | ..... |
-| ......... | ...... | ..... |
+| `prif_event_post`          | no  | n\a |
+| `prif_event_post_indirect` | no  | n\a |
+| `prif_event_wait`          | no  | n\a |
+| `prif_event_query`         | no  | n\a |
+| `prif_notify_wait`         | no  | n\a |
 
 ---
 
