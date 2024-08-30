@@ -91,12 +91,18 @@ No (update with verbage)
 ---
 
 ## Continguous Coarray Access
-### Support = ...
+### Support = partial
 
 | Procedure | Status | Notes |
 |-----------|--------|-------|
-| ......... | ...... | ..... |
-| ......... | ...... | ..... |
+| `prif_get`                               | yes | n\a |
+| `prif_get_indirect`                      | yes | n\a |
+| `prif_put`                               | yes | n\a |
+| `prif_put_indirect`                      | yes | n\a |
+| `prif_put_with_notify`                   | no  | n\a |
+| `prif_put_with_notify_indirect`          | no  | n\a |
+| `prif_put_indirect_with_notify`          | no  | n\a |
+| `prif_put_indirect_with_notify_indirect` | no  | n\a |
 
 ---
 
