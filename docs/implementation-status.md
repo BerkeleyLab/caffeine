@@ -112,6 +112,7 @@ in the following sections.
 ## Strided Coarray Access
 ### Support = no
 
+<!---
 | Procedure | Status | Notes |
 |-----------|--------|-------|
 | `prif_get_strided`                               | no  | n\a |
@@ -122,6 +123,7 @@ in the following sections.
 | `prif_put_strided_with_notify_indirect`          | no  | n\a |
 | `prif_put_strided_indirect_with_notify`          | no  | n\a |
 | `prif_put_strided_indirect_with_notify_indirect` | no  | n\a |
+-->
 
 ---
 
@@ -140,28 +142,33 @@ in the following sections.
 ## Locks and Unlocks
 ### Support = no
 
+<!---
 | Procedure | Status | Notes |
 |-----------|--------|-------|
 | `prif_lock`            | no  | n\a |
 | `prif_lock_indirect`   | no  | n\a |
 | `prif_unlock`          | no  | n\a |
 | `prif_unlock_indirect` | no  | n\a |
+-->
 
 ---
 
 ## Critical
 ### Support = no
 
+<!---
 | Procedure | Status | Notes |
 |-----------|--------|-------|
 | `prif_critical`     | no  | n\a |
 | `prif_end_critical` | no  | n\a |
+-->
 
 ---
 
 ## Events and Notifications
 ### Support = no
 
+<!---
 | Procedure | Status | Notes |
 |-----------|--------|-------|
 | `prif_event_post`          | no  | n\a |
@@ -169,6 +176,7 @@ in the following sections.
 | `prif_event_wait`          | no  | n\a |
 | `prif_event_query`         | no  | n\a |
 | `prif_notify_wait`         | no  | n\a |
+-->
 
 ---
 
@@ -201,6 +209,7 @@ in the following sections.
 ## Atomic Memory Operations
 ### Support = no
 
+<!---
 | Procedure | Status | Notes |
 |-----------|--------|-------|
 | `prif_atomic_add`          | no  | n\a |
@@ -231,5 +240,6 @@ in the following sections.
 | `prif_atomic_ref_int_indirect`        | no  | n\a |
 | `prif_atomic_ref_logical`             | no  | n\a |
 | `prif_atomic_ref_logical_indirect`    | no  | n\a |
+-->
 
 ---
