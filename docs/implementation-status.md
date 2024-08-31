@@ -8,7 +8,7 @@ more details about the implementation of the various PRIF features, please see t
 following sections:
 
 - [Named Constants](#Named-Constants)
-- [`stat` and `errmsg` support](#`stat`-and-`errmsg`-support) NO support yet
+- [`stat` and `errmsg` support](#stat-and-errmsg-support) - NO support yet
 - [Program Startup and Shutdown](#Program-Startup-and-Shutdown)
 - [Image Queries](#Image-Queries)
 - [Storage Management](#Storage-Management)
@@ -20,7 +20,7 @@ following sections:
 - [Critical](#Critical)
 - [Events and Notifications](#Events-and-Notifications)
 - [Teams](#teams)
-- [Collectives](collectives#)
+- [Collectives](#Collectives)
 - [Atomic Memory Operations](#Atomic-Memory-Operations)
 
 TODO: For features with all no support, flesh out table, but comment it out
