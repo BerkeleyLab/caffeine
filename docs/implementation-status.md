@@ -7,8 +7,8 @@ of the PRIF procedures and are callable, but some procedure definitions are unim
 more details about the implementation of the various PRIF features, please see the
 following sections:
 
-- [PRIF-specific constants](#PRIF-specific-constants)
-- [`stat` and `errmsg` support](#`stat`-and-`errmsg`-support)
+- [Named Constants](#Named-Constants)
+- [`stat` and `errmsg` support](#`stat`-and-`errmsg`-support) NO support yet
 - [Program Startup and Shutdown](#Program-Startup-and-Shutdown)
 - [Image Queries](#Image-Queries)
 - [Storage Management](#Storage-Management)
@@ -25,13 +25,16 @@ following sections:
 
 TODO: For features with all no support, flesh out table, but comment it out
 
-## PRIF-specific constants
+## Named Constants
 
-Yes (update with verbage)
+Caffeine contains definitions for all of the PRIF-relevant constants from ISO_FORTRAN_ENV and for
+all of the PRIF-specific constants.
 
 ## `stat` and `errmsg` support
 
-No (update with verbage)
+Many PRIF procedures have optional arguments `stat`, `errmsg`, and `errmsg_alloc`. There is no
+support for these optional arguments in Caffeine yet and this is not represented in the tables
+in the following sections.
 
 
 ## Program Startup and Shutdown
@@ -127,7 +130,6 @@ No (update with verbage)
 
 | Procedure | Status | Notes |
 |-----------|--------|-------|
-
 | `prif_sync_memory` | no  | n\a |
 | `prif_sync_all`    | yes | n\a |
 | `prif_sync_images` | no  | n\a |
