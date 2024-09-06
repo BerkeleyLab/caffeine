@@ -260,7 +260,6 @@ contains
       type(c_ptr), value ::  cdata       !! Client data
 
       character(kind=c_char, len=:), allocatable, target :: prototype(:)
-      character(kind=c_char, len=:), pointer :: lhs(:)=>null(), rhs_and_result(:)=>null()
       integer(c_int), pointer :: arglen=>null()
 
       associate(c_associated_args => [c_associated(arg1), c_associated(arg2_and_out), c_associated(cdata)])
@@ -269,18 +268,19 @@ contains
 
       call c_f_pointer(cdata, arglen)
       allocate(character(kind=c_char, len=arglen) :: prototype(count))
-      lhs => prototype ! set string length
-      rhs_and_result => prototype ! set string length
-
-      call c_f_pointer(arg1, lhs, [count])
-      call c_f_pointer(arg2_and_out, rhs_and_result, [count])
-
       block
-        integer(c_size_t) i
+        character(kind=c_char, len=arglen), pointer :: lhs(:)=>null(), rhs_and_result(:)=>null()
 
-        do i=1, count
-          rhs_and_result(i) = char_op(lhs(i), rhs_and_result(i))
-        end do
+        call c_f_pointer(arg1, lhs, [count])
+        call c_f_pointer(arg2_and_out, rhs_and_result, [count])
+
+        block
+          integer(c_size_t) i
+
+          do i=1, count
+            rhs_and_result(i) = char_op(lhs(i), rhs_and_result(i))
+          end do
+        end block
       end block
 
     end subroutine
