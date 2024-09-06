@@ -24,7 +24,7 @@ contains
       !! synchronize, stop the executing image, and provide the stop_code, or 0 if not present, as the process exit status
       integer, intent(in), optional :: stop_code
 
-      sync all
+      call prif_sync_all()
 
       !write(output_unit, *) "caf_stop: stop code '", stop_code, "'"
       write(output_unit, *) stop_code
@@ -39,7 +39,7 @@ contains
       !! synchronize, stop the executing image, and provide the stop_code as the process exit status
       character(len=*), intent(in) :: stop_code
 
-      sync all
+      call prif_sync_all()
 
       write(output_unit, *) "caf_stop: stop code '" // stop_code // "'"
       flush output_unit
