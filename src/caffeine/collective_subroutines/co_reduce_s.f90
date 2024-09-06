@@ -259,7 +259,6 @@ contains
       integer(c_size_t), value :: count  !! Operand count
       type(c_ptr), value ::  cdata       !! Client data
 
-      character(kind=c_char, len=:), allocatable, target :: prototype(:)
       integer(c_int), pointer :: arglen=>null()
 
       associate(c_associated_args => [c_associated(arg1), c_associated(arg2_and_out), c_associated(cdata)])
@@ -267,7 +266,6 @@ contains
       end associate
 
       call c_f_pointer(cdata, arglen)
-      allocate(character(kind=c_char, len=arglen) :: prototype(count))
       block
         character(kind=c_char, len=arglen), pointer :: lhs(:)=>null(), rhs_and_result(:)=>null()
 
