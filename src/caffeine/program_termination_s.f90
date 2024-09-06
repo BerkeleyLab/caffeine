@@ -145,7 +145,7 @@ contains
     character(len=length) :: f_string
 
     integer :: i
-    do concurrent (i = 1:length)
+    do i = 1,length
       f_string(i:i) = c_string(i)
     end do
   end function
