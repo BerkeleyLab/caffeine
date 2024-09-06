@@ -356,12 +356,21 @@ EOF
 
 exit_if_pkg_config_pc_file_missing "caffeine"
 
+compiler_version=$($FPM_FC --version)
+if [[ $compiler_version == *llvm* ]]; then
+  compiler_flag="-mmlir -allow-assumed-rank -Ofast"
+else
+  compiler_flag="-O3"
+fi
+
 RUN_FPM_SH="build/run-fpm.sh"
 cat << EOF > $RUN_FPM_SH
 #!/bin/sh
 #-- DO NOT EDIT -- created by caffeine/install.sh
 fpm_sub_cmd=\$1; shift
 "${FPM}" "\$fpm_sub_cmd" \\
+--profile release \\
+--flag "$compiler_flag" \\
 --compiler "`$PKG_CONFIG caffeine --variable=CAFFEINE_FPM_FC`"   \\
 --c-compiler "`$PKG_CONFIG caffeine --variable=CAFFEINE_FPM_CC`" \\
 --c-flag "`$PKG_CONFIG caffeine --variable=CAFFEINE_FPM_CFLAGS`" \\
