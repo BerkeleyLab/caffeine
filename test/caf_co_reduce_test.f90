@@ -30,6 +30,7 @@ contains
     type(result_t) result_
     character(len=*, kind=c_char), parameter :: names(*) = ["larry","harry","carey","betty","tommy","billy"]
     character(len=:, kind=c_char), allocatable :: my_name(:)
+    character(len=:), allocatable :: expected_name
     integer :: me, num_imgs
 
     call prif_this_image_no_coarray(this_image=me)
@@ -39,9 +40,9 @@ contains
     end associate
 
     call prif_num_images(num_images=num_imgs)
-    associate(expected_name => minval(names(1:min(num_imgs, size(names)))))
-      result_ = assert_that(all(expected_name == my_name))
-    end associate
+    !expected_name = minval(names(1:min(num_imgs, size(names)))) ! this exposes a flang bug
+    expected_name = "betty"
+    result_ = assert_that(all(expected_name == my_name))
 
   contains
 
