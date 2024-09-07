@@ -6,7 +6,6 @@ maintainer = "rouson@lbl.gov"
 copyright = "2021-2024 UC Regents"
 
 [dev-dependencies]
-veggies = {git = "https://gitlab.com/everythingfunctional/veggies"}
-iso_varying_string = {git = "https://gitlab.com/everythingfunctional/iso_varying_string.git", tag = "v3.0.4"}
+julienne = {git = "https://github.com/berkeleylab/julienne", tag = "1.3.0"}
 
 [build]
