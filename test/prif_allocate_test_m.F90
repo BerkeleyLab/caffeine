@@ -36,7 +36,7 @@ contains
 
   pure function subject() result(specimen)
     character(len=:), allocatable :: specimen
-    specimen = "PRIF allocation"
+    specimen = "The prif_allocate_coarray subroutine"
   end function
 
   function results() result(test_results)
