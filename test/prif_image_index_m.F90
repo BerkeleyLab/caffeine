@@ -8,7 +8,7 @@ module prif_image_index_test_m
   use iso_c_binding, only: c_int, c_intmax_t, c_ptr, c_size_t, c_null_funptr
   use prif, only: prif_coarray_handle, prif_allocate_coarray, prif_deallocate_coarray, prif_image_index, prif_num_images
   use julienne_m, only : test_t, test_result_t, test_description_t, test_description_substring
-#ifndef HAVE_PROCEDURE_ACTUAL_FOR_POINTER_DUMMY
+#if ! HAVE_PROCEDURE_ACTUAL_FOR_POINTER_DUMMY
   use julienne_m, only : test_function_i
 #endif
   implicit none
@@ -33,7 +33,7 @@ contains
     type(test_result_t), allocatable :: test_results(:)
     type(test_description_t), allocatable :: test_descriptions(:)
 
-#ifdef HAVE_PROCEDURE_ACTUAL_FOR_POINTER_DUMMY
+#if HAVE_PROCEDURE_ACTUAL_FOR_POINTER_DUMMY
     test_descriptions = [ &
        test_description_t("returning 1 for the simplest case", check_simple_case) &
       ,test_description_t("returning 1 when given the lower bounds", check_lower_bounds) &

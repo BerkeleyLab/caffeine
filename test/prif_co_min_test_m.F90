@@ -8,7 +8,7 @@ module prif_co_min_test_m
   use iso_c_binding, only: c_size_t, c_ptr, c_intmax_t, c_null_funptr
   use prif, only : prif_co_min, prif_num_images, prif_this_image_no_coarray, prif_num_images
   use julienne_m, only : test_t, test_result_t, test_description_t, test_description_substring
-#ifndef HAVE_PROCEDURE_ACTUAL_FOR_POINTER_DUMMY
+#if ! HAVE_PROCEDURE_ACTUAL_FOR_POINTER_DUMMY
   use julienne_m, only : test_function_i
 #endif
   implicit none
@@ -34,7 +34,7 @@ contains
     type(test_result_t), allocatable :: test_results(:)
     type(test_description_t), allocatable :: test_descriptions(:)
 
-#ifdef HAVE_PROCEDURE_ACTUAL_FOR_POINTER_DUMMY
+#if HAVE_PROCEDURE_ACTUAL_FOR_POINTER_DUMMY
     test_descriptions = [ &
        test_description_t("default integer scalar with stat argument present",                     min_default_integer_scalars)    &
       ,test_description_t("integer(c_int64_t) scalar with no optional arguments present",          min_c_int64_scalars)            &

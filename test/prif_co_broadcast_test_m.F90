@@ -7,7 +7,7 @@ module prif_co_broadcast_test_m
   !! Unit test for the prif_co_broadcast subroutine
   use prif, only : prif_co_broadcast, prif_num_images, prif_this_image_no_coarray
   use julienne_m, only : test_t, test_result_t, test_description_t, test_description_substring
-#ifndef HAVE_PROCEDURE_ACTUAL_FOR_POINTER_DUMMY
+#if ! HAVE_PROCEDURE_ACTUAL_FOR_POINTER_DUMMY
   use julienne_m, only : test_function_i
 #endif
   implicit none
@@ -43,7 +43,7 @@ contains
     type(test_result_t), allocatable :: test_results(:)
     type(test_description_t), allocatable :: test_descriptions(:)
 
-#ifdef HAVE_PROCEDURE_ACTUAL_FOR_POINTER_DUMMY
+#if HAVE_PROCEDURE_ACTUAL_FOR_POINTER_DUMMY
     test_descriptions = [ &
        test_description_t("broadcasts a default integer scalar with no optional arguments", broadcast_default_integer) &
       ,test_description_t("broadcasts a derived type scalar with no allocatable components", broadcast_derived_type) &

@@ -7,7 +7,7 @@ module prif_init_test_m
   !! Unit test fort the prif_init program inititation subroutine
   use prif, only : prif_init, PRIF_STAT_ALREADY_INIT
   use julienne_m, only : test_t, test_result_t, test_description_t, test_description_substring
-#ifndef HAVE_PROCEDURE_ACTUAL_FOR_POINTER_DUMMY
+#if ! HAVE_PROCEDURE_ACTUAL_FOR_POINTER_DUMMY
   use julienne_m, only : test_function_i
 #endif
     implicit none
@@ -32,7 +32,7 @@ contains
     type(test_result_t), allocatable :: test_results(:)
     type(test_description_t), allocatable :: test_descriptions(:)
 
-#ifdef HAVE_PROCEDURE_ACTUAL_FOR_POINTER_DUMMY
+#if HAVE_PROCEDURE_ACTUAL_FOR_POINTER_DUMMY
     test_descriptions = [ & 
       test_description_t("completing normally when called once", check_caffeination), &
       test_description_t("returning PRIF_STAT_ALREADY_INIT when called a second time", check_subsequent_prif_init_call) &

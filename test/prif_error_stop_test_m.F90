@@ -7,7 +7,7 @@ module prif_error_stop_test_m
   !! Unit test for the prif_error_stop subroutine
   use prif, only : prif_error_stop
   use julienne_m, only : test_t, test_result_t, test_description_t, test_description_substring
-#ifndef HAVE_PROCEDURE_ACTUAL_FOR_POINTER_DUMMY
+#if ! HAVE_PROCEDURE_ACTUAL_FOR_POINTER_DUMMY
   use julienne_m, only : test_function_i
 #endif
     implicit none
@@ -32,7 +32,7 @@ contains
     type(test_result_t), allocatable :: test_results(:)
     type(test_description_t), allocatable :: test_descriptions(:)
 
-#ifdef HAVE_PROCEDURE_ACTUAL_FOR_POINTER_DUMMY
+#if HAVE_PROCEDURE_ACTUAL_FOR_POINTER_DUMMY
     test_descriptions = [ &
        test_description_t("exiting with a non-zero exitstat with an integer stop code", check_integer_stop_code) &
       ,test_description_t("exiting with a non-zero exitstat when a character stop code", check_character_stop_code) &

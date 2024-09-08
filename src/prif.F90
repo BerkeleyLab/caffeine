@@ -46,7 +46,7 @@ module prif
 
   integer(c_int), parameter, public :: PRIF_ATOMIC_INT_KIND = selected_int_kind(18)
 
-#ifdef HAVE_SELECTED_LOGICAL_KIND
+#if HAVE_SELECTED_LOGICAL_KIND
   integer(c_int), parameter, public :: PRIF_ATOMIC_LOGICAL_KIND = selected_logical_kind(32)
 #else
   integer(c_int), parameter, public :: PRIF_ATOMIC_LOGICAL_KIND = PRIF_ATOMIC_INT_KIND

@@ -7,7 +7,7 @@ module prif_stop_test_m
   !! Unit test for the prif_stop subroutine
   use prif, only : prif_stop
   use julienne_m, only : test_t, test_result_t, test_description_t, test_description_substring
-#ifndef HAVE_PROCEDURE_ACTUAL_FOR_POINTER_DUMMY
+#if ! HAVE_PROCEDURE_ACTUAL_FOR_POINTER_DUMMY
   use julienne_m, only : test_function_i
 #endif
     implicit none
@@ -32,7 +32,7 @@ contains
     type(test_result_t), allocatable :: test_results(:)
     type(test_description_t), allocatable :: test_descriptions(:)
 
-#ifdef HAVE_PROCEDURE_ACTUAL_FOR_POINTER_DUMMY
+#if HAVE_PROCEDURE_ACTUAL_FOR_POINTER_DUMMY
     test_descriptions = [ &
        test_description_t("exiting with exitstat=0 when no stop code is present", exit_with_no_stop_code) &
       ,test_description_t("exiting with the integer stop code exitstat", exit_with_integer_stop_code) &

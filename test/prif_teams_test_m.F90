@@ -10,7 +10,7 @@ module prif_teams_test_m
      prif_coarray_handle, prif_allocate_coarray, prif_deallocate_coarray, prif_this_image_no_coarray, prif_num_images &
     ,prif_team_type,      prif_form_team,        prif_change_team,        prif_end_team
   use julienne_m, only : test_t, test_result_t, test_description_t, test_description_substring
-#ifndef HAVE_PROCEDURE_ACTUAL_FOR_POINTER_DUMMY
+#if ! HAVE_PROCEDURE_ACTUAL_FOR_POINTER_DUMMY
   use julienne_m, only : test_function_i
 #endif
   implicit none
@@ -35,7 +35,7 @@ contains
     type(test_result_t), allocatable :: test_results(:)
     type(test_description_t), allocatable :: test_descriptions(:)
 
-#ifdef HAVE_PROCEDURE_ACTUAL_FOR_POINTER_DUMMY
+#if HAVE_PROCEDURE_ACTUAL_FOR_POINTER_DUMMY
     test_descriptions = [test_description_t("team creation, change, and coarray allocation", check_teams)]
 
 #else

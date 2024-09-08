@@ -11,7 +11,7 @@ module prif_allocate_test_m
                          ,test_result_t             , vector_function_strategy_t &
                          ,test_description_t        , vector_test_description_t  &
                          ,test_description_substring
-#ifndef HAVE_PROCEDURE_ACTUAL_FOR_POINTER_DUMMY
+#if ! HAVE_PROCEDURE_ACTUAL_FOR_POINTER_DUMMY
   use julienne_m, only : test_function_i
 #endif
   use iso_c_binding, only:  c_ptr, c_int, c_intmax_t, c_size_t, c_null_funptr, c_f_pointer, c_null_ptr, c_loc
@@ -44,7 +44,7 @@ contains
     type(vector_test_description_t), allocatable :: vector_test_descriptions(:)
     type(symmetric_allocation_test_function_t) symmetric_allocation_test_function
 
-#ifdef HAVE_PROCEDURE_ACTUAL_FOR_POINTER_DUMMY
+#if HAVE_PROCEDURE_ACTUAL_FOR_POINTER_DUMMY
     scalar_test_descriptions = [ & 
       test_description_t("allocating/using/deallocating a corank-1 integer scalar coarray", &
               check_asymmetric_allocation) &
