@@ -1,14 +1,18 @@
 ! Copyright (c) 2022-2024, The Regents of the University of California and Sourcery Institute
 ! Terms of use are as specified in LICENSE.txt
 
-#ifndef __GFORTRAN__
-  #define F2008_PROC_PTR_ARG_ASSOCIATION
+#ifndef F2008_PROC_PTR_ARG_ASSOCIATION
+  #ifdef __GFORTRAN__
+    #define F2008_PROC_PTR_ARG_ASSOCIATION 0
+  #else    
+    #define F2008_PROC_PTR_ARG_ASSOCIATION 1  
+  #endif
 #endif
 
 module prif_init_test_m
   use prif, only : prif_init, PRIF_STAT_ALREADY_INIT
   use julienne_m, only : test_t, test_result_t, test_description_t, test_description_substring
-#ifndef F2008_PROC_PTR_ARG_ASSOCIATION
+#if !F2008_PROC_PTR_ARG_ASSOCIATION
   use julienne_m, only : test_function_i
 #endif
     implicit none
