@@ -40,7 +40,7 @@ contains
 #else
     procedure(test_function_i), pointer :: check_num_images_valid
 
-    check_num_images_valid_ptr =>  check_num_images_valid_ptr 
+    check_num_images_valid_ptr => check_num_images_valid
 
     test_descriptions = [ & 
       test_description_t("providing a valid number of images when invoked with no arguments", check_num_images_valid_ptr) &
