@@ -13,6 +13,7 @@ program main
   use prif_num_images_test_m, only : prif_num_images_test_t
   use prif_this_image_test_m, only : prif_this_image_test_t
   use prif_error_stop_test_m, only : prif_error_stop_test_t
+  use prif_stop_test_m, only : prif_stop_test_t
   implicit none
 
   call stop_and_print_usage_info_if_help_requested
@@ -40,6 +41,7 @@ contains
     type(prif_allocate_test_t) prif_allocate_test
     type(prif_num_images_test_t) prif_num_images_test
     type(prif_this_image_test_t) prif_this_image_test
+    type(prif_stop_test_t) prif_stop_test
     type(prif_error_stop_test_t) prif_error_stop_test
     integer :: passes=0, tests=0
 
@@ -47,6 +49,8 @@ contains
     call prif_allocate_test%report(passes, tests)
     call prif_num_images_test%report(passes, tests)
     call prif_this_image_test%report(passes, tests)
+    call prif_stop_test%report(passes, tests)
+    call prif_stop_test%report(passes, tests)
     call prif_error_stop_test%report(passes, tests)
 
 #ifndef NO_MULTI_IMAGE_SUPPORT
