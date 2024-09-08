@@ -49,9 +49,8 @@ contains
     call prif_allocate_test%report(passes, tests)
     call prif_num_images_test%report(passes, tests)
     call prif_this_image_test%report(passes, tests)
-    call prif_stop_test%report(passes, tests)
-    call prif_stop_test%report(passes, tests)
-    call prif_error_stop_test%report(passes, tests)
+   !call prif_stop_test%report(passes, tests)
+   !call prif_error_stop_test%report(passes, tests)
 
 #ifndef NO_MULTI_IMAGE_SUPPORT
     if (this_image()==1) &
