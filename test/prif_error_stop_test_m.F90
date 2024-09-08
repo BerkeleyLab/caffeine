@@ -1,45 +1,84 @@
-module caf_error_stop_test
-    use veggies, only: test_item_t, describe, result_t, it, assert_that
+! Copyright (c) 2022-2024, The Regents of the University of California and Sourcery Institute
+! Terms of use are as specified in LICENSE.txt
 
+#ifndef __GFORTRAN__
+  #define F2008_PROC_PTR_ARG_ASSOCIATION
+#endif
+
+module prif_error_stop_test_m
+  use prif, only : prif_error_stop
+  use julienne_m, only : test_t, test_result_t, test_description_t, test_description_substring
+#ifndef F2008_PROC_PTR_ARG_ASSOCIATION
+  use julienne_m, only : test_function_i
+#endif
     implicit none
+
     private
-    public :: test_prif_this_image
+    public :: prif_error_stop_test_t
+
+  type, extends(test_t) :: prif_error_stop_test_t
+  contains
+    procedure, nopass :: subject
+    procedure, nopass :: results
+  end type
 
 contains
-    function test_prif_this_image() result(tests)
-        type(test_item_t) :: tests
 
-        tests = describe( &
-                "A program that executes the prif_error_stop function", &
-                [ it("exits with a non-zero exitstat when stop code is an integer", check_integer_stop_code) &
-                 ,it("exits with a non-zero exitstat when stop code is an character", check_character_stop_code) &
-                ])
-    end function
+  pure function subject() result(specimen)
+    character(len=:), allocatable :: specimen
+    specimen =  "A program that calls prif_error_stop"
+  end function
 
-    function check_integer_stop_code() result(result_)
-        type(result_t) :: result_
-        integer exit_status
+  function results() result(test_results)
+    type(test_result_t), allocatable :: test_results(:)
+    type(test_description_t), allocatable :: test_descriptions(:)
 
-        call execute_command_line( &
-          command = "./build/run-fpm.sh run --example error_stop_integer_code > /dev/null 2>&1", &
-          wait = .true., &
-          exitstat = exit_status &
-        )   
-        result_ = assert_that(exit_status /= 0)
+#ifdef F2008_PROC_PTR_ARG_ASSOCIATION
+    test_descriptions = [ &
+       test_description_t("exiting with a non-zero exitstat with an integer stop code", check_integer_stop_code) &
+      ,test_description_t("exiting with a non-zero exitstat when a character stop code", check_character_stop_code) &
+    ]
+#else
+    procedure(test_function_i), pointer :: check_integer_stop_code_ptr, check_character_stop_code_ptr
 
-    end function
+    check_integer_stop_code_ptr => check_integer_stop_code
+    check_character_stop_code_ptr =>check_character_stop_code
 
-    function check_character_stop_code() result(result_)
-        type(result_t) :: result_
-        integer exit_status
+    test_descriptions = [ &
+       test_description_t("exiting with a non-zero exitstat with an integer stop code", check_integer_stop_code_ptr) &
+      ,test_description_t("exiting with a non-zero exitstat when a character stop code", check_character_stop_code_ptr) &
+    ]
+#endif
 
-        call execute_command_line( &
-          command = "./build/run-fpm.sh run --example error_stop_character_code > /dev/null 2>&1", &
-          wait = .true., &
-          exitstat = exit_status &
-        )   
-        result_ = assert_that(exit_status /= 0)
+    test_descriptions = pack(test_descriptions, &
+      index(subject(), test_description_substring) /= 0  &
+      .or. test_descriptions%contains_text(test_description_substring))
 
-    end function
+    test_results = test_descriptions%run()
+  end function
 
-end module caf_error_stop_test
+  function check_integer_stop_code() result(test_passes)
+      logical test_passes
+      integer exit_status
+
+      call execute_command_line( &
+        command = "./build/run-fpm.sh run --example error_stop_integer_code > /dev/null 2>&1", &
+        wait = .true., &
+        exitstat = exit_status &
+      )
+      test_passes = exit_status /= 0
+  end function
+
+  function check_character_stop_code() result(test_passes)
+      logical test_passes
+      integer exit_status
+
+      call execute_command_line( &
+        command = "./build/run-fpm.sh run --example error_stop_character_code > /dev/null 2>&1", &
+        wait = .true., &
+        exitstat = exit_status &
+      )
+      test_passes = exit_status /= 0
+  end function
+
+end module prif_error_stop_test_m
