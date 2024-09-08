@@ -35,7 +35,7 @@ contains
 
 #ifdef F2008_PROC_PTR_ARG_ASSOCIATION
     test_descriptions = [ & 
-      test_description_t("returning its member of the image set when called with no arguments", check_this_image_set) &
+      test_description_t("returning its member of the image set if called with no arguments", check_this_image_set) &
     ]   
 #else
     procedure(test_function_i), pointer :: check_this_image_set_ptr 
@@ -43,7 +43,7 @@ contains
     check_this_image_set_ptr => check_this_image_set
 
     test_descriptions = [ & 
-      test_description_t("returning its member of the image set when called with no arguments", check_this_image_set_ptr) &
+      test_description_t("returning its member of the image set if called with no arguments", check_this_image_set_ptr) &
     ]   
 #endif
 
