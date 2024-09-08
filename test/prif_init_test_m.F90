@@ -45,8 +45,8 @@ contains
     check_subsequent_prif_init_call_ptr => check_subsequent_prif_init_call
 
     test_descriptions = [ & 
-      test_description_t("partitioning items nearly evenly across bins", check_caffeination_ptr) &
-     ,test_description_t("partitioning all item across all bins without item loss", check_subsequent_prif_init_call_ptr) &
+       test_description_t("completing normally when called once", check_caffeination_ptr) &
+      ,test_description_t("returning PRIF_STAT_ALREADY_INIT when called a second time", check_subsequent_prif_init_call_ptr) &
     ]   
 #endif
 
