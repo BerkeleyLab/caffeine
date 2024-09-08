@@ -17,6 +17,7 @@ program main
   use prif_co_broadcast_test_m, only : prif_co_broadcast_test_t
   use prif_teams_test_m, only : prif_teams_test_t
   use prif_image_index_test_m, only : prif_image_index_test_t
+  use prif_co_min_test_m, only : prif_co_min_test_t
   implicit none
 
   call stop_and_print_usage_info_if_help_requested
@@ -49,6 +50,7 @@ contains
     type(prif_co_broadcast_test_t) prif_co_broadcast_test
     type(prif_teams_test_t) prif_teams_test
     type(prif_image_index_test_t) prif_image_index_test
+    type(prif_co_min_test_t) prif_co_min_test
     integer :: passes=0, tests=0
 
     call prif_init_test%report(passes, tests)
@@ -58,6 +60,7 @@ contains
     call prif_co_broadcast_test%report(passes, tests)
     call prif_teams_test%report(passes, tests)
 #ifndef __flang__
+    call prif_co_min_test%report(passes, tests)
     call prif_image_index_test%report(passes, tests)
     call prif_stop_test%report(passes, tests)
     call prif_error_stop_test%report(passes, tests)
