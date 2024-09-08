@@ -56,8 +56,8 @@ contains
     broadcast_derived_type_ptr => broadcast_derived_type
 
     test_descriptions = [ &
-      test_descriptions_t("broadcasting a default integer when called without optional arguments", broadcast_default_integer_ptr) &
-     ,test_descriptions_t("broadcasting a derived type with no allocatable components", broadcast_derived_type_ptr) &
+      test_description_t("broadcasting a default integer when called without optional arguments", broadcast_default_integer_ptr) &
+     ,test_description_t("broadcasting a derived type with no allocatable components", broadcast_derived_type_ptr) &
     ]
 #endif
 
