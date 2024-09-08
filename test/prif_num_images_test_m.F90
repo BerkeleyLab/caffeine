@@ -38,7 +38,7 @@ contains
       test_description_t("providing a valid number of images when called with no arguments", check_num_images_valid) &
     ]   
 #else
-    procedure(test_function_i), pointer :: check_num_images_valid
+    procedure(test_function_i), pointer :: check_num_images_valid_ptr
 
     check_num_images_valid_ptr => check_num_images_valid
 
