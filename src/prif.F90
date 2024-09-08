@@ -1,9 +1,7 @@
 ! Copyright (c), The Regents of the University of California
 ! Terms of use are as specified in LICENSE.txt
 
-#ifndef __GFORTRAN__
-  #define NO_SELECTED_LOGICAL_KIND
-#endif
+#include "language-support.F90"
 
 module prif
 
@@ -48,7 +46,7 @@ module prif
 
   integer(c_int), parameter, public :: PRIF_ATOMIC_INT_KIND = selected_int_kind(18)
 
-#ifndef NO_SELECTED_LOGICAL_KIND
+#ifdef HAVE_SELECTED_LOGICAL_KIND
   integer(c_int), parameter, public :: PRIF_ATOMIC_LOGICAL_KIND = selected_logical_kind(32)
 #else
   integer(c_int), parameter, public :: PRIF_ATOMIC_LOGICAL_KIND = PRIF_ATOMIC_INT_KIND

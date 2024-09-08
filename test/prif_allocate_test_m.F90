@@ -1,18 +1,17 @@
 ! Copyright (c) 2022-2024, The Regents of the University of California and Sourcery Institute
 ! Terms of use are as specified in LICENSE.txt
 
-#ifndef __GFORTRAN__
-  #define F2008_PROC_PTR_ARG_ASSOCIATION
-#endif
+#include "language-support.F90"
 
 module prif_allocate_test_m
+  !! Unit test for Caffeine's support for symmetric and asymmetric memory allocations
   use prif, only : prif_allocate_coarray, prif_deallocate_coarray, prif_coarray_handle &
                   ,prif_allocate,         prif_deallocate,         prif_num_images 
   use julienne_m, only :  test_t                    , string_t &
                          ,test_result_t             , vector_function_strategy_t &
                          ,test_description_t        , vector_test_description_t  &
                          ,test_description_substring
-#ifndef F2008_PROC_PTR_ARG_ASSOCIATION
+#ifndef HAVE_PROCEDURE_ACTUAL_FOR_POINTER_DUMMY
   use julienne_m, only : test_function_i
 #endif
   use iso_c_binding, only:  c_ptr, c_int, c_intmax_t, c_size_t, c_null_funptr, c_f_pointer, c_null_ptr, c_loc
@@ -45,7 +44,7 @@ contains
     type(vector_test_description_t), allocatable :: vector_test_descriptions(:)
     type(symmetric_allocation_test_function_t) symmetric_allocation_test_function
 
-#ifdef F2008_PROC_PTR_ARG_ASSOCIATION
+#ifdef HAVE_PROCEDURE_ACTUAL_FOR_POINTER_DUMMY
     scalar_test_descriptions = [ & 
       test_description_t("allocating/using/deallocating a corank-1 integer scalar coarray", &
               check_asymmetric_allocation) &

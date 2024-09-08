@@ -1,17 +1,16 @@
 ! Copyright (c) 2022-2024, The Regents of the University of California and Sourcery Institute
 ! Terms of use are as specified in LICENSE.txt
 
-#ifndef __GFORTRAN__
-  #define F2008_PROC_PTR_ARG_ASSOCIATION
-#endif
+#include "language-support.F90"
 
 module prif_teams_test_m
+  !! Unit test for Caffeine's support for teams
   use iso_c_binding, only: c_size_t, c_ptr, c_intmax_t, c_null_funptr
   use prif, only: &
      prif_coarray_handle, prif_allocate_coarray, prif_deallocate_coarray, prif_this_image_no_coarray, prif_num_images &
     ,prif_team_type,      prif_form_team,        prif_change_team,        prif_end_team
   use julienne_m, only : test_t, test_result_t, test_description_t, test_description_substring
-#ifndef F2008_PROC_PTR_ARG_ASSOCIATION
+#ifndef HAVE_PROCEDURE_ACTUAL_FOR_POINTER_DUMMY
   use julienne_m, only : test_function_i
 #endif
   implicit none
@@ -36,7 +35,7 @@ contains
     type(test_result_t), allocatable :: test_results(:)
     type(test_description_t), allocatable :: test_descriptions(:)
 
-#ifdef F2008_PROC_PTR_ARG_ASSOCIATION
+#ifdef HAVE_PROCEDURE_ACTUAL_FOR_POINTER_DUMMY
     test_descriptions = [test_description_t("team creation, change, and coarray allocation", check_teams)]
 
 #else

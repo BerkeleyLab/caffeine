@@ -1,14 +1,13 @@
 ! Copyright (c) 2022-2024, The Regents of the University of California and Sourcery Institute
 ! Terms of use are as specified in LICENSE.txt
 
-#ifndef __GFORTRAN__
-  #define F2008_PROC_PTR_ARG_ASSOCIATION
-#endif
+#include "language-support.F90"
 
 module prif_num_images_test_m
+  !! Unit test for the prif_num_images subroutine
   use prif, only : prif_num_images
   use julienne_m, only : test_t, test_result_t, test_description_t, test_description_substring
-#ifndef F2008_PROC_PTR_ARG_ASSOCIATION
+#ifndef HAVE_PROCEDURE_ACTUAL_FOR_POINTER_DUMMY
   use julienne_m, only : test_function_i
 #endif
   implicit none
@@ -33,7 +32,7 @@ contains
     type(test_result_t), allocatable :: test_results(:)
     type(test_description_t), allocatable :: test_descriptions(:)
 
-#ifdef F2008_PROC_PTR_ARG_ASSOCIATION
+#ifdef HAVE_PROCEDURE_ACTUAL_FOR_POINTER_DUMMY
     test_descriptions = [ & 
       test_description_t("providing a valid number of images when called with no arguments", check_num_images_valid) &
     ]   
