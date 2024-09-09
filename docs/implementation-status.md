@@ -23,7 +23,6 @@ following sections:
 - [Collectives](#Collectives)
 - [Atomic Memory Operations](#Atomic-Memory-Operations)
 
-TODO: For features with all no support, flesh out table, but comment it out
 
 ## Named Constants
 
