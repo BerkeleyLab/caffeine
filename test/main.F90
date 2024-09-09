@@ -15,6 +15,7 @@ program main
   use prif_image_index_test_m, only : prif_image_index_test_t
   use prif_init_test_m, only : prif_init_test_t
   use prif_num_images_test_m, only : prif_num_images_test_t
+  use prif_rma_test_m, only : prif_rma_test_t
   use prif_stop_test_m, only : prif_stop_test_t
   use prif_teams_test_m, only : prif_teams_test_t
   use prif_this_image_test_m, only : prif_this_image_test_t
@@ -61,6 +62,7 @@ contains
     type(prif_image_index_test_t) prif_image_index_test
     type(prif_init_test_t) prif_init_test
     type(prif_num_images_test_t) prif_num_images_test
+    type(prif_rma_test_t) prif_rma_test
     type(prif_stop_test_t) prif_stop_test
     type(prif_teams_test_t) prif_teams_test
     type(prif_this_image_test_t) prif_this_image_test
@@ -92,6 +94,7 @@ contains
     call prif_co_sum_test%report(passes, tests)
     call prif_error_stop_test%report(passes, tests)
     call prif_image_index_test%report(passes, tests)
+    call prif_rma_test%report(passes, tests)
     call prif_stop_test%report(passes, tests)
 #endif
 
