@@ -36,42 +36,35 @@ contains
 
 #if HAVE_PROCEDURE_ACTUAL_FOR_POINTER_DUMMY
     test_descriptions = [ &
-       test_description_t("default-integer scalars with stat argument",             max_default_integer_scalars)      &
-      ,test_description_t("integer(c_int64_t) scalars with no optional arguments",  max_c_int64_scalars)              &
-      ,test_description_t("default-integer 1D arrays with no optional arguments",   max_default_integer_1D_array)     &
-      ,test_description_t("default-integer 7D arrays with stat argument",           max_default_integer_7D_array)     &
-      ,test_description_t("default-real scalars with stat argument present",        max_default_real_scalars)         &
-      ,test_description_t("double-precision 2D arrays  with no optional arguments", max_double_precision_2D_array)    &
-      ,test_description_t("elements across images with 2D arrays of strings",       max_elements_in_2D_string_arrays) &
-      ,test_description_t("default-character variables with no optional arguments", reverse_alphabetize_default_character_scalar) &
+       test_description_t("default-integer scalars with stat argument",             max_default_integer_scalars           ) &
+      ,test_description_t("integer(c_int64_t) scalars with no optional arguments",  max_c_int64_scalars                   ) &
+      ,test_description_t("default-integer 1D arrays with no optional arguments",   max_default_integer_1D_array          ) &
+      ,test_description_t("default-integer 7D arrays with stat argument",           max_default_integer_7D_array          ) &
+      ,test_description_t("default-real scalars with stat argument present",        max_default_real_scalars              ) &
+      ,test_description_t("double-precision 2D arrays  with no optional arguments", max_double_precision_2D_array         ) &
+      ,test_description_t("elements across images with 2D arrays of strings",       max_elements_in_2D_string_arrays      ) &
+      ,test_description_t("default-character variables with no optional arguments", reverse_alphabetize_default_characters) &
     ]
 #else
     procedure(test_function_i), pointer :: & 
-       min_default_integer_scalars_ptr &
-      ,min_c_int64_scalars_ptr &
-      ,min_default_integer_7D_array_ptr &
-      ,min_default_real_scalars_ptr &
-      ,min_double_precision_2D_array_ptr &
-      ,min_elements_in_2D_string_arrays_ptr &
-      ,alphabetically_1st_scalar_string_ptr
-      
-      min_default_integer_scalars_ptr      => min_default_integer_scalars
-      min_c_int64_scalars_ptr              => min_c_int64_scalars
-      min_default_integer_7D_array_ptr     => min_default_integer_7D_array
-      min_default_real_scalars_ptr         => min_default_real_scalars
-      min_double_precision_2D_array_ptr    => min_double_precision_2D_array
-      min_elements_in_2D_string_arrays_ptr => min_elements_in_2D_string_arrays
-      alphabetically_1st_scalar_string_ptr => alphabetically_1st_scalar_string
-      
+       max_default_integer_scalars_ptr            =>  max_default_integer_scalars            &
+      ,max_c_int64_scalars_ptr                    =>  max_c_int64_scalars                    &
+      ,max_default_integer_1D_array_ptr           =>  max_default_integer_1D_array           &
+      ,max_default_integer_7D_array_ptr           =>  max_default_integer_7D_array           &
+      ,max_default_real_scalars_ptr               =>  max_default_real_scalars               &
+      ,max_double_precision_2D_array_ptr          =>  max_double_precision_2D_array          &
+      ,max_elements_in_2D_string_arrays_ptr       =>  max_elements_in_2D_string_arrays       &
+      ,reverse_alphabetize_default_characters_ptr =>  reverse_alphabetize_default_characters
+
     test_descriptions = [ &
-       test_description_t("default-integer scalars with stat argument",             max_default_integer_scalars_ptr)      &
-      ,test_description_t("integer(c_int64_t) scalars with no optional arguments",  max_c_int64_scalars_ptr)              &
-      ,test_description_t("default-integer 1D arrays with no optional arguments",   max_default_integer_1D_array_ptr)     &
-      ,test_description_t("default-integer 7D arrays with stat argument",           max_default_integer_7D_array_ptr)     &
-      ,test_description_t("default-real scalars with stat argument present",        max_default_real_scalars_ptr)         &
-      ,test_description_t("double-precision 2D arrays  with no optional arguments", max_double_precision_2D_array_ptr)    &
-      ,test_description_t("elements across images with 2D arrays of strings",       max_elements_in_2D_string_arrays_ptr) &
-      ,test_description_t("default-character variables with no optional arguments", reverse_alphabetize_default_character_scala_ptr) &
+       test_description_t("default-integer scalars with stat argument",             max_default_integer_scalars_ptr           ) &
+      ,test_description_t("integer(c_int64_t) scalars with no optional arguments",  max_c_int64_scalars_ptr                   ) &
+      ,test_description_t("default-integer 1D arrays with no optional arguments",   max_default_integer_1D_array_ptr          ) &
+      ,test_description_t("default-integer 7D arrays with stat argument",           max_default_integer_7D_array_ptr          ) &
+      ,test_description_t("default-real scalars with stat argument present",        max_default_real_scalars_ptr              ) &
+      ,test_description_t("double-precision 2D arrays  with no optional arguments", max_double_precision_2D_array_ptr         ) &
+      ,test_description_t("elements across images with 2D arrays of strings",       max_elements_in_2D_string_arrays_ptr      ) &
+      ,test_description_t("default-character variables with no optional arguments", reverse_alphabetize_default_characters_ptr) &
     ]
 #endif
 
@@ -195,7 +188,7 @@ contains
 
     end function
 
-    function reverse_alphabetize_default_character_scalar() result(test_passes)
+    function reverse_alphabetize_default_characters() result(test_passes)
       logical test_passes
       integer, parameter :: length = len("to party!")
       character(len=length), parameter :: words(*) = [character(len=length):: "Loddy","doddy","we","like","to party!"]

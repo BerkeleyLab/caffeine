@@ -36,42 +36,35 @@ contains
 
 #if HAVE_PROCEDURE_ACTUAL_FOR_POINTER_DUMMY
     test_descriptions = [ &
-       test_description_t("default integer scalar with stat argument present",                     min_default_integer_scalars)    &
-      ,test_description_t("integer(c_int64_t) scalar with no optional arguments present",          min_c_int64_scalars)            &
-      ,test_description_t("default integer 1D array elements with no optional arguments present",  min_default_integer_1D_array)   &
-      ,test_description_t("default integer 7D array elements with stat argument present",          min_default_integer_7D_array)   &
-      ,test_description_t("default real scalars with stat argument present",                       min_default_real_scalars)       &
-      ,test_description_t("double precision 2D array elements with no optional arguments present", min_double_precision_2D_array)  &
-      ,test_description_t("elements across images with 2D arrays of strings",                    min_elements_in_2D_string_arrays) &
-      ,test_description_t("length-5 string with no optional arguments",                          alphabetically_1st_scalar_string) &
+       test_description_t("default integer scalar with stat argument",                     min_default_integer_scalars     ) &
+      ,test_description_t("integer(c_int64_t) scalar with no optional arguments",          min_c_int64_scalars             ) &
+      ,test_description_t("default integer 1D array elements with no optional arguments",  min_default_integer_1D_array    ) &
+      ,test_description_t("default integer 7D array elements with stat argument present",  min_default_integer_7D_array    ) &
+      ,test_description_t("default real scalars with stat argument present",               min_default_real_scalars        ) &
+      ,test_description_t("double precision 2D array elements with no optional arguments", min_double_precision_2D_array   ) &
+      ,test_description_t("elements across images with 2D arrays of strings",              min_elements_in_2D_string_arrays) &
+      ,test_description_t("length-5 string with no optional arguments",                    alphabetically_1st_scalar_string) &
     ]
 #else
     procedure(test_function_i), pointer :: & 
-       min_default_integer_scalars_ptr &
-      ,min_c_int64_scalars_ptr &
-      ,min_default_integer_7D_array_ptr &
-      ,min_default_real_scalars_ptr &
-      ,min_double_precision_2D_array_ptr &
-      ,min_elements_in_2D_string_arrays_ptr &
-      ,alphabetically_1st_scalar_string_ptr
-      
-      min_default_integer_scalars_ptr      => min_default_integer_scalars
-      min_c_int64_scalars_ptr              => min_c_int64_scalars
-      min_default_integer_7D_array_ptr     => min_default_integer_7D_array
-      min_default_real_scalars_ptr         => min_default_real_scalars
-      min_double_precision_2D_array_ptr    => min_double_precision_2D_array
-      min_elements_in_2D_string_arrays_ptr => min_elements_in_2D_string_arrays
-      alphabetically_1st_scalar_string_ptr => alphabetically_1st_scalar_string
-      
+       min_default_integer_scalars_ptr      => min_default_integer_scalars      &
+      ,min_c_int64_scalars_ptr              => min_c_int64_scalars              &
+      ,min_default_integer_1D_array_ptr     => min_default_integer_1D_array     &
+      ,min_default_integer_7D_array_ptr     => min_default_integer_7D_array     &
+      ,min_default_real_scalars_ptr         => min_default_real_scalars         &
+      ,min_double_precision_2D_array_ptr    => min_double_precision_2D_array    &
+      ,min_elements_in_2D_string_arrays_ptr => min_elements_in_2D_string_arrays &
+      ,alphabetically_1st_scalar_string_ptr => alphabetically_1st_scalar_string 
+
     test_descriptions = [ &
-       test_description_t("default integer scalar with stat arguments",             min_default_integer_scalars_ptr)   &
-      ,test_description_t("integer(c_int64_t) scalar with no optional arguments",   min_c_int64_scalars_ptr)           &
-      ,test_description_t("a default-integer 1D array with no optional arguments",  min_default_integer_1D_array_ptr)  &
-      ,test_description_t("default-integer 7D array elements with stat argument",   min_default_integer_7D_array_ptr)  &
-      ,test_description_t("default real scalars with stat argument present",        min_default_real_scalars_ptr)      &
-      ,test_description_t("a double-precision 2D array with no optional arguments", min_double_precision_2D_array_ptr) &
-      ,test_description_t("elements across images with 2D arrays of strings",       min_elements_in_2D_string_arrays_ptr) &
-      ,test_description_t("length-5 string with no optional arguments",             alphabetically_1st_scalar_string_ptr) &
+       test_description_t("default integer scalar with stat argument",                     min_default_integer_scalars_ptr     ) &
+      ,test_description_t("integer(c_int64_t) scalar with no optional arguments",          min_c_int64_scalars_ptr             ) &
+      ,test_description_t("default integer 1D array elements with no optional arguments",  min_default_integer_1D_array_ptr    ) &
+      ,test_description_t("default integer 7D array elements with stat argument present",  min_default_integer_7D_array_ptr    ) &
+      ,test_description_t("default real scalars with stat argument present",               min_default_real_scalars_ptr        ) &
+      ,test_description_t("double precision 2D array elements with no optional arguments", min_double_precision_2D_array_ptr   ) &
+      ,test_description_t("elements across images with 2D arrays of strings",              min_elements_in_2D_string_arrays_ptr) &
+      ,test_description_t("length-5 string with no optional arguments",                    alphabetically_1st_scalar_string_ptr) &
     ]
 #endif
 
