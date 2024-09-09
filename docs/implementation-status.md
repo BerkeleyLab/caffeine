@@ -198,11 +198,11 @@ in the following sections.
 
 | Procedure | Status | Notes |
 |-----------|--------|-------|
-| `prif_co_broadcast` | ... | ... |
-| `prif_co_max`       | ... | ... |
-| `prif_co_min`       | ... | ... |
-| `prif_co_sum`       | ... | ... |
-| `prif_co_reduce`    | ... | ... |
+| `prif_co_broadcast` | partial | no support for derived types with `allocatable` components |
+| `prif_co_max`       | partial | only supports 32-bit and 64-bit numeric types |
+| `prif_co_min`       | partial | only supports 32-bit and 64-bit numeric types |
+| `prif_co_sum`       | partial | only supports 32-bit and 64-bit numeric types |
+| `prif_co_reduce`    | partial | only supports intrinsic types (no support for derived types) |
 
 ---
 
