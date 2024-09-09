@@ -41,9 +41,9 @@ in the following sections.
 
 | Procedure | Status | Notes |
 |-----------|--------|-------|
-| `prif_init` | yes | n/a |
+| `prif_init` | yes |  |
 | `prif_stop`, `prif_error_stop` | partial | Missing support for `quiet=.true.` |
-| `prif_fail_image` | no | n/a |
+| `prif_fail_image` | no |  |
 
 ---
 
@@ -52,13 +52,13 @@ in the following sections.
 
 | Procedure | Status | Notes |
 |-----------|--------|-------|
-| `prif_num_images`    | yes | n\a |
-| `prif_num_images_with_team`, `prif_num_images_with_team_number`  | no | n\a |
+| `prif_num_images`    | yes |  |
+| `prif_num_images_with_team`, `prif_num_images_with_team_number`  | no |  |
 | `prif_this_image_no_coarray` | partial | team argument is ignored |
-| `prif_this_image_with_coarray`, `prif_this_image_with_dim`  | no | n\a |
-| `prif_failed_images` | no | n/a |
-| `prif_stopped_images` | no | n/a |
-| `prif_image_status` | no | n/a |
+| `prif_this_image_with_coarray`, `prif_this_image_with_dim`  | no |  |
+| `prif_failed_images` | no |  |
+| `prif_stopped_images` | no |  |
+| `prif_image_status` | no |  |
 
 ---
 
@@ -67,12 +67,12 @@ in the following sections.
 
 | Procedure | Status | Notes |
 |-----------|--------|-------|
-| `prif_allocate_coarray`    | yes | n/a |
-| `prif_allocate`    | yes | n/a |
+| `prif_allocate_coarray`    | yes |  |
+| `prif_allocate`    | yes |  |
 | `prif_deallocate_coarray`    | *partial* | no `final_func` arg support |
-| `prif_deallocate`    | **YES** | n/a |
-| `prif_alias_create`    | no | n/a |
-| `prif_alias_destroy`    | no | n/a |
+| `prif_deallocate`    | **YES** |  |
+| `prif_alias_create`    | no |  |
+| `prif_alias_destroy`    | no |  |
 
 ---
 
@@ -81,14 +81,14 @@ in the following sections.
 
 | Procedure | Status | Notes |
 |-----------|--------|-------|
-| `prif_set_context_data`, `prif_get_context_data` | no | n\a |
-| `prif_size_bytes` | no | n\a |
-| `prif_lcobound_no_dim`, `prif_lcobound_with_dim` | no | n\a |
-| `prif_ucobound_no_dim`, `prif_ucobound_with_dim` | no | n\a |
-| `prif_coshape` | no | n\a |
-| `prif_image_index` | yes | n\a |
-| `prif_image_index_with_team` | no | n\a |
-| `prif_image_index_with_team_number` | no | n\a |
+| `prif_set_context_data`, `prif_get_context_data` | no |  |
+| `prif_size_bytes` | no |  |
+| `prif_lcobound_no_dim`, `prif_lcobound_with_dim` | no |  |
+| `prif_ucobound_no_dim`, `prif_ucobound_with_dim` | no |  |
+| `prif_coshape` | no |  |
+| `prif_image_index` | yes |  |
+| `prif_image_index_with_team` | no |  |
+| `prif_image_index_with_team_number` | no |  |
 
 ---
 
@@ -97,14 +97,14 @@ in the following sections.
 
 | Procedure | Status | Notes |
 |-----------|--------|-------|
-| `prif_get`                               | yes | n\a |
-| `prif_get_indirect`                      | yes | n\a |
-| `prif_put`                               | yes | n\a |
-| `prif_put_indirect`                      | yes | n\a |
-| `prif_put_with_notify`                   | no  | n\a |
-| `prif_put_with_notify_indirect`          | no  | n\a |
-| `prif_put_indirect_with_notify`          | no  | n\a |
-| `prif_put_indirect_with_notify_indirect` | no  | n\a |
+| `prif_get`                               | yes |  |
+| `prif_get_indirect`                      | yes |  |
+| `prif_put`                               | yes |  |
+| `prif_put_indirect`                      | yes |  |
+| `prif_put_with_notify`                   | no  |  |
+| `prif_put_with_notify_indirect`          | no  |  |
+| `prif_put_indirect_with_notify`          | no  |  |
+| `prif_put_indirect_with_notify_indirect` | no  |  |
 
 ---
 
@@ -114,14 +114,14 @@ in the following sections.
 <!---
 | Procedure | Status | Notes |
 |-----------|--------|-------|
-| `prif_get_strided`                               | no  | n\a |
-| `prif_get_strided_indirect`                      | no  | n\a |
-| `prif_put_strided`                               | no  | n\a |
-| `prif_put_strided_indirect`                      | no  | n\a |
-| `prif_put_strided_with_notify`                   | no  | n\a |
-| `prif_put_strided_with_notify_indirect`          | no  | n\a |
-| `prif_put_strided_indirect_with_notify`          | no  | n\a |
-| `prif_put_strided_indirect_with_notify_indirect` | no  | n\a |
+| `prif_get_strided`                               | no  |  |
+| `prif_get_strided_indirect`                      | no  |  |
+| `prif_put_strided`                               | no  |  |
+| `prif_put_strided_indirect`                      | no  |  |
+| `prif_put_strided_with_notify`                   | no  |  |
+| `prif_put_strided_with_notify_indirect`          | no  |  |
+| `prif_put_strided_indirect_with_notify`          | no  |  |
+| `prif_put_strided_indirect_with_notify_indirect` | no  |  |
 -->
 
 ---
@@ -131,10 +131,10 @@ in the following sections.
 
 | Procedure | Status | Notes |
 |-----------|--------|-------|
-| `prif_sync_memory` | no  | n\a |
-| `prif_sync_all`    | yes | n\a |
-| `prif_sync_images` | no  | n\a |
-| `prif_sync_team`   | no  | n\a |
+| `prif_sync_memory` | no  |  |
+| `prif_sync_all`    | yes |  |
+| `prif_sync_images` | no  |  |
+| `prif_sync_team`   | no  |  |
 
 ---
 
@@ -144,10 +144,10 @@ in the following sections.
 <!---
 | Procedure | Status | Notes |
 |-----------|--------|-------|
-| `prif_lock`            | no  | n\a |
-| `prif_lock_indirect`   | no  | n\a |
-| `prif_unlock`          | no  | n\a |
-| `prif_unlock_indirect` | no  | n\a |
+| `prif_lock`            | no  |  |
+| `prif_lock_indirect`   | no  |  |
+| `prif_unlock`          | no  |  |
+| `prif_unlock_indirect` | no  |  |
 -->
 
 ---
@@ -158,8 +158,8 @@ in the following sections.
 <!---
 | Procedure | Status | Notes |
 |-----------|--------|-------|
-| `prif_critical`     | no  | n\a |
-| `prif_end_critical` | no  | n\a |
+| `prif_critical`     | no  |  |
+| `prif_end_critical` | no  |  |
 -->
 
 ---
@@ -170,11 +170,11 @@ in the following sections.
 <!---
 | Procedure | Status | Notes |
 |-----------|--------|-------|
-| `prif_event_post`          | no  | n\a |
-| `prif_event_post_indirect` | no  | n\a |
-| `prif_event_wait`          | no  | n\a |
-| `prif_event_query`         | no  | n\a |
-| `prif_notify_wait`         | no  | n\a |
+| `prif_event_post`          | no  |  |
+| `prif_event_post_indirect` | no  |  |
+| `prif_event_wait`          | no  |  |
+| `prif_event_query`         | no  |  |
+| `prif_notify_wait`         | no  |  |
 -->
 
 ---
@@ -184,11 +184,11 @@ in the following sections.
 
 | Procedure | Status | Notes |
 |-----------|--------|-------|
-| `prif_form_team`   | yes | n\a |
-| `prif_get_team`    | no  | n\a |
-| `prif_team_number` | no  | n\a |
-| `prif_change_team` | yes | n\a |
-| `prif_end_team`    | yes | n\a |
+| `prif_form_team`   | yes |  |
+| `prif_get_team`    | no  |  |
+| `prif_team_number` | no  |  |
+| `prif_change_team` | yes |  |
+| `prif_end_team`    | yes |  |
 
 ---
 
@@ -211,34 +211,34 @@ in the following sections.
 <!---
 | Procedure | Status | Notes |
 |-----------|--------|-------|
-| `prif_atomic_add`          | no  | n\a |
-| `prif_atomic_add_indirect` | no  | n\a |
-| `prif_atomic_and`          | no  | n\a |
-| `prif_atomic_and_indirect` | no  | n\a |
-| `prif_atomic_or`           | no  | n\a |
-| `prif_atomic_or_indirect`  | no  | n\a |
-| `prif_atomic_xor`          | no  | n\a |
-| `prif_atomic_xor_indirect` | no  | n\a |
-| `prif_atomic_cas_int`                 | no  | n\a |
-| `prif_atomic_cas_int_indirect`        | no  | n\a |
-| `prif_atomic_cas_logical`             | no  | n\a |
-| `prif_atomic_cas_logical_indirect`    | no  | n\a |
-| `prif_atomic_fetch_add`               | no  | n\a |
-| `prif_atomic_fetch_add_indirect`      | no  | n\a |
-| `prif_atomic_fetch_and`               | no  | n\a |
-| `prif_atomic_fetch_and_indirect`      | no  | n\a |
-| `prif_atomic_fetch_or`                | no  | n\a |
-| `prif_atomic_fetch_or_indirect`       | no  | n\a |
-| `prif_atomic_fetch_xor`               | no  | n\a |
-| `prif_atomic_fetch_xor_indirect`      | no  | n\a |
-| `prif_atomic_define_int`              | no  | n\a |
-| `prif_atomic_define_int_indirect`     | no  | n\a |
-| `prif_atomic_define_logical`          | no  | n\a |
-| `prif_atomic_define_logical_indirect` | no  | n\a |
-| `prif_atomic_ref_int`                 | no  | n\a |
-| `prif_atomic_ref_int_indirect`        | no  | n\a |
-| `prif_atomic_ref_logical`             | no  | n\a |
-| `prif_atomic_ref_logical_indirect`    | no  | n\a |
+| `prif_atomic_add`          | no  |  |
+| `prif_atomic_add_indirect` | no  |  |
+| `prif_atomic_and`          | no  |  |
+| `prif_atomic_and_indirect` | no  |  |
+| `prif_atomic_or`           | no  |  |
+| `prif_atomic_or_indirect`  | no  |  |
+| `prif_atomic_xor`          | no  |  |
+| `prif_atomic_xor_indirect` | no  |  |
+| `prif_atomic_cas_int`                 | no  |  |
+| `prif_atomic_cas_int_indirect`        | no  |  |
+| `prif_atomic_cas_logical`             | no  |  |
+| `prif_atomic_cas_logical_indirect`    | no  |  |
+| `prif_atomic_fetch_add`               | no  |  |
+| `prif_atomic_fetch_add_indirect`      | no  |  |
+| `prif_atomic_fetch_and`               | no  |  |
+| `prif_atomic_fetch_and_indirect`      | no  |  |
+| `prif_atomic_fetch_or`                | no  |  |
+| `prif_atomic_fetch_or_indirect`       | no  |  |
+| `prif_atomic_fetch_xor`               | no  |  |
+| `prif_atomic_fetch_xor_indirect`      | no  |  |
+| `prif_atomic_define_int`              | no  |  |
+| `prif_atomic_define_int_indirect`     | no  |  |
+| `prif_atomic_define_logical`          | no  |  |
+| `prif_atomic_define_logical_indirect` | no  |  |
+| `prif_atomic_ref_int`                 | no  |  |
+| `prif_atomic_ref_int_indirect`        | no  |  |
+| `prif_atomic_ref_logical`             | no  |  |
+| `prif_atomic_ref_logical_indirect`    | no  |  |
 -->
 
 ---
