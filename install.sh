@@ -239,8 +239,8 @@ EOF
 fi
 
 PREFIX=${PREFIX:-"${HOME}/.local"}
-mkdir -p $PREFIX
-PREFIX=`$REALPATH $PREFIX`
+mkdir -p "$PREFIX"
+PREFIX=`$REALPATH "$PREFIX"`
 echo "PREFIX=$PREFIX"
 
 if [ -z ${PKG_CONFIG_PATH+x} ]; then
