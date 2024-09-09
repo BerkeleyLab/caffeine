@@ -70,8 +70,8 @@ in the following sections.
 |-----------|--------|-------|
 | `prif_allocate_coarray`    | yes | n/a |
 | `prif_allocate`    | yes | n/a |
-| `prif_deallocate_coarray`    | partial | no `final_func` arg support |
-| `prif_deallocate`    | yes | n/a |
+| `prif_deallocate_coarray`    | *partial* | no `final_func` arg support |
+| `prif_deallocate`    | **YES** | n/a |
 | `prif_alias_create`    | no | n/a |
 | `prif_alias_destroy`    | no | n/a |
 
