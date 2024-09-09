@@ -41,8 +41,8 @@ in the following sections.
 
 | Procedure | Status | Notes |
 |-----------|--------|-------|
-| `prif_init` | yes |  |
-| `prif_stop`, `prif_error_stop` | partial | Missing support for `quiet=.true.` |
+| `prif_init` | **YES** |  |
+| `prif_stop`, `prif_error_stop` | *partial* | Missing support for `quiet=.true.` |
 | `prif_fail_image` | no |  |
 
 ---
@@ -52,9 +52,9 @@ in the following sections.
 
 | Procedure | Status | Notes |
 |-----------|--------|-------|
-| `prif_num_images`    | yes |  |
+| `prif_num_images`    | **YES** |  |
 | `prif_num_images_with_team`, `prif_num_images_with_team_number`  | no |  |
-| `prif_this_image_no_coarray` | partial | team argument is ignored |
+| `prif_this_image_no_coarray` | *partial* | team argument is ignored |
 | `prif_this_image_with_coarray`, `prif_this_image_with_dim`  | no |  |
 | `prif_failed_images` | no |  |
 | `prif_stopped_images` | no |  |
@@ -67,8 +67,8 @@ in the following sections.
 
 | Procedure | Status | Notes |
 |-----------|--------|-------|
-| `prif_allocate_coarray`    | yes |  |
-| `prif_allocate`    | yes |  |
+| `prif_allocate_coarray`    | **YES** |  |
+| `prif_allocate`    | **YES** |  |
 | `prif_deallocate_coarray`    | *partial* | no `final_func` arg support |
 | `prif_deallocate`    | **YES** |  |
 | `prif_alias_create`    | no |  |
@@ -86,7 +86,7 @@ in the following sections.
 | `prif_lcobound_no_dim`, `prif_lcobound_with_dim` | no |  |
 | `prif_ucobound_no_dim`, `prif_ucobound_with_dim` | no |  |
 | `prif_coshape` | no |  |
-| `prif_image_index` | yes |  |
+| `prif_image_index` | **YES** |  |
 | `prif_image_index_with_team` | no |  |
 | `prif_image_index_with_team_number` | no |  |
 
@@ -97,14 +97,14 @@ in the following sections.
 
 | Procedure | Status | Notes |
 |-----------|--------|-------|
-| `prif_get`                               | yes |  |
-| `prif_get_indirect`                      | yes |  |
-| `prif_put`                               | yes |  |
-| `prif_put_indirect`                      | yes |  |
-| `prif_put_with_notify`                   | no  |  |
-| `prif_put_with_notify_indirect`          | no  |  |
-| `prif_put_indirect_with_notify`          | no  |  |
-| `prif_put_indirect_with_notify_indirect` | no  |  |
+| `prif_get`                               | **YES**   |  |
+| `prif_get_indirect`                      | **YES**   |  |
+| `prif_put`                               | **YES**   |  |
+| `prif_put_indirect`                      | **YES**   |  |
+| `prif_put_with_notify`                   | no        |  |
+| `prif_put_with_notify_indirect`          | no        |  |
+| `prif_put_indirect_with_notify`          | no        |  |
+| `prif_put_indirect_with_notify_indirect` | no        |  |
 
 ---
 
@@ -131,10 +131,10 @@ in the following sections.
 
 | Procedure | Status | Notes |
 |-----------|--------|-------|
-| `prif_sync_memory` | no  |  |
-| `prif_sync_all`    | yes |  |
-| `prif_sync_images` | no  |  |
-| `prif_sync_team`   | no  |  |
+| `prif_sync_memory` | no        |  |
+| `prif_sync_all`    | **YES**   |  |
+| `prif_sync_images` | no        |  |
+| `prif_sync_team`   | no        |  |
 
 ---
 
@@ -184,11 +184,11 @@ in the following sections.
 
 | Procedure | Status | Notes |
 |-----------|--------|-------|
-| `prif_form_team`   | yes |  |
-| `prif_get_team`    | no  |  |
-| `prif_team_number` | no  |  |
-| `prif_change_team` | yes |  |
-| `prif_end_team`    | yes |  |
+| `prif_form_team`   | **YES**   |  |
+| `prif_get_team`    | no        |  |
+| `prif_team_number` | no        |  |
+| `prif_change_team` | **YES**   |  |
+| `prif_end_team`    | **YES**   |  |
 
 ---
 
@@ -197,11 +197,11 @@ in the following sections.
 
 | Procedure | Status | Notes |
 |-----------|--------|-------|
-| `prif_co_broadcast` | partial | no support for derived types with `allocatable` components |
-| `prif_co_max`       | partial | only supports 32-bit and 64-bit numeric types |
-| `prif_co_min`       | partial | only supports 32-bit and 64-bit numeric types |
-| `prif_co_sum`       | partial | only supports 32-bit and 64-bit numeric types |
-| `prif_co_reduce`    | partial | only supports intrinsic types (no support for derived types) |
+| `prif_co_broadcast` | *partial* | no support for derived types with `allocatable` components |
+| `prif_co_max`       | *partial* | only supports 32-bit and 64-bit numeric types |
+| `prif_co_min`       | *partial* | only supports 32-bit and 64-bit numeric types |
+| `prif_co_sum`       | *partial* | only supports 32-bit and 64-bit numeric types |
+| `prif_co_reduce`    | *partial* | only supports intrinsic types (no support for derived types) |
 
 ---
 
