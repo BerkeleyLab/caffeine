@@ -4,7 +4,7 @@ set -e # exit on error
 
 print_usage_info()
 {
-    cat << EOF
+    cat <<'EOF'
 Caffeine Installation Script
 
 USAGE:
@@ -15,8 +15,26 @@ USAGE:
  --prereqs          Display a list of prerequisite software.
                     Default prefix='\$HOME/.local/bin'
 
+All unrecognized arguments will be passed to GASNet's configure.
+
+Some influential environment variables:
+  FC          Fortran compiler command
+  CC          C compiler command
+  CFLAGS      C compiler flags
+  CPP         C preprocessor
+  CPPFLAGS    C preprocessor flags, e.g. -I<include dir> if you have
+              headers in a nonstandard directory <include dir>
+  LDFLAGS     linker flags, e.g. -L<lib dir> if you have libraries in a
+              nonstandard directory <lib dir>
+  LIBS        libraries to pass to the linker, e.g. -l<library>
+Use these variables to override the choices made by the installer or to help
+it to find libraries and programs with nonstandard names/locations.
+
 For a non-interactive build with the 'yes' utility installed, execute
 yes | ./install.sh
+
+Report bugs to fortran@lbl.gov or at https://go.lbl.gov/caffeine
+
 EOF
 }
 
@@ -40,7 +58,11 @@ the latest versions using Homebrew:
 EOF
 }
 
+# GASNET_CONFIGURE_ARGS is deliberately inherited from the caller environment
+GASNET_CONFIGURE_ARGS=${GASNET_CONFIGURE_ARGS:=}
+
 while [ "$1" != "" ]; do
+    orig_arg="$1"
     PARAM=$(echo "$1" | awk -F= '{print $1}')
     VALUE=$(echo "$1" | awk -F= '{print $2}')
     case $PARAM in
@@ -56,9 +78,9 @@ while [ "$1" != "" ]; do
             PREFIX=$VALUE
             ;;
         *)
-            echo "ERROR: unknown parameter \"$PARAM\""
-            usage
-            exit 1
+            # We pass the unmodified argument to GASNet configure
+            # Quoting is believed sufficient for embedded whitespace but not quotes
+            GASNET_CONFIGURE_ARGS+="${GASNET_CONFIGURE_ARGS+ }\"${orig_arg//\"/\\\"}\""
             ;;
     esac
     shift
@@ -264,7 +286,9 @@ EOF
   printf "Is it ok to download and install $1? [yes] "
 }
 
-pkg="gasnet-smp-seq"
+# TODO: Expand this to other GASNet conduits (issue #66)
+GASNET_CONDUIT=smp
+pkg="gasnet-$GASNET_CONDUIT-seq"
 export PKG_CONFIG_PATH
 
 if ! $PKG_CONFIG $pkg ; then
@@ -276,16 +300,31 @@ if ! $PKG_CONFIG $pkg ; then
   if [ ! -d $DEPENDENCIES_DIR ]; then
     mkdir -pv $DEPENDENCIES_DIR
   fi
+  GASNET_DIR=$DEPENDENCIES_DIR/GASNet-$GASNET_VERSION
+  if [ -d $GASNET_DIR ]; then
+    # clean any existing GASNet build dir we are overwriting
+    rm -Rf $GASNET_DIR
+  fi
   
   curl -L $GASNET_SOURCE_URL | tar xvzf - -C $DEPENDENCIES_DIR
   
-  if [ -d $DEPENDENCIES_DIR/GASNet-$GASNET_VERSION ]; then
-    cd $DEPENDENCIES_DIR/GASNet-$GASNET_VERSION
-      FC="$FC" CC="$CC" CXX="$CXX" ./configure --prefix "$PREFIX"
+  ( 
+      cd $GASNET_DIR
+      cmd="set -x ; ./configure --prefix=\"$PREFIX\""
+      # user-provided overrides:
+      cmd="$cmd $GASNET_CONFIGURE_ARGS"
+      # pass-thru compiler settings:
+      cmd="$cmd --with-cc=\"$CC\" --with-cxx=\"$CXX\""
+      # select the GASNet config settings Caffeine requires, and disable unused features:
+      cmd="$cmd --enable-$GASNET_CONDUIT"
+      cmd="$cmd --enable-seq --disable-par --disable-parsync"
+      cmd="$cmd --disable-segment-everything"
+      # TEMPORARY: disable MPI compatibility until Caffeine supports distributed conduits
+      cmd="$cmd --without-mpicc"
+      eval $cmd
       $MAKE -j 8 all
       $MAKE -j 8 install
-    cd -
-  fi
+  )
 fi # if ! $PKG_CONFIG $pkg ; then
 
 exit_if_pkg_config_pc_file_missing()
