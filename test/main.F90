@@ -17,6 +17,7 @@ program main
   use prif_co_min_test_m, only : prif_co_min_test_t
   use prif_co_max_test_m, only : prif_co_max_test_t
   use prif_co_reduce_test_m, only : prif_co_reduce_test_t
+  use prif_co_sum_test_m, only : prif_co_sum_test_t
   implicit none
 
   integer :: passes=0, tests=0
@@ -62,6 +63,7 @@ contains
     type(prif_co_min_test_t) prif_co_min_test
     type(prif_co_max_test_t) prif_co_max_test
     type(prif_co_reduce_test_t) prif_co_reduce_test
+    type(prif_co_sum_test_t) prif_co_sum_test
 
     call prif_init_test%report(passes, tests)
     call prif_allocate_test%report(passes, tests)
@@ -74,21 +76,23 @@ contains
     print *,"!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
     print *
     print *,"LLVM Flang detected. Skipping tests that crash:"
-    print *,"  - prif_co_reduce_test"
     print *,"  - prif_co_max_test"
     print *,"  - prif_co_min_test"
+    print *,"  - prif_co_reduce_test"
+    print *,"  - prif_co_sum_test"
+    print *,"  - prif_error_stop_test"
     print *,"  - prif_image_index_test"
     print *,"  - prif_stop_test"
-    print *,"  - prif_error_stop_test"
     print *
     print *,"!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
 #else
-    call prif_co_reduce_test%report(passes, tests)
     call prif_co_max_test%report(passes, tests)
     call prif_co_min_test%report(passes, tests)
+    call prif_co_reduce_test%report(passes, tests)
+    call prif_co_sum_test%report(passes, tests)
+    call prif_error_stop_test%report(passes, tests)
     call prif_image_index_test%report(passes, tests)
     call prif_stop_test%report(passes, tests)
-    call prif_error_stop_test%report(passes, tests)
 #endif
 
   end subroutine run_tests_and_report
