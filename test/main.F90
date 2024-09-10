@@ -30,7 +30,9 @@ program main
 
   if (me==1) print *, new_line(''), "_________ In total, ",passes," of ",tests, " tests pass. _________"
   call prif_sync_all
-  if (passes /= tests) error stop
+  ! PRIF sec 5.2 requires the client to eventually call prif_error_stop or prif_stop
+  if (passes /= tests) call prif_error_stop(quiet=.false.)
+  else call prif_stop(quiet=.true.)
 
 contains
 
