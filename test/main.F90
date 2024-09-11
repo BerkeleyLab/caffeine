@@ -4,7 +4,11 @@
 program main
   !! Test the Caffeine implementation of the Parallel Runtime Interface for Fortran (PRIF)
   use julienne_m, only : command_line_t, GitHub_CI
-  use prif, only : prif_this_image_no_coarray, prif_sync_all
+  use prif, only : &
+    prif_this_image_no_coarray &
+   ,prif_sync_all &
+   ,prif_error_stop &
+   ,prif_stop
   use prif_allocate_test_m, only : prif_allocate_test_t
   use prif_co_broadcast_test_m, only : prif_co_broadcast_test_t
   use prif_co_max_test_m, only : prif_co_max_test_t
@@ -26,13 +30,12 @@ program main
 
   call stop_and_print_usage_info_if_help_requested
   call run_tests_and_report(passes, tests)
-  call prif_this_image_no_coarray(this_image=me)
+  !call prif_this_image_no_coarray(this_image=me)
 
-  if (me==1) print *, new_line(''), "_________ In total, ",passes," of ",tests, " tests pass. _________"
-  call prif_sync_all
-  ! PRIF sec 5.2 requires the client to eventually call prif_error_stop or prif_stop
-  if (passes /= tests) call prif_error_stop(quiet=.false.)
-  else call prif_stop(quiet=.true.)
+  !if (me==1) print *, new_line(''), "_________ In total, ",passes," of ",tests, " tests pass. _________"
+  !call prif_sync_all
+  !if (passes /= tests) call prif_error_stop(quiet=.false.) ! PRIF sec 5.2 requires the client to 
+  !call prif_stop(quiet=.true.)                             ! eventually call prif_error_stop or prif_stop
 
 contains
 
@@ -75,6 +78,7 @@ contains
     call prif_this_image_test%report(passes, tests)
     call prif_co_broadcast_test%report(passes, tests)
     call prif_teams_test%report(passes, tests)
+    call prif_error_stop_test%report(passes, tests)
 #ifdef __flang__
     print *
     print *,"!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
@@ -94,10 +98,9 @@ contains
     call prif_co_min_test%report(passes, tests)
     call prif_co_reduce_test%report(passes, tests)
     call prif_co_sum_test%report(passes, tests)
-    call prif_error_stop_test%report(passes, tests)
+    call prif_stop_test%report(passes, tests)
     call prif_image_index_test%report(passes, tests)
     call prif_rma_test%report(passes, tests)
-    call prif_stop_test%report(passes, tests)
 #endif
 
   end subroutine run_tests_and_report

@@ -7,6 +7,7 @@ module prif_error_stop_test_m
   !! Unit test for the prif_error_stop subroutine
   use prif, only : prif_error_stop
   use julienne_m, only : test_t, test_result_t, test_description_t, test_description_substring
+  use unit_test_parameters_m, only : expected_error_stop
 #if ! HAVE_PROCEDURE_ACTUAL_FOR_POINTER_DUMMY
   use julienne_m, only : test_function_i
 #endif
@@ -58,26 +59,32 @@ contains
 
   function check_integer_stop_code() result(test_passes)
       logical test_passes
-      integer exit_status
+      integer exit_status, command_status
+      character(len=256), command_message
 
       call execute_command_line( &
-        command = "./build/run-fpm.sh run --example error_stop_integer_code > /dev/null 2>&1", &
-        wait = .true., &
-        exitstat = exit_status &
+        command = "./build/run-fpm.sh run --example error_stop_integer_code > /dev/null 2>&1" &
+        ,wait = .true. &
+        ,exitstat = exit_status &
+        ,cmdstat = command_status &
+        ,cmdmsg = command_message &
       )
-      test_passes = exit_status /= 0
+      test_passes = exit_status == expected_error_stop
   end function
 
   function check_character_stop_code() result(test_passes)
       logical test_passes
-      integer exit_status
+      integer exit_status, command_status
+      character(len=256), command_message
 
       call execute_command_line( &
-        command = "./build/run-fpm.sh run --example error_stop_character_code > /dev/null 2>&1", &
-        wait = .true., &
-        exitstat = exit_status &
-      )
-      test_passes = exit_status /= 0
+         command = "./build/run-fpm.sh run --example error_stop_character_code > /dev/null 2>&1" &
+        ,wait = .true. &
+        ,exitstat = exit_status &
+        ,cmdstat = command_status &
+        ,cmdmsg = command_message &
+      ) 
+      test_passes = exit_status == expected_error_stop
   end function
 
 end module prif_error_stop_test_m
