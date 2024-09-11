@@ -108,12 +108,11 @@ contains
       character(len=*), parameter :: script(*) = &
         [character(len=len("the question.")) :: "To be ","or not"," to ","be.","  That is ","the question."]
       character(len=len(script)), dimension(3,2) :: scramlet, co_min_scramlet
-      integer i, cyclic_permutation(size(script))
+      integer i, cyclic_permutation(size(script)), me
 
-      associate(me => this_image())
-        associate(cyclic_permutation => [(1 + mod(i-1,size(script)), i=me, me+size(script) )])
-          scramlet = reshape(script(cyclic_permutation), shape(scramlet))
-        end associate
+      call prif_this_image_no_coarray(this_image=me)
+      associate(cyclic_permutation => [(1 + mod(i-1,size(script)), i=me, me+size(script) )])
+        scramlet = reshape(script(cyclic_permutation), shape(scramlet))
       end associate
 
       co_min_scramlet = scramlet
@@ -141,8 +140,9 @@ contains
 
     function alphabetically_1st_scalar_string() result(result_)
       type(result_t) result_
-      character(len=*), parameter :: words(*) = [character(len=len("to party!")):: "Loddy","doddy","we","like","to party!"]
-      character(len=:), allocatable :: my_word
+      integer, parameter :: length = len("to party!")
+      character(len=length), parameter :: words(*) = [character(len=length):: "Loddy","doddy","we","like","to party!"]
+      character(len=:), allocatable :: my_word, expected_word
       integer :: me, num_imgs
 
       call prif_this_image_no_coarray(this_image=me)
@@ -152,9 +152,9 @@ contains
       end associate
 
       call prif_num_images(num_images=num_imgs)
-      associate(expected_word => minval(words(1:min(num_imgs, size(words)))))
-        result_ = assert_equals(expected_word, my_word)
-      end associate
+      ! expected_word = minval(words(1:min(num_imgs, size(words)))) ! this line exposes a flang bug
+      expected_word = "Loddy"
+      result_ = assert_equals(expected_word, my_word)
     end function
 
 end module caf_co_min_test
