@@ -1,5 +1,6 @@
 module caf_stop_test
     use veggies, only: test_item_t, describe, result_t, it, assert_that, assert_equals
+    use unit_test_parameters_m, only : expected_stop_code
 
     implicit none
     private
@@ -33,7 +34,6 @@ contains
     function exit_with_integer_stop_code() result(result_)
         type(result_t) :: result_
         integer exit_status
-        integer, parameter :: expected_stop_code=1 ! defined in example/support-test/stop_with_integer_code.f90
 
         call execute_command_line( &
           command = "./build/run-fpm.sh run --example stop_with_integer_code > /dev/null 2>&1", &
@@ -47,14 +47,13 @@ contains
     function exit_with_character_stop_code() result(result_)
         type(result_t) :: result_
         integer exit_status
-        integer, parameter :: expected_exit_code=1 ! defined in src/caffeine/program_termination.f90
 
         call execute_command_line( &
           command = "./build/run-fpm.sh run --example stop_with_character_code > /dev/null 2>&1", &
           wait = .true., &
           exitstat = exit_status &
         )   
-        result_ = assert_equals(expected_exit_code, exit_status)
+        result_ = assert_equals(0, exit_status) ! the standard recommends zero exit status for character stop codes
 
     end function
 
