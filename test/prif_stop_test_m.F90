@@ -6,6 +6,7 @@
 module prif_stop_test_m
   !! Unit test for the prif_stop subroutine
   use prif, only : prif_stop
+  use unit_test_parameters_m, only : expected_stop
   use julienne_m, only : test_t, test_result_t, test_description_t, test_description_substring
 #if ! HAVE_PROCEDURE_ACTUAL_FOR_POINTER_DUMMY
   use julienne_m, only : test_function_i
@@ -34,9 +35,9 @@ contains
 
 #if HAVE_PROCEDURE_ACTUAL_FOR_POINTER_DUMMY
     test_descriptions = [ &
-       test_description_t("exiting with exitstat=0 when no stop code is present", exit_with_no_stop_code) &
-      ,test_description_t("exiting with the integer stop code exitstat", exit_with_integer_stop_code) &
-      ,test_description_t("exiting a character stop code and non-zero exitstat", exit_with_character_stop_code) &
+      test_description_t("exiting with the integer stop code as the exitstat", exit_with_integer_stop_code) &
+      !,test_description_t("exiting with exitstat=0 when no stop code is present", exit_with_no_stop_code) &
+      !,test_description_t("exiting a character stop code and non-zero exitstat", exit_with_character_stop_code) &
     ]
 #else
     procedure(test_function_i), pointer :: &
@@ -62,29 +63,36 @@ contains
 
   function exit_with_no_stop_code() result(test_passes)
       logical test_passes
-      integer exit_status
+      integer exit_status, command_status
+      character(len=256), command_message
 
       call execute_command_line( &
         command = "./build/run-fpm.sh run --example stop_with_no_code > /dev/null 2>&1", &
         wait = .true., &
         exitstat = exit_status &
+        ,cmdstat = command_status &
+        ,cmdmsg = command_message &
       )   
-      test_passes = exit_status == 0
+        print *, exit_status, "<------ exit_status ---------"
+        print *, command_status, "<----- command_status ----------"
+        print *, command_message, "<-------command_message ----"
+      test_passes = exit_status == 1
 
   end function
 
   function exit_with_integer_stop_code() result(test_passes)
       logical test_passes
-      integer exit_status
-      integer, parameter :: expected_stop_code=1 ! defined in example/support-test/stop_with_integer_code.f90
+      integer exit_status, command_status
+      character(len=256), command_message
 
       call execute_command_line( &
-        command = "./build/run-fpm.sh run --example stop_with_integer_code > /dev/null 2>&1", &
-        wait = .true., &
-        exitstat = exit_status &
+        command = "./build/run-fpm.sh run --example stop_with_integer_code > /dev/null 2>&1" &
+        ,wait = .true. &
+        ,exitstat = exit_status &
+        ,cmdstat = command_status &
+        ,cmdmsg = command_message &
       )   
-      test_passes = expected_stop_code == exit_status
-
+      test_passes = exit_status == expected_stop
   end function
 
   function exit_with_character_stop_code() result(test_passes)

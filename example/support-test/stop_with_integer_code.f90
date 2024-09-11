@@ -1,14 +1,18 @@
-program stop_with_no_code
+program stop_with_integer_code
   use iso_c_binding, only: c_bool
-  use prif, only : prif_init, prif_stop
+  use prif, only : prif_init, prif_error_stop, prif_stop
+  use unit_test_parameters_m, only : unexpected_error_stop, expected_stop, unexpected_stop
   implicit none
 
   integer :: init_exit_code
 
   call prif_init(init_exit_code)
-  if (init_exit_code /= 0) error stop "caffeinate returned a non-zero exit_code"
+  if (init_exit_code /= 0) call prif_error_stop(.false._c_bool, unexpected_error_stop)
+    ! prif_stop_test.f90 should report a test failure if the above line invoikes prif_error_stop
 
-  call prif_stop(.false._c_bool, 1)
+  call prif_stop(.false._c_bool, expected_stop)
+    ! prif_stop_test.f90 should report a passing test if the above prif_error_stop call succeeds 
 
-  stop 2 ! caffeine/test/zzz_finalization_test.f90 reports a failure if this line runs
-end program 
+  call prif_stop(.false._c_bool, unexpected_stop)
+    ! prif_stop_test.f90 should report a test failure if the above prif_stop call executes
+end program

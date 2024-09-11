@@ -35,8 +35,8 @@ contains
 
 #if HAVE_PROCEDURE_ACTUAL_FOR_POINTER_DUMMY
     test_descriptions = [ &
-       test_description_t("exiting with a non-zero exitstat with an integer stop code", check_integer_stop_code) &
-      ,test_description_t("exiting with a non-zero exitstat when a character stop code", check_character_stop_code) &
+       test_description_t("exiting with an integer stop code as the exitstat", check_integer_stop_code) &
+      ,test_description_t("exiting with a characrer stop code and non-zero exitstat", check_character_stop_code) &
     ]
 #else
     procedure(test_function_i), pointer :: check_integer_stop_code_ptr, check_character_stop_code_ptr
@@ -46,7 +46,7 @@ contains
 
     test_descriptions = [ &
        test_description_t("exiting with a non-zero exitstat with an integer stop code", check_integer_stop_code_ptr) &
-      ,test_description_t("exiting with a non-zero exitstat when a character stop code", check_character_stop_code_ptr) &
+      ,test_description_t("exiting with a non-zero exitstat with a character stop code", check_character_stop_code_ptr) &
     ]
 #endif
 
@@ -63,13 +63,13 @@ contains
       character(len=256), command_message
 
       call execute_command_line( &
-        command = "./build/run-fpm.sh run --example error_stop_integer_code > /dev/null 2>&1" &
+        command = "./build/run-fpm.sh run --example error_stop_with_integer_code > /dev/null 2>&1" &
         ,wait = .true. &
         ,exitstat = exit_status &
         ,cmdstat = command_status &
         ,cmdmsg = command_message &
       )
-      test_passes = exit_status == expected_error_stop
+        test_passes = exit_status == expected_error_stop
   end function
 
   function check_character_stop_code() result(test_passes)
@@ -78,7 +78,7 @@ contains
       character(len=256), command_message
 
       call execute_command_line( &
-         command = "./build/run-fpm.sh run --example error_stop_character_code > /dev/null 2>&1" &
+         command = "./build/run-fpm.sh run --example error_stop_with_character_code > /dev/null 2>&1" &
         ,wait = .true. &
         ,exitstat = exit_status &
         ,cmdstat = command_status &

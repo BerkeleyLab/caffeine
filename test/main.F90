@@ -30,11 +30,11 @@ program main
 
   call stop_and_print_usage_info_if_help_requested
   call run_tests_and_report(passes, tests)
-  !call prif_this_image_no_coarray(this_image=me)
+  call prif_this_image_no_coarray(this_image=me)
 
-  !if (me==1) print *, new_line(''), "_________ In total, ",passes," of ",tests, " tests pass. _________"
-  !call prif_sync_all
-  !if (passes /= tests) call prif_error_stop(quiet=.false.) ! PRIF sec 5.2 requires the client to 
+  if (me==1) print *, new_line(''), "_________ In total, ",passes," of ",tests, " tests pass. _________"
+  call prif_sync_all
+  if (passes /= tests) call prif_error_stop(quiet=.false.) ! PRIF sec 5.2 requires the client to 
   !call prif_stop(quiet=.true.)                             ! eventually call prif_error_stop or prif_stop
 
 contains
@@ -78,7 +78,7 @@ contains
     call prif_this_image_test%report(passes, tests)
     call prif_co_broadcast_test%report(passes, tests)
     call prif_teams_test%report(passes, tests)
-    call prif_error_stop_test%report(passes, tests)
+    call prif_stop_test%report(passes, tests)
 #ifdef __flang__
     print *
     print *,"!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
@@ -88,18 +88,16 @@ contains
     print *,"  - prif_co_min_test"
     print *,"  - prif_co_reduce_test"
     print *,"  - prif_co_sum_test"
-    print *,"  - prif_error_stop_test"
     print *,"  - prif_image_index_test"
-    print *,"  - prif_stop_test"
     print *
     print *,"!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
 #else
+    call prif_image_index_test%report(passes, tests)
+    call prif_error_stop_test%report(passes, tests)
     call prif_co_max_test%report(passes, tests)
     call prif_co_min_test%report(passes, tests)
     call prif_co_reduce_test%report(passes, tests)
     call prif_co_sum_test%report(passes, tests)
-    call prif_stop_test%report(passes, tests)
-    call prif_image_index_test%report(passes, tests)
     call prif_rma_test%report(passes, tests)
 #endif
 

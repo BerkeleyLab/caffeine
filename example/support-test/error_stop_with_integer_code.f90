@@ -1,4 +1,4 @@
-program error_stop_integer_code
+program error_stop_with_integer_code
   use iso_c_binding, only: c_bool
   use prif, only : prif_init, prif_error_stop, prif_stop
   use unit_test_parameters_m, only : unexpected_error_stop, expected_error_stop, unexpected_stop
