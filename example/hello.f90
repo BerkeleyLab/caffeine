@@ -1,17 +1,23 @@
 program hello_world
   use iso_c_binding, only: c_bool
-  use prif, only : prif_init, this_image => prif_this_image_no_coarray, num_images => prif_num_images, prif_stop
+  use prif, only : &
+     prif_init &
+    ,prif_this_image_no_coarray &
+    ,prif_num_images &
+    ,prif_stop &
+    ,prif_error_stop
   implicit none
 
   integer :: init_exit_code, me, num_imgs
+  logical(kind=c_bool), parameter :: false = .false._c_bool
 
   call prif_init(init_exit_code)
-  if (init_exit_code /= 0) error stop "caffeinate returned a non-zero exit code"
+  if (init_exit_code /= 0) call prif_error_stop(quiet=false, stop_code_char="program startup failed")
 
-  call this_image(this_image=me)
-  call num_images(num_images=num_imgs)
+  call prif_this_image_no_coarray(this_image=me)
+  call prif_num_images(num_images=num_imgs)
   print *, "Hello from image", me, "of", num_imgs
 
-  call prif_stop(.false._c_bool, stop_code_int=0) ! normal termination
+  call prif_stop(quiet=false)
 
 end program
