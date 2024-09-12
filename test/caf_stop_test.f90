@@ -14,7 +14,7 @@ contains
                 "A program that executes the prif_stop function", &
                 [ it("exits with a zero exitstat when the program omits the stop code", exit_with_no_stop_code) &
                  ,it("prints an integer stop code and exits with exitstat equal to the stop code", exit_with_integer_stop_code) &
-                 ,it("prints a character stop code and exits with a non-zero existat", exit_with_character_stop_code) &
+                 ,it("prints a character stop code and exits with a non-zero exitstat", exit_with_character_stop_code) &
                 ])
     end function
 
