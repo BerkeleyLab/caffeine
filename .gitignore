@@ -6,3 +6,12 @@ fpm.toml
 
 # ford-generated documentation
 doc/html
+
+# executable programs
+a.out
+*.exe
+
+# compiler-generated intermediate files
+*.mod
+*.smod
+*.o
