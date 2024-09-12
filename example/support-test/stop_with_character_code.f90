@@ -10,6 +10,6 @@ program stop_with_character_code
   logical(kind=c_bool), parameter :: false = .false._c_bool
 
   call prif_init(init_exit_code)
-  call prif_stop(quiet=false, stop_code_char="") ! a prif_stop unit test passes if this line executes normal termination
+  call prif_stop(quiet=false, stop_code_char="USER_PROVIDED_STRING") ! a prif_stop unit test passes if this line executes normal termination
   call prif_error_stop(quiet=false) ! a prif_stop unit test fails if this line runs
 end program 
