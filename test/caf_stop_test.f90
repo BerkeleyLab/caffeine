@@ -26,7 +26,7 @@ contains
           command = "./build/run-fpm.sh run --example stop_with_no_code > /dev/null 2>&1", &
           wait = .true., &
           exitstat = exit_status &
-        )   
+        )
         result_ = assert_equals(0, exit_status)
 
     end function
@@ -39,7 +39,7 @@ contains
           command = "./build/run-fpm.sh run --example stop_with_integer_code > /dev/null 2>&1", &
           wait = .true., &
           exitstat = exit_status &
-        )   
+        )
         result_ = assert_equals(expected_stop_code, exit_status)
 
     end function
