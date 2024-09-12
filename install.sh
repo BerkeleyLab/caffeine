@@ -39,7 +39,7 @@ EOF
 }
 
 GCC_VERSION=${GCC_VERSION:=14}
-GASNET_VERSION="stable"
+GASNET_VERSION="2024.5.0"
 
 list_prerequisites()
 {
