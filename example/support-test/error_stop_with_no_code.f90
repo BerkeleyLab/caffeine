@@ -11,6 +11,6 @@ program error_stop_with_no_code
 
   call prif_init(init_exit_code)
   call prif_error_stop(quiet=false) ! a prif_error_stop unit test passes if this line correctly executes error termination
-  call prif_stop(quiet=false, stop_code_char= "program startup failed") ! a prif_error_stop unit test fails if this line runs
+  call prif_stop(quiet=false) ! a prif_error_stop unit test fails if this line runs
      
 end program 
