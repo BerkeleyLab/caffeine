@@ -390,7 +390,7 @@ CAFFEINE_FPM_CFLAGS=$GASNET_CFLAGS $GASNET_CPPFLAGS
 Name: caffeine
 Description: Coarray Fortran parallel runtime library
 URL: https://gitlab.lbl.gov/berkeleylab/caffeine
-Version: 0.2.1
+Version: 0.3.0
 EOF
 
 exit_if_pkg_config_pc_file_missing "caffeine"
