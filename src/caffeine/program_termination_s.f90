@@ -64,12 +64,11 @@ contains
   subroutine prif_error_stop_character(stop_code)
     !! stop all images and provide the stop_code as the process exit status
     character(len=*), intent(in) :: stop_code
-    integer(c_int), parameter :: error_occured = 1
 
     write(error_unit, *) stop_code
     flush error_unit
 
-    call prif_error_stop_integer(error_occured)
+    call caf_decaffeinate(1_c_int) ! does not return
   end subroutine
 
   subroutine prif_error_stop_integer(stop_code)
