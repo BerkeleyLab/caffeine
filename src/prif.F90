@@ -1,5 +1,8 @@
 ! Copyright (c), The Regents of the University of California
 ! Terms of use are as specified in LICENSE.txt
+
+#include "language-support.F90"
+
 module prif
 
   use iso_c_binding, only: c_int, c_bool, c_intptr_t, c_intmax_t, c_ptr, c_funptr, c_size_t, c_ptrdiff_t, c_null_ptr
@@ -42,11 +45,12 @@ module prif
   integer(c_int), parameter, public :: PRIF_VERSION_MINOR = 4
 
   integer(c_int), parameter, public :: PRIF_ATOMIC_INT_KIND = selected_int_kind(18)
-  ! gfortran-14 doesn't currently support the intrinsic selected_logical_kind
-  ! The following commented-out definition is the desired definition and should replace
-  ! the temporary definition when possible
-  ! integer(c_int), parameter, public :: PRIF_ATOMIC_LOGICAL_KIND = selected_logical_kind(32)
+
+#if HAVE_SELECTED_LOGICAL_KIND
+  integer(c_int), parameter, public :: PRIF_ATOMIC_LOGICAL_KIND = selected_logical_kind(32)
+#else
   integer(c_int), parameter, public :: PRIF_ATOMIC_LOGICAL_KIND = PRIF_ATOMIC_INT_KIND
+#endif
 
   integer(c_int), parameter, public :: &
     PRIF_CURRENT_TEAM               = 101, &
