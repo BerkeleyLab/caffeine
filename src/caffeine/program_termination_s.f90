@@ -9,39 +9,53 @@ contains
 
   module procedure prif_stop
 
-    !TODO: deal with argument `quiet`
     if (present(stop_code_char)) then
-       call prif_stop_character(stop_code_char)
+       call prif_stop_character(quiet, stop_code_char)
     else if (present(stop_code_int)) then
-       call prif_stop_integer(stop_code_int)
+       call prif_stop_integer(quiet, stop_code_int)
     else
-       call prif_stop_integer()
+       call prif_stop_integer(quiet)
     end if
 
   contains
 
-    subroutine prif_stop_integer(stop_code)
+    subroutine prif_stop_integer(quiet, stop_code)
       !! synchronize, stop the executing image, and provide the stop_code, or 0 if not present, as the process exit status
+      logical(c_bool), intent(in) :: quiet
       integer(c_int), intent(in), optional :: stop_code
+      integer(c_int) :: exit_code
 
       call prif_sync_all
 
-      write(output_unit, *) "STOP ", stop_code
-      flush output_unit
+      if (present(stop_code)) then
+        if (.not. quiet) then
+          write(output_unit, *) "STOP ", stop_code
+          flush output_unit
+        end if
+        exit_code = stop_code
+      else
+        if (.not. quiet) then
+          write(output_unit, *) "STOP"
+          flush output_unit
+        end if
+        exit_code = 0_c_int
+      end if
 
-      if (.not. present(stop_code)) call caf_decaffeinate(exit_code=0_c_int) ! does not return
-      call caf_decaffeinate(stop_code)
+      call caf_decaffeinate(exit_code)
 
     end subroutine prif_stop_integer
 
-    subroutine prif_stop_character(stop_code)
+    subroutine prif_stop_character(quiet, stop_code)
       !! synchronize, stop the executing image, and provide the stop_code as the process exit status
+      logical(c_bool), intent(in) :: quiet
       character(len=*), intent(in) :: stop_code
 
       call prif_sync_all
 
-      write(output_unit, *) "STOP '" // stop_code // "'"
-      flush output_unit
+      if (.not. quiet) then
+        write(output_unit, *) "STOP '" // stop_code // "'"
+        flush output_unit
+      end if
 
       call caf_decaffeinate(exit_code=0_c_int) ! does not return
 
