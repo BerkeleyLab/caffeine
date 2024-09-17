@@ -65,30 +65,12 @@ contains
   subroutine prif_error_stop_character(stop_code)
     !! stop all images and provide the stop_code as the process exit status
     character(len=*), intent(in) :: stop_code
-
-    interface
-      subroutine caf_error_stop_character_c(stop_code, length) bind(C, name = "caf_error_stop_character_c")
-        use, intrinsic :: iso_c_binding, only: c_char, c_int
-        implicit none
-        integer(c_int), intent(in), value :: length
-        character(len=1,kind=c_char), intent(in) :: stop_code(length)
-      end subroutine
-    end interface
-
-    call caf_error_stop_character_c(f_c_string(stop_code), len(stop_code))
-  end subroutine
-
-  subroutine inner_caf_error_stop_character(stop_code, length) bind(C, name = "inner_caf_error_stop_character")
-    integer(c_int), intent(in) :: length
-    character(len=1,kind=c_char), intent(in) :: stop_code(length)
-
     integer(c_int), parameter :: error_occured = 1
 
-    write(error_unit, *) c_f_string(stop_code, length)
+    write(error_unit, *) stop_code
     flush error_unit
 
     call prif_error_stop_integer(error_occured)
-
   end subroutine
 
   subroutine prif_error_stop_integer(stop_code)
