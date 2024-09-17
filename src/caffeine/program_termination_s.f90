@@ -50,45 +50,47 @@ contains
   end procedure prif_stop
 
   module procedure prif_error_stop
-
-    !TODO: deal with argument `quiet`
     if (present(stop_code_char)) then
-       call prif_error_stop_character(stop_code_char)
+       call prif_error_stop_character(quiet, stop_code_char)
     else if (present(stop_code_int)) then
-       call prif_error_stop_integer(stop_code_int)
+       call prif_error_stop_integer(quiet, stop_code_int)
     else
-       call prif_error_stop_integer()
+       call prif_error_stop_integer(quiet)
     end if
   end procedure prif_error_stop
 
-  subroutine prif_error_stop_character(stop_code)
+  subroutine prif_error_stop_character(quiet, stop_code)
     !! stop all images and provide the stop_code as the process exit status
+    logical(c_bool), intent(in) :: quiet
     character(len=*), intent(in) :: stop_code
 
-    write(error_unit, *) stop_code
-    flush error_unit
+    if (.not. quiet) then
+      write(error_unit, *) stop_code
+      flush error_unit
+    end if
 
     call caf_decaffeinate(1_c_int) ! does not return
   end subroutine
 
-  subroutine prif_error_stop_integer(stop_code)
+  subroutine prif_error_stop_integer(quiet, stop_code)
     !! stop all images and provide the stop_code, or 1 if not present, as the process exit status
+    logical(c_bool), intent(in) :: quiet
     integer(c_int), intent(in), optional :: stop_code
     integer(c_int) :: exit_code
 
-    ! TODO: Resolve test issue - writing to the error_unit, which is the semantics of PRIF
-    ! breaks the current testing strategy for `prif_error_stop`
-    ! We plan to change the testing strategy anyway, so once this is done, need to comment back
-    ! in the code below related to the error_unit
     if (present(stop_code)) then
-!      write(error_unit) "ERROR STOP ", stop_code
+      if (.not.quiet) then
+        write(error_unit) "ERROR STOP ", stop_code
+        flush error_unit
+      end if
       exit_code = stop_code
-   else
-!      write(error_unit) "ERROR STOP"
+    else
+      if (.not.quiet) then
+        write(error_unit) "ERROR STOP"
+        flush error_unit
+      end if
       exit_code = 1_c_int
     end if
-
-!    flush error_unit
 
     call caf_decaffeinate(exit_code) ! does not return
   end subroutine
