@@ -62,12 +62,12 @@ contains
     end if
   end procedure prif_error_stop
 
-  pure subroutine prif_error_stop_character(stop_code)
+  subroutine prif_error_stop_character(stop_code)
     !! stop all images and provide the stop_code as the process exit status
     character(len=*), intent(in) :: stop_code
 
     interface
-      pure subroutine caf_error_stop_character_c(stop_code, length) bind(C, name = "caf_error_stop_character_c")
+      subroutine caf_error_stop_character_c(stop_code, length) bind(C, name = "caf_error_stop_character_c")
         use, intrinsic :: iso_c_binding, only: c_char, c_int
         implicit none
         integer(c_int), intent(in), value :: length
@@ -91,12 +91,12 @@ contains
 
   end subroutine
 
-  pure subroutine prif_error_stop_integer(stop_code)
+  subroutine prif_error_stop_integer(stop_code)
     !! stop all images and provide the stop_code, or 0 if not present, as the process exit status
     integer, intent(in), optional :: stop_code
 
     interface
-      pure subroutine caf_error_stop_integer_c(stop_code) bind(C, name = "caf_error_stop_integer_c")
+      subroutine caf_error_stop_integer_c(stop_code) bind(C, name = "caf_error_stop_integer_c")
         use, intrinsic :: iso_c_binding, only: c_int
         implicit none
         integer(c_int), intent(in) :: stop_code
@@ -128,7 +128,7 @@ contains
 
   end subroutine
 
-  pure function f_c_string(f_string) result(c_string)
+  function f_c_string(f_string) result(c_string)
     character(len=*), intent(in) :: f_string
     character(len=1,kind=c_char) :: c_string(len(f_string))
 
@@ -139,7 +139,7 @@ contains
     end do
   end function
 
-  pure function c_f_string(c_string, length) result(f_string)
+  function c_f_string(c_string, length) result(f_string)
     integer(c_int), intent(in) :: length
     character(len=1,kind=c_char), intent(in) :: c_string(length)
     character(len=length) :: f_string
