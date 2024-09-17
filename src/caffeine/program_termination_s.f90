@@ -110,28 +110,6 @@ contains
 
   end subroutine
 
-  function f_c_string(f_string) result(c_string)
-    character(len=*), intent(in) :: f_string
-    character(len=1,kind=c_char) :: c_string(len(f_string))
-
-    integer :: i
-
-    do concurrent (i = 1:len(f_string))
-      c_string(i) = f_string(i:i)
-    end do
-  end function
-
-  function c_f_string(c_string, length) result(f_string)
-    integer(c_int), intent(in) :: length
-    character(len=1,kind=c_char), intent(in) :: c_string(length)
-    character(len=length) :: f_string
-
-    integer :: i
-    do concurrent (i = 1:length)
-      f_string(i:i) = c_string(i)
-    end do
-  end function
-
   module procedure prif_fail_image
     call unimplemented("prif_fail_image")
   end procedure
