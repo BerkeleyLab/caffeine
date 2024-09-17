@@ -11,10 +11,8 @@ contains
 
     if (present(stop_code_char)) then
        call prif_stop_character(quiet, stop_code_char)
-    else if (present(stop_code_int)) then
-       call prif_stop_integer(quiet, stop_code_int)
     else
-       call prif_stop_integer(quiet)
+       call prif_stop_integer(quiet, stop_code_int)
     end if
 
   contains
@@ -66,10 +64,8 @@ contains
   module procedure prif_error_stop
     if (present(stop_code_char)) then
        call prif_error_stop_character(quiet, stop_code_char)
-    else if (present(stop_code_int)) then
-       call prif_error_stop_integer(quiet, stop_code_int)
     else
-       call prif_error_stop_integer(quiet)
+       call prif_error_stop_integer(quiet, stop_code_int)
     end if
   end procedure prif_error_stop
 
