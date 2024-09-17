@@ -26,8 +26,7 @@ contains
 
       call prif_sync_all
 
-      !write(output_unit, *) "caf_stop: stop code '", stop_code, "'"
-      write(output_unit, *) stop_code
+      write(output_unit, *) "STOP ", stop_code
       flush output_unit
 
       if (.not. present(stop_code)) call caf_decaffeinate(exit_code=0_c_int) ! does not return
@@ -41,7 +40,7 @@ contains
 
       call prif_sync_all
 
-      write(output_unit, *) "caf_stop: stop code '" // stop_code // "'"
+      write(output_unit, *) "STOP '" // stop_code // "'"
       flush output_unit
 
       call caf_decaffeinate(exit_code=0_c_int) ! does not return
