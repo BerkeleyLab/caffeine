@@ -76,29 +76,11 @@ contains
   subroutine prif_error_stop_integer(stop_code)
     !! stop all images and provide the stop_code, or 0 if not present, as the process exit status
     integer, intent(in), optional :: stop_code
-
-    interface
-      subroutine caf_error_stop_integer_c(stop_code) bind(C, name = "caf_error_stop_integer_c")
-        use, intrinsic :: iso_c_binding, only: c_int
-        implicit none
-        integer(c_int), intent(in) :: stop_code
-      end subroutine
-    end interface
-
-    call caf_error_stop_integer_c(stop_code)
-  end subroutine
-
-  subroutine inner_caf_error_stop_integer(stop_code) bind(C, name = "inner_caf_error_stop_integer")
-    integer, intent(in), optional :: stop_code
-
     integer exit_code
 
     if (.not. present(stop_code)) then
-
       call caf_decaffeinate(exit_code=1)
-
     else if (stop_code==0) then
-
       write(error_unit) stop_code
       flush error_unit
       exit_code = 1
@@ -107,7 +89,6 @@ contains
     end if
 
     call caf_decaffeinate(exit_code) ! does not return
-
   end subroutine
 
   module procedure prif_fail_image
