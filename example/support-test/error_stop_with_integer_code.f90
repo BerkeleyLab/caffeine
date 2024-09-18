@@ -8,9 +8,9 @@ program error_stop_with_integer_code
   implicit none
 
   integer init_exit_code
-  logical(kind=c_bool), parameter :: false = .false._c_bool
+  logical(kind=c_bool), parameter :: true = .true._c_bool
 
   call prif_init(init_exit_code)
-  call prif_error_stop(quiet=false, stop_code_int=expected_error_stop_code) ! a prif_error_stop unit test passes if this line executes error termination
-  call prif_stop(quiet=false) ! a prif_error_stop unit tests fails if this line runs
+  call prif_error_stop(quiet=true, stop_code_int=expected_error_stop_code) ! a prif_error_stop unit test passes if this line executes error termination
+  call prif_stop(quiet=true) ! a prif_error_stop unit tests fails if this line runs
 end program

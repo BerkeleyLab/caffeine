@@ -9,7 +9,7 @@ submodule(prif) prif_private_s
 
   interface
 
-    pure module subroutine assert(assertion, description, diagnostics)
+    module subroutine assert(assertion, description, diagnostics)
       implicit none
       logical, intent(in) :: assertion
       character(len=*), intent(in) :: description
