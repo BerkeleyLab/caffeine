@@ -75,7 +75,7 @@ contains
     character(len=*), intent(in) :: stop_code
 
     if (.not. quiet) then
-      write(error_unit, *) stop_code
+      write(error_unit, *) "ERROR STOP '" // stop_code // "'"
       flush error_unit
     end if
 
