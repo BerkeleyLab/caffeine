@@ -33,13 +33,24 @@ program contrived
 
     implicit none
 
-    type :: my_type
-      integer :: a
-      real, pointer :: b(:) => null()
+    type :: allocatable_descriptor
+        logical :: is_allocated = .false.
+        real, pointer :: elements(:) => null()
     end type
 
-    type(prif_coarray_handle) :: c_handle
-    type(my_type), pointer :: local_c
+    type :: my_type
+      integer :: a
+      type(allocatable_descriptor) :: b
+    end type
+
+    type :: coarray_descriptor
+        logical :: is_allocated = .false.
+        type(my_type), pointer :: local_data => null()
+        type(prif_coarray_handle) :: handle
+    end type
+
+
+    type(coarray_descriptor), target :: c
 
     real :: d
     integer :: i, me, neighbor
@@ -58,13 +69,14 @@ program contrived
                 ubounds = [integer(c_intmax_t)::], &
                 element_size = int(storage_size(for_element_size)/8, c_size_t), &
                 final_func = c_funloc(deallocate_components), &
-                coarray_handel = c_handle, &
+                coarray_handel = c%handle, &
                 allocated_memory = allocated_memory)
-        call c_f_pointer(cptr = allocated_memory, fptr = local_c)
-        call prif_set_context_data(c_handle, allocated_memory)
+        call c_f_pointer(cptr = allocated_memory, fptr = c%local_data)
+        c%is_allocated = .true.
+        call prif_set_context_data(c%handle, c_loc(c))
     end block
 
-    local_c%a = me
+    c%local_data%a = me
 
     block
         type(c_ptr) :: allocated_memory
@@ -72,11 +84,12 @@ program contrived
         call prif_allocate( &
                 size_in_bytes = int((storage_size(for_element_size)*me)/8, c_size_t), &
                 allocated_memory = allocated_memory)
-        call c_f_pointer(cptr = allocated_memory, fptr = local_c%b, shape = [me])
+        call c_f_pointer(cptr = allocated_memory, fptr = c%local_data%b%elements, shape = [me])
+        c%local_data%b%is_allocated = .true.
     end block
 
     do i = 1, me
-        c%b(i) = i
+        c%local_data%b%elements(i) = i
     end do
 
     call prif_sync_all()
@@ -91,14 +104,14 @@ program contrived
 
     block
         type(c_ptr) :: buffer
-        integer(c_size_t), parameter :: b_offset = 4_c_size_t ! compiler dependent
+        integer(c_size_t), parameter :: b_offset = 8_c_size_t ! compiler dependent
         integer(c_intptr_t), target :: b_pointer
         real, target :: rhs_temp
         buffer = c_loc(b_pointer)
         ! fetch address of allocatable array on other image
         call prif_get( &
                 image_num = neighbor, &
-                coarray_handle = c_handle, &
+                coarray_handle = c%handle, &
                 offset = b_offset, &
                 current_image_buffer = buffer, &
                 size_in_bytes = int(storage_size(b_pointer)/8, c_size_t))
@@ -114,7 +127,7 @@ program contrived
 
     call prif_sync_all()
 
-    call prif_deallocate_coarray([c_handle])
+    call prif_deallocate_coarray([c%handle])
 
     print *, "On image ", me, ", got ", d
 contains
@@ -123,16 +136,22 @@ contains
         integer(c_int), intent(out) :: stat
         character(len=:), intent(out), allocatable :: errmsg
 
-        type(my_type), pointer :: coarray_var
+        type(coarray_descriptor), pointer :: coarray_var
         type(c_ptr) :: context_data
 
         call prif_get_context_data(handle, context_data)
         call c_f_pointer(cptr = context_data, fptr = coarray_var)
-        if (associated(coarray_var%b)) then
-            call prif_deallocate(c_loc(coarray_var%b), stat, errmsg_alloc=errmsg)
+        if (coarray_var%local_data%b%is_allocated) then
+            call prif_deallocate(c_loc(coarray_var%local_data%b%elements), stat, errmsg_alloc=errmsg)
+            coarray_var%local_data%b%is_allocated = .false.
+            nullify(coarray_var%local_data%b%elements)
         else
             stat = 0
             errmsg = ""
+        end if
+        if (stat == 0) then
+            coarray_var%is_allocated = .false.
+            nullify(coarray_var%local_data)
         end if
     end subroutine
 end program
