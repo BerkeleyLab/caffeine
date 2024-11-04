@@ -55,6 +55,12 @@ program contrived
     real :: d
     integer :: i, me, neighbor
 
+    block
+        integer(c_int) :: stat
+        call prif_init(stat)
+        if (stat /= 0_c_int) error stop "initialization failed"
+    end block
+
     call prif_this_image_no_coarray(this_image=me)
 
     block
@@ -130,6 +136,8 @@ program contrived
     call prif_deallocate_coarray([c%handle])
 
     print *, "On image ", me, ", got ", d
+
+    call prif_stop(quiet=.false._c_bool)
 contains
     subroutine deallocate_components(handle, stat, errmsg) bind(C)
         type(prif_coarray_handle), pointer, intent(in) :: handle
