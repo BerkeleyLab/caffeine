@@ -126,4 +126,18 @@ contains
     call unimplemented("prif_fail_image")
   end procedure
 
+  subroutine run_callbacks(is_error_stop, quiet, stop_code_int, stop_code_char)
+    logical(c_bool), intent(in) :: is_error_stop, quiet
+    integer(c_int), intent(in), optional :: stop_code_int
+    character(len=*), intent(in), optional :: stop_code_char
+
+    type(callback_entry), pointer :: next_entry
+
+    next_entry => callback_list
+    do while (associated(next_entry))
+      call next_entry%callback(is_error_stop, quiet, stop_code_int, stop_code_char)
+      next_entry => next_entry%next
+    end do
+  end subroutine
+
 end submodule program_termination_s
