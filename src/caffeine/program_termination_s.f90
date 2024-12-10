@@ -25,6 +25,8 @@ contains
   end procedure
 
   module procedure prif_stop
+    call prif_sync_all
+    call run_callbacks(.false._c_bool, quiet, stop_code_int, stop_code_char)
 
     if (present(stop_code_char)) then
        call prif_stop_character(quiet, stop_code_char)
@@ -39,8 +41,6 @@ contains
       logical(c_bool), intent(in) :: quiet
       integer(c_int), intent(in), optional :: stop_code
       integer(c_int) :: exit_code
-
-      call prif_sync_all
 
       if (present(stop_code)) then
         if (.not. quiet) then
@@ -65,8 +65,6 @@ contains
       logical(c_bool), intent(in) :: quiet
       character(len=*), intent(in) :: stop_code
 
-      call prif_sync_all
-
       if (.not. quiet) then
         write(output_unit, *) "STOP '" // stop_code // "'"
         flush output_unit
@@ -79,6 +77,7 @@ contains
   end procedure prif_stop
 
   module procedure prif_error_stop
+    call run_callbacks(.true._c_bool, quiet, stop_code_int, stop_code_char)
     if (present(stop_code_char)) then
        call prif_error_stop_character(quiet, stop_code_char)
     else
