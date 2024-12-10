@@ -5,9 +5,23 @@ submodule(prif:prif_private_s) program_termination_s
   use iso_c_binding, only : c_char
   implicit none
 
+  type :: callback_entry
+    procedure(prif_stop_callback_interface), pointer, nopass :: callback
+    type(callback_entry), pointer :: next => null()
+  end type
+
+  type(callback_entry), pointer :: callback_list => null()
+
 contains
 
   module procedure prif_register_stop_callback
+    type(callback_entry), pointer :: new_entry
+    allocate(new_entry)
+    new_entry%callback => callback
+    if (associated(callback_list)) then
+      new_entry%next => callback_list
+    end if
+    callback_list => new_entry
   end procedure
 
   module procedure prif_stop
