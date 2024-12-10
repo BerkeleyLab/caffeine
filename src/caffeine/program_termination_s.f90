@@ -7,6 +7,9 @@ submodule(prif:prif_private_s) program_termination_s
 
 contains
 
+  module procedure prif_register_stop_callback
+  end procedure
+
   module procedure prif_stop
 
     if (present(stop_code_char)) then

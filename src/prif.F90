@@ -11,6 +11,7 @@ module prif
 
   private
   public :: prif_init
+  public :: prif_register_stop_callback, prif_stop_callback_interface
   public :: prif_stop, prif_error_stop, prif_fail_image
   public :: prif_allocate_coarray, prif_allocate, prif_deallocate_coarray, prif_deallocate
   public :: prif_put, prif_put_indirect, prif_get, prif_get_indirect, prif_put_with_notify, prif_put_with_notify_indirect
@@ -99,11 +100,27 @@ module prif
     type(team_data), pointer :: info => null()
   end type
 
+  abstract interface
+    subroutine prif_stop_callback_interface( &
+          is_error_stop, quiet, stop_code_int, stop_code_char)
+      import :: c_bool, c_int
+      implicit none
+      logical(c_bool), intent(in) :: is_error_stop, quiet
+      integer(c_int), intent(in), optional :: stop_code_int
+      character(len=*), intent(in), optional :: stop_code_char
+    end subroutine
+  end interface
+
   interface
 
     module subroutine prif_init(stat)
       implicit none
       integer(c_int), intent(out) :: stat
+    end subroutine
+
+    module subroutine prif_register_stop_callback(callback)
+      implicit none
+      procedure(prif_stop_callback_interface), pointer :: callback
     end subroutine
 
     module subroutine prif_stop(quiet, stop_code_int, stop_code_char)
