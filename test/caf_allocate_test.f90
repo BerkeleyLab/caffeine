@@ -5,7 +5,7 @@ module caf_allocate_test
       prif_coarray_handle, prif_num_images
   use veggies, only: result_t, test_item_t, assert_that, assert_equals, describe, it
   use iso_c_binding, only: &
-      c_ptr, c_int, c_intmax_t, c_size_t, c_funptr, c_null_funptr, &
+      c_ptr, c_int, c_int64_t, c_size_t, c_funptr, c_null_funptr, &
       c_f_pointer, c_null_ptr, c_loc, c_sizeof
 
   implicit none
@@ -32,9 +32,7 @@ contains
     ! Allocate memory for an integer scalar single corank coarray, such as the following decl
     ! integer :: coarr[*]
 
-    integer(kind=c_intmax_t), dimension(1) :: lcobounds, ucobounds
-    integer(kind=c_intmax_t), dimension(0), parameter :: lbounds = [integer(kind=c_intmax_t) ::]
-    integer(kind=c_intmax_t), dimension(0), parameter :: ubounds = [integer(kind=c_intmax_t) ::]
+    integer(kind=c_int64_t), dimension(1) :: lcobounds, ucobounds
     integer :: dummy_element, num_imgs
     type(prif_coarray_handle) :: coarray_handle
     type(c_ptr) :: allocated_memory
@@ -49,7 +47,7 @@ contains
     result_ = assert_that(.not.associated(local_slice))
 
     call prif_allocate_coarray( &
-      lcobounds, ucobounds, lbounds, ubounds, int(storage_size(dummy_element)/8, c_size_t), c_null_funptr, &
+      lcobounds, ucobounds, int(storage_size(dummy_element)/8, c_size_t), c_null_funptr, &
       coarray_handle, allocated_memory)
 
     call c_f_pointer(allocated_memory, local_slice)

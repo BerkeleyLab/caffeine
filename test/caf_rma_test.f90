@@ -1,6 +1,6 @@
 module caf_rma_test
     use iso_c_binding, only: &
-            c_ptr, c_intmax_t, c_intptr_t, c_size_t, c_null_funptr, c_f_pointer, c_loc, c_sizeof
+            c_ptr, c_int64_t, c_intptr_t, c_size_t, c_null_funptr, c_f_pointer, c_loc, c_sizeof
     use prif, only: &
             prif_coarray_handle, &
             prif_allocate_coarray, &
@@ -40,7 +40,7 @@ contains
         type(prif_coarray_handle) :: coarray_handle
         type(c_ptr) :: allocated_memory
         integer, pointer :: local_slice
-        integer(c_intmax_t) :: lcobounds(1), ucobounds(1)
+        integer(c_int64_t) :: lcobounds(1), ucobounds(1)
 
         call prif_num_images(num_images=num_imgs)
         lcobounds(1) = 1
@@ -48,9 +48,7 @@ contains
         call prif_allocate_coarray( &
                 lcobounds = lcobounds, &
                 ucobounds = ucobounds, &
-                lbounds = [integer(c_intmax_t)::], &
-                ubounds = [integer(c_intmax_t)::], &
-                element_size = int(storage_size(dummy_element)/8, c_size_t), &
+                size_in_bytes = int(storage_size(dummy_element)/8, c_size_t), &
                 final_func = c_null_funptr, &
                 coarray_handle = coarray_handle, &
                 allocated_memory = allocated_memory)
@@ -87,7 +85,7 @@ contains
         type(prif_coarray_handle) :: coarray_handle
         type(c_ptr) :: allocated_memory
         type(my_type), pointer :: local_slice
-        integer(c_intmax_t) :: lcobounds(1), ucobounds(1)
+        integer(c_int64_t) :: lcobounds(1), ucobounds(1)
         integer(c_intptr_t) :: base_addr
 
         call prif_num_images(num_images=num_imgs)
@@ -96,9 +94,7 @@ contains
         call prif_allocate_coarray( &
                 lcobounds = lcobounds, &
                 ucobounds = ucobounds, &
-                lbounds = [integer(c_intmax_t)::], &
-                ubounds = [integer(c_intmax_t)::], &
-                element_size = int(storage_size(dummy_element)/8, c_size_t), &
+                size_in_bytes = int(storage_size(dummy_element)/8, c_size_t), &
                 final_func = c_null_funptr, &
                 coarray_handle = coarray_handle, &
                 allocated_memory = allocated_memory)
@@ -141,7 +137,7 @@ contains
         type(prif_coarray_handle) :: coarray_handle
         type(c_ptr) :: allocated_memory
         integer, pointer :: local_slice
-        integer(c_intmax_t) :: lcobounds(1), ucobounds(1)
+        integer(c_int64_t) :: lcobounds(1), ucobounds(1)
 
         call prif_num_images(num_images=num_imgs)
         lcobounds(1) = 1
@@ -149,9 +145,7 @@ contains
         call prif_allocate_coarray( &
                 lcobounds = lcobounds, &
                 ucobounds = ucobounds, &
-                lbounds = [integer(c_intmax_t)::], &
-                ubounds = [integer(c_intmax_t)::], &
-                element_size = int(storage_size(dummy_element)/8, c_size_t), &
+                size_in_bytes = int(storage_size(dummy_element)/8, c_size_t), &
                 final_func = c_null_funptr, &
                 coarray_handle = coarray_handle, &
                 allocated_memory = allocated_memory)
@@ -189,7 +183,7 @@ contains
         type(prif_coarray_handle) :: coarray_handle
         type(c_ptr) :: allocated_memory
         type(my_type), pointer :: local_slice
-        integer(c_intmax_t) :: lcobounds(1), ucobounds(1)
+        integer(c_int64_t) :: lcobounds(1), ucobounds(1)
         integer(c_intptr_t) :: base_addr
 
         call prif_num_images(num_images=num_imgs)
@@ -198,9 +192,7 @@ contains
         call prif_allocate_coarray( &
                 lcobounds = lcobounds, &
                 ucobounds = ucobounds, &
-                lbounds = [integer(c_intmax_t)::], &
-                ubounds = [integer(c_intmax_t)::], &
-                element_size = int(storage_size(dummy_element)/8, c_size_t), &
+                size_in_bytes = int(storage_size(dummy_element)/8, c_size_t), &
                 final_func = c_null_funptr, &
                 coarray_handle = coarray_handle, &
                 allocated_memory = allocated_memory)

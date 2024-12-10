@@ -1,5 +1,5 @@
 module caf_teams_test
-    use iso_c_binding, only: c_size_t, c_ptr, c_intmax_t, c_null_funptr
+    use iso_c_binding, only: c_size_t, c_ptr, c_intmax_t, c_null_funptr, c_int64_t
     use prif, only: &
             prif_coarray_handle, &
             prif_allocate_coarray, &
@@ -50,11 +50,9 @@ contains
                     "Team has correct number of images")
             do i = 1, num_coarrays
                 call prif_allocate_coarray( &
-                    lcobounds = [1_c_intmax_t], &
-                    ucobounds = [int(num_imgs, c_intmax_t)], &
-                    lbounds = [integer(c_intmax_t)::], &
-                    ubounds = [integer(c_intmax_t)::], &
-                    element_size = element_size, &
+                    lcobounds = [1_c_int64_t], &
+                    ucobounds = [int(num_imgs, c_int64_t)], &
+                    size_in_bytes = element_size, &
                     final_func = c_null_funptr, &
                     coarray_handle = coarrays(i), &
                     allocated_memory = allocated_memory)
