@@ -15,6 +15,7 @@ contains
                 [ it("exits with a zero exitstat when the program omits the stop code", exit_with_no_stop_code) &
                  ,it("prints an integer stop code and exits with exitstat equal to the stop code", exit_with_integer_stop_code) &
                  ,it("prints a character stop code and exits with a non-zero exitstat", exit_with_character_stop_code) &
+                 ,it("invokes a registered callback", check_callback_invocation) &
                 ])
     end function
 
@@ -55,6 +56,19 @@ contains
         )   
         result_ = assert_equals(0, exit_status) ! the standard recommends zero exit status for character stop codes
 
+    end function
+
+    function check_callback_invocation() result(result_)
+      type(result_t) :: result_
+
+      integer :: exit_status
+
+      call execute_command_line( &
+        command = "./build/run-fpm.sh run --example register_stop_callback > /dev/null 2>&1", &
+        wait = .true., &
+        exitstat = exit_status &
+      )
+      result_ = assert_equals(0, exit_status)
     end function
 
 end module caf_stop_test

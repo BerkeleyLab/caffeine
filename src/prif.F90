@@ -120,7 +120,7 @@ module prif
 
     module subroutine prif_register_stop_callback(callback)
       implicit none
-      procedure(prif_stop_callback_interface), pointer :: callback
+      procedure(prif_stop_callback_interface), pointer, intent(in) :: callback
     end subroutine
 
     module subroutine prif_stop(quiet, stop_code_int, stop_code_char)
