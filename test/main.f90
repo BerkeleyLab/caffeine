@@ -36,6 +36,9 @@ contains
         use caf_co_sum_test, only: &
                 caf_co_sum_prif_co_sum => &
                     test_prif_co_sum
+        use caf_coarray_inquiry_test, only: &
+                caf_coarray_inquiry_coarray_inquiry => &
+                    test_coarray_inquiry
         use caf_error_stop_test, only: &
                 caf_error_stop_prif_this_image => &
                     test_prif_this_image
@@ -64,7 +67,7 @@ contains
         logical :: passed
 
         type(test_item_t) :: tests
-        type(test_item_t) :: individual_tests(14)
+        type(test_item_t) :: individual_tests(15)
 
         individual_tests(1) = a00_caffeinate_caffeinate()
         individual_tests(2) = caf_allocate_prif_allocate()
@@ -73,13 +76,14 @@ contains
         individual_tests(5) = caf_co_min_prif_co_min()
         individual_tests(6) = caf_co_reduce_prif_co_reduce()
         individual_tests(7) = caf_co_sum_prif_co_sum()
-        individual_tests(8) = caf_error_stop_prif_this_image()
-        individual_tests(9) = caf_image_index_prif_image_index()
-        individual_tests(10) = caf_num_images_prif_num_images()
-        individual_tests(11) = caf_rma_prif_rma()
-        individual_tests(12) = caf_stop_prif_this_image()
-        individual_tests(13) = caf_teams_caf_teams()
-        individual_tests(14) = caf_this_image_prif_this_image_no_coarray()
+        individual_tests(8) = caf_coarray_inquiry_coarray_inquiry()
+        individual_tests(9) = caf_error_stop_prif_this_image()
+        individual_tests(10) = caf_image_index_prif_image_index()
+        individual_tests(11) = caf_num_images_prif_num_images()
+        individual_tests(12) = caf_rma_prif_rma()
+        individual_tests(13) = caf_stop_prif_this_image()
+        individual_tests(14) = caf_teams_caf_teams()
+        individual_tests(15) = caf_this_image_prif_this_image_no_coarray()
         tests = test_that(individual_tests)
 
 
