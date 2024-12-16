@@ -24,7 +24,7 @@ module prif
   public :: prif_this_image_no_coarray, prif_this_image_with_coarray, prif_this_image_with_dim
   public :: prif_num_images, prif_num_images_with_team, prif_num_images_with_team_number
   public :: prif_failed_images, prif_stopped_images, prif_image_status
-  public :: prif_set_context_data, prif_get_context_data, prif_size_bytes
+  public :: prif_local_data_pointer, prif_set_context_data, prif_get_context_data, prif_size_bytes
   public :: prif_co_sum, prif_co_max, prif_co_min, prif_co_reduce, prif_co_broadcast
   public :: prif_form_team, prif_change_team, prif_end_team, prif_get_team, prif_team_number
   public :: prif_sync_all, prif_sync_images, prif_sync_team, prif_sync_memory
@@ -532,6 +532,11 @@ module prif
       integer(c_int), intent(in) :: image
       type(prif_team_type), intent(in), optional :: team
       integer(c_int), intent(out) :: image_status
+    end subroutine
+
+    module subroutine prif_local_data_pointer(coarray_handle, local_data)
+      type(prif_coarray_handle), intent(in) :: coarray_handle
+      type(c_ptr), intent(out) :: local_data
     end subroutine
 
     module subroutine prif_set_context_data(coarray_handle, context_data)
