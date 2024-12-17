@@ -5,7 +5,7 @@
 
 module prif
 
-  use iso_c_binding, only: c_int, c_bool, c_intptr_t, c_intmax_t, c_ptr, c_funptr, c_size_t, c_ptrdiff_t, c_null_ptr
+  use iso_c_binding, only: c_int, c_bool, c_intptr_t, c_intmax_t, c_ptr, c_funptr, c_size_t, c_ptrdiff_t, c_null_ptr, c_int64_t
 
   implicit none
 
@@ -92,7 +92,7 @@ module prif
 
   type, public :: prif_coarray_handle
     private
-    type(handle_data), pointer :: info
+    type(prif_coarray_descriptor), pointer :: info
   end type
 
   type, public :: prif_team_type
@@ -142,12 +142,11 @@ module prif
     end subroutine
 
     module subroutine prif_allocate_coarray( &
-        lcobounds, ucobounds, lbounds, ubounds, element_size, final_func, coarray_handle, &
+        lcobounds, ucobounds, size_in_bytes, final_func, coarray_handle, &
         allocated_memory, stat, errmsg, errmsg_alloc)
       implicit none
-      integer(c_intmax_t), dimension(:), intent(in) :: lcobounds, ucobounds
-      integer(c_intmax_t), dimension(:), intent(in) :: lbounds, ubounds
-      integer(c_size_t), intent(in) :: element_size
+      integer(c_int64_t), dimension(:), intent(in) :: lcobounds, ucobounds
+      integer(c_size_t), intent(in) :: size_in_bytes
       type(c_funptr), intent(in) :: final_func
       type(prif_coarray_handle), intent(out) :: coarray_handle
       type(c_ptr), intent(out) :: allocated_memory
@@ -1042,12 +1041,11 @@ module prif
 
 ! Type definitions only relevant to Caffeine internals
 
-  type, private, bind(C) :: handle_data
+  type, private, bind(C) :: prif_coarray_descriptor
     private
     type(c_ptr) :: coarray_data
     integer(c_int) :: corank
     integer(c_size_t) :: coarray_size
-    integer(c_size_t) :: element_size
     type(c_funptr) :: final_func
     type(c_ptr) :: previous_handle = c_null_ptr, next_handle = c_null_ptr
     integer(c_intmax_t) :: lcobounds(15), ucobounds(15)
@@ -1059,7 +1057,7 @@ module prif
     integer(c_intptr_t) :: heap_start
     integer(c_size_t) :: heap_size
     type(team_data), pointer :: parent_team => null()
-    type(handle_data), pointer :: coarrays => null()
+    type(prif_coarray_descriptor), pointer :: coarrays => null()
     type(child_team_info), pointer :: child_heap_info => null()
   end type
 

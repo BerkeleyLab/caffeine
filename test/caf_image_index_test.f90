@@ -1,5 +1,5 @@
 module caf_image_index_test
-    use iso_c_binding, only: c_int, c_intmax_t, c_ptr, c_size_t, c_null_funptr
+    use iso_c_binding, only: c_int, c_intmax_t, c_ptr, c_size_t, c_null_funptr, c_int64_t
     use prif, only: prif_coarray_handle, prif_allocate_coarray, prif_deallocate_coarray, prif_image_index, prif_num_images
     use veggies, only: result_t, test_item_t, assert_equals, describe, it
 
@@ -27,11 +27,9 @@ contains
         integer(c_int) :: answer
 
         call prif_allocate_coarray( &
-                lcobounds = [1_c_intmax_t], &
-                ucobounds = [2_c_intmax_t], &
-                lbounds = [integer(c_intmax_t)::], &
-                ubounds = [integer(c_intmax_t)::], &
-                element_size = 1_c_size_t, &
+                lcobounds = [1_c_int64_t], &
+                ucobounds = [2_c_int64_t], &
+                size_in_bytes = 1_c_size_t, &
                 final_func = c_null_funptr, &
                 coarray_handle = coarray_handle, &
                 allocated_memory = allocated_memory)
@@ -48,11 +46,9 @@ contains
         integer(c_int) :: answer
 
         call prif_allocate_coarray( &
-                lcobounds = [2_c_intmax_t, 3_c_intmax_t], &
-                ucobounds = [3_c_intmax_t, 4_c_intmax_t], &
-                lbounds = [integer(c_intmax_t)::], &
-                ubounds = [integer(c_intmax_t)::], &
-                element_size = 1_c_size_t, &
+                lcobounds = [2_c_int64_t, 3_c_int64_t], &
+                ucobounds = [3_c_int64_t, 4_c_int64_t], &
+                size_in_bytes = 1_c_size_t, &
                 final_func = c_null_funptr, &
                 coarray_handle = coarray_handle, &
                 allocated_memory = allocated_memory)
@@ -69,11 +65,9 @@ contains
         integer(c_int) :: answer
 
         call prif_allocate_coarray( &
-                lcobounds = [-2_c_intmax_t, 2_c_intmax_t], &
-                ucobounds = [2_c_intmax_t, 6_c_intmax_t], &
-                lbounds = [integer(c_intmax_t)::], &
-                ubounds = [integer(c_intmax_t)::], &
-                element_size = 1_c_size_t, &
+                lcobounds = [-2_c_int64_t, 2_c_int64_t], &
+                ucobounds = [2_c_int64_t, 6_c_int64_t], &
+                size_in_bytes = 1_c_size_t, &
                 final_func = c_null_funptr, &
                 coarray_handle = coarray_handle, &
                 allocated_memory = allocated_memory)
@@ -91,11 +85,9 @@ contains
 
         call prif_num_images(num_images=ni)
         call prif_allocate_coarray( &
-                lcobounds = [1_c_intmax_t, 2_c_intmax_t], &
-                ucobounds = [2_c_intmax_t, 3_c_intmax_t], &
-                lbounds = [integer(c_intmax_t)::], &
-                ubounds = [integer(c_intmax_t)::], &
-                element_size = 1_c_size_t, &
+                lcobounds = [1_c_int64_t, 2_c_int64_t], &
+                ucobounds = [2_c_int64_t, 3_c_int64_t], &
+                size_in_bytes = 1_c_size_t, &
                 final_func = c_null_funptr, &
                 coarray_handle = coarray_handle, &
                 allocated_memory = allocated_memory)
