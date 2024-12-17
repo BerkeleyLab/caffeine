@@ -28,7 +28,7 @@ contains
 
   function alphabetically_1st_size1_string_array() result(result_)
     type(result_t) result_
-    character(len=*, kind=c_char), parameter :: names(*) = ["larry","harry","carey","betty","tommy","billy"]
+    character(len=5, kind=c_char), parameter :: names(*) = ["larry","harry","carey","betty","tommy","billy"]
     character(len=len(names), kind=c_char) :: my_name(1)
     character(len=len(names)) :: expected_name
     integer :: me, num_imgs
@@ -46,8 +46,8 @@ contains
   contains
 
     function alphabetize(lhs, rhs) result(first_alphabetically)
-      character(len=len(names)), intent(in) :: lhs, rhs
-      character(len=len(names)) :: first_alphabetically
+      character(len=5), intent(in) :: lhs, rhs
+      character(len=5) :: first_alphabetically
 
       first_alphabetically = min(lhs,rhs)
     end function
