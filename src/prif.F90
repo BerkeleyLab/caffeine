@@ -428,8 +428,8 @@ module prif
     module subroutine prif_alias_create(source_handle, alias_lcobounds, alias_ucobounds, alias_handle)
       implicit none
       type(prif_coarray_handle), intent(in) :: source_handle
-      integer(c_intmax_t), intent(in) :: alias_lcobounds(:)
-      integer(c_intmax_t), intent(in) :: alias_ucobounds(:)
+      integer(c_int64_t), intent(in) :: alias_lcobounds(:)
+      integer(c_int64_t), intent(in) :: alias_ucobounds(:)
       type(prif_coarray_handle), intent(out) :: alias_handle
     end subroutine
 
@@ -442,26 +442,26 @@ module prif
       implicit none
       type(prif_coarray_handle), intent(in) :: coarray_handle
       integer(c_int), intent(in) :: dim
-      integer(c_intmax_t), intent(out) :: lcobound
+      integer(c_int64_t), intent(out) :: lcobound
     end subroutine
 
     module subroutine prif_lcobound_no_dim(coarray_handle, lcobounds)
       implicit none
       type(prif_coarray_handle), intent(in) :: coarray_handle
-      integer(c_intmax_t), intent(out) :: lcobounds(:)
+      integer(c_int64_t), intent(out) :: lcobounds(:)
     end subroutine
 
     module subroutine prif_ucobound_with_dim(coarray_handle, dim, ucobound)
       implicit none
       type(prif_coarray_handle), intent(in) :: coarray_handle
       integer(c_int), intent(in) :: dim
-      integer(c_intmax_t), intent(out) :: ucobound
+      integer(c_int64_t), intent(out) :: ucobound
     end subroutine
 
     module subroutine prif_ucobound_no_dim(coarray_handle, ucobounds)
       implicit none
       type(prif_coarray_handle), intent(in) :: coarray_handle
-      integer(c_intmax_t), intent(out) :: ucobounds(:)
+      integer(c_int64_t), intent(out) :: ucobounds(:)
     end subroutine
 
     module subroutine prif_coshape(coarray_handle, sizes)
@@ -473,14 +473,14 @@ module prif
     module subroutine prif_image_index(coarray_handle, sub, image_index)
       implicit none
       type(prif_coarray_handle), intent(in) :: coarray_handle
-      integer(c_intmax_t), intent(in) :: sub(:)
+      integer(c_int64_t), intent(in) :: sub(:)
       integer(c_int), intent(out) :: image_index
     end subroutine
 
     module subroutine prif_image_index_with_team(coarray_handle, sub, team, image_index)
       implicit none
       type(prif_coarray_handle), intent(in) :: coarray_handle
-      integer(c_intmax_t), intent(in) :: sub(:)
+      integer(c_int64_t), intent(in) :: sub(:)
       type(prif_team_type), intent(in) :: team
       integer(c_int), intent(out) :: image_index
     end subroutine
@@ -488,7 +488,7 @@ module prif
     module subroutine prif_image_index_with_team_number(coarray_handle, sub, team_number, image_index)
       implicit none
       type(prif_coarray_handle), intent(in) :: coarray_handle
-      integer(c_intmax_t), intent(in) :: sub(:)
+      integer(c_int64_t), intent(in) :: sub(:)
       integer(c_int), intent(in) :: team_number
       integer(c_int), intent(out) :: image_index
     end subroutine
