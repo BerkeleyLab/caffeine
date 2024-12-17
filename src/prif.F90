@@ -506,7 +506,7 @@ module prif
 
     module subroutine prif_num_images_with_team_number(team_number, num_images)
       implicit none
-      integer(c_intmax_t), intent(in) :: team_number
+      integer(c_int64_t), intent(in) :: team_number
       integer(c_int), intent(out) :: num_images
     end subroutine
 
@@ -520,7 +520,7 @@ module prif
       implicit none
       type(prif_coarray_handle), intent(in) :: coarray_handle
       type(prif_team_type), intent(in), optional :: team
-      integer(c_intmax_t), intent(out) :: cosubscripts(:)
+      integer(c_int64_t), intent(out) :: cosubscripts(:)
     end subroutine
 
     module subroutine prif_this_image_with_dim(coarray_handle, dim, team, cosubscript)
@@ -528,7 +528,7 @@ module prif
       type(prif_coarray_handle), intent(in) :: coarray_handle
       integer(c_int), intent(in) :: dim
       type(prif_team_type), intent(in), optional :: team
-      integer(c_intmax_t), intent(out) :: cosubscript
+      integer(c_int64_t), intent(out) :: cosubscript
     end subroutine
 
     module subroutine prif_failed_images(team, failed_images)
@@ -621,7 +621,7 @@ module prif
 
     module subroutine prif_form_team(team_number, team, new_index, stat, errmsg, errmsg_alloc)
       implicit none
-      integer(c_intmax_t), intent(in) :: team_number
+      integer(c_int64_t), intent(in) :: team_number
       type(prif_team_type), intent(out) :: team
       integer(c_int), intent(in), optional :: new_index
       integer(c_int), intent(out), optional :: stat
@@ -653,7 +653,7 @@ module prif
     module subroutine prif_team_number(team, team_number)
       implicit none
       type(prif_team_type), intent(in), optional :: team
-      integer(c_intmax_t), intent(out) :: team_number
+      integer(c_int64_t), intent(out) :: team_number
     end subroutine
 
     module subroutine prif_sync_all(stat, errmsg, errmsg_alloc)
