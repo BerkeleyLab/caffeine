@@ -105,37 +105,22 @@ contains
 
     function min_elements_in_2D_string_arrays() result(result_)
       type(result_t) result_
-      character(len=*), parameter :: script(*) = &
-        [character(len=len("the question.")) :: "To be ","or not"," to ","be.","  That is ","the question."]
-      character(len=len(script)), dimension(3,2) :: scramlet, co_min_scramlet
-      integer i, cyclic_permutation(size(script)), me
+      character(len=*), parameter :: script(*,*,*) = reshape( &
+          [ "To be   ","or not  " &
+          , "to      ","be.     " &
+
+          , "that    ","is      " &
+          , "the     ","question"], &
+          [2,2,2])
+      character(len=len(script)), dimension(size(script,1),size(script,2)) :: scramlet, expected
+      integer me, ni
 
       call prif_this_image_no_coarray(this_image=me)
-      associate(cyclic_permutation => [(1 + mod(i-1,size(script)), i=me, me+size(script) )])
-        scramlet = reshape(script(cyclic_permutation), shape(scramlet))
-      end associate
-
-      co_min_scramlet = scramlet
-      call prif_co_min(co_min_scramlet, result_image=1)
-
-      block
-        integer j, delta_j, num_imgs
-        character(len=len(script)) expected_script(size(script)), expected_scramlet(size(scramlet,1),size(scramlet,2))
-
-        call prif_num_images(num_images=num_imgs)
-        do j=1, size(script)
-          expected_script(j) = script(j)
-          do delta_j = 1, min(num_imgs-1, size(script))
-            associate(periodic_index => 1 + mod(j+delta_j-1, size(script)))
-              expected_script(j) = min(expected_script(j), script(periodic_index))
-            end associate
-          end do
-        end do
-        expected_scramlet = reshape(expected_script, shape(scramlet))
-
-        result_ =  assert_that(all(scramlet == co_min_scramlet),"all(scramlet == co_min_scramlet)")
-      end block
-
+      call prif_num_images(ni)
+      scramlet = script(:,:,mod(me,size(script,3))+1)
+      call prif_co_min(scramlet)
+      expected = minval(script(:,:,1:min(ni,size(script,3))), dim=3)
+      result_ = assert_that(all(expected == scramlet),"all(expected == scramlet)")
     end function
 
     function alphabetically_1st_scalar_string() result(result_)
