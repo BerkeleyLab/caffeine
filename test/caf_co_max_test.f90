@@ -20,7 +20,7 @@ contains
            ,it("double precision 2D array elements with no optional arguments present", max_double_precision_2D_array) &
            ,it("reverse-alphabetizes length-5 default character scalars with no optional arguments", &
                reverse_alphabetize_default_character_scalars) &
-           ,it("elements across images with 3D arrays of strings", max_elements_in_3D_string_arrays) &
+           ,it("elements across images with 2D arrays of strings", max_elements_in_2D_string_arrays) &
         ])
     end function
 
@@ -101,38 +101,24 @@ contains
         result_ = assert_that(all(array==tent))
     end function
 
-    function max_elements_in_3D_string_arrays() result(result_)
+    function max_elements_in_2D_string_arrays() result(result_)
       type(result_t) result_
-      character(len=*), parameter :: script(*) = ["To be ","or not","to    ","be.   "]
-      character(len=len(script)), dimension(2,1,2) :: scramlet, co_max_scramlet
-      integer i, cyclic_permutation(size(script)), me
+      character(len=*), parameter :: script(*,*,*) = reshape( &
+          [ "To be   ","or not  " &
+          , "to      ","be.     " &
+
+          , "that    ","is      " &
+          , "the     ","question"], &
+          [2,2,2])
+      character(len=len(script)), dimension(size(script,1),size(script,2)) :: scramlet, expected
+      integer me, ni
 
       call prif_this_image_no_coarray(this_image=me)
-      associate(cyclic_permutation => [(1 + mod(i-1,size(script)), i=me, me+size(script) )])
-        scramlet = reshape(script(cyclic_permutation), shape(scramlet))
-      end associate
-
-      co_max_scramlet = scramlet
-      call prif_co_max(co_max_scramlet, result_image=1)
-
-      block
-        integer j, delta_j, num_imgs
-        character(len=len(script)) expected_script(size(script)), expected_scramlet(size(scramlet,1),size(scramlet,2))
-
-        call prif_num_images(num_images=num_imgs)
-        do j=1, size(script)
-          expected_script(j) = script(j)
-          do delta_j = 1, max(num_imgs-1, size(script))
-            associate(periodic_index => 1 + mod(j+delta_j-1, size(script)))
-              expected_script(j) = max(expected_script(j), script(periodic_index))
-            end associate
-          end do
-        end do
-        expected_scramlet = reshape(expected_script, shape(expected_scramlet))
-
-        result_ =  assert_that(all(scramlet == co_max_scramlet),"all(scramlet == co_max_scramlet)")
-      end block
-
+      call prif_num_images(ni)
+      scramlet = script(:,:,mod(me,size(script,3))+1)
+      call prif_co_max(scramlet)
+      expected = maxval(script(:,:,1:min(ni,size(script,3))), dim=3)
+      result_ = assert_that(all(expected == scramlet),"all(expected == scramlet)")
     end function
 
     function reverse_alphabetize_default_character_scalars() result(result_)
