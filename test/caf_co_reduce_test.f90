@@ -29,31 +29,26 @@ contains
   function alphabetically_1st_size1_string_array() result(result_)
     type(result_t) result_
     character(len=*, kind=c_char), parameter :: names(*) = ["larry","harry","carey","betty","tommy","billy"]
-    character(len=:, kind=c_char), allocatable :: my_name(:)
-    character(len=:), allocatable :: expected_name
+    character(len=len(names), kind=c_char) :: my_name(1)
+    character(len=len(names)) :: expected_name
     integer :: me, num_imgs
 
     call prif_this_image_no_coarray(this_image=me)
     associate(periodic_index => 1 + mod(me-1,size(names)))
-      my_name = [names(periodic_index)]
+      my_name(1) = names(periodic_index)
       call prif_co_reduce(my_name, c_funloc(alphabetize))
     end associate
 
     call prif_num_images(num_images=num_imgs)
-    !expected_name = minval(names(1:min(num_imgs, size(names)))) ! this exposes a flang bug
-    expected_name = "betty"
+    expected_name = minval(names(1:min(num_imgs, size(names))), dim=1)
     result_ = assert_that(all(expected_name == my_name))
 
   contains
 
     function alphabetize(lhs, rhs) result(first_alphabetically)
-      character(len=*), intent(in) :: lhs, rhs
-      character(len=:), allocatable :: first_alphabetically
+      character(len=len(names)), intent(in) :: lhs, rhs
+      character(len=len(names)) :: first_alphabetically
 
-      if (len(lhs).ne.len(rhs)) then
-        call prif_error_stop(quiet=.false._c_bool, &
-          stop_code_char="co_reduce_s alphabetize: LHS(" // lhs // ")/RHS(" // rhs // ") length don't match")
-      end if
       first_alphabetically = min(lhs,rhs)
     end function
 

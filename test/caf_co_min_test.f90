@@ -127,7 +127,7 @@ contains
       type(result_t) result_
       integer, parameter :: length = len("to party!")
       character(len=length), parameter :: words(*) = [character(len=length):: "Loddy","doddy","we","like","to party!"]
-      character(len=:), allocatable :: my_word, expected_word
+      character(len=length) :: my_word, expected_word
       integer :: me, num_imgs
 
       call prif_this_image_no_coarray(this_image=me)
@@ -137,8 +137,7 @@ contains
       end associate
 
       call prif_num_images(num_images=num_imgs)
-      ! expected_word = minval(words(1:min(num_imgs, size(words)))) ! this line exposes a flang bug
-      expected_word = "Loddy"
+      expected_word = minval(words(1:min(num_imgs, size(words))), dim=1)
       result_ = assert_equals(expected_word, my_word)
     end function
 

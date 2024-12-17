@@ -124,8 +124,8 @@ contains
     function reverse_alphabetize_default_character_scalars() result(result_)
       type(result_t) result_
       integer, parameter :: length = len("loddy")
-      character(len=length), parameter :: words(*) = [character(len=length):: "loddy","doddy","we","like","to","party"]
-      character(len=:), allocatable :: my_word, expected_word
+      character(len=*), parameter :: words(*) = [character(len=length):: "loddy","doddy","we","like","to","party"]
+      character(len=len(words)) :: my_word, expected_word
       integer :: me, num_imgs
 
       call prif_this_image_no_coarray(this_image=me)
@@ -135,8 +135,7 @@ contains
       end associate
 
       call prif_num_images(num_imgs)
-      !expected_word = maxval(words(1:min(num_imgs, size(words)))) ! this line crashes flang
-      expected_word = "we"
+      expected_word = maxval(words(1:min(num_imgs, size(words))), dim=1)
       result_ = assert_equals(expected_word, my_word)
     end function
 
