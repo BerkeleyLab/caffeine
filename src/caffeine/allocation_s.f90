@@ -20,9 +20,9 @@ contains
     integer :: me
     type(c_ptr) :: whole_block
     integer(c_ptrdiff_t) :: block_offset
-    integer(c_size_t) :: handle_size, total_size
-    type(handle_data) :: unused
-    type(handle_data), pointer :: unused2(:)
+    integer(c_size_t) :: descriptor_size, total_size
+    type(prif_coarray_descriptor) :: unused
+    type(prif_coarray_descriptor), pointer :: unused2(:)
 
     me = caf_this_image(current_team%info%gex_team)
     if (caf_have_child_teams()) then
@@ -32,8 +32,8 @@ contains
       end if
     end if
     if (me == 1) then
-      handle_size = c_sizeof(unused)
-      total_size = handle_size + size_in_bytes
+      descriptor_size = c_sizeof(unused)
+      total_size = descriptor_size + size_in_bytes
       whole_block = caf_allocate(current_team%info%heap_mspace, total_size)
       block_offset = as_int(whole_block) - current_team%info%heap_start
     else
@@ -149,7 +149,7 @@ contains
   subroutine remove_from_team_list(coarray_handle)
     type(prif_coarray_handle), intent(in) :: coarray_handle
 
-    type(handle_data), pointer :: tmp_data
+    type(prif_coarray_descriptor), pointer :: tmp_data
 
     if (&
         .not.c_associated(coarray_handle%info%previous_handle) &

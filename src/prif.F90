@@ -92,7 +92,7 @@ module prif
 
   type, public :: prif_coarray_handle
     private
-    type(handle_data), pointer :: info
+    type(prif_coarray_descriptor), pointer :: info
   end type
 
   type, public :: prif_team_type
@@ -1041,7 +1041,7 @@ module prif
 
 ! Type definitions only relevant to Caffeine internals
 
-  type, private, bind(C) :: handle_data
+  type, private, bind(C) :: prif_coarray_descriptor
     private
     type(c_ptr) :: coarray_data
     integer(c_int) :: corank
@@ -1057,7 +1057,7 @@ module prif
     integer(c_intptr_t) :: heap_start
     integer(c_size_t) :: heap_size
     type(team_data), pointer :: parent_team => null()
-    type(handle_data), pointer :: coarrays => null()
+    type(prif_coarray_descriptor), pointer :: coarrays => null()
     type(child_team_info), pointer :: child_heap_info => null()
   end type
 
