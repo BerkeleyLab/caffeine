@@ -273,7 +273,9 @@ fi
 echo "PKG_CONFIG_PATH=$PKG_CONFIG_PATH"
 
 FPM_FC="$($REALPATH $(command -v $FC))"
-FPM_FC=${FPM_FC/flang-20/flang-new}
+if [[ $FPM_FC == *flang* ]]; then
+  FPM_FC=${FPM_FC/flang-20/flang-new}
+fi
 FPM_CC="$($REALPATH $(command -v $CC))"
 
 ask_package_permission()
