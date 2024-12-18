@@ -287,8 +287,10 @@ size_t caf_elem_len(CFI_cdesc_t* a_desc)
   return a_desc->elem_len;
 }
 
-void caf_form_team(gex_TM_t current_team, gex_TM_t* new_team, intmax_t team_number, int new_index)
+void caf_form_team(gex_TM_t current_team, gex_TM_t* new_team, int64_t team_number, int new_index)
 {
+   // GASNet color argument is int (32-bit), check for value truncation:
+  assert((unsigned int)team_number == team_number);
   gex_TM_Split(new_team, current_team, team_number, new_index, NULL, 0, GEX_FLAG_TM_NO_SCRATCH);
 }
 

@@ -1,5 +1,5 @@
 module caf_image_index_test
-    use iso_c_binding, only: c_int, c_intmax_t, c_ptr, c_size_t, c_null_funptr, c_int64_t
+    use iso_c_binding, only: c_int, c_ptr, c_size_t, c_null_funptr, c_int64_t
     use prif, only: prif_coarray_handle, prif_allocate_coarray, prif_deallocate_coarray, prif_image_index, prif_num_images
     use veggies, only: result_t, test_item_t, assert_equals, describe, it
 
@@ -33,7 +33,7 @@ contains
                 final_func = c_null_funptr, &
                 coarray_handle = coarray_handle, &
                 allocated_memory = allocated_memory)
-        call prif_image_index(coarray_handle, [1_c_intmax_t], image_index=answer)
+        call prif_image_index(coarray_handle, [1_c_int64_t], image_index=answer)
         result_ = assert_equals(1_c_int, answer)
         call prif_deallocate_coarray([coarray_handle])
     end function
@@ -52,7 +52,7 @@ contains
                 final_func = c_null_funptr, &
                 coarray_handle = coarray_handle, &
                 allocated_memory = allocated_memory)
-        call prif_image_index(coarray_handle, [2_c_intmax_t, 3_c_intmax_t], image_index=answer)
+        call prif_image_index(coarray_handle, [2_c_int64_t, 3_c_int64_t], image_index=answer)
         result_ = assert_equals(1_c_int, answer)
         call prif_deallocate_coarray([coarray_handle])
     end function
@@ -71,7 +71,7 @@ contains
                 final_func = c_null_funptr, &
                 coarray_handle = coarray_handle, &
                 allocated_memory = allocated_memory)
-        call prif_image_index(coarray_handle, [-1_c_intmax_t, 1_c_intmax_t], image_index=answer)
+        call prif_image_index(coarray_handle, [-1_c_int64_t, 1_c_int64_t], image_index=answer)
         result_ = assert_equals(0_c_int, answer)
         call prif_deallocate_coarray([coarray_handle])
     end function
@@ -91,7 +91,7 @@ contains
                 final_func = c_null_funptr, &
                 coarray_handle = coarray_handle, &
                 allocated_memory = allocated_memory)
-        call prif_image_index(coarray_handle, [1_c_intmax_t, 3_c_intmax_t], image_index=answer)
+        call prif_image_index(coarray_handle, [1_c_int64_t, 3_c_int64_t], image_index=answer)
         result_ = assert_equals(merge(3_c_int,0_c_int,ni >= 3), answer)
         call prif_deallocate_coarray([coarray_handle])
     end function

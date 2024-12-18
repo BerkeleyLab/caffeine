@@ -1,5 +1,5 @@
 module caf_teams_test
-    use iso_c_binding, only: c_size_t, c_ptr, c_intmax_t, c_null_funptr, c_int64_t
+    use iso_c_binding, only: c_size_t, c_ptr, c_null_funptr, c_int64_t
     use prif, only: &
             prif_coarray_handle, &
             prif_allocate_coarray, &
@@ -31,7 +31,7 @@ contains
         ! TODO: use final_func to observe automatic deallocation of coarrays
         integer :: dummy_element, initial_num_imgs, num_imgs, me, i
         integer(c_size_t) :: element_size
-        integer(c_intmax_t) :: which_team
+        integer(c_int64_t) :: which_team
         integer, parameter :: num_coarrays = 4
         type(prif_coarray_handle) :: coarrays(num_coarrays)
         type(c_ptr) :: allocated_memory
@@ -39,7 +39,7 @@ contains
 
         call prif_this_image_no_coarray(this_image=me)
         call prif_num_images(num_images=initial_num_imgs)
-        which_team = merge(1_c_intmax_t, 2_c_intmax_t, mod(me, 2) == 0)
+        which_team = merge(1_c_int64_t, 2_c_int64_t, mod(me, 2) == 0)
         element_size = int(storage_size(dummy_element)/8, c_size_t)
         call prif_form_team(team_number = which_team, team = team)
         call prif_change_team(team)
