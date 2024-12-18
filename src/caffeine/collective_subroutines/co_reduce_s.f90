@@ -50,7 +50,7 @@ submodule(prif:prif_private_s) co_reduce_s
       import c_char
       implicit none
       character(kind=c_char,len=*), intent(in) :: lhs, rhs
-      character(kind=c_char,len=:), allocatable :: lhs_op_rhs
+      character(kind=c_char,len=len(lhs)) :: lhs_op_rhs
     end function
 
     pure function c_float_complex_operation(lhs, rhs) result(lhs_op_rhs)
