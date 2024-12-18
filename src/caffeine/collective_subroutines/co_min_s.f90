@@ -23,7 +23,7 @@ contains
 
     function alphabetize(lhs, rhs) result(first_alphabetically)
       character(len=*), intent(in) :: lhs, rhs
-      character(len=:), allocatable :: first_alphabetically
+      character(len=len(lhs)) :: first_alphabetically
       call assert(len(lhs)==len(rhs), "prif_co_min: LHS/RHS length match", lhs//" , "//rhs)
       first_alphabetically = min(lhs,rhs)
     end function

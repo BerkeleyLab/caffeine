@@ -35,4 +35,4 @@ jobs:
     - name: Run unit tests
       run: |
         export GASNET_PSHM_NODES=8
-        ./build/run-fpm.sh test
+        ./build/run-fpm.sh test -- -d

@@ -105,44 +105,29 @@ contains
 
     function min_elements_in_2D_string_arrays() result(result_)
       type(result_t) result_
-      character(len=*), parameter :: script(*) = &
-        [character(len=len("the question.")) :: "To be ","or not"," to ","be.","  That is ","the question."]
-      character(len=len(script)), dimension(3,2) :: scramlet, co_min_scramlet
-      integer i, cyclic_permutation(size(script))
+      character(len=*), parameter :: script(*,*,*) = reshape( &
+          [ "To be   ","or not  " &
+          , "to      ","be.     " &
 
-      associate(me => this_image())
-        associate(cyclic_permutation => [(1 + mod(i-1,size(script)), i=me, me+size(script) )])
-          scramlet = reshape(script(cyclic_permutation), shape(scramlet))
-        end associate
-      end associate
+          , "that    ","is      " &
+          , "the     ","question"], &
+          [2,2,2])
+      character(len=len(script)), dimension(size(script,1),size(script,2)) :: scramlet, expected
+      integer me, ni
 
-      co_min_scramlet = scramlet
-      call prif_co_min(co_min_scramlet, result_image=1)
-
-      block
-        integer j, delta_j, num_imgs
-        character(len=len(script)) expected_script(size(script)), expected_scramlet(size(scramlet,1),size(scramlet,2))
-
-        call prif_num_images(num_images=num_imgs)
-        do j=1, size(script)
-          expected_script(j) = script(j)
-          do delta_j = 1, min(num_imgs-1, size(script))
-            associate(periodic_index => 1 + mod(j+delta_j-1, size(script)))
-              expected_script(j) = min(expected_script(j), script(periodic_index))
-            end associate
-          end do
-        end do
-        expected_scramlet = reshape(expected_script, shape(scramlet))
-
-        result_ =  assert_that(all(scramlet == co_min_scramlet),"all(scramlet == co_min_scramlet)")
-      end block
-
+      call prif_this_image_no_coarray(this_image=me)
+      call prif_num_images(ni)
+      scramlet = script(:,:,mod(me,size(script,3))+1)
+      call prif_co_min(scramlet)
+      expected = minval(script(:,:,1:min(ni,size(script,3))), dim=3)
+      result_ = assert_that(all(expected == scramlet),"all(expected == scramlet)")
     end function
 
     function alphabetically_1st_scalar_string() result(result_)
       type(result_t) result_
-      character(len=*), parameter :: words(*) = [character(len=len("to party!")):: "Loddy","doddy","we","like","to party!"]
-      character(len=:), allocatable :: my_word
+      integer, parameter :: length = len("to party!")
+      character(len=length), parameter :: words(*) = [character(len=length):: "Loddy","doddy","we","like","to party!"]
+      character(len=length) :: my_word, expected_word
       integer :: me, num_imgs
 
       call prif_this_image_no_coarray(this_image=me)
@@ -152,9 +137,8 @@ contains
       end associate
 
       call prif_num_images(num_images=num_imgs)
-      associate(expected_word => minval(words(1:min(num_imgs, size(words)))))
-        result_ = assert_equals(expected_word, my_word)
-      end associate
+      expected_word = minval(words(1:min(num_imgs, size(words))), dim=1)
+      result_ = assert_equals(expected_word, my_word)
     end function
 
 end module caf_co_min_test
