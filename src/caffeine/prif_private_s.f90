@@ -182,31 +182,6 @@ submodule(prif) prif_private_s
        type(c_ptr), value :: team
      end subroutine
 
-     logical(c_bool) pure function caf_same_cfi_type(a, b) bind(C)
-       !! bool caf_same_cfi_type(CFI_cdesc_t* a_desc, CFI_cdesc_t* a_desc);
-       import c_bool
-       type(*), intent(in) :: a(..), b(..)
-     end function
-
-     logical(c_bool) pure function caf_numeric_type(a) bind(C)
-       !! bool caf_numeric_type(CFI_cdesc_t* a_desc);
-       import c_bool
-       type(*), intent(in) :: a(..)
-     end function
-
-     logical(c_bool) pure function caf_is_f_string(a) bind(C)
-       !! bool caf_is_f_string(CFI_cdesc_t* a_desc);
-       import c_bool
-       type(*), intent(in) :: a(..)
-     end function
-
-     pure function caf_elem_len(a) result(a_elem_len) bind(C)
-       !! size_t caf_elem_len(CFI_cdesc_t* a_desc);
-       import c_size_t
-       type(*), intent(in) :: a(..)
-       integer(c_size_t), target :: a_elem_len
-     end function
-
      subroutine caf_form_team(current_team, new_team, team_number, new_index) bind(C)
       !! void caf_form_team(gex_TM_t* current_team, gex_TM_t* new_team, int64_t team_number, int new_index);
       import c_ptr, c_int, c_int64_t

@@ -7,10 +7,7 @@ submodule(prif:prif_private_s) co_sum_s
 contains
 
   module procedure prif_co_sum
-    if (present(stat)) stat=0
-
-    call caf_co_sum( &
-        a, optional_value(result_image), int(product(shape(a)), c_size_t), current_team%info%gex_team)
+    call unimplemented("prif_co_sum")
   end procedure
 
 end submodule co_sum_s
