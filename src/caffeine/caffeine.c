@@ -204,7 +204,7 @@ void caf_sync_team( gex_TM_t team ) {
 //-------------------------------------------------------------------
 
 void caf_co_reduce(
-  CFI_cdesc_t* a_desc, int result_image, int num_elements, gex_Coll_ReduceFn_t user_op, void* client_data, gex_TM_t team
+  CFI_cdesc_t* a_desc, int result_image, size_t num_elements, gex_Coll_ReduceFn_t user_op, void* client_data, gex_TM_t team
 )
 {
   char* a_address = (char*) a_desc->base_addr;
@@ -322,17 +322,6 @@ void caf_co_sum(CFI_cdesc_t* a_desc, int result_image, size_t num_elements, gex_
   gex_Event_Wait(ev);
 }
 
-bool caf_same_cfi_type(CFI_cdesc_t* a_desc, CFI_cdesc_t* b_desc)
-{
-  if (a_desc->type == b_desc->type) return true;
-  return false;
-}
-
-size_t caf_elem_len(CFI_cdesc_t* a_desc)
-{
-  return a_desc->elem_len;
-}
-
 void caf_form_team(gex_TM_t current_team, gex_TM_t* new_team, int64_t team_number, int new_index)
 {
    // GASNet color argument is int (32-bit), check for value truncation:
@@ -340,28 +329,3 @@ void caf_form_team(gex_TM_t current_team, gex_TM_t* new_team, int64_t team_numbe
   gex_TM_Split(new_team, current_team, team_number, new_index, NULL, 0, GEX_FLAG_TM_NO_SCRATCH);
 }
 
-bool caf_numeric_type(CFI_cdesc_t* a_desc)
-{
-  switch (a_desc->type)
-  {
-    case CFI_type_int32_t:          return true;
-    case CFI_type_int64_t:          return true;
-    case CFI_type_float:            return true;
-    case CFI_type_double:           return true;
-    case float_Complex_workaround:  return true;
-    case double_Complex_workaround: return true;
-    default:                        return false;
-  }
-}
-
-#ifdef __GNUC__
-bool caf_is_f_string(CFI_cdesc_t* a_desc){
-  if ( (a_desc->type - 5) % 256 == 0) return true;
-  return false;
-}
-#else // The code below is untested but believed to conform with the Fortran 2018 standard.
-bool caf_is_f_string(CFI_cdesc_t* a_desc){
-  if (a_desc->type == CFI_type_char) return true;
-  return false;
-}
-#endif

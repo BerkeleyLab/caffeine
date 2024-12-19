@@ -1,6 +1,7 @@
 module caf_co_sum_test
+    use iso_c_binding, only: c_int32_t, c_int64_t, c_float, c_double
     use prif, only : prif_co_sum, prif_num_images, prif_this_image_no_coarray
-    use veggies, only: result_t, test_item_t, assert_equals, describe, it, assert_that, assert_equals, succeed
+    use veggies, only: result_t, test_item_t, assert_equals, describe, it, succeed
 
     implicit none
     private
@@ -11,140 +12,132 @@ contains
         type(test_item_t) tests
 
         tests = describe( &
-          "The prif_co_sum subroutine", &
-          [ it("sums default integer scalars with no optional arguments present", sum_default_integer_scalars) &
-           ,it("sums default integer scalars with all arguments present", sum_integers_all_arguments) &
-           ,it("sums integer(c_int64_t) scalars with stat argument present", sum_c_int64_scalars) &
-           ,it("sums default integer 1D arrays with no optional arguments present", sum_default_integer_1D_array) &
-           ,it("sums default integer 15D arrays with stat argument present", sum_default_integer_15D_array) &
-           ,it("sums default real scalars with result_image argument present", sum_default_real_scalars) &
-           ,it("sums double precision 2D arrays with no optional arguments present", sum_double_precision_2D_array) &
-           ,it("sums default complex scalars with stat argument present", sum_default_complex_scalars) &
-           ,it("sums double precision 1D complex arrays with no optional arguments present", sum_dble_complex_1D_arrays) &
-        ])
+          "The prif_co_sum subroutine computes the sum across images for corresponding elements for", &
+          [ it("32 bit integer scalars", check_32_bit_integer) &
+          , it("a 1D 64 bit integer array", check_64_bit_integer) &
+          , it("a 2D 32 bit real array", check_32_bit_real) &
+          , it("a 1D 64 bit real array", check_64_bit_real) &
+          , it("a 2D complex array with 32 bit components", check_32_bit_complex) &
+          , it("a 1D complex array with 64 bit components", check_64_bit_complex) &
+          ])
     end function
 
-    function sum_default_integer_scalars() result(result_)
-        type(result_t) result_
-        integer i, num_imgs
+    function check_32_bit_integer() result(result_)
+        type(result_t) :: result_
 
-        i = 1
-        call prif_co_sum(i)
-        call prif_num_images(num_images=num_imgs)
-        result_ = assert_equals(num_imgs, i)
-    end function
-
-    function sum_integers_all_arguments() result(result_)
-        type(result_t) result_
-        integer i, status_, result_image_, me, num_imgs
-        character(len=*), parameter :: whitespace = repeat(" ", ncopies=29)
-        character(len=:), allocatable :: error_message
-
-        i = 1
-        result_image_ = 1
-        status_ = -1
-        error_message = whitespace
+        integer(c_int32_t), parameter :: values(*) = [1, 19, 5, 13, 11, 7, 17, 3]
+        integer :: me, ni, i
+        integer(c_int32_t) :: my_val, expected
 
         call prif_this_image_no_coarray(this_image=me)
-        call prif_num_images(num_images=num_imgs)
-        associate(expected_i => merge(num_imgs*i, i, me==result_image_))
-          call prif_co_sum(i, result_image_, status_, error_message)
-          result_ = assert_equals(expected_i, i) .and. assert_equals(0, status_) .and. assert_equals(whitespace, error_message)
-        end associate
+        call prif_num_images(ni)
+
+        my_val = values(mod(me-1, size(values))+1)
+        call prif_co_sum(my_val)
+
+        expected = sum([(values(mod(i-1,size(values))+1), i = 1, ni)])
+        result_ = assert_equals(expected, my_val)
     end function
 
-    function sum_c_int64_scalars() result(result_)
-        use iso_c_binding, only : c_int64_t
-        type(result_t) result_
-        integer(c_int64_t) i
-        integer i_default_kind, status_, num_imgs
+    function check_64_bit_integer() result(result_)
+        type(result_t) :: result_
 
-        status_ = -1
-        i = 2_c_int64_t
-        call prif_co_sum(i, stat=status_)
-        i_default_kind = i
-        call prif_num_images(num_images=num_imgs)
-        result_ = assert_equals(2*num_imgs, int(i)) .and. assert_equals(0, status_)
-    end function
+        integer(c_int64_t), parameter :: values(*,*) = reshape([1, 19, 5, 13, 11, 7, 17, 3], [2, 4])
+        integer :: me, ni, i
+        integer(c_int64_t), dimension(size(values,1)) :: my_val, expected
 
-    function sum_default_integer_1D_array() result(result_)
-        type(result_t) result_
-        integer i, images
-        integer, allocatable :: array(:)
-
-        call prif_num_images(num_images=images)
-        associate(sequence_ => [(i,i=1,images)])
-          array = sequence_
-          call prif_co_sum(array)
-          result_ = assert_that(all(array==images*sequence_))
-        end associate
-    end function
-
-    function sum_default_integer_15D_array() result(result_)
-        type(result_t) result_
-        integer array(2,1,1, 1,1,1, 1,1,1, 1,1,1, 1,2,1)
-        integer status_, num_imgs
-
-        status_ = -1
-        array = 3
-        call prif_co_sum(array, stat=status_)
-        call prif_num_images(num_images=num_imgs)
-        result_ = assert_that(all(3*num_imgs == array)) .and.  assert_equals(0, status_)
-    end function
-
-    function sum_default_real_scalars() result(result_)
-        type(result_t) result_
-        real scalar
-        real, parameter :: e = 2.7182818459045
-        integer result_image_, me, num_imgs
-
-        result_image_ = 1
-        scalar = e
-        call prif_co_sum(scalar, result_image=result_image_)
         call prif_this_image_no_coarray(this_image=me)
-        call prif_num_images(num_images=num_imgs)
-        associate(expected_result => merge(num_imgs*e, e, me==result_image_))
-          result_ = assert_equals(dble(expected_result), dble(scalar))
-        end associate
+        call prif_num_images(ni)
+
+        my_val = values(:, mod(me-1, size(values,2))+1)
+        call prif_co_sum(my_val)
+
+        expected = sum(reshape([(values(:, mod(i-1,size(values,2))+1), i = 1, ni)], [size(values,1),ni]), dim=2)
+        result_ = assert_equals(int(expected), int(my_val))
     end function
 
-    function sum_double_precision_2D_array() result(result_)
-        type(result_t) result_
-        double precision, allocatable :: array(:,:)
-        double precision, parameter :: input(*,*) = reshape(-[6,5,4,3,2,1], [3,2])
-        integer :: num_imgs
+    function check_32_bit_real() result(result_)
+        type(result_t) :: result_
 
-        array = input
-        call prif_co_sum(array)
-        call prif_num_images(num_images=num_imgs)
-        result_ = assert_equals(product(num_imgs*input), product(array))
+        real(c_float), parameter :: values(*,*,*) = reshape([1, 19, 5, 13, 11, 7, 17, 3], [2,2,2])
+        integer :: me, ni, i
+        real(c_float), dimension(size(values,1), size(values,2)) :: my_val, expected
+
+        call prif_this_image_no_coarray(this_image=me)
+        call prif_num_images(ni)
+
+        my_val = values(:, :, mod(me-1, size(values,3))+1)
+        call prif_co_sum(my_val)
+
+        expected = sum(reshape([(values(:,:,mod(i-1,size(values,3))+1), i = 1, ni)], [size(values,1), size(values,2), ni]), dim=3)
+        result_ = assert_equals(real(expected,kind=c_double), real(my_val,kind=c_double))
     end function
 
-    function sum_default_complex_scalars() result(result_)
-        type(result_t) result_
-        real scalar
-        complex z
-        complex, parameter :: i=(0.,1.)
-        integer status_, num_imgs
+    function check_64_bit_real() result(result_)
+        type(result_t) :: result_
 
-        status_ = -1
-        z = i
-        call prif_co_sum(z, stat=status_)
-        call prif_num_images(num_images=num_imgs)
-        result_ = assert_equals(dble(abs(i*num_imgs)), dble(abs(z)) ) .and. assert_equals(0, status_)
+        real(c_double), parameter :: values(*,*) = reshape([1, 19, 5, 13, 11, 7, 17, 3], [2, 4])
+        integer :: me, ni, i
+        real(c_double), dimension(size(values,1)) :: my_val, expected
+
+        call prif_this_image_no_coarray(this_image=me)
+        call prif_num_images(ni)
+
+        my_val = values(:, mod(me-1, size(values,2))+1)
+        call prif_co_sum(my_val)
+
+        expected = sum(reshape([(values(:, mod(i-1,size(values,2))+1), i = 1, ni)], [size(values,1),ni]), dim=2)
+        result_ = assert_equals(expected, my_val)
     end function
 
-    function sum_dble_complex_1D_arrays() result(result_)
-        type(result_t) result_
-        integer, parameter :: dp = kind(1.D0)
-        integer :: num_imgs
-        complex(dp), allocatable :: array(:)
-        complex(dp), parameter :: input(*) = [(1.D0,1.0D0)]
+    function check_32_bit_complex() result(result_)
+        type(result_t) :: result_
 
-        array = [(1.D0,1.D0)]
-        call prif_co_sum(array)
-        call prif_num_images(num_images=num_imgs)
-        result_ = assert_that(all([input*num_imgs] == array))
+        complex(c_float), parameter :: values(*,*,*) = reshape( &
+                [ cmplx(1., 53.), cmplx(3., 47.) &
+                , cmplx(5., 43.), cmplx(7., 41.) &
+                , cmplx(11., 37.), cmplx(13., 31.) &
+                , cmplx(17., 29.), cmplx(19., 23.) &
+                ], &
+                [2,2,2])
+        integer :: me, ni, i
+        complex(c_float), dimension(size(values,1),size(values,2)) :: my_val, expected
+
+        call prif_this_image_no_coarray(this_image=me)
+        call prif_num_images(ni)
+
+        my_val = values(:, :, mod(me-1, size(values,3))+1)
+        call prif_co_sum(my_val)
+
+        expected = sum(reshape([(values(:,:,mod(i-1,size(values,3))+1), i = 1, ni)], [size(values,1), size(values,2), ni]), dim=3)
+        result_ = &
+                assert_equals(real(expected, kind=c_double), real(my_val, kind=c_double)) &
+                .and.assert_equals(real(aimag(expected), kind=c_double), real(aimag(my_val), kind=c_double))
+    end function
+
+    function check_64_bit_complex() result(result_)
+        type(result_t) :: result_
+
+        complex(c_double), parameter :: values(*,*) = reshape( &
+                [ cmplx(1., 53.), cmplx(3., 47.) &
+                , cmplx(5., 43.), cmplx(7., 41.) &
+                , cmplx(11., 37.), cmplx(13., 31.) &
+                , cmplx(17., 29.), cmplx(19., 23.) &
+                ], &
+                [2,4])
+        integer :: me, ni, i
+        complex(c_double), dimension(size(values,1)) :: my_val, expected
+
+        call prif_this_image_no_coarray(this_image=me)
+        call prif_num_images(ni)
+
+        my_val = values(:, mod(me-1, size(values,2))+1)
+        call prif_co_sum(my_val)
+
+        expected = sum(reshape([(values(:,mod(i-1,size(values,2))+1), i = 1, ni)], [size(values,1), ni]), dim=2)
+        result_ = &
+                assert_equals(real(expected), real(my_val)) &
+                .and.assert_equals(aimag(expected), aimag(my_val))
     end function
 
 end module caf_co_sum_test
