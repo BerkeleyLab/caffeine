@@ -1,16 +1,19 @@
 ! Copyright (c), The Regents of the University of California
 ! Terms of use are as specified in LICENSE.txt
 submodule(prif:prif_private_s) co_reduce_s
-  use iso_c_binding, only : &
-    c_loc, c_funloc, c_associated, c_f_pointer, c_f_procpointer, c_char, c_double, &
-    c_float, c_int32_t
-
   implicit none
 
 contains
 
-  module procedure prif_co_reduce
+  module subroutine prif_co_reduce(a, operation_wrapper, cdata, result_image, stat, errmsg, errmsg_alloc)
+    type(*), intent(inout), target :: a(..)
+    procedure(prif_operation_wrapper_interface), pointer, intent(in) :: operation_wrapper
+    type(c_ptr), intent(in), value :: cdata
+    integer(c_int), intent(in), optional :: result_image
+    integer(c_int), intent(out), optional :: stat
+    character(len=*), intent(inout), optional :: errmsg
+    character(len=:), intent(inout), allocatable, optional :: errmsg_alloc
     call unimplemented("prif_co_reduce")
-  end procedure
+  end subroutine
 
 end submodule co_reduce_s
