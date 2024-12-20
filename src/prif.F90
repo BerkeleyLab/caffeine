@@ -29,6 +29,7 @@ module prif
   public :: prif_failed_images, prif_stopped_images, prif_image_status
   public :: prif_local_data_pointer, prif_set_context_data, prif_get_context_data, prif_size_bytes
   public :: prif_co_sum, prif_co_max, prif_co_min, prif_co_reduce, prif_co_broadcast
+  public :: prif_co_min_character, prif_co_max_character
   public :: prif_operation_wrapper_interface
   public :: prif_form_team, prif_change_team, prif_end_team, prif_get_team, prif_team_number
   public :: prif_sync_all, prif_sync_images, prif_sync_team, prif_sync_memory

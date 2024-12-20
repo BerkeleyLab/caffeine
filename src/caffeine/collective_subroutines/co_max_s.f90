@@ -10,4 +10,8 @@ contains
     call unimplemented("prif_co_max")
   end procedure
 
+  module procedure prif_co_max_character
+    call unimplemented("prif_co_max_character")
+  end procedure
+
 end submodule co_max_s
