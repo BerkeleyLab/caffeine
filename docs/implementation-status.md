@@ -3,7 +3,7 @@
 Caffeine is an implementation of the Parallel Runtime Interface for Fortran (PRIF). This document
 outlines the implementation status in Caffeine of the features defined in the
 [latest PRIF specification, revision 0.5](https://dx.doi.org/10.25344/S4CG6G). Caffeine contains interfaces for all
-of the PRIF procedures (except when mentioned otherwise below) and the symbols are linkable and callable, but some procedures will fail at runtime with an unimplemented error. For
+of the PRIF procedures (except when stated otherwise below) and the symbols are linkable and callable, but some procedures will fail at runtime with an unimplemented error. For
 more details about the implementation of the various PRIF features, please see the
 following sections:
 
