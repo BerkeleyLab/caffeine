@@ -101,9 +101,7 @@ See [LICENSE.txt](LICENSE.txt) for usage terms and conditions.
 [CLaSS]: https://go.lbl.gov/class
 [Berkeley Lab]: https://lbl.gov
 [ECP]: https://www.exascaleproject.org
-[ford]: https://github.com/Fortran-FOSS-Programmers/ford
 [MPI]: https://www.mpi-forum.org
-[site]: https://berkeleylab.github.io/caffeine
 [S4PST]: https://ornl.github.io/events/s4pst2023/
 [Homebrew]: https://brew.sh
 [GASNet-EX]: https://gasnet.lbl.gov
