@@ -2,8 +2,8 @@
 
 Caffeine is an implementation of the Parallel Runtime Interface for Fortran (PRIF). This document
 outlines the implementation status in Caffeine of the features defined in the
-[latest PRIF specification, revision 0.4](https://dx.doi.org/10.25344/S4WG64). Caffeine contains interfaces for all
-of the PRIF procedures and the symbols are linkable and callable, but some procedures will fail at runtime with an unimplemented error. For
+[latest PRIF specification, revision 0.5](https://dx.doi.org/10.25344/S4CG6G). Caffeine contains interfaces for all
+of the PRIF procedures (except when stated otherwise below) and the symbols are linkable and callable, but some procedures will fail at runtime with an unimplemented error. For
 more details about the implementation of the various PRIF features, please see the
 following sections:
 
@@ -44,6 +44,8 @@ in the following sections.
 | `prif_init` | **YES** |  |
 | `prif_stop`, `prif_error_stop` | *partial* | Missing support for `quiet=.true.` |
 | `prif_fail_image` | no |  |
+| `prif_register_stop_callback` | **YES** |  |
+
 
 ---
 
@@ -86,6 +88,7 @@ in the following sections.
 | `prif_lcobound_no_dim`, `prif_lcobound_with_dim` | no |  |
 | `prif_ucobound_no_dim`, `prif_ucobound_with_dim` | no |  |
 | `prif_coshape` | no |  |
+| `prif_local_data_pointer` | **YES** |  |
 | `prif_image_index` | **YES** |  |
 | `prif_image_index_with_team` | no |  |
 | `prif_image_index_with_team_number` | no |  |
@@ -197,11 +200,13 @@ in the following sections.
 
 | Procedure | Status | Notes |
 |-----------|--------|-------|
-| `prif_co_broadcast` | *partial* | no support for derived types with `allocatable` components |
+| `prif_co_broadcast` | **YES** |  |
 | `prif_co_max`       | *partial* | only supports 32-bit and 64-bit numeric types |
+| `prif_co_max_character` | no | procedure not yet added to Caffeine |
 | `prif_co_min`       | *partial* | only supports 32-bit and 64-bit numeric types |
+| `prif_co_min_character` | no | procedure not yet added to Caffeine |
 | `prif_co_sum`       | *partial* | only supports 32-bit and 64-bit numeric types |
-| `prif_co_reduce`    | *partial* | only supports intrinsic types (no support for derived types) |
+| `prif_co_reduce`    | *partial* | only supports intrinsic types (no support for derived types), interface not yet updated to v0.5 |
 
 ---
 
