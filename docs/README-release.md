@@ -16,7 +16,8 @@ Release Procedure for Caffeine
     3. Update the author list embedded in: [manifest/fpm.toml.template](../manifest/fpm.toml.template)
     4. Review top-level [README.md](../README.md) and other user-facing documentation for any
        necessary changes
-    5. Temporarily hardcode version of gasnet installer in [install.sh](../install.sh) as the
+    5. Update [docs/implementation-status.md](../docs/implementation-status.md) with current status
+    6. Temporarily hardcode version of gasnet installer in [install.sh](../install.sh) as the
        last commit in the release. Set GASNET_VERSION flag to the latest gasnet release
 5. Produce the ChangeLog
     1. Create draft release on GitHub
