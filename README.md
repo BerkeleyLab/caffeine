@@ -57,6 +57,10 @@ Run tests
 Implementation Status
 --------------------
 
+### Caffeine is an implementation of the [Parallel Runtime Interface for Fortran (PRIF)](#citing-prif-please-use-the-following-publication)
+
+![PRIF system stack diagram](https://github.com/BerkeleyLab/caffeine/wiki/img/prif-stack.gif)
+
 For details on the PRIF features that are implemented, please see the [Implementation Status doc](docs/implementation-status.md).
 
 Publications
@@ -70,18 +74,20 @@ Proceedings of the [Eighth Annual Workshop on the LLVM Compiler Infrastructure i
 Paper: <https://doi.org/10.25344/S4459B>     
 [Talk Slides](https://github.com/BerkeleyLab/caffeine/wiki/pubs/Caffeine_for_LLVM-2022-Slides.pdf)
 
-### Caffeine is an implementation of the Parallel Runtime Interface for Fortran (PRIF):
+### Citing PRIF? Please use the following publication:
 
 Dan Bonachea, Katherine Rasmussen, Brad Richardson, Damian Rouson.    
-"[**Parallel Runtime Interface for Fortran (PRIF) Specification, Revision 0.4**](https://github.com/BerkeleyLab/caffeine/wiki/pubs/PRIF_0.4.pdf)",     
-Lawrence Berkeley National Laboratory Technical Report (LBNL-2001604), July 2024.    
-<https://doi.org/10.25344/S4WG64>
-
-Dan Bonachea, Katherine Rasmussen, Brad Richardson, Damian Rouson.
-"[**Parallel Runtime Interface for Fortran (PRIF): A Multi-Image Solution for LLVM Flang**](https://dx.doi.org/10.25344/S4N017)",     
+"[**Parallel Runtime Interface for Fortran (PRIF): A Multi-Image Solution for LLVM Flang**](https://github.com/BerkeleyLab/caffeine/wiki/pubs/LLVM-HPC24_PRIF.pdf)",     
 Proceedings of the [Tenth Annual Workshop on the LLVM Compiler Infrastructure in HPC (LLVM-HPC2024)](https://llvm-hpc-2024-workshop.github.io/), November 2024.    
-Paper: <https://dx.doi.org/10.25344/S4N017>     
-[Talk Slides](https://crd.lbl.gov/assets/Uploads/LLVM-HPC24_PRIF_Slides.pdf)
+Paper: <https://doi.org/10.25344/S4N017>    
+[Talk Slides](https://github.com/BerkeleyLab/caffeine/wiki/pubs/LLVM-HPC24_PRIF_Slides.pdf)
+
+### PRIF Specification:
+
+Dan Bonachea, Katherine Rasmussen, Brad Richardson, Damian Rouson.    
+"[**Parallel Runtime Interface for Fortran (PRIF) Specification, Revision 0.5**](https://github.com/BerkeleyLab/caffeine/wiki/pubs/PRIF_0.5.pdf)",     
+Lawrence Berkeley National Laboratory Technical Report (LBNL-2001636), Dec 2024.    
+<https://doi.org/10.25344/S4CG6G>
 
 Documentation
 -------------
