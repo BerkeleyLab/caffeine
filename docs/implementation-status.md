@@ -200,7 +200,7 @@ in the following sections.
 
 | Procedure | Status | Notes |
 |-----------|--------|-------|
-| `prif_co_broadcast` | *partial* | no support for derived types with `allocatable` components |
+| `prif_co_broadcast` | **YES** |  |
 | `prif_co_max`       | *partial* | only supports 32-bit and 64-bit numeric types |
 | `prif_co_max_character` | no | procedure not yet added to Caffeine |
 | `prif_co_min`       | *partial* | only supports 32-bit and 64-bit numeric types |
