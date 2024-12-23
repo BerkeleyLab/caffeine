@@ -77,6 +77,12 @@ Dan Bonachea, Katherine Rasmussen, Brad Richardson, Damian Rouson.
 Lawrence Berkeley National Laboratory Technical Report (LBNL-2001604), July 2024.    
 <https://doi.org/10.25344/S4WG64>
 
+Dan Bonachea, Katherine Rasmussen, Brad Richardson, Damian Rouson.
+"[**Parallel Runtime Interface for Fortran (PRIF): A Multi-Image Solution for LLVM Flang**](https://dx.doi.org/10.25344/S4N017)",     
+Proceedings of the [Tenth Annual Workshop on the LLVM Compiler Infrastructure in HPC (LLVM-HPC2024)](https://llvm-hpc-2024-workshop.github.io/), November 2024.    
+Paper: <https://dx.doi.org/10.25344/S4N017>     
+[Talk Slides](https://crd.lbl.gov/assets/Uploads/LLVM-HPC24_PRIF_Slides.pdf)
+
 Documentation
 -------------
 One of our continuous integration (CI) scripts generates up-to-date Caffeine documentation using [ford].  The CI script also deploys the generated documentation to the our GitHub Pages [site].
