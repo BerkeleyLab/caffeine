@@ -5,7 +5,9 @@
 
 module prif
 
-  use iso_c_binding, only: c_int, c_bool, c_intptr_t, c_ptr, c_funptr, c_size_t, c_ptrdiff_t, c_null_ptr, c_int64_t
+  use iso_c_binding, only: &
+      c_char, c_int, c_bool, c_intptr_t, c_ptr, &
+      c_funptr, c_size_t, c_ptrdiff_t, c_null_ptr, c_int64_t
 
   implicit none
 
@@ -27,6 +29,8 @@ module prif
   public :: prif_failed_images, prif_stopped_images, prif_image_status
   public :: prif_local_data_pointer, prif_set_context_data, prif_get_context_data, prif_size_bytes
   public :: prif_co_sum, prif_co_max, prif_co_min, prif_co_reduce, prif_co_broadcast
+  public :: prif_co_min_character, prif_co_max_character
+  public :: prif_operation_wrapper_interface
   public :: prif_form_team, prif_change_team, prif_end_team, prif_get_team, prif_team_number
   public :: prif_sync_all, prif_sync_images, prif_sync_team, prif_sync_memory
   public :: prif_lock, prif_lock_indirect, prif_unlock, prif_unlock_indirect
@@ -108,6 +112,14 @@ module prif
       logical(c_bool), intent(in) :: is_error_stop, quiet
       integer(c_int), intent(in), optional :: stop_code_int
       character(len=*), intent(in), optional :: stop_code_char
+    end subroutine
+
+    subroutine prif_operation_wrapper_interface(arg1, arg2_and_out, count, cdata) bind(C)
+      import :: c_ptr, c_size_t
+      implicit none
+      type(c_ptr), intent(in), value :: arg1, arg2_and_out
+      integer(c_size_t), intent(in), value :: count
+      type(c_ptr), intent(in), value :: cdata
     end subroutine
   end interface
 
@@ -575,7 +587,7 @@ module prif
 
     module subroutine prif_co_sum(a, result_image, stat, errmsg, errmsg_alloc)
       implicit none
-      type(*), intent(inout), contiguous, target :: a(..)
+      type(*), intent(inout), target :: a(..)
       integer(c_int), intent(in), optional :: result_image
       integer(c_int), intent(out), optional :: stat
       character(len=*), intent(inout), optional :: errmsg
@@ -584,7 +596,16 @@ module prif
 
     module subroutine prif_co_max(a, result_image, stat, errmsg, errmsg_alloc)
       implicit none
-      type(*), intent(inout), contiguous, target :: a(..)
+      type(*), intent(inout), target :: a(..)
+      integer(c_int), intent(in), optional :: result_image
+      integer(c_int), intent(out), optional :: stat
+      character(len=*), intent(inout), optional :: errmsg
+      character(len=:), intent(inout), allocatable, optional :: errmsg_alloc
+    end subroutine
+
+    module subroutine prif_co_max_character(a, result_image, stat, errmsg, errmsg_alloc)
+      implicit none
+      character(len=*, kind=c_char), intent(inout), target :: a(..)
       integer(c_int), intent(in), optional :: result_image
       integer(c_int), intent(out), optional :: stat
       character(len=*), intent(inout), optional :: errmsg
@@ -593,17 +614,27 @@ module prif
 
     module subroutine prif_co_min(a, result_image, stat, errmsg, errmsg_alloc)
       implicit none
-      type(*), intent(inout), contiguous, target :: a(..)
+      type(*), intent(inout), target :: a(..)
       integer(c_int), intent(in), optional :: result_image
       integer(c_int), intent(out), optional :: stat
       character(len=*), intent(inout), optional :: errmsg
       character(len=:), intent(inout), allocatable, optional :: errmsg_alloc
     end subroutine
 
-    module subroutine prif_co_reduce(a, operation, result_image, stat, errmsg, errmsg_alloc)
+    module subroutine prif_co_min_character(a, result_image, stat, errmsg, errmsg_alloc)
       implicit none
-      type(*), intent(inout), contiguous, target :: a(..)
-      type(c_funptr), value :: operation
+      character(len=*, kind=c_char), intent(inout), target :: a(..)
+      integer(c_int), intent(in), optional :: result_image
+      integer(c_int), intent(out), optional :: stat
+      character(len=*), intent(inout), optional :: errmsg
+      character(len=:), intent(inout), allocatable, optional :: errmsg_alloc
+    end subroutine
+
+    module subroutine prif_co_reduce(a, operation_wrapper, cdata, result_image, stat, errmsg, errmsg_alloc)
+      implicit none
+      type(*), intent(inout), target :: a(..)
+      procedure(prif_operation_wrapper_interface), pointer, intent(in) :: operation_wrapper
+      type(c_ptr), intent(in), value :: cdata
       integer(c_int), intent(in), optional :: result_image
       integer(c_int), intent(out), optional :: stat
       character(len=*), intent(inout), optional :: errmsg
@@ -612,7 +643,7 @@ module prif
 
     module subroutine prif_co_broadcast(a, source_image, stat, errmsg, errmsg_alloc)
       implicit none
-      type(*), intent(inout), contiguous, target :: a(..)
+      type(*), intent(inout), target :: a(..)
       integer(c_int), intent(in) :: source_image
       integer(c_int), intent(out), optional :: stat
       character(len=*), intent(inout), optional :: errmsg
