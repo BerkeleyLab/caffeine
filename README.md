@@ -89,15 +89,6 @@ Dan Bonachea, Katherine Rasmussen, Brad Richardson, Damian Rouson.
 Lawrence Berkeley National Laboratory Technical Report (LBNL-2001636), Dec 2024.    
 <https://doi.org/10.25344/S4CG6G>
 
-Documentation
--------------
-One of our continuous integration (CI) scripts generates up-to-date Caffeine documentation using [ford].  The CI script also deploys the generated documentation to the our GitHub Pages [site].
-Alternatively, generate HTML documentation locally using [ford] as follows:
-```
-ford doc-generator.md
-```
-Open `doc/html/index.html` in a web browser.
-
 Funding
 -------
 The Computer Languages and Systems Software ([CLaSS]) Group at [Berkeley Lab] has developed Caffeine development on funding from the Exascale Computing Project ([ECP]) and the Stewardship for Programming Systems and Tools ([S4PST]) project. 
@@ -110,9 +101,7 @@ See [LICENSE.txt](LICENSE.txt) for usage terms and conditions.
 [CLaSS]: https://go.lbl.gov/class
 [Berkeley Lab]: https://lbl.gov
 [ECP]: https://www.exascaleproject.org
-[ford]: https://github.com/Fortran-FOSS-Programmers/ford
 [MPI]: https://www.mpi-forum.org
-[site]: https://berkeleylab.github.io/caffeine
 [S4PST]: https://ornl.github.io/events/s4pst2023/
 [Homebrew]: https://brew.sh
 [GASNet-EX]: https://gasnet.lbl.gov
