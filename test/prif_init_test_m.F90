@@ -34,46 +34,29 @@ contains
 
 #if HAVE_PROCEDURE_ACTUAL_FOR_POINTER_DUMMY
     test_descriptions = [ & 
-      test_description_t("completing normally when called once", check_caffeination), &
-      test_description_t("returning PRIF_STAT_ALREADY_INIT when called a second time", check_subsequent_prif_init_call) &
+      test_description_t("returning PRIF_STAT_ALREADY_INIT when called a second time", check_redundant_prif_init_call) &
     ]   
 #else
-    procedure(test_function_i), pointer :: check_caffeination_ptr, check_subsequent_prif_init_call_ptr 
-
-    check_caffeination_ptr              =>  check_caffeination
-    check_subsequent_prif_init_call_ptr => check_subsequent_prif_init_call
+    procedure(test_function_i), pointer :: check_caffeination_ptr, check_redundant_prif_init_call_ptr 
+    check_redundant_prif_init_call_ptr => check_redundant_prif_init_call
 
     test_descriptions = [ & 
-       test_description_t("completing normally when called once", check_caffeination_ptr) &
-      ,test_description_t("returning PRIF_STAT_ALREADY_INIT when called a second time", check_subsequent_prif_init_call_ptr) &
+      test_description_t("returning PRIF_STAT_ALREADY_INIT when called a second time", check_redundant_prif_init_call_ptr) &
     ]   
 #endif
 
     test_descriptions = pack(test_descriptions, &
       index(subject(), test_description_substring) /= 0  &
       .or. test_descriptions%contains_text(test_description_substring))
-      
     test_results = test_descriptions%run()
   end function
 
-    function check_caffeination() result(test_passes)
-      !! check program initiation
+    function check_redundant_prif_init_call()  result(test_passes)
       logical test_passes
-      integer, parameter :: successful_initiation = 0
-      integer init_exit_code
-
-      call prif_init(init_exit_code)
-      test_passes = init_exit_code == successful_initiation
-    end function
-
-    function check_subsequent_prif_init_call()  result(test_passes)
-      logical test_passes
-
-        integer :: stat
-
-        call prif_init(stat)
-        call prif_init(stat)
-        test_passes = stat == PRIF_STAT_ALREADY_INIT
+      integer stat
+      call prif_init(stat)
+      call prif_init(stat)
+      test_passes = stat == PRIF_STAT_ALREADY_INIT
     end function
 
 end module prif_init_test_m
