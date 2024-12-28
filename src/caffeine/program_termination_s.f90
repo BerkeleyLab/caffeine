@@ -106,13 +106,13 @@ contains
 
     if (present(stop_code)) then
       if (.not.quiet) then
-        write(error_unit) "ERROR STOP ", stop_code
+        write(error_unit,'(a)') "ERROR STOP ", stop_code
         flush error_unit
       end if
       exit_code = stop_code
     else
       if (.not.quiet) then
-        write(error_unit) "ERROR STOP"
+        write(error_unit,'(a)') "ERROR STOP"
         flush error_unit
       end if
       exit_code = 1_c_int
