@@ -1,7 +1,8 @@
-Test Support
-------------
-The programs in this directory intentionally terminate to support the `stop` and `error stop` 
-unit tests, which use Fortran's `execute_command_line` to run the programs in this directory 
-and to check for the expected non-zero stop codes.  Running the tests in this manner enables 
-the tests to continue executing after the child process launched by `execute_command_line` 
-terminates.
+Test Termination
+----------------
+The code in this subdirectory intentionally terminate to test the following
+procedures and interface from  prif.F90:
+  - `prif_error_stop`
+  - `prif_register_stop_callback`
+  - `prif_stop_callback_interface`
+  - `prif_stop`
