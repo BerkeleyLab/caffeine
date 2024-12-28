@@ -115,7 +115,7 @@ contains
 
       call prif_this_image_no_coarray(this_image=me)
       call prif_num_images(ni)
-      scramlet = script(:,:,mod(me,size(script,3))+1)
+      scramlet = script(:,:,mod(me-1,size(script,3))+1)
       call prif_co_max(scramlet)
       expected = maxval(script(:,:,1:min(ni,size(script,3))), dim=3)
       result_ = assert_that(all(expected == scramlet),"all(expected == scramlet)")
