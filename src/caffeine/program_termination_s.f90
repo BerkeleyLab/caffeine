@@ -106,7 +106,7 @@ contains
 
     if (present(stop_code)) then
       if (.not.quiet) then
-        write(error_unit,'(a)') "ERROR STOP ", stop_code
+        write(error_unit,'(A, I0)') "ERROR STOP ", stop_code
         flush error_unit
       end if
       exit_code = stop_code
