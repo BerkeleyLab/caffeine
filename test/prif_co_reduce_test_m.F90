@@ -91,8 +91,7 @@ contains
     end associate
 
     call prif_num_images(num_images=num_imgs)
-    !expected_name = minval(names(1:min(num_imgs, size(names)))) ! this exposes a flang bug
-    expected_name = "betty"
+    expected_name = minval(names(1:min(num_imgs, size(names)))) ! this exposes a flang bug
     test_passes = all(expected_name == my_name)
 
   contains
