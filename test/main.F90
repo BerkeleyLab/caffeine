@@ -1,4 +1,4 @@
-! Copyright (c) 2024, The Regents of the University of California and Sourcery Institute
+! Copyright (c) 2020-2024, The Regents of the University of California
 ! Terms of use are as specified in LICENSE.txt
 
 #include "assert_macros.h"

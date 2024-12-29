@@ -7,10 +7,10 @@ module prif_allocate_test_m
   !! Unit test for Caffeine's support for symmetric and asymmetric memory allocations
   use prif, only : prif_allocate_coarray, prif_deallocate_coarray, prif_coarray_handle &
                   ,prif_allocate,         prif_deallocate,         prif_num_images 
-  use julienne_m, only :  test_t                    , string_t &
-                         ,test_result_t             , vector_function_strategy_t &
-                         ,test_description_t        , vector_test_description_t  &
-                         ,test_description_substring
+  use prif_test_m, only : prif_test_t, test_description_substring
+  use julienne_m,  only : test_result_t     , vector_function_strategy_t, string_t & 
+                         ,test_description_t, vector_test_description_t
+                         
 #if ! HAVE_PROCEDURE_ACTUAL_FOR_POINTER_DUMMY
   use julienne_m, only : test_function_i
 #endif
@@ -20,7 +20,7 @@ module prif_allocate_test_m
   private
   public :: prif_allocate_test_t
 
-  type, extends(test_t) :: prif_allocate_test_t
+  type, extends(prif_test_t) :: prif_allocate_test_t
   contains
     procedure, nopass :: subject
     procedure, nopass :: results

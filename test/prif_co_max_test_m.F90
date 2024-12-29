@@ -7,7 +7,8 @@ module prif_co_max_test_m
   !! Unit test for the prif_co_max subroutine
   use iso_c_binding, only: c_size_t, c_ptr, c_intmax_t, c_null_funptr
   use prif, only : prif_co_max, prif_num_images, prif_this_image_no_coarray, prif_num_images
-  use julienne_m, only : test_t, test_result_t, test_description_t, test_description_substring
+  use prif_test_m, only : prif_test_t, test_description_substring
+  use julienne_m, only : test_result_t, test_description_t
 #if ! HAVE_PROCEDURE_ACTUAL_FOR_POINTER_DUMMY
   use julienne_m, only : test_function_i
 #endif
@@ -16,7 +17,7 @@ module prif_co_max_test_m
   private
   public :: prif_co_max_test_t
 
-  type, extends(test_t) :: prif_co_max_test_t
+  type, extends(prif_test_t) :: prif_co_max_test_t
   contains
     procedure, nopass :: subject
     procedure, nopass :: results

@@ -5,9 +5,10 @@
 
 module prif_rma_test_m
   !! Unit test fort the prif_rma program inititation subroutine
-  use julienne_m, only : test_t, test_result_t, test_description_t, test_description_substring
+  use julienne_m, only : test_t, test_result_t, test_description_t
   use iso_c_binding, only: &
           c_ptr, c_intmax_t, c_intptr_t, c_size_t, c_null_funptr, c_f_pointer, c_loc, c_sizeof
+  use prif_test_m, only : prif_test_t, test_description_substring
   use prif, only: &
           prif_coarray_handle, &
           prif_allocate_coarray, &
@@ -29,7 +30,7 @@ module prif_rma_test_m
   private
   public :: prif_rma_test_t
 
-  type, extends(test_t) :: prif_rma_test_t
+  type, extends(prif_test_t) :: prif_rma_test_t
   contains
     procedure, nopass :: subject
     procedure, nopass :: results

@@ -6,7 +6,8 @@
 module prif_num_images_test_m
   !! Unit test for the prif_num_images subroutine
   use prif, only : prif_num_images
-  use julienne_m, only : test_t, test_result_t, test_description_t, test_description_substring
+  use prif_test_m, only : prif_test_t, test_description_substring
+  use julienne_m, only : test_t, test_result_t, test_description_t
 #if ! HAVE_PROCEDURE_ACTUAL_FOR_POINTER_DUMMY
   use julienne_m, only : test_function_i
 #endif
@@ -15,7 +16,7 @@ module prif_num_images_test_m
   private
   public :: prif_num_images_test_t
 
-  type, extends(test_t) :: prif_num_images_test_t
+  type, extends(prif_test_t) :: prif_num_images_test_t
   contains
     procedure, nopass :: subject
     procedure, nopass :: results
