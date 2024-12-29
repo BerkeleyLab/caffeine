@@ -78,115 +78,103 @@ contains
 
     function max_default_integer_scalars() result(test_passes)
         logical test_passes
-        integer i, status_, me, num_imgs
+        integer i, status_, n
 
         status_ = -1
-        call prif_this_image_no_coarray(this_image=me)
-        i = -me
+        call prif_this_image_no_coarray(this_image=i)
         call prif_co_max(i, stat=status_)
-        call prif_num_images(num_images=num_imgs)
-        test_passes = i == -num_imgs .and. status_ == 0
+        call prif_num_images(num_images=n)
+        test_passes = i == n .and. status_ == 0
     end function
 
     function max_c_int64_scalars() result(test_passes)
         use iso_c_binding, only : c_int64_t
         logical test_passes
         integer(c_int64_t) i
-        integer :: me
+        integer me, status_, n
 
+        status_ = -1
         call prif_this_image_no_coarray(this_image=me)
         i = me
-        call prif_co_max(i)
-        test_passes = int(i) == 1
+        call prif_co_max(i, stat=status_)
+        call prif_num_images(num_images=n)
+        test_passes = i == int(n)
     end function
 
     function max_default_integer_1D_array() result(test_passes)
         logical test_passes
-        integer i, me, num_imgs
+        integer i, me, n
         integer, allocatable :: array(:)
 
         call prif_this_image_no_coarray(this_image=me)
-        call prif_num_images(num_images=num_imgs)
-        associate(sequence_ => me*[(i, i=1, num_imgs)])
+        call prif_num_images(num_images=n)
+        associate(sequence_ => me*[(i, i=1, n)])
           array = sequence_
           call prif_co_max(array)
-          associate(min_sequence => [(i, i=1, num_imgs)])
-            test_passes = all(min_sequence == array)
+          associate(max_sequence => n*[(i, i=1, n)])
+            test_passes = all(max_sequence == array)
           end associate
         end associate
     end function
 
     function max_default_integer_7D_array() result(test_passes)
         logical test_passes
-        integer array(2,1,1, 1,1,1, 2), status_, me, num_imgs
+        integer array(2,1,1, 1,1,1, 2), status_, me, n
 
         status_ = -1
         call prif_this_image_no_coarray(this_image=me)
         array = 3 - me
         call prif_co_max(array, stat=status_)
-        call prif_num_images(num_images=num_imgs)
-        test_passes = all(array == 3 - num_imgs) .and. status_ == 0
+        call prif_num_images(num_images=n)
+        test_passes = all(array == 3 - 1) .and. status_ == 0
     end function
 
     function max_default_real_scalars() result(test_passes)
         logical test_passes
         real scalar
         real, parameter :: pi = 3.141592654
-        integer status_, me, num_imgs
+        integer status_, me, n
 
         status_ = -1
         call prif_this_image_no_coarray(this_image=me)
         scalar = -pi*me
         call prif_co_max(scalar, stat=status_)
-        call prif_num_images(num_images=num_imgs)
-        test_passes = -dble(pi*num_imgs) == dble(scalar) .and. status_ == 0
+        call prif_num_images(num_images=n)
+        test_passes = -dble(pi*1) == dble(scalar) .and. status_ == 0
     end function
 
     function max_double_precision_2D_array() result(test_passes)
         logical test_passes
         double precision, allocatable :: array(:,:)
         double precision, parameter :: tent(*,*) = dble(reshape(-[0,1,2,3,2,1], [3,2]))
-        integer :: me, num_imgs
+        integer :: me, n
 
         call prif_this_image_no_coarray(this_image=me)
         array = tent*dble(me)
         call prif_co_max(array)
-        call prif_num_images(num_images=num_imgs)
-        test_passes = all(array==tent*num_imgs)
+        call prif_num_images(num_images=n)
+        test_passes = all(array==tent*dble(1))
     end function
 
     function max_elements_in_2D_string_arrays() result(test_passes)
       logical test_passes
-      character(len=*), parameter :: script(*) = &
-        [character(len=len("the question.")) :: "To be ","or not"," to ","be.","  That is ","the question."]
-      character(len=len(script)), dimension(3,2) :: scramlet, co_max_scramlet
-      integer i, cyclic_permutation(size(script)), me
+      character(len=*), parameter :: script(*,*,*) = reshape( &
+          [ "To be   ","or not  "   & ! odd images get
+          , "to      ","be.     "   & ! this slice: script(:,:,1)
+                                      !--------------------------
+          , "that    ","is      "   & ! even images get 
+          , "the     ","question"], & ! this slice: script(:,:,2)
+          [2,2,2])
+      character(len=len(script)), dimension(size(script,1),size(script,2)) :: slice
+      integer me, ni
 
       call prif_this_image_no_coarray(this_image=me)
-      associate(cyclic_permutation => [(1 + mod(i-1,size(script)), i=me, me+size(script) )])
-        scramlet = reshape(script(cyclic_permutation), shape(scramlet))
+      call prif_num_images(ni)
+      slice = script(:,:,mod(me-1,size(script,3))+1)
+      call prif_co_max(slice)
+      associate(expected => maxval(script(:,:,1:min(ni,size(script,3))), dim=3))
+        test_passes = all(expected == slice)
       end associate
-
-      co_max_scramlet = scramlet
-      call prif_co_max(co_max_scramlet, result_image=1)
-
-      block
-        integer j, delta_j, num_imgs
-        character(len=len(script)) expected_script(size(script)), expected_scramlet(size(scramlet,1),size(scramlet,2))
-
-        call prif_num_images(num_images=num_imgs)
-        do j=1, size(script)
-          expected_script(j) = script(j)
-          do delta_j = 1, min(num_imgs-1, size(script))
-            associate(periodic_index => 1 + mod(j+delta_j-1, size(script)))
-              expected_script(j) = min(expected_script(j), script(periodic_index))
-            end associate
-          end do
-        end do
-        expected_scramlet = reshape(expected_script, shape(scramlet))
-        test_passes =  all(scramlet == co_max_scramlet)
-      end block
-
     end function
 
     function reverse_alphabetize_default_characters() result(test_passes)
@@ -194,7 +182,7 @@ contains
       integer, parameter :: length = len("to party!")
       character(len=length), parameter :: words(*) = [character(len=length):: "Loddy","doddy","we","like","to party!"]
       character(len=:), allocatable :: my_word, expected_word
-      integer :: me, num_imgs
+      integer :: me, n
 
       call prif_this_image_no_coarray(this_image=me)
       associate(periodic_index => 1 + mod(me-1,size(words)))
@@ -202,9 +190,8 @@ contains
         call prif_co_max(my_word)
       end associate
 
-      call prif_num_images(num_images=num_imgs)
-      ! expected_word = minval(words(1:min(num_imgs, size(words)))) ! this line exposes a flang bug
-      expected_word = "Loddy"
+      call prif_num_images(num_images=n)
+      expected_word = maxval(words(1:min(n, size(words)))) ! this line exposes a flang bug
       test_passes = expected_word == my_word
     end function
 
