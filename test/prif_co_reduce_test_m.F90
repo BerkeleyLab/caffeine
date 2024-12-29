@@ -2,10 +2,12 @@
 ! Terms of use are as specified in LICENSE.txt
 
 #include "language-support.F90"
+#include "assert_macros.h"
 
 module prif_co_reduce_test_m
   !! Unit test fort the prif_init program inititation subroutine
-  use prif, only : prif_co_reduce, prif_num_images, prif_this_image_no_coarray, prif_error_stop
+  use assert_m
+  use prif, only : prif_co_reduce, prif_num_images, prif_this_image_no_coarray, prif_error_stop, prif_co_max
   use prif_test_m, only : prif_test_t, test_description_substring
   use iso_c_binding, only : c_bool, c_funloc, c_char, c_double, c_int64_t
   use julienne_m, only : test_result_t, test_description_t
@@ -36,15 +38,15 @@ contains
 
 #if HAVE_PROCEDURE_ACTUAL_FOR_POINTER_DUMMY
     test_descriptions = [ & 
-        test_description_t("alphabetical reduction of strings with result_image present",   alphabetically_first_string) &
-       ,test_description_t("sums default integer scalars with no optional arguments",       sum_default_integer_scalars) &
-       ,test_description_t("sums integer(c_int64_t) scalars with no optional arguments",    sum_c_int64_t_scalars) &
-       ,test_description_t("multiplies default real scalars with all optional arguments",   multiply_default_real_scalars) &
-       ,test_description_t("multiplies real(c_double) scalars with all optional arguments", multiply_c_double_scalars) &
-       ,test_description_t("performs a collective .and. operation across logical scalars",  reports_on_consensus) &
-       ,test_description_t("sums default complex scalars with a stat-variable present",     sum_default_complex_scalars) &
-       ,test_description_t("sums complex(c_double) scalars with a stat-variable present",   sum_complex_c_double_scalars) &
-       ,test_description_t("sums default integer elements of a 2D array across images",     sum_integer_array_elements) &
+       test_description_t("sums default integer scalars with no optional arguments",       sum_default_integer_scalars) &
+      ,test_description_t("sums integer(c_int64_t) scalars with no optional arguments",    sum_c_int64_t_scalars) &
+      ,test_description_t("multiplies default real scalars with all optional arguments",   multiply_default_real_scalars) &
+      ,test_description_t("multiplies real(c_double) scalars with all optional arguments", multiply_c_double_scalars) &
+      ,test_description_t("performs a collective .and. operation across logical scalars",  reports_on_consensus) &
+      ,test_description_t("sums default complex scalars with a stat-variable present",     sum_default_complex_scalars) &
+      ,test_description_t("sums complex(c_double) scalars with a stat-variable present",   sum_complex_c_double_scalars) &
+      ,test_description_t("sums default integer elements of a 2D array across images",     sum_integer_array_elements) &
+      ,test_description_t("alphabetical reduction of strings with result_image present",   alphabetically_first_string) &
     ]   
 #else
     procedure(test_function_i), pointer :: &
@@ -59,8 +61,7 @@ contains
      ,sum_integer_array_elements_ptr     => sum_integer_array_elements
 
     test_descriptions = [ & 
-       test_description_t("alphabetical reduction of strings with result_image present",   alphabetically_first_string_ptr) &
-      ,test_description_t("sums default integer scalars with no optional arguments",       sum_default_integer_scalars_ptr) &
+       test_description_t("sums default integer scalars with no optional arguments",       sum_default_integer_scalars_ptr) &
       ,test_description_t("sums integer(c_int64_t) scalars with no optional arguments",    sum_c_int64_t_scalars_ptr) &
       ,test_description_t("multiplies default real scalars with all optional arguments",   multiply_default_real_scalars_ptr) &
       ,test_description_t("multiplies real(c_double) scalars with all optional arguments", multiply_c_double_scalars_ptr) &
@@ -68,6 +69,7 @@ contains
       ,test_description_t("sums default complex scalars with a stat-variable present",     sum_default_complex_scalars_ptr) &
       ,test_description_t("sums complex(c_double) scalars with a stat-variable present",   sum_complex_c_double_scalars_ptr) &
       ,test_description_t("sums default integer elements of a 2D array across images",     sum_integer_array_elements_ptr) &
+      ,test_description_t("alphabetical reduction of strings with result_image present",   alphabetically_first_string_ptr) &
     ]
 #endif
 
@@ -81,30 +83,25 @@ contains
   function alphabetically_first_string() result(test_passes)
     logical test_passes
     character(len=*, kind=c_char), parameter :: names(*) = ["larry","harry","carey","betty","tommy","billy"]
-    character(len=:, kind=c_char), allocatable :: my_name(:)
-    character(len=:), allocatable :: expected_name
-    integer :: me, num_imgs
+    character(len=len(names), kind=c_char) my_name, expected_name
+    integer :: me, n
 
     call prif_this_image_no_coarray(this_image=me)
     associate(periodic_index => 1 + mod(me-1,size(names)))
-      my_name = [names(periodic_index)]
+      my_name = names(periodic_index)
       call prif_co_reduce(my_name, c_funloc(alphabetize))
     end associate
 
-    call prif_num_images(num_images=num_imgs)
-    expected_name = minval(names(1:min(num_imgs, size(names)))) ! this exposes a flang bug
-    test_passes = all(expected_name == my_name)
+    call prif_num_images(num_images=n)
+    expected_name = minval(names(1:min(n, size(names)))) ! this exposes a flang bug
+    test_passes = expected_name == my_name
 
   contains
 
-    function alphabetize(lhs, rhs) result(first_alphabetically)
+    pure function alphabetize(lhs, rhs) result(first_alphabetically)
       character(len=*), intent(in) :: lhs, rhs
-      character(len=:), allocatable :: first_alphabetically
-
-      if (len(lhs).ne.len(rhs)) then
-        call prif_error_stop(quiet=.false._c_bool, &
-          stop_code_char="co_reduce_s alphabetize: LHS(" // lhs // ")/RHS(" // rhs // ") length don't match")
-      end if
+      character(len=len(lhs)) first_alphabetically
+      call_assert(len(lhs) == len(rhs))
       first_alphabetically = min(lhs,rhs)
     end function
 
