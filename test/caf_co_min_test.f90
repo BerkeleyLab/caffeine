@@ -106,21 +106,24 @@ contains
     function min_elements_in_2D_string_arrays() result(result_)
       type(result_t) result_
       character(len=*), parameter :: script(*,*,*) = reshape( &
-          [ "To be   ","or not  " &
-          , "to      ","be.     " &
-
-          , "that    ","is      " &
-          , "the     ","question"], &
+          [ "To be   ","or not  "   & ! images with odd image
+          , "to      ","be.     "   & ! numbers get this slice
+                                      ! ----------------------
+          , "that    ","is      "   & ! images with even image
+          , "the     ","question"], & ! numbers get this slice
           [2,2,2])
-      character(len=len(script)), dimension(size(script,1),size(script,2)) :: scramlet, expected
+      character(len=len(script)), dimension(size(script,1),size(script,2)) :: slice
       integer me, ni
 
       call prif_this_image_no_coarray(this_image=me)
       call prif_num_images(ni)
-      scramlet = script(:,:,mod(me,size(script,3))+1)
-      call prif_co_min(scramlet)
-      expected = minval(script(:,:,1:min(ni,size(script,3))), dim=3)
-      result_ = assert_that(all(expected == scramlet),"all(expected == scramlet)")
+      associate(slice_number => mod(me-1,size(script,3)) + 1)
+        slice = script(:,:,slice_number)
+      end associate
+      call prif_co_min(slice)
+      associate(expected => minval(script(:,:,1:min(ni,size(script,3))), dim=3))
+        result_ = assert_that(all(expected == slice),"all(expected == scramlet)")
+      end associate
     end function
 
     function alphabetically_1st_scalar_string() result(result_)
