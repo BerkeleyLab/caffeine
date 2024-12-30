@@ -9,7 +9,7 @@ submodule(prif_test_m) prif_test_s
 
 contains
 
-  subroutine co_all(boolean)
+  impure elemental subroutine co_all(boolean)
     logical(c_bool), intent(inout) :: boolean
     call prif_co_reduce(boolean, c_funloc(both))
   contains
@@ -61,11 +61,8 @@ contains
         end if
         block 
           logical(c_bool), allocatable :: passing_tests(:)
-          integer test
           passing_tests = test_results%passed()
-          do test = 1, size(passing_tests)
-            call co_all(passing_tests(test))
-          end do
+          call co_all(passing_tests)
           associate(num_passes => count(passing_tests))
             if (me==1) print '(a,2(i0,a))'," ",num_passes," of ", num_tests," tests pass."
             passes = passes + num_passes
