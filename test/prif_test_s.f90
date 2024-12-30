@@ -42,7 +42,7 @@ contains
         end if
       end if first_report
 
-      print '(*(a))', new_line('a'), test%subject()
+      print '(*(a))', new_line(''), test%subject()
 
     end if
 
@@ -55,7 +55,7 @@ contains
           block
             integer i
             do i=1,num_tests
-              if (me==1) print '(3x,a)', test_results(i)%characterize()
+              print '(3x,a)', test_results(i)%characterize()
             end do
           end block
         end if
