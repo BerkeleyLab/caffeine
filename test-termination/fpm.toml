@@ -1,0 +1,10 @@
+name       = "Caffeine-Termination-Tests"
+license    = "(Please see caffeine/LICENSE.txt.)"
+author     = "(Please see caffeine/fpm.toml.)"
+maintainer = "(Please see caffeine/fpm.toml.)"
+
+[dev-dependencies]
+caffeine = { path = ".." }
+
+[build]
+link = ["gasnet-smp-seq", "gcc"]
