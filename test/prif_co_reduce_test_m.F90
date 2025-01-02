@@ -2,11 +2,9 @@
 ! Terms of use are as specified in LICENSE.txt
 
 #include "language-support.F90"
-#include "assert_macros.h"
 
 module prif_co_reduce_test_m
   !! Unit test fort the prif_init program inititation subroutine
-  use assert_m
   use prif, only : prif_co_reduce, prif_num_images, prif_this_image_no_coarray, prif_error_stop, prif_co_max
   use prif_test_m, only : prif_test_t, test_description_substring
   use iso_c_binding, only : c_bool, c_funloc, c_char, c_double, c_int64_t
@@ -101,7 +99,7 @@ contains
     pure function alphabetize(lhs, rhs) result(first_alphabetically)
       character(len=*), intent(in) :: lhs, rhs
       character(len=len(lhs)) first_alphabetically
-      call_assert(len(lhs) == len(rhs))
+      if (len(lhs) /= len(rhs)) call prif_error_stop(quiet=.false., stop_code_char="argument size mismatchin in function alphabetize")
       first_alphabetically = min(lhs,rhs)
     end function
 

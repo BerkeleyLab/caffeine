@@ -7,6 +7,5 @@ copyright = "2021-2024 UC Regents"
 
 [dev-dependencies]
 julienne = {git = "https://github.com/berkeleylab/julienne.git", tag = "1.5.3"}
-assert = {git = "https://github.com/berkeleylab/assert.git", tag = "2.0.0"}
 
 [build]

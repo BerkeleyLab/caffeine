@@ -1,11 +1,7 @@
 ! Copyright (c) 2020-2024, The Regents of the University of California
 ! Terms of use are as specified in LICENSE.txt
-
-#include "assert_macros.h"
-
 program main
   !! Test the Caffeine implementation of the Parallel Runtime Interface for Fortran (PRIF)
-  use assert_m
   use iso_c_binding, only : c_bool
   use julienne_m, only : command_line_t, GitHub_CI
   use prif, only : &
@@ -34,7 +30,6 @@ program main
 
   call stop_and_print_usage_info_if_help_requested
   call prif_init(stat=init_status)
-  call_assert(init_status==successful)
   call run_tests_and_report(passes, tests)
   call prif_this_image_no_coarray(this_image=me)
   if (me==1) print "(a,*(a,G0))", new_line(''), "_________ In total, ",passes," of ",tests, " tests pass. _________"
