@@ -3,7 +3,7 @@ version = "0.4.1"
 license = "BSD"
 author = ["Damian Rouson", "Brad Richardson", "Katherine Rasmussen", "Dan Bonachea"]
 maintainer = "rouson@lbl.gov"
-copyright = "2021-2024 UC Regents"
+copyright = "2021-2025 The Regents of the University of California, through Lawrence Berkeley National Laboratory"
 
 [dev-dependencies]
 veggies = {git = "https://gitlab.com/everythingfunctional/veggies", tag = "v1.1.3"}

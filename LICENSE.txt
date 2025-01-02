@@ -7,7 +7,7 @@ are subject to the following copyright and licensing terms:
 
 *** Copyright Notice ***
 
-Caffeine Copyright (c) 2021-2024, The Regents of the University of California,
+Caffeine Copyright (c) 2021-2025, The Regents of the University of California,
 through Lawrence Berkeley National Laboratory (subject to receipt of
 any required approvals from the U.S. Dept. of Energy), Archaeologic Inc.,
 and Harris Snyder. All rights reserved.
@@ -25,7 +25,7 @@ works, and perform publicly and display publicly, and to permit others to do so.
 
 *** License Agreement ***
 
-Caffeine Copyright (c) 2021-2024, The Regents of the University of California,
+Caffeine Copyright (c) 2021-2025, The Regents of the University of California,
 through Lawrence Berkeley National Laboratory (subject to receipt of
 any required approvals from the U.S. Dept. of Energy), Archaeologic Inc., 
 and Harris Snyder. All rights reserved.
