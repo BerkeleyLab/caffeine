@@ -96,10 +96,10 @@ contains
 
   contains
 
-    pure function alphabetize(lhs, rhs) result(first_alphabetically)
+    function alphabetize(lhs, rhs) result(first_alphabetically)
       character(len=*), intent(in) :: lhs, rhs
       character(len=len(lhs)) first_alphabetically
-      if (len(lhs) /= len(rhs)) call prif_error_stop(quiet=.false., stop_code_char="argument size mismatchin in function alphabetize")
+      if (len(lhs) /= len(rhs)) call prif_error_stop(quiet=.false._c_bool, stop_code_char="argument size mismatchin in function alphabetize")
       first_alphabetically = min(lhs,rhs)
     end function
 
