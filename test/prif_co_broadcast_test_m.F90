@@ -7,9 +7,9 @@ module prif_co_broadcast_test_m
   !! Unit test for the prif_co_broadcast subroutine
   use prif, only : prif_co_broadcast, prif_num_images, prif_this_image_no_coarray
   use prif_test_m, only : prif_test_t, test_description_substring
-  use julienne_m, only : test_t, test_result_t, test_description_t
+  use julienne_m, only : test_t, test_result_t, test_description_t, test_diagnosis_t, string_t
 #if ! HAVE_PROCEDURE_ACTUAL_FOR_POINTER_DUMMY
-  use julienne_m, only : test_function_i
+  use julienne_m, only : diagnosis_function_i
 #endif
   implicit none
 
@@ -50,7 +50,7 @@ contains
       ,test_description_t("broadcasts a derived type scalar with no allocatable components", broadcast_derived_type) &
     ]
 #else
-    procedure(test_function_i), pointer :: broadcast_default_integer_ptr, broadcast_derived_type_ptr
+    procedure(diagnosis_function_i), pointer :: broadcast_default_integer_ptr, broadcast_derived_type_ptr
 
     broadcast_default_integer_ptr => broadcast_default_integer
     broadcast_derived_type_ptr => broadcast_derived_type
@@ -68,38 +68,56 @@ contains
     test_results = test_descriptions%run()
   end function
 
-  logical pure function equals(lhs, rhs) 
+  pure function equals(lhs, rhs) result(lhs_equals_rhs)
     type(object_t), intent(in) :: lhs, rhs 
-    equals = all([ &
-      lhs%i == rhs%i &
-     ,lhs%fallacy .eqv. rhs%fallacy &
-     ,lhs%actor == rhs%actor &
-     ,lhs%issues == rhs%issues &
-    ])
+    logical lhs_equals_rhs 
+    lhs_equals_rhs = &
+            (lhs%i == rhs%i) &
+      .and. (lhs%fallacy .eqv. rhs%fallacy) &
+      .and. (lhs%actor == rhs%actor) &
+      .and. (lhs%issues == rhs%issues)
   end function
 
-  function broadcast_default_integer() result(test_passes)
-    logical test_passes
-    integer iPhone, me
+  pure function stringify(self) result(string)
+    class(object_t), intent(in) :: self
+    type(string_t) string
+    string = "object_t(" &
+                   // string_t(self%i) &
+          //   "," // merge("T","F",self%fallacy) &
+          //   "," // string_t(self%actor) &
+          //   ",(" // string_t(self%issues%Re) //","// string_t(self%issues%Re) // ")" &
+          // ")"
+  end function
+
+  function broadcast_default_integer() result(test_diagnosis)
+    type(test_diagnosis_t) test_diagnosis
+    integer received_value, me
     integer, parameter :: source_value = 7779311, junk = -99
 
     call prif_this_image_no_coarray(this_image=me)
-    iPhone = merge(source_value, junk, me==1)
-    call prif_co_broadcast(iPhone, source_image=1)
-    test_passes = source_value == iPhone
+    received_value = merge(source_value, junk, me==1)
+    call prif_co_broadcast(received_value, source_image=1)
+    
+    test_diagnosis = test_diagnosis_t( &
+       test_passed = source_value == received_value &
+      ,diagnostics_string = "expected " // string_t(source_value) // ", actual " // string_t(received_value) &
+    )
   end function
 
-  function broadcast_derived_type() result(test_passes)
-    logical test_passes
+  function broadcast_derived_type() result(test_diagnosis)
+    type(test_diagnosis_t) test_diagnosis
     type(object_t) object
-    integer :: me, ni
+    integer me, ni
 
     call prif_this_image_no_coarray(this_image=me)
     call prif_num_images(num_images=ni)
     object = object_t(me, .false., "gooey", me*(1.,0.))
     call prif_co_broadcast(object, source_image=ni)
     associate(expected_object => object_t(ni, .false., "gooey", ni*(1.,0.)))
-      test_passes = expected_object == object
+      test_diagnosis = test_diagnosis_t( &
+         test_passed = expected_object == object &
+        ,diagnostics_string = "expected " // stringify(object) // ", actual " // stringify(expected_object) &
+    )
     end associate
 
   end function
