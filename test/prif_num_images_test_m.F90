@@ -7,9 +7,9 @@ module prif_num_images_test_m
   !! Unit test for the prif_num_images subroutine
   use prif, only : prif_num_images
   use prif_test_m, only : prif_test_t, test_description_substring
-  use julienne_m, only : test_t, test_result_t, test_description_t
+  use julienne_m, only : test_t, test_result_t, test_description_t, test_diagnosis_t, string_t
 #if ! HAVE_PROCEDURE_ACTUAL_FOR_POINTER_DUMMY
-  use julienne_m, only : test_function_i
+  use julienne_m, only : diagnosis_function_i
 #endif
   implicit none
 
@@ -38,7 +38,7 @@ contains
       test_description_t("providing a valid number of images when called with no arguments", check_num_images_valid) &
     ]   
 #else
-    procedure(test_function_i), pointer :: check_num_images_valid_ptr
+    procedure(diagnosis_function_i), pointer :: check_num_images_valid_ptr
 
     check_num_images_valid_ptr => check_num_images_valid
 
@@ -54,11 +54,12 @@ contains
     test_results = test_descriptions%run()
   end function
 
-  function check_num_images_valid() result(test_passes)
-    logical test_passes
-    integer num_imgs
-    call prif_num_images(num_images=num_imgs)
-    test_passes = num_imgs > 0
+  function check_num_images_valid() result(test_diagnosis)
+    type(test_diagnosis_t) test_diagnosis
+    integer n
+
+    call prif_num_images(num_images=n)
+    test_diagnosis = test_diagnosis_t(test_passed = n > 0, diagnostics_string = "expected: n > 0" // ", actual: " // string_t(n))
   end function
 
 end module prif_num_images_test_m
