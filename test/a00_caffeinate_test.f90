@@ -1,6 +1,7 @@
 module a00_caffeinate_test
     use prif, only : prif_init, PRIF_STAT_ALREADY_INIT
-    use veggies, only: test_item_t, describe, result_t, it, assert_that
+    use veggies, only: test_item_t, result_t, assert_that
+    use prif_veggies, only: describe, it
 
     implicit none
     private
