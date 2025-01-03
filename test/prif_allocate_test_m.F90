@@ -105,8 +105,6 @@ contains
     !! integer :: coarr[*]
     logical, allocatable :: test_passes(:)
     integer(kind=c_intmax_t), dimension(1) :: lcobounds, ucobounds
-    integer(kind=c_intmax_t), dimension(0), parameter :: lbounds = [integer(kind=c_intmax_t) ::]
-    integer(kind=c_intmax_t), dimension(0), parameter :: ubounds = [integer(kind=c_intmax_t) ::]
     integer, pointer :: local_slice
     integer dummy_element, num_imgs
     type(prif_coarray_handle) coarray_handle
