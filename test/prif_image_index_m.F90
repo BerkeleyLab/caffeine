@@ -8,9 +8,9 @@ module prif_image_index_test_m
   use iso_c_binding, only: c_int, c_intmax_t, c_ptr, c_size_t, c_null_funptr
   use prif, only: prif_coarray_handle, prif_allocate_coarray, prif_deallocate_coarray, prif_image_index, prif_num_images
   use prif_test_m, only: prif_test_t, test_description_substring
-  use julienne_m, only : test_result_t, test_description_t
+  use julienne_m, only : test_result_t, test_description_t, string_t, test_diagnosis_t
 #if ! HAVE_PROCEDURE_ACTUAL_FOR_POINTER_DUMMY
-  use julienne_m, only : test_function_i
+  use julienne_m, only : diagnosis_function_i
 #endif
   implicit none
 
@@ -43,7 +43,7 @@ contains
     ]
 
 #else
-    procedure(test_function_i), pointer :: &
+    procedure(diagnosis_function_i), pointer :: &
       check_simple_case_ptr, &
       check_lower_bounds_ptr, &
       check_invalid_subscripts_ptr, &
@@ -68,8 +68,8 @@ contains
   end function
 
 
-  function check_simple_case() result(test_passes)
-    logical test_passes
+  function check_simple_case() result(test_diagnosis)
+    type(test_diagnosis_t) test_diagnosis
     type(prif_coarray_handle) :: coarray_handle
     type(c_ptr) :: allocated_memory
     integer(c_int) :: answer
@@ -82,12 +82,15 @@ contains
       coarray_handle = coarray_handle, &
       allocated_memory = allocated_memory)
     call prif_image_index(coarray_handle, [1_c_intmax_t], image_index=answer)
-    test_passes = answer == 1_c_int
     call prif_deallocate_coarray([coarray_handle])
+    test_diagnosis = test_diagnosis_t( &
+       test_passed = answer == 1_c_int &
+      ,diagnostics_string = "expected " // string_t(1_c_int) // ", actual " // string_t(answer) &
+    )
   end function
 
-  function check_lower_bounds() result(test_passes)
-    logical test_passes
+  function check_lower_bounds() result(test_diagnosis)
+    type(test_diagnosis_t) test_diagnosis
     type(prif_coarray_handle) coarray_handle
     type(c_ptr) allocated_memory
     integer(c_int) answer
@@ -100,12 +103,15 @@ contains
       coarray_handle = coarray_handle, &
       allocated_memory = allocated_memory)
     call prif_image_index(coarray_handle, [2_c_intmax_t, 3_c_intmax_t], image_index=answer)
-    test_passes = answer == 1_c_int
     call prif_deallocate_coarray([coarray_handle])
+    test_diagnosis = test_diagnosis_t( &
+       test_passed = answer == 1_c_int &
+      ,diagnostics_string = "expected " // string_t(1_c_int) // ", actual " // string_t(answer) &
+    )
   end function
 
-  function check_invalid_subscripts() result(test_passes)
-    logical test_passes
+  function check_invalid_subscripts() result(test_diagnosis)
+    type(test_diagnosis_t) test_diagnosis
     type(prif_coarray_handle) coarray_handle
     type(c_ptr) allocated_memory
     integer(c_int) answer
@@ -118,12 +124,15 @@ contains
       coarray_handle = coarray_handle, &
       allocated_memory = allocated_memory)
     call prif_image_index(coarray_handle, [-1_c_intmax_t, 1_c_intmax_t], image_index=answer)
-    test_passes = answer == 0_c_int
     call prif_deallocate_coarray([coarray_handle])
+    test_diagnosis = test_diagnosis_t( &
+       test_passed = answer == 0_c_int &
+      ,diagnostics_string = "expected " // string_t(0_c_int) // ", actual " // string_t(answer) &
+    )
   end function
 
-  function check_complicated() result(test_passes)
-    logical test_passes
+  function check_complicated() result(test_diagnosis)
+    type(test_diagnosis_t) test_diagnosis
     type(prif_coarray_handle) coarray_handle
     type(c_ptr) allocated_memory
     integer(c_int) answer, ni
@@ -137,8 +146,13 @@ contains
       coarray_handle = coarray_handle, &
       allocated_memory = allocated_memory)
     call prif_image_index(coarray_handle, [1_c_intmax_t, 3_c_intmax_t], image_index=answer)
-    test_passes = answer == merge(3_c_int, 0_c_int, ni >= 3)
     call prif_deallocate_coarray([coarray_handle])
+    associate(expected_answer => merge(3_c_int, 0_c_int, ni >= 3))
+      test_diagnosis = test_diagnosis_t( &
+         test_passed = answer == expected_answer &
+        ,diagnostics_string = "expected " // string_t(expected_answer) // ", actual " // string_t(answer) &
+      )
+    end associate
   end function
 
 end module prif_image_index_test_m
