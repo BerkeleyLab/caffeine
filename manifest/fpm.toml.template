@@ -6,6 +6,6 @@ maintainer = "rouson@lbl.gov"
 copyright = "2021-2024 UC Regents"
 
 [dev-dependencies]
-julienne = {git = "https://github.com/berkeleylab/julienne.git", tag = "1.5.3"}
+julienne = {git = "https://github.com/berkeleylab/julienne.git", tag = "1.6.0"}
 
 [build]
