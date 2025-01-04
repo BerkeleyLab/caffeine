@@ -10,9 +10,9 @@ module prif_teams_test_m
   use prif, only: &
      prif_coarray_handle, prif_allocate_coarray, prif_deallocate_coarray, prif_this_image_no_coarray, prif_num_images &
     ,prif_team_type,      prif_form_team,        prif_change_team,        prif_end_team
-  use julienne_m, only : test_result_t, test_description_t
+  use julienne_m, only : test_result_t, test_description_t, test_diagnosis_t, string_t
 #if ! HAVE_PROCEDURE_ACTUAL_FOR_POINTER_DUMMY
-  use julienne_m, only : test_function_i
+  use julienne_m, only : diagnosis_function_i
 #endif
   implicit none
 
@@ -40,7 +40,7 @@ contains
     test_descriptions = [test_description_t("team creation, change, and coarray allocation", check_teams)]
 
 #else
-    procedure(test_function_i), pointer :: check_teams_ptr
+    procedure(diagnosis_function_i), pointer :: check_teams_ptr
     check_teams_ptr => check_teams
     test_descriptions = [test_description_t("team creation, change, and coarray allocation", check_teams_ptr)]
 #endif
@@ -52,8 +52,8 @@ contains
     test_results = test_descriptions%run()
   end function
 
-  function check_teams() result(test_passes)
-      logical test_passes
+  function check_teams() result(test_diagnosis)
+      type(test_diagnosis_t) test_diagnosis
       integer dummy_element, initial_num_imgs, num_imgs, me, i
       integer(c_size_t) element_size
       integer(c_intmax_t) which_team
@@ -69,7 +69,12 @@ contains
       call prif_change_team(team)
       call prif_num_images(num_images=num_imgs)
 
-      test_passes = num_imgs == initial_num_imgs/2 + mod(initial_num_imgs,2)*(int(which_team)-1)
+      associate(expected_images => initial_num_imgs/2 + mod(initial_num_imgs,2)*(int(which_team)-1))
+        test_diagnosis = test_diagnosis_t( &
+           test_passed = num_imgs == expected_images &
+          ,diagnostics_string = "expected " // string_t(expected_images) // "; actual " // string_t(num_imgs) &
+        )
+      end associate
 
       do i = 1, num_coarrays
           call prif_allocate_coarray( &
