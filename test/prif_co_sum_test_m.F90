@@ -7,9 +7,9 @@ module prif_co_sum_test_m
   !! Unit test fort the prif_co_sum program inititation subroutine
   use prif, only : prif_co_sum, prif_num_images, prif_this_image_no_coarray
   use prif_test_m, only : prif_test_t, test_description_substring
-  use julienne_m, only : test_result_t, test_description_t
+  use julienne_m, only : test_result_t, test_description_t, test_diagnosis_t, string_t, operator(.csv.)
 #if ! HAVE_PROCEDURE_ACTUAL_FOR_POINTER_DUMMY
-  use julienne_m, only : test_function_i
+  use julienne_m, only : diagnosis_function_i
 #endif
   implicit none
 
@@ -46,7 +46,7 @@ contains
       ,test_description_t("summing double-precision 1D complex arrays with no optional arguments", sum_dble_complex_1D_arrays) &
     ]   
 #else
-    procedure(test_function_i), pointer :: &
+    procedure(diagnosis_function_i), pointer :: &
        sum_default_integer_scalars_ptr   =>  sum_default_integer_scalars  &
       ,sum_integers_all_arguments_ptr    =>  sum_integers_all_arguments   &
       ,sum_c_int64_scalars_ptr           =>  sum_c_int64_scalars          &
@@ -77,18 +77,21 @@ contains
     test_results = test_descriptions%run()
   end function
 
-  function sum_default_integer_scalars() result(test_passes)
-      logical test_passes
-      integer i, num_imgs
+  function sum_default_integer_scalars() result(test_diagnosis)
+      type(test_diagnosis_t) test_diagnosis
+      integer image_count, n
 
-      i = 1
-      call prif_co_sum(i)
-      call prif_num_images(num_images=num_imgs)
-      test_passes = num_imgs == i
+      image_count = 1
+      call prif_co_sum(image_count)
+      call prif_num_images(num_images=n)
+      test_diagnosis = test_diagnosis_t( &
+         test_passed = image_count == n &
+        ,diagnostics_string = "expected " // string_t(n) // ", actual " // string_t(image_count) &
+      )
   end function
 
-  function sum_integers_all_arguments() result(test_passes)
-      logical test_passes
+  function sum_integers_all_arguments() result(test_diagnosis)
+      type(test_diagnosis_t) test_diagnosis
       integer i, status_, result_image_, me, num_imgs
       character(len=*), parameter :: whitespace = repeat(" ", ncopies=29)
       character(len=:), allocatable :: error_message
@@ -102,26 +105,36 @@ contains
       call prif_num_images(num_images=num_imgs)
       associate(expected_i => merge(num_imgs*i, i, me==result_image_))
         call prif_co_sum(i, result_image_, status_, error_message)
-        test_passes = (expected_i == i) .and. (status_ == 0) .and. (whitespace == error_message)
+        test_diagnosis = test_diagnosis_t( &
+           test_passed = (expected_i == i) .and. (status_ == 0) .and. (whitespace == error_message) &
+          ,diagnostics_string = &
+               "expected i=" // string_t(expected_i) // ", status=" // "0"               // ", error_message='" // whitespace    // "'" & 
+            // ", actual i=" // string_t(i)          // ", status=" // string_t(status_) // ", error_message='" // error_message // "'" &
+        )
       end associate
   end function
 
-  function sum_c_int64_scalars() result(test_passes)
+  function sum_c_int64_scalars() result(test_diagnosis)
       use iso_c_binding, only : c_int64_t
-      logical test_passes
+      type(test_diagnosis_t) test_diagnosis
       integer(c_int64_t) i
       integer i_default_kind, status_, num_imgs
 
       status_ = -1
       i = 2_c_int64_t
       call prif_co_sum(i, stat=status_)
-      i_default_kind = i
+      i_default_kind = int(i,kind(i_default_kind))
       call prif_num_images(num_images=num_imgs)
-      test_passes = (2*num_imgs == int(i)) .and. (status_ == 0)
+      test_diagnosis = test_diagnosis_t( &
+         test_passed = (2*num_imgs == i_default_kind) .and. (status_ == 0) &
+        ,diagnostics_string = &
+             "expected i=" // string_t(2*num_imgs)     // ", status_= " // "0" &
+          // "; actual i=" // string_t(i_default_kind) // ", status_= " // string_t(status_) &
+      )
   end function
 
-  function sum_default_integer_1D_array() result(test_passes)
-      logical test_passes
+  function sum_default_integer_1D_array() result(test_diagnosis)
+      type(test_diagnosis_t) test_diagnosis
       integer i, images
       integer, allocatable :: array(:)
 
@@ -129,26 +142,40 @@ contains
       associate(sequence_ => [(i,i=1,images)])
         array = sequence_
         call prif_co_sum(array)
-        test_passes = all(array == images*sequence_)
+        test_diagnosis = test_diagnosis_t( &
+           test_passed = all(array == images*sequence_) &
+          ,diagnostics_string = &
+               "expected " // .csv. string_t(images*sequence_)  &
+            // "; actual " // .csv. string_t(array) & 
+        )
       end associate
   end function
 
-  function sum_default_integer_15D_array() result(test_passes)
-      logical test_passes
-      integer array(2,1,1, 1,1,1, 1,1,1, 1,1,1, 1,2,1)
+  function sum_default_integer_15D_array() result(test_diagnosis)
+      type(test_diagnosis_t) test_diagnosis
+      integer, target :: array(2,1,1, 1,1,1, 1,1,1, 1,1,1, 1,2,1)
+      integer, pointer :: array_1D_ptr(:)
       integer status_, num_imgs
 
       status_ = -1
       array = 3
       call prif_co_sum(array, stat=status_)
       call prif_num_images(num_images=num_imgs)
-      test_passes = (all(3*num_imgs == array)) .and.  (0 == status_)
+      associate(expected_sum => 3*num_imgs)
+        array_1D_ptr(1:size(array)) => array
+        test_diagnosis = test_diagnosis_t( &
+           test_passed = all(array == expected_sum) .and. (status_ == 0) &
+          ,diagnostics_string = &
+                "expected element value  = " //       string_t(expected_sum) // ", status_= " // "0" &
+             // "; actual element values = " // .csv. string_t(array_1D_ptr) // ", status_= " // string_t(status_) &
+        )
+      end associate
   end function
 
-  function sum_default_real_scalars() result(test_passes)
-      logical test_passes
+  function sum_default_real_scalars() result(test_diagnosis)
+      type(test_diagnosis_t) test_diagnosis
       real scalar
-      real, parameter :: e = 2.7182818459045
+      real, parameter :: e = 2.7182818459045, tolerance = 1E-07
       integer result_image_, me, num_imgs
 
       result_image_ = 1
@@ -157,25 +184,40 @@ contains
       call prif_this_image_no_coarray(this_image=me)
       call prif_num_images(num_images=num_imgs)
       associate(expected_result => merge(num_imgs*e, e, me==result_image_))
-        test_passes = dble(expected_result) == dble(scalar)
+        test_diagnosis = test_diagnosis_t( &
+           test_passed = abs(expected_result - scalar) < tolerance &
+          ,diagnostics_string = "expected " // string_t(expected_result) &
+                             // "; actual " // string_t(scalar) &
+        )
       end associate
   end function
 
-  function sum_double_precision_2D_array() result(test_passes)
-      logical test_passes
-      double precision, allocatable :: array(:,:)
-      double precision, parameter :: input(*,*) = reshape(-[6,5,4,3,2,1], [3,2])
-      integer :: num_imgs
+  function sum_double_precision_2D_array() result(test_diagnosis)
+      type(test_diagnosis_t) test_diagnosis
+      double precision, allocatable, target :: array(:,:)
+      double precision, parameter :: input(*,*) = reshape(-[6,5,4,3,2,1], [3,2]), tolerance = 1D-14
+      double precision, pointer :: array_1D_ptr(:)
+      integer num_imgs
 
       array = input
       call prif_co_sum(array)
       call prif_num_images(num_images=num_imgs)
-      test_passes = product(num_imgs*input) == product(array)
+
+      associate(expected_sum => input*num_imgs)
+        array_1D_ptr(1:size(array)) => array
+        test_diagnosis = test_diagnosis_t( &
+           test_passed = all(abs(expected_sum - array) < tolerance)  &
+          ,diagnostics_string = &
+            "expected " // .csv. string_t(reshape(expected_sum, [size(expected_sum)])) // &
+            "; actual " // .csv. string_t(array_1D_ptr) &
+        )
+      end associate
   end function
 
-  function sum_default_complex_scalars() result(test_passes)
-      logical test_passes
+  function sum_default_complex_scalars() result(test_diagnosis)
+      type(test_diagnosis_t) test_diagnosis
       real scalar
+      real, parameter :: tolerance = 1E-07
       complex z
       complex, parameter :: i=(0.,1.)
       integer status_, num_imgs
@@ -184,20 +226,35 @@ contains
       z = i
       call prif_co_sum(z, stat=status_)
       call prif_num_images(num_images=num_imgs)
-      test_passes = (dble(abs(i*num_imgs)) == dble(abs(z)) ) .and. (status_ == 0)
+      associate(expected_z => i*num_imgs)
+        test_diagnosis = test_diagnosis_t( &
+           test_passed = (abs(expected_z - z) < tolerance ) .and. (status_ == 0) &
+          ,diagnostics_string = &
+               "expected (" // string_t(expected_z%Re) //","// string_t(expected_z%Im) // "; status= " // "0" &
+            // "; actual " // string_t(          z%Re) //","// string_t(         z%Im) // "; status= " // string_t(status_) &
+        )
+      end associate
   end function
 
-  function sum_dble_complex_1D_arrays() result(test_passes)
-      logical test_passes
+  function sum_dble_complex_1D_arrays() result(test_diagnosis)
+      type(test_diagnosis_t) test_diagnosis
       integer, parameter :: dp = kind(1.D0)
       integer :: num_imgs
       complex(dp), allocatable :: array(:)
       complex(dp), parameter :: input(*) = [(1.D0,1.0D0)]
+      double precision, parameter :: tolerance = 1E-14
 
-      array = [(1.D0,1.D0)]
+      array = input
       call prif_co_sum(array)
       call prif_num_images(num_images=num_imgs)
-      test_passes = all([input*num_imgs] == array)
+      associate(expected_sum => input*num_imgs)
+        test_diagnosis = test_diagnosis_t( &
+           test_passed = all(abs(expected_sum - array) < tolerance) &
+          ,diagnostics_string = &
+               "expected (" // string_t(expected_sum(1)%Re) // "," // string_t(expected_sum(1)%Im) // ")" &
+            // "; actual (" // string_t(       array(1)%Re) // "," // string_t(       array(1)%Im) // ")" &
+        )
+      end associate
   end function
 
 end module prif_co_sum_test_m
