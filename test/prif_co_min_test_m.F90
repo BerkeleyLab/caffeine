@@ -8,9 +8,9 @@ module prif_co_min_test_m
   use iso_c_binding, only: c_size_t, c_ptr, c_intmax_t, c_null_funptr
   use prif, only : prif_co_min, prif_num_images, prif_this_image_no_coarray, prif_num_images
   use prif_test_m, only : prif_test_t, test_description_substring
-  use julienne_m, only : test_result_t, test_description_t
+  use julienne_m, only : test_result_t, test_description_t, test_diagnosis_t, string_t, operator(.csv.)
 #if ! HAVE_PROCEDURE_ACTUAL_FOR_POINTER_DUMMY
-  use julienne_m, only : test_function_i
+  use julienne_m, only : diagnosis_function_i
 #endif
   implicit none
 
@@ -47,7 +47,7 @@ contains
       ,test_description_t("length-5 string with no optional arguments",                    alphabetically_1st_scalar_string) &
     ]
 #else
-    procedure(test_function_i), pointer :: & 
+    procedure(diagnosis_function_i), pointer :: & 
        min_default_integer_scalars_ptr      => min_default_integer_scalars      &
       ,min_c_int64_scalars_ptr              => min_c_int64_scalars              &
       ,min_default_integer_1D_array_ptr     => min_default_integer_1D_array     &
@@ -76,8 +76,8 @@ contains
     test_results = test_descriptions%run()
   end function
 
-    function min_default_integer_scalars() result(test_passes)
-        logical test_passes
+    function min_default_integer_scalars() result(test_diagnosis)
+        type(test_diagnosis_t) test_diagnosis
         integer i, status_, me, num_imgs
 
         status_ = -1
@@ -85,23 +85,30 @@ contains
         i = -me
         call prif_co_min(i, stat=status_)
         call prif_num_images(num_images=num_imgs)
-        test_passes = i == -num_imgs .and. status_ == 0
+        test_diagnosis = test_diagnosis_t( &
+            test_passed = (i == -num_imgs) .and. (status_ == 0) &
+           ,diagnostics_string = "expected i = " // string_t(-num_imgs)  // ", status = 0" &
+                              // "; actual i = " // string_t(i)          // ", status = " // string_t(status_) &
+        )
     end function
 
-    function min_c_int64_scalars() result(test_passes)
+    function min_c_int64_scalars() result(test_diagnosis)
         use iso_c_binding, only : c_int64_t
-        logical test_passes
+        type(test_diagnosis_t) test_diagnosis
         integer(c_int64_t) i
-        integer :: me
+        integer me
 
         call prif_this_image_no_coarray(this_image=me)
-        i = me
+        i = int(me, c_int64_t)
         call prif_co_min(i)
-        test_passes = int(i) == 1
+        test_diagnosis = test_diagnosis_t( &
+            test_passed= i == 1_c_int64_t &
+           ,diagnostics_string = "expected i = 1; actual i = " // string_t(int(i)) &
+        )
     end function
 
-    function min_default_integer_1D_array() result(test_passes)
-        logical test_passes
+    function min_default_integer_1D_array() result(test_diagnosis)
+        type(test_diagnosis_t) test_diagnosis
         integer i, me, num_imgs
         integer, allocatable :: array(:)
 
@@ -111,27 +118,37 @@ contains
           array = sequence_
           call prif_co_min(array)
           associate(min_sequence => [(i, i=1, num_imgs)])
-            test_passes = all(min_sequence == array)
+            test_diagnosis = test_diagnosis_t( &
+                test_passed = all(min_sequence == array) &
+               ,diagnostics_string = "expected " // .csv. string_t(min_sequence) // "; actual = " // .csv. string_t(array) &
+            )
           end associate
         end associate
     end function
 
-    function min_default_integer_7D_array() result(test_passes)
-        logical test_passes
-        integer array(2,1,1, 1,1,1, 2), status_, me, num_imgs
+    function min_default_integer_7D_array() result(test_diagnosis)
+        type(test_diagnosis_t) test_diagnosis
+        integer, target :: array(2,1,1, 1,1,1, 2)
+        integer, pointer :: array_1D_ptr(:)
+        integer status_, me, num_imgs
 
         status_ = -1
         call prif_this_image_no_coarray(this_image=me)
         array = 3 - me
         call prif_co_min(array, stat=status_)
         call prif_num_images(num_images=num_imgs)
-        test_passes = all(array == 3 - num_imgs) .and. status_ == 0
+        array_1D_ptr(1:size(array)) => array
+        test_diagnosis = test_diagnosis_t( &
+            test_passed = all(array == 3 - num_imgs) .and. status_ == 0 &
+           ,diagnostics_string = "expected element values " //       string_t(3 - num_imgs) // ", status_ = 0" & 
+                              // "; actual element values " // .csv. string_t(array_1D_ptr) // ", status_ = " // string_t(status_) &
+        )
     end function
 
-    function min_default_real_scalars() result(test_passes)
-        logical test_passes
+    function min_default_real_scalars() result(test_diagnosis)
+        type(test_diagnosis_t) test_diagnosis
         real scalar
-        real, parameter :: pi = 3.141592654
+        real, parameter :: pi = 3.141592654, tolerance = 1E-07
         integer status_, me, num_imgs
 
         status_ = -1
@@ -139,24 +156,37 @@ contains
         scalar = -pi*me
         call prif_co_min(scalar, stat=status_)
         call prif_num_images(num_images=num_imgs)
-        test_passes = -dble(pi*num_imgs) == dble(scalar) .and. status_ == 0
+        associate(expected_value => -pi*num_imgs)
+          test_diagnosis = test_diagnosis_t( &
+             test_passed =(abs(scalar - expected_value) < tolerance) .and. (status_ == 0) &
+            ,diagnostics_string = "expected " // string_t(expected_value) // ", status = 0" &
+                               // "; actual " // string_t(scalar)         // ", status = " // string_t(status_) &
+          )
+        end associate
     end function
 
-    function min_double_precision_2D_array() result(test_passes)
-        logical test_passes
-        double precision, allocatable :: array(:,:)
-        double precision, parameter :: tent(*,*) = dble(reshape(-[0,1,2,3,2,1], [3,2]))
-        integer :: me, num_imgs
+    function min_double_precision_2D_array() result(test_diagnosis)
+        type(test_diagnosis_t) test_diagnosis
+        double precision, dimension(:,:), allocatable, target :: array, expected
+        double precision, dimension(:), pointer :: array_1D_ptr, expected_1D_ptr
+        double precision, parameter :: tent(*,*) = dble(reshape(-[0,1,2,3,2,1], [3,2])), tolerance=1D-14
+        integer me, num_imgs
 
         call prif_this_image_no_coarray(this_image=me)
         array = tent*dble(me)
         call prif_co_min(array)
         call prif_num_images(num_images=num_imgs)
-        test_passes = all(array==tent*dble(num_imgs))
+        expected = tent*dble(num_imgs)
+        array_1D_ptr(1:size(array)) => array
+        expected_1D_ptr(1:size(expected)) => expected
+        test_diagnosis = test_diagnosis_t( &
+           test_passed = all(abs(array - tent*dble(num_imgs)) < tolerance) &
+          ,diagnostics_string = "expected " // .csv. string_t(expected_1D_ptr) // "; actual " // .csv. string_t(array_1D_ptr) &
+        )
     end function
 
-    function min_elements_in_2D_string_arrays() result(test_passes)
-      logical test_passes
+    function min_elements_in_2D_string_arrays() result(test_diagnosis)
+      type(test_diagnosis_t) test_diagnosis
       character(len=*), parameter :: script(*,*,*) = reshape( &
           [ "To be   ","or not  "   & ! odd images get
           , "to      ","be.     "   & ! this slice: script(:,:,1)
@@ -164,24 +194,30 @@ contains
           , "that    ","is      "   & ! even images get 
           , "the     ","question"], & ! this slice: script(:,:,2)
           [2,2,2])
-      character(len=len(script)), dimension(size(script,1),size(script,2)) :: slice
+      character(len=len(script)), dimension(size(script,1),size(script,2)), target :: slice, expected
+      character(len=len(script)), dimension(:), pointer :: slice_1D_ptr, expected_1D_ptr
+
       integer me, ni
 
       call prif_this_image_no_coarray(this_image=me)
       call prif_num_images(ni)
       slice = script(:,:,mod(me-1,size(script,3))+1)
       call prif_co_min(slice)
-      associate(expected => minval(script(:,:,1:min(ni,size(script,3))), dim=3))
-        test_passes = all(expected == slice)
-      end associate
+      slice_1D_ptr(1:size(slice)) => slice
+      expected = minval(script(:,:,1:min(ni,size(script,3))), dim=3)
+      expected_1D_ptr(1:size(expected)) => expected
+      test_diagnosis = test_diagnosis_t( &
+          test_passed = all(expected == slice) &
+         ,diagnostics_string = "expected " // .csv. string_t(expected_1D_ptr) // "; actual " // .csv. string_t(slice_1D_ptr) &
+      )
     end function
 
-    function alphabetically_1st_scalar_string() result(test_passes)
-      logical test_passes
+    function alphabetically_1st_scalar_string() result(test_diagnosis)
+      type(test_diagnosis_t) test_diagnosis
       integer, parameter :: length = len("to party!")
       character(len=length), parameter :: words(*) = [character(len=length):: "Loddy","doddy","we","like","to party!"]
       character(len=:), allocatable :: my_word, expected_word
-      integer :: me, num_imgs
+      integer me, num_imgs
 
       call prif_this_image_no_coarray(this_image=me)
       associate(periodic_index => 1 + mod(me-1,size(words)))
@@ -191,7 +227,10 @@ contains
 
       call prif_num_images(num_images=num_imgs)
       expected_word = minval(words(1:min(num_imgs, size(words)))) ! this line exposes a flang bug
-      test_passes = expected_word == my_word
+      test_diagnosis = test_diagnosis_t( &
+          test_passed = expected_word == my_word &
+         ,diagnostics_string = "expected " // expected_word // "; actual " // my_word &
+      )
     end function
 
 end module prif_co_min_test_m
