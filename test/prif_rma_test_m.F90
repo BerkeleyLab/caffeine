@@ -5,7 +5,7 @@
 
 module prif_rma_test_m
   !! Unit test fort the prif_rma program inititation subroutine
-  use julienne_m, only : test_t, test_result_t, test_description_t
+  use julienne_m, only : test_t, test_result_t, test_description_t, test_diagnosis_t, string_t
   use iso_c_binding, only: &
           c_ptr, c_intmax_t, c_intptr_t, c_size_t, c_null_funptr, c_f_pointer, c_loc, c_sizeof
   use prif_test_m, only : prif_test_t, test_description_substring
@@ -23,7 +23,7 @@ module prif_rma_test_m
           prif_sync_all, &
           prif_this_image_no_coarray
 #if ! HAVE_PROCEDURE_ACTUAL_FOR_POINTER_DUMMY
-  use julienne_m, only : test_function_i
+  use julienne_m, only : diagnosis_function_i
 #endif
   implicit none
 
@@ -55,7 +55,7 @@ contains
       ,test_description_t("getting a value with indirect interface", check_get_indirect) &
     ]   
 #else
-    procedure(test_function_i), pointer :: &
+    procedure(diagnosis_function_i), pointer :: &
       check_put_ptr          => check_put          &
      ,check_put_indirect_ptr => check_put_indirect &
      ,check_get_ptr          => check_get          &
@@ -76,10 +76,10 @@ contains
     test_results = test_descriptions%run()
   end function
 
-  function check_put() result(test_passes)
-    logical test_passes
+  function check_put() result(test_diagnosis)
+    type(test_diagnosis_t) test_diagnosis
 
-    integer :: dummy_element, num_imgs, expected, neighbor
+    integer dummy_element, num_imgs, expected, neighbor
     integer, target :: me
     type(prif_coarray_handle) :: coarray_handle
     type(c_ptr) :: allocated_memory
@@ -110,15 +110,17 @@ contains
             size_in_bytes = c_sizeof(me))
     call prif_sync_all
 
-    test_passes = expected == local_slice
-
+    test_diagnosis = test_diagnosis_t( &
+       test_passed = expected == local_slice &
+      ,diagnostics_string = "expected " // string_t(expected) // "; actual " // string_t(local_slice) &
+    ) 
     call prif_deallocate_coarray([coarray_handle])
   end function
 
-  function check_put_indirect() result(test_passes)
-    logical test_passes
+  function check_put_indirect() result(test_diagnosis)
+    type(test_diagnosis_t) test_diagnosis
 
-    type :: my_type
+    type my_type
       type(c_ptr) :: my_component
     end type
 
@@ -167,14 +169,17 @@ contains
     call prif_sync_all
 
     call c_f_pointer(local_slice%my_component, component_access)
-    test_passes = expected == component_access
 
+    test_diagnosis = test_diagnosis_t( &
+       test_passed = expected == component_access &
+      ,diagnostics_string = "expected " // string_t(expected) // "; actual " // string_t(component_access) &
+    ) 
     call prif_deallocate(local_slice%my_component)
     call prif_deallocate_coarray([coarray_handle])
   end function
 
-  function check_get() result(test_passes)
-    logical test_passes
+  function check_get() result(test_diagnosis)
+    type(test_diagnosis_t) test_diagnosis
 
     integer :: dummy_element, num_imgs, me, neighbor, expected
     integer, target :: retrieved
@@ -208,15 +213,17 @@ contains
             current_image_buffer = c_loc(retrieved), &
             size_in_bytes = c_sizeof(retrieved))
 
-    test_passes = expected == retrieved
-
+    test_diagnosis = test_diagnosis_t( &
+       test_passed = expected == retrieved &
+      ,diagnostics_string = "expected " // string_t(expected) // "; actual " // string_t(retrieved) &
+    )
     call prif_deallocate_coarray([coarray_handle])
   end function
 
-  function check_get_indirect() result(test_passes)
-    logical test_passes
+  function check_get_indirect() result(test_diagnosis)
+    type(test_diagnosis_t) test_diagnosis
 
-    type :: my_type
+    type my_type
       type(c_ptr) :: my_component
     end type
 
@@ -265,8 +272,10 @@ contains
             current_image_buffer = c_loc(retrieved), &
             size_in_bytes = int(storage_size(retrieved)/8, c_size_t))
 
-    test_passes = expected == retrieved
-
+    test_diagnosis = test_diagnosis_t( &
+       test_passed = expected == retrieved &
+      ,diagnostics_string = "expected " // string_t(expected) // "; actual " // string_t(retrieved) &
+    )
     call prif_deallocate(local_slice%my_component)
     call prif_deallocate_coarray([coarray_handle])
   end function
