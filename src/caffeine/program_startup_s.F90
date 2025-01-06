@@ -18,6 +18,7 @@ contains
           initial_team%gex_team)
        current_team%info => initial_team
        initial_team%parent_team => initial_team
+       initial_team%team_number = -1
        initial_team%this_image = caf_this_image(initial_team%gex_team)
        initial_team%num_images = caf_num_images(initial_team%gex_team)
        prif_init_called_previously = .true.
