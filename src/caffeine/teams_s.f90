@@ -79,7 +79,15 @@ contains
   end procedure
 
   module procedure prif_get_team
-    call unimplemented("prif_get_team")
+    if (.not. present(level) .or. level == PRIF_CURRENT_TEAM) then
+      team = current_team
+    else if (level == PRIF_PARENT_TEAM) then
+      team = prif_team_type(current_team%info%parent_team)
+    else if (level == PRIF_INITIAL_TEAM) then
+      team = prif_team_type(initial_team)
+    else
+      call prif_error_stop(.false._c_bool, stop_code_char="prif_get_team: invalid level")
+    endif
   end procedure
 
   module procedure prif_team_number
