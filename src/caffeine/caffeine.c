@@ -35,11 +35,16 @@ typedef uint8_t byte;
   const int double_Complex_workaround =4100;
 #endif
 
-int caf_this_image(gex_TM_t team)
+// ---------------------------------------------------
+int caf_this_image(gex_TM_t gex_team)
 {
-  return gex_TM_QueryRank(team) + 1;
+  return gex_TM_QueryRank(gex_team) + 1;
 }
-
+int caf_num_images(gex_TM_t gex_team)
+{
+  return gex_TM_QuerySize(gex_team);
+}
+// ---------------------------------------------------
 // NOTE: gex_TM_T is a typedef to a C pointer, so the `gex_TM_t* initial_team` arg in the C signature matches the BIND(C) interface of an `intent(out)` arg of type `c_ptr` for the same argument
 void caf_caffeinate(
   mspace* symmetric_heap,
@@ -92,11 +97,6 @@ void caf_caffeinate(
 void caf_decaffeinate(int exit_code)
 {
   gasnet_exit(exit_code);
-}
-
-int caf_num_images(gex_TM_t team)
-{
-  return gex_TM_QuerySize(team);
 }
 
 void* caf_allocate(mspace heap, size_t bytes)

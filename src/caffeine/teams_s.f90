@@ -73,6 +73,8 @@ contains
       allocate(team%info)
       team%info%parent_team => current_team%info
       call caf_form_team(current_team%info%gex_team, team%info%gex_team, team_number, new_index_)
+      team%info%this_image = caf_this_image(team%info%gex_team)
+      team%info%num_images = caf_num_images(team%info%gex_team)
     end block
   end procedure
 
