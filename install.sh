@@ -405,6 +405,7 @@ else
   compiler_flag="-g -O3 -ffree-line-length-0"
 fi
 compiler_flag+=" -DASSERT_PARALLEL_CALLBACKS"
+compiler_flag+=" -DASSERTIONS"
 
 RUN_FPM_SH="build/run-fpm.sh"
 cat << EOF > $RUN_FPM_SH
