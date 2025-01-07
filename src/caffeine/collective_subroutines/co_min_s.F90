@@ -1,7 +1,11 @@
 ! Copyright (c), The Regents of the University of California
 ! Terms of use are as specified in LICENSE.txt
+
+#include "assert_macros.h"
+
 submodule(prif:prif_private_s) co_min_s
   use iso_c_binding, only : c_funloc
+  use assert_m
 
   implicit none
 
@@ -24,7 +28,7 @@ contains
     function alphabetize(lhs, rhs) result(first_alphabetically)
       character(len=*), intent(in) :: lhs, rhs
       character(len=len(lhs)) :: first_alphabetically
-      call assert(len(lhs)==len(rhs), "prif_co_min: LHS/RHS length match", lhs//" , "//rhs)
+      call_assert_diagnose(len(lhs)==len(rhs), "prif_co_min: LHS/RHS length match", lhs//" , "//rhs)
       first_alphabetically = min(lhs,rhs)
     end function
 
