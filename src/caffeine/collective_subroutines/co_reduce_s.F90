@@ -7,7 +7,6 @@ submodule(prif:prif_private_s) co_reduce_s
   use iso_c_binding, only : &
     c_loc, c_funloc, c_associated, c_f_pointer, c_f_procpointer, c_char, c_double, &
     c_float, c_int32_t
-  use assert_m
 
   implicit none
 

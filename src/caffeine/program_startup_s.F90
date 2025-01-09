@@ -29,7 +29,6 @@ contains
 
 #if ASSERT_PARALLEL_CALLBACKS
     subroutine assert_init()
-      use assert_m
       implicit none
       assert_this_image => assert_callback_this_image
       assert_error_stop => assert_callback_error_stop

@@ -1,7 +1,7 @@
 ! Copyright (c), The Regents of the University of California
 ! Terms of use are as specified in LICENSE.txt
 submodule(prif) prif_private_s
-  !use assert_m
+  use assert_m
   implicit none
 
   type(team_data), target :: initial_team
@@ -9,13 +9,6 @@ submodule(prif) prif_private_s
   type(c_ptr) :: non_symmetric_heap_mspace
 
   interface
-
-    module subroutine assert(assertion, description, diagnostics)
-      implicit none
-      logical, intent(in) :: assertion
-      character(len=*), intent(in) :: description
-      class(*), intent(in), optional :: diagnostics
-    end subroutine
 
     ! ________ Program initiation and finalization ___________
 

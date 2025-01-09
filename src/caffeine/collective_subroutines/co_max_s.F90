@@ -5,7 +5,6 @@
 
 submodule(prif:prif_private_s) co_max_s
   use iso_c_binding, only : c_funloc
-  use assert_m
 
   implicit none
 
