@@ -28,11 +28,11 @@ typedef void(*final_func_ptr)(void*, size_t) ;
 typedef uint8_t byte;
 
 #if __GNUC__ >= 12
-  const int float_Complex_workaround = CFI_type_float_Complex;
-  const int double_Complex_workaround = CFI_type_double_Complex;
+  #define float_Complex_workaround  CFI_type_float_Complex
+  #define double_Complex_workaround CFI_type_double_Complex
 #else
-  const int float_Complex_workaround = 2052;
-  const int double_Complex_workaround =4100;
+  #define float_Complex_workaround  2052
+  #define double_Complex_workaround 4100
 #endif
 
 // ---------------------------------------------------
