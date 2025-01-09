@@ -40,6 +40,12 @@ submodule(prif) prif_private_s
       integer(c_int), value :: exit_code
     end subroutine
 
+    pure subroutine caf_fatal_error(str) bind(C)
+      !! void caf_fatal_error( const CFI_cdesc_t* Fstr )
+      use iso_c_binding, only : c_char
+      implicit none
+      character(kind=c_char,len=:), pointer, intent(in) :: str
+    end subroutine
     ! _________________ Image enumeration ____________________
 
     function caf_this_image(gex_team) bind(C)

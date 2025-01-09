@@ -99,6 +99,14 @@ void caf_decaffeinate(int exit_code)
   gasnet_exit(exit_code);
 }
 
+void caf_fatal_error( const CFI_cdesc_t* Fstr )
+{
+  const char *msg = (char *)Fstr->base_addr;
+  int len = Fstr->elem_len;
+  //printf("%p:%i\n",msg,len); fflush(0);
+  gasnett_fatalerror_nopos("%.*s", len, msg);
+}
+
 void* caf_allocate(mspace heap, size_t bytes)
 {
    void* allocated_space = mspace_memalign(heap, 8, bytes);
