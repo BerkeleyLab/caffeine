@@ -24,7 +24,7 @@ contains
     type(prif_coarray_descriptor) :: unused
     type(prif_coarray_descriptor), pointer :: unused2(:)
 
-    me = caf_this_image(current_team%info%gex_team)
+    me = current_team%info%this_image
     if (caf_have_child_teams()) then
       ! Free the child team space to make sure we have space to allocate the coarray
       if (me == 1) then
@@ -119,13 +119,13 @@ contains
     ! end do
     do i = 1, num_handles
       call remove_from_team_list(coarray_handles(i))
-      if (caf_this_image(current_team%info%gex_team) == 1) &
+      if (current_team%info%this_image == 1) &
         call caf_deallocate(current_team%info%heap_mspace, c_loc(coarray_handles(i)%info))
     end do
     if (present(stat)) stat = 0
     if (caf_have_child_teams()) then
       ! reclaim any free space possible for the child teams to use
-      if (caf_this_image(current_team%info%gex_team) == 1) then
+      if (current_team%info%this_image == 1) then
         call caf_deallocate(current_team%info%heap_mspace, current_team%info%child_heap_info%allocated_memory)
       end if
       call caf_establish_child_heap

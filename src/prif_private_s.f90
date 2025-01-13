@@ -42,19 +42,19 @@ submodule(prif) prif_private_s
 
     ! _________________ Image enumeration ____________________
 
-    function caf_this_image(team) bind(C)
-      !! int caf_this_image();
+    function caf_this_image(gex_team) bind(C)
+      !! int caf_this_image(gex_TM_t gex_team);
       import c_ptr, c_int
       implicit none
-      type(c_ptr), value :: team
+      type(c_ptr), value :: gex_team
       integer(c_int) caf_this_image
     end function
 
-    pure function caf_num_images(team) bind(C)
-      !! int caf_num_images();
+    pure function caf_num_images(gex_team) bind(C)
+      !! int caf_num_images(gex_TM_t gex_team);
       import c_ptr, c_int
       implicit none
-      type(c_ptr), value :: team
+      type(c_ptr), value :: gex_team
       integer(c_int) caf_num_images
     end function
 
@@ -270,7 +270,7 @@ contains
   end function
 
   subroutine caf_establish_child_heap
-    if (caf_this_image(current_team%info%gex_team) == 1) then
+    if (current_team%info%this_image == 1) then
       call caf_allocate_remaining( &
           current_team%info%heap_mspace, &
           current_team%info%child_heap_info%allocated_memory, &
