@@ -73,15 +73,30 @@ contains
       allocate(team%info)
       team%info%parent_team => current_team%info
       call caf_form_team(current_team%info%gex_team, team%info%gex_team, team_number, new_index_)
+      team%info%team_number = team_number
+      team%info%this_image = caf_this_image(team%info%gex_team)
+      team%info%num_images = caf_num_images(team%info%gex_team)
     end block
   end procedure
 
   module procedure prif_get_team
-    call unimplemented("prif_get_team")
+    if (.not. present(level) .or. level == PRIF_CURRENT_TEAM) then
+      team = current_team
+    else if (level == PRIF_PARENT_TEAM) then
+      team = prif_team_type(current_team%info%parent_team)
+    else if (level == PRIF_INITIAL_TEAM) then
+      team = prif_team_type(initial_team)
+    else
+      call prif_error_stop(.false._c_bool, stop_code_char="prif_get_team: invalid level")
+    endif
   end procedure
 
   module procedure prif_team_number
-    call unimplemented("prif_team_number")
+    if (present(team)) then
+      team_number = team%info%team_number
+    else
+      team_number = current_team%info%team_number
+    endif
   end procedure
 
 end submodule
