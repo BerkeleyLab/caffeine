@@ -80,7 +80,9 @@ contains
   end procedure
 
   module procedure prif_get_team
-    if (.not. present(level) .or. level == PRIF_CURRENT_TEAM) then
+    if (.not. present(level)) then
+      team = current_team
+    else if (level == PRIF_CURRENT_TEAM) then
       team = current_team
     else if (level == PRIF_PARENT_TEAM) then
       team = prif_team_type(current_team%info%parent_team)
