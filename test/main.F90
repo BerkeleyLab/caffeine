@@ -67,23 +67,36 @@ contains
         logical :: passed
 
         type(test_item_t) :: tests
-        type(test_item_t) :: individual_tests(15)
+        type(test_item_t), allocatable :: individual_tests(:)
 
-        individual_tests(1) = a00_caffeinate_caffeinate()
-        individual_tests(2) = caf_allocate_prif_allocate()
-        individual_tests(3) = caf_co_broadcast_prif_co_broadcast()
-        individual_tests(4) = caf_co_max_prif_co_max()
-        individual_tests(5) = caf_co_min_prif_co_min()
-        individual_tests(6) = caf_co_reduce_prif_co_reduce()
-        individual_tests(7) = caf_co_sum_prif_co_sum()
-        individual_tests(8) = caf_coarray_inquiry_coarray_inquiry()
-        individual_tests(9) = caf_error_stop_prif_this_image()
-        individual_tests(10) = caf_image_index_prif_image_index()
-        individual_tests(11) = caf_num_images_prif_num_images()
-        individual_tests(12) = caf_rma_prif_rma()
-        individual_tests(13) = caf_stop_prif_this_image()
-        individual_tests(14) = caf_teams_caf_teams()
-        individual_tests(15) = caf_this_image_prif_this_image_no_coarray()
+        allocate(individual_tests(0))
+
+#if __flang__
+        print *, "-----------------------------------------------------------------"
+        print *, "WARNING: flang-new compiler detected."
+        print *, "WARNING: Skipping tests that are known to fail with this compiler"
+        print *, "-----------------------------------------------------------------"
+#endif
+        individual_tests = [individual_tests, a00_caffeinate_caffeinate()]
+        individual_tests = [individual_tests, caf_allocate_prif_allocate()]
+        individual_tests = [individual_tests, caf_coarray_inquiry_coarray_inquiry()]
+        individual_tests = [individual_tests, caf_co_broadcast_prif_co_broadcast()]
+#if !__flang__
+        individual_tests = [individual_tests, caf_co_max_prif_co_max()]
+        individual_tests = [individual_tests, caf_co_min_prif_co_min()]
+        individual_tests = [individual_tests, caf_co_reduce_prif_co_reduce()]
+        individual_tests = [individual_tests, caf_co_sum_prif_co_sum()]
+        individual_tests = [individual_tests, caf_error_stop_prif_this_image()]
+#endif
+        individual_tests = [individual_tests, caf_image_index_prif_image_index()]
+        individual_tests = [individual_tests, caf_num_images_prif_num_images()]
+        individual_tests = [individual_tests, caf_rma_prif_rma()]
+#if !__flang__
+        individual_tests = [individual_tests, caf_stop_prif_this_image()]
+#endif
+        individual_tests = [individual_tests, caf_teams_caf_teams()]
+        individual_tests = [individual_tests, caf_this_image_prif_this_image_no_coarray()]
+
         tests = test_that(individual_tests)
 
 
