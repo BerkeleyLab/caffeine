@@ -19,6 +19,7 @@ All unrecognized arguments will be passed to GASNet's configure.
 
 Some influential environment variables:
   FC          Fortran compiler command
+  FFLAGS      Fortran compiler flags
   CC          C compiler command
   CFLAGS      C compiler flags
   CPP         C preprocessor
@@ -398,6 +399,8 @@ EOF
 
 exit_if_pkg_config_pc_file_missing "caffeine"
 
+user_compiler_flags="${CPPFLAGS:-} ${FFLAGS:-}"
+
 compiler_version=$($FPM_FC --version)
 if [[ $compiler_version == *llvm* ]]; then
   compiler_flag="-mmlir -allow-assumed-rank -g -Ofast"
@@ -405,7 +408,14 @@ else
   compiler_flag="-g -O3 -ffree-line-length-0"
 fi
 compiler_flag+=" -DASSERT_MULTI_IMAGE -DASSERT_PARALLEL_CALLBACKS"
-compiler_flag+=" -DASSERTIONS"
+
+if ! [[ "$user_compiler_flags " =~ -[DU]ASSERTIONS[=\ ] ]] ; then 
+  # default to enabling assertions, unless the command line sets a relevant flag
+  compiler_flag+=" -DASSERTIONS"
+fi
+
+# Should come last to allow command-line overrides
+compiler_flag+=" $user_compiler_flags"
 
 RUN_FPM_SH="build/run-fpm.sh"
 cat << EOF > $RUN_FPM_SH
