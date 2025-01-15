@@ -1,5 +1,8 @@
 ! Copyright (c), The Regents of the University of California
 ! Terms of use are as specified in LICENSE.txt
+
+#include "assert_macros.h"
+
 submodule(prif:prif_private_s) co_reduce_s
   use iso_c_binding, only : &
     c_loc, c_funloc, c_associated, c_f_pointer, c_f_procpointer, c_char, c_double, &
@@ -83,7 +86,7 @@ contains
     procedure(c_double_complex_operation), pointer :: double_complex_op => null()
 
     if (present(stat)) stat=0
-    call assert(c_associated(operation), "caf_co_reduce: c_associated(operation)")
+    call_assert_describe(c_associated(operation), "caf_co_reduce: c_associated(operation)")
 
     if (caf_same_cfi_type(a, 0)) then
       call c_f_procpointer(operation, int32_op)
@@ -135,7 +138,7 @@ contains
       integer(c_int32_t), pointer :: lhs(:)=>null(), rhs_and_result(:)=>null()
       integer(c_size_t) i
 
-      call assert(all([c_associated(arg1), c_associated(arg2_and_out)]), "Coll_ReduceSub_c_int32_t: operands associated")
+      call_assert_describe(all([c_associated(arg1), c_associated(arg2_and_out)]), "Coll_ReduceSub_c_int32_t: operands associated")
 
       call c_f_pointer(arg1, lhs, [count])
       call c_f_pointer(arg2_and_out, rhs_and_result, [count])
@@ -153,7 +156,7 @@ contains
       integer(c_int64_t), pointer :: lhs(:)=>null(), rhs_and_result(:)=>null()
       integer(c_size_t) i
 
-      call assert(all([c_associated(arg1), c_associated(arg2_and_out)]), "Coll_ReduceSub_c_int64_t: operands associated")
+      call_assert_describe(all([c_associated(arg1), c_associated(arg2_and_out)]), "Coll_ReduceSub_c_int64_t: operands associated")
 
       call c_f_pointer(arg1, lhs, [count])
       call c_f_pointer(arg2_and_out, rhs_and_result, [count])
@@ -171,7 +174,7 @@ contains
       real(c_double), pointer :: lhs(:)=>null(), rhs_and_result(:)=>null()
       integer(c_size_t) i
 
-      call assert(all([c_associated(arg1), c_associated(arg2_and_out)]), "Coll_ReduceSub_c_double: operands associated")
+      call_assert_describe(all([c_associated(arg1), c_associated(arg2_and_out)]), "Coll_ReduceSub_c_double: operands associated")
 
       call c_f_pointer(arg1, lhs, [count])
       call c_f_pointer(arg2_and_out, rhs_and_result, [count])
@@ -189,7 +192,7 @@ contains
       real(c_float), pointer :: lhs(:)=>null(), rhs_and_result(:)=>null()
       integer(c_size_t) i
 
-      call assert(all([c_associated(arg1), c_associated(arg2_and_out)]), "Coll_ReduceSub_c_float: operands associated")
+      call_assert_describe(all([c_associated(arg1), c_associated(arg2_and_out)]), "Coll_ReduceSub_c_float: operands associated")
 
       call c_f_pointer(arg1, lhs, [count])
       call c_f_pointer(arg2_and_out, rhs_and_result, [count])
@@ -207,7 +210,7 @@ contains
       complex(c_double), pointer :: lhs(:)=>null(), rhs_and_result(:)=>null()
       integer(c_size_t) i
 
-      call assert(all([c_associated(arg1), c_associated(arg2_and_out)]), "Coll_ReduceSub_c_dobule_complex: operands associated")
+      call_assert_describe(all([c_associated(arg1), c_associated(arg2_and_out)]), "Coll_ReduceSub_c_dobule_complex: operands associated")
 
       call c_f_pointer(arg1, lhs, [count])
       call c_f_pointer(arg2_and_out, rhs_and_result, [count])
@@ -225,7 +228,7 @@ contains
       complex(c_float), pointer :: lhs(:)=>null(), rhs_and_result(:)=>null()
       integer(c_size_t) i
 
-      call assert(all([c_associated(arg1), c_associated(arg2_and_out)]), "Coll_ReduceSub_c_float_complex: operands associated")
+      call_assert_describe(all([c_associated(arg1), c_associated(arg2_and_out)]), "Coll_ReduceSub_c_float_complex: operands associated")
 
       call c_f_pointer(arg1, lhs, [count])
       call c_f_pointer(arg2_and_out, rhs_and_result, [count])
@@ -243,7 +246,7 @@ contains
       logical(c_bool), pointer :: lhs(:)=>null(), rhs_and_result(:)=>null()
       integer(c_size_t) i
 
-      call assert(all([c_associated(arg1), c_associated(arg2_and_out)]), "Coll_ReduceSub_c_bool: operands associated")
+      call_assert_describe(all([c_associated(arg1), c_associated(arg2_and_out)]), "Coll_ReduceSub_c_bool: operands associated")
 
       call c_f_pointer(arg1, lhs, [count])
       call c_f_pointer(arg2_and_out, rhs_and_result, [count])
@@ -262,7 +265,7 @@ contains
       integer(c_int), pointer :: arglen=>null()
 
       associate(c_associated_args => [c_associated(arg1), c_associated(arg2_and_out), c_associated(cdata)])
-        call assert(all(c_associated_args), "Coll_ReduceSub_c_char: all(c_associated_args)")
+        call_assert_describe(all(c_associated_args), "Coll_ReduceSub_c_char: all(c_associated_args)")
       end associate
 
       call c_f_pointer(cdata, arglen)

@@ -1,6 +1,7 @@
 ! Copyright (c), The Regents of the University of California
 ! Terms of use are as specified in LICENSE.txt
 submodule(prif) prif_private_s
+  use assert_m
   implicit none
 
   type(team_data), target :: initial_team
@@ -8,13 +9,6 @@ submodule(prif) prif_private_s
   type(c_ptr) :: non_symmetric_heap_mspace
 
   interface
-
-    module subroutine assert(assertion, description, diagnostics)
-      implicit none
-      logical, intent(in) :: assertion
-      character(len=*), intent(in) :: description
-      class(*), intent(in), optional :: diagnostics
-    end subroutine
 
     ! ________ Program initiation and finalization ___________
 
@@ -40,6 +34,12 @@ submodule(prif) prif_private_s
       integer(c_int), value :: exit_code
     end subroutine
 
+    pure subroutine caf_fatal_error(str) bind(C)
+      !! void caf_fatal_error( const CFI_cdesc_t* Fstr )
+      use iso_c_binding, only : c_char
+      implicit none
+      character(kind=c_char,len=:), pointer, intent(in) :: str
+    end subroutine
     ! _________________ Image enumeration ____________________
 
     function caf_this_image(gex_team) bind(C)
