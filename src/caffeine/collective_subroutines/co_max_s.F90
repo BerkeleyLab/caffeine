@@ -1,5 +1,8 @@
 ! Copyright (c), The Regents of the University of California
 ! Terms of use are as specified in LICENSE.txt
+
+#include "assert_macros.h"
+
 submodule(prif:prif_private_s) co_max_s
   use iso_c_binding, only : c_funloc
 
@@ -24,7 +27,7 @@ contains
     function reverse_alphabetize(lhs, rhs) result(last_alphabetically)
       character(len=*), intent(in) :: lhs, rhs
       character(len=len(lhs)) :: last_alphabetically
-      call assert(len(lhs)==len(rhs), "caf_co_max: LHS/RHS length match", lhs//" , "//rhs)
+      call_assert_diagnose(len(lhs)==len(rhs), "caf_co_max: LHS/RHS length match", lhs//" , "//rhs)
       last_alphabetically = max(lhs,rhs)
     end function
 
