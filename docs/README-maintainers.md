@@ -20,6 +20,7 @@ Additional git policies:
 Conventions for code and commits in Caffeine
 -------------
 [TODO: Improve wording of below bullets]
+* All Fortran filenames must have a `*.F90` suffix
 * Procedures with `prif_` prefix are public facing procedures
 * Procedures with `caf_` prefix are private procedures,
   internal to Caffeine, which are implemented in C
@@ -37,7 +38,7 @@ Conventions for code and commits in Caffeine
 * If you absolutely must make whitespace-only changes to otherwise unmodified lines
   (for example, rewrapping the lines in documentation), please isolate those changes
   in a separate commit with a commit message explaining the lack of meaningful change.
-* Similarly if you need to move blocks of lines unchanged between distant locations,
+* Similarly if you need to move blocks of lines unchanged between distant locations or rename files,
   please also isolate those changes in a separate commit with a commit message 
   explaining the lack of meaningful change.
 * Tab characters should NOT be used in source code
