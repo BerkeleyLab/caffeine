@@ -1,4 +1,4 @@
-name: CI
+name: Build with gfortran
 
 on: [push, pull_request]
 
