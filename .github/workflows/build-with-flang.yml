@@ -35,3 +35,4 @@ jobs:
         apt update
         apt install -y build-essential pkg-config make
         ./install.sh
+        ./build/run-fpm.sh test -- -d
