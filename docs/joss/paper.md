@@ -122,12 +122,9 @@ Test citations:
 
 # Figures
 
-Figures can be included like this:
-![Caption for example figure.\label{fig:example}](figure.png)
-and referenced from text using \autoref{fig:example}.
+Figures \autoref{fig:example} depicts a Fortran software stack in which a parallel runtime library such as Caffeine supportes compiled Fortran code by implementing PRIF.
 
-Figure sizes can be customized by adding an optional second parameter:
-![Caption for example figure.](figure.png){ width=20% }
+![The parallel Fortran software stack enabled by the Caffeine parallel runtime PRIF implementation.\label{fig:prif-stack}](PRIF-software-stack-with-more.pdf){ width=100% }
 
 # Acknowledgements
 
