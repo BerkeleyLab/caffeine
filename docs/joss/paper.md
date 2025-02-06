@@ -37,7 +37,7 @@ bibliography: paper.bib
 
 The Fortran programming language standard added features supporting
 single-program, multiple-data (SPMD) parallel programming and loop
-parallelism beginning with the Fortran 2008 revision.  The SPMD features
+parallelism beginning with [@fortran2008].  The SPMD features
 involve the creation of a fixed number of images (instances) of a program
 that execute asynchronously in shared or distributed memory except where
 a programmer except where a programmer explicitly imposes synchronization.
@@ -45,7 +45,7 @@ Coarrays employ a subscripted multidimensional array notation to define a
 partitioned global address space (PGAS) that images can use to communicate
 data with each other.  The CoArray Fortran Framework of Efficient Interfaces
 to Network Environments (Caffeine) provides a runtime library that supports
-Fortran's SPMD features [@rouson2022caffeine].  Caffeine is the first
+Fortran's SPMD features [@rouson2022caffeine; @caffeine-site].  Caffeine is the first
 implementation of the Parallel Runtime Interface for Fortran (PRIF)
 specification [@bonachea2024prif].  Any compiler that targets PRIF can use
 Caffeine.  In addition to supporting research related to the implementation
