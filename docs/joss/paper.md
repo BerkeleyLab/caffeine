@@ -22,15 +22,13 @@ authors:
   - name: Damian Rouson
     orcid: 0000-0002-2344-868X
     equal-contrib: true
-    affiliation: "1, 3" # (Multiple affiliations must be quoted)
+    affiliation: 1
 affiliations:
  - name: Lawrence Berkeley National Laboratory, United States
    index: 1
  - name: Amentum Services, Inc., United States
    index: 2
- - name: San Diego State University, United States
-   index: 3
-date: 25 January 2024
+date: 5 February 2025
 bibliography: paper.bib
 
 ---
