@@ -98,6 +98,18 @@ For a quick reference, the following citation commands can be used:
 - `[@author:2001]` -> "(Author et al., 2001)"
 - `[@author1:2001; @author2:2001]` -> "(Author1 et al., 2001; Author2 et al., 2002)"
 
+Test citations:
+- @rouson2022caffeine
+- @bonachea2024prif
+- @prif-0.5
+- @open-coarrays
+- @gasnet-lcpc18
+- @gasnetex-spec
+- @caffeine-site
+- @fortran2023
+- @fortran2008
+
+
 # Figures
 
 Figures can be included like this:
