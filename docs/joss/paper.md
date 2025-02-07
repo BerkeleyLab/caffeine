@@ -18,7 +18,7 @@ authors:
   - name: Brad Richardson
     orcid: 0000-0002-3205-2169
     equal-contrib: true
-    affiliation: 2
+    affiliation: 1
   - name: Damian Rouson
     orcid: 0000-0002-2344-868X
     equal-contrib: true
@@ -26,8 +26,6 @@ authors:
 affiliations:
  - name: Lawrence Berkeley National Laboratory, United States
    index: 1
- - name: Amentum Services, Inc., United States
-   index: 2
 date: 5 February 2025
 bibliography: paper.bib
 
@@ -40,7 +38,7 @@ single-program, multiple-data (SPMD) parallel programming and loop
 parallelism beginning with [@fortran2008].  The SPMD features
 involve the creation of a fixed number of images (instances) of a program
 that execute asynchronously in shared or distributed memory except where
-a programmer except where a programmer explicitly imposes synchronization.
+a programmer explicitly imposes synchronization.
 Coarrays employ a subscripted multidimensional array notation to define a
 partitioned global address space (PGAS) that images can use to communicate
 data with each other.  The CoArray Fortran Framework of Efficient Interfaces
@@ -64,17 +62,16 @@ Cython-optimized) implementations of common operations such as gravitational
 potential and force evaluation, orbit integration, dynamical transformations,
 and chaos indicators for nonlinear dynamics. `Gala` also relies heavily on and
 interfaces well with the implementations of physical units and astronomical
-coordinate systems in the `Astropy` package [@astropy] (`astropy.units` and
-`astropy.coordinates`).
+coordinate systems in the `Astropy` package
 
 `Gala` was designed to be used by both astronomical researchers and by
 students in courses on gravitational dynamics or astronomy. It has already been
-used in a number of scientific publications [@Pearson:2017] and has also been
+used in a number of scientific publications  and has also been
 used in graduate courses on Galactic dynamics to, e.g., provide interactive
-visualizations of textbook material [@Binney:2008]. The combination of speed,
+visualizations of textbook material . The combination of speed,
 design, and support for Astropy functionality in `Gala` will enable exciting
 scientific explorations of forthcoming data releases from the *Gaia* mission
-[@gaia] by students and experts alike.
+by students and experts alike.
 
 # Mathematics
 
@@ -99,9 +96,6 @@ Citations to entries in paper.bib should be in
 [rMarkdown](http://rmarkdown.rstudio.com/authoring_bibliographies_and_citations.html)
 format.
 
-If you want to cite a software repository URL (e.g. something on GitHub without a preferred
-citation) then you can do it with the example BibTeX entry below for @fidgit.
-
 For a quick reference, the following citation commands can be used:
 - `@author:2001`  ->  "Author et al. (2001)"
 - `[@author:2001]` -> "(Author et al., 2001)"
@@ -122,12 +116,13 @@ Test citations:
 
 # Figures
 
-Figures \autoref{fig:example} depicts a Fortran software stack in which a parallel runtime library such as Caffeine supportes compiled Fortran code by implementing PRIF.
+Figures \autoref{fig:prif-stack} depicts a Fortran software stack in which a parallel runtime library such as Caffeine supportes compiled Fortran code by implementing PRIF.
 
 ![The parallel Fortran software stack enabled by the Caffeine parallel runtime PRIF implementation.\label{fig:prif-stack}](PRIF-software-stack-with-more.pdf){ width=100% }
 
 # Acknowledgements
 
-The Computer Languages and Systems Software (CLaSS) Group at Berkeley Lab has developed Caffeine development on funding from the Exascale Computing Project (ECP) and the Stewardship for Programming Systems and Tools (S4PST) project.
+The Computer Languages and Systems Software (CLaSS) Group at Berkeley Lab [@class-site]
+has developed Caffeine on funding from the Exascale Computing Project (ECP) and the Stewardship for Programming Systems and Tools (S4PST) project.
 
 # References
