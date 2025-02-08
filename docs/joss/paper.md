@@ -35,49 +35,55 @@ bibliography: paper.bib
 
 The Fortran programming language standard added features supporting
 single-program, multiple-data (SPMD) parallel programming and loop
-parallelism beginning with [@fortran2008].  The SPMD features involve the
-creation of a fixed number of images (instances) of a program that execute
-asynchronously in shared or distributed memory except where a programmer
-explicitly imposes synchronization.  Coarrays employ a subscripted
-multidimensional array notation to define a partitioned global address 
-space (PGAS) that images use to communicate data with each other. The
-CoArray Fortran Framework of Efficient Interfaces to Network Environments
-(Caffeine) provides a runtime library that supports Fortran's SPMD features
-by building atop the GASNet-EX exascale networking middleware
-[@rouson2022caffeine; @caffeine-site; @gasnet-lcpc18; @gasnetex-spec].
-Caffeine is the first implementation of the compiler- and runtime-agnostic
-Parallel Runtime Interface for Fortran (PRIF) specification [@bonachea2024prif].
-Any compiler that targets PRIF can use any runtime that supports PRIF.
-As a platform for researching approaches to mapping Fortran's SPMD/PGAS
-features onto lower-level communication primitives, Caffeine facilitates
-exploring the novel approach of writing most of a compiler's parallel runtime
-library in the language being compiled: Caffeine uses Fortran's non-parallel
-features to support Fortran's parallel features.  Doing so in open source
+parallelism beginning with [@fortran2008].  In Fortran, SPMD programming
+involves the creation of a fixed number of images (instances) of a
+program that execute asynchronously in shared or distributed memory except
+where a program uses specific synchronization mechanisms.  Fortran's
+``coarray'' distributed data structures offer a subscripted,
+multidimensional array notation defining a partitioned global address space
+(PGAS).  One image can use this notation for one-sided access to another
+image's slice of a coarray. The CoArray Fortran Framework of Efficient
+Interfaces to Network Environments (Caffeine) provides a runtime library
+that supports Fortran's SPMD features by building atop the GASNet-EX exascale
+networking middleware [@rouson2022caffeine; @caffeine-site; @gasnet-lcpc18;
+@gasnetex-spec].  Caffeine is the first implementation of the compiler- and
+runtime-agnostic Parallel Runtime Interface for Fortran (PRIF) specification
+[@bonachea2024prif].  Any compiler that targets PRIF can use any runtime that
+supports PRIF.  Caffeine supports researching the novel approach of writing
+most of a compiler's parallel runtime library in the language being compiled:
+Caffeine uses Fortran's non-parallel features to wrap a thin C-language layer
+that invokes GASNet-EX functions.  Exploring this approach in open source
 lowers a barrier to contributions from the compiler's users: Fortran
 programmers.  Future research will include investigating optimization
-opportunities related to specific hardware such as shared memory or 
-specific interconnects.
+opportunities afforded by specific hardware such as shared memory or 
+or specific interconnects.
 
 # Statement of need
 
-`Gala` is an Astropy-affiliated Python package for galactic dynamics. Python
-enables wrapping low-level languages (e.g., C) for speed without losing
-flexibility or ease-of-use in the user-interface. The API for `Gala` was
-designed to provide a class-based and user-friendly interface to fast (C or
-Cython-optimized) implementations of common operations such as gravitational
-potential and force evaluation, orbit integration, dynamical transformations,
-and chaos indicators for nonlinear dynamics. `Gala` also relies heavily on and
-interfaces well with the implementations of physical units and astronomical
-coordinate systems in the `Astropy` package
+The Coarray Fortran domain-specific language pioneered a parallel programming
+approach designed as a syntactically small extension to Fortran 95
+[@numrich1998coarray].  Fortran 2008 incorporated Coarray Fortran features, 
+including multi-image execution, synchronization statements, coarrays, and more.
+Fortran 2018 greatly expanded this feature set to include such concepts as 
+teams (groupings) of images, events (counting semaphores), and collective
+subroutines, failed-image detection (fault tolerance). Fortran 2023 provided
+additional, minor mult-image extensions, including notified remote data access.
 
-`Gala` was designed to be used by both astronomical researchers and by
-students in courses on gravitational dynamics or astronomy. It has already been
-used in a number of scientific publications  and has also been
-used in graduate courses on Galactic dynamics to, e.g., provide interactive
-visualizations of textbook material . The combination of speed,
-design, and support for Astropy functionality in `Gala` will enable exciting
-scientific explorations of forthcoming data releases from the *Gaia* mission
-by students and experts alike.
+At least six Fortran compilers have released support for multi-image execution.
+These include production compilers from Hewlett Packard Enterprise (HPE),
+Intel, GNU Compiler Collection (GCC), and the Numerical Algorithms Group (NAG);
+research compilers developed primarily at Rice University and the University of
+Houston; and the dormant `g95` compiler project.  Each compiler required programs
+using multi-image features to rely a parallel runtime developed to support only
+the chosen compiler.  Caffeine improves upon the prior approaches by facilitating
+use with any compiler that targets PRIF.  Caffeine's initial target compilers
+include LLVM `flang` and LFortran, both of which have no existing parallel
+runtime and thus will need one to reach full compliance with the Fortran 2008,
+2018, or 2023 versions of the Fortran standard.  The Caffeine project team has
+submitted the PRIF specification as a pull request on the `llvm-project` `git`
+repository and have confirmed through private correspondence the primary
+LFortran developer's interest in adopting PRIF when LFortran begins work on
+enabling mult-image execution.
 
 # Mathematics
 
