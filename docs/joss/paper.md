@@ -35,22 +35,28 @@ bibliography: paper.bib
 
 The Fortran programming language standard added features supporting
 single-program, multiple-data (SPMD) parallel programming and loop
-parallelism beginning with [@fortran2008].  The SPMD features
-involve the creation of a fixed number of images (instances) of a program
-that execute asynchronously in shared or distributed memory except where
-a programmer explicitly imposes synchronization.
-Coarrays employ a subscripted multidimensional array notation to define a
-partitioned global address space (PGAS) that images can use to communicate
-data with each other.  The CoArray Fortran Framework of Efficient Interfaces
-to Network Environments (Caffeine) provides a runtime library that supports
-Fortran's SPMD features [@rouson2022caffeine; @caffeine-site].  Caffeine is the first
-implementation of the Parallel Runtime Interface for Fortran (PRIF)
-specification [@bonachea2024prif].  Any compiler that targets PRIF can use
-Caffeine.  In addition to supporting research related to the implementation
-of Fortran's PGAS programming model, Caffeine provides a platform for
-researching strategies for mapping high-performance computing (HPC) and
-artificial intelligence (AI) algorithms onto Fortran's parallel programming
-feature set.
+parallelism beginning with [@fortran2008].  The SPMD features involve the
+creation of a fixed number of images (instances) of a program that execute
+asynchronously in shared or distributed memory except where a programmer
+explicitly imposes synchronization.  Coarrays employ a subscripted
+multidimensional array notation to define a partitioned global address 
+space (PGAS) that images use to communicate data with each other. The
+CoArray Fortran Framework of Efficient Interfaces to Network Environments
+(Caffeine) provides a runtime library that supports Fortran's SPMD features
+by building atop the GASNet-EX exascale networking middleware
+[@rouson2022caffeine; @caffeine-site; @gasnet-lcpc18; @gasnetex-spec].
+Caffeine is the first implementation of the compiler- and runtime-agnostic
+Parallel Runtime Interface for Fortran (PRIF) specification [@bonachea2024prif].
+Any compiler that targets PRIF can use any runtime that supports PRIF.
+As a platform for researching approaches to mapping Fortran's SPMD/PGAS
+features onto lower-level communication primitives, Caffeine facilitates
+exploring the novel approach of writing most of a compiler's parallel runtime
+library in the language being compiled: Caffeine uses Fortran's non-parallel
+features to support Fortran's parallel features.  Doing so in open source
+lowers a barrier to contributions from the compiler's users: Fortran
+programmers.  Future research will include investigating optimization
+opportunities related to specific hardware such as shared memory or 
+specific interconnects.
 
 # Statement of need
 
