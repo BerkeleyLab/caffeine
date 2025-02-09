@@ -69,6 +69,16 @@ teams (groupings) of images, events (counting semaphores), and collective
 subroutines, failed-image detection (fault tolerance). Fortran 2023 provided
 additional, minor mult-image extensions, including notified remote data access.
 
+Caffeine's initial target compilers include LLVM `flang` and LFortran, both of
+which have no existing parallel runtime and thus will need one to reach full
+compliance with the Fortran 2008, 2018, or 2023 versions of the Fortran standard.
+The Caffeine project team has submitted the PRIF specification as a pull request
+on the `llvm-project` `git` repository and have confirmed through private
+correspondence the primary LFortran developer's interest in adopting PRIF when
+LFortran begins work on enabling mult-image execution.
+
+# Comparisons
+
 At least six Fortran compilers have released support for multi-image execution.
 These include production compilers from Hewlett Packard Enterprise (HPE),
 Intel, GNU Compiler Collection (GCC), and the Numerical Algorithms Group (NAG);
@@ -76,31 +86,15 @@ research compilers developed primarily at Rice University and the University of
 Houston; and the dormant `g95` compiler project.  Each compiler required programs
 using multi-image features to rely a parallel runtime developed to support only
 the chosen compiler.  Caffeine improves upon the prior approaches by facilitating
-use with any compiler that targets PRIF.  Caffeine's initial target compilers
-include LLVM `flang` and LFortran, both of which have no existing parallel
-runtime and thus will need one to reach full compliance with the Fortran 2008,
-2018, or 2023 versions of the Fortran standard.  The Caffeine project team has
-submitted the PRIF specification as a pull request on the `llvm-project` `git`
-repository and have confirmed through private correspondence the primary
-LFortran developer's interest in adopting PRIF when LFortran begins work on
-enabling mult-image execution.
+use with any compiler that targets PRIF.  
 
-# Mathematics
+Caffeine also differs from the alternatives in its use of GASNet-EX...
 
-Single dollars ($) are required for inline mathematics e.g. $f(x) = e^{\pi/x}$
+# Figures
 
-Double dollars make self-standing equations:
+Figures \autoref{fig:prif-stack} depicts a Fortran software stack in which a parallel runtime library such as Caffeine supportes compiled Fortran code by implementing PRIF.
 
-$$\Theta(x) = \left\{\begin{array}{l}
-0\textrm{ if } x < 0\cr
-1\textrm{ else}
-\end{array}\right.$$
-
-You can also use plain \LaTeX for equations
-\begin{equation}\label{eq:fourier}
-\hat f(\omega) = \int_{-\infty}^{\infty} f(x) e^{i\omega x} dx
-\end{equation}
-and refer to \autoref{eq:fourier} from text.
+![The parallel Fortran software stack enabled by the Caffeine parallel runtime PRIF implementation.\label{fig:prif-stack}](PRIF-software-stack-with-more.pdf){ width=100% }
 
 # Citations
 
@@ -125,12 +119,6 @@ Test citations:
 * [@fortran2023]
 * [@fortran2008]
 
-
-# Figures
-
-Figures \autoref{fig:prif-stack} depicts a Fortran software stack in which a parallel runtime library such as Caffeine supportes compiled Fortran code by implementing PRIF.
-
-![The parallel Fortran software stack enabled by the Caffeine parallel runtime PRIF implementation.\label{fig:prif-stack}](PRIF-software-stack-with-more.pdf){ width=100% }
 
 # Acknowledgements
 
