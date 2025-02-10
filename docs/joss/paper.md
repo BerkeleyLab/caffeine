@@ -82,9 +82,9 @@ LFortran begins work on enabling mult-image execution.
 At least six Fortran compilers have released support for multi-image execution.
 These include production compilers from Hewlett Packard Enterprise (HPE),
 GNU Compiler Collection (GCC), Intel, and the Numerical Algorithms Group (NAG);
-research compilers developed primarily at Rice University and the University of
-Houston; and the dormant `g95` compiler project.  One can view each of these
-along several axes from open- to closed-source, from portable to hardware-specfic
+research compilers developed at the University of Houston and Lawrence Livermore
+National Laboratory; and the dormant `g95` compiler project.  One can view each of
+these along several axes from open- to closed-source, from portable to hardware-specfic
 from research artifact to production-ready, and from dormant to actively developed.
 One can also categorize each runtime in terms of the choice of communication
 substrate and the ability to switch subtrates.  In each measure, Caffeine stands
