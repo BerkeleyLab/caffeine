@@ -113,13 +113,12 @@ middleware.  Developed as part of the Exascale Computing Project funded by the
 United States Department of Energy (DOE), GASNet-EX facilitates communication 
 for PGAS programming models on supercomputes at DOE leadership computing
 facilities.  GASNet-EX often outperforms the widely used Message Passing
-Interface (MPI) communication library as Figure~\autoref{fig:Frontier-bw}
+Interface (MPI) communication library as \autoref{fig:Frontier-bw}
 shows for the Frontier supercomputer that currently ranked first on the Top 500
 list of the fastest general-purpose computers from November 2022 through
 November 2024.
 
-![Comparison of GASNet-EX and MPI bandwidth on the Frontier supercomputer.\label{fig:Frontier-bw}](Fronntier-bw.png){ width=100% }
-
+![Comparison of GASNet-EX and MPI bandwidth on the Frontier supercomputer.\label{fig:Frontier-bw}](Frontier-bw){ width=100% }
 
 The GCC Fortran compiler (`gfortran`) uses the OpenCoarrays runtime library 
 to support mult-image execution.  The only maintained runtime in OpenCoarrays
@@ -149,7 +148,7 @@ any compiler that targets PRIF...
 
 # Figures
 
-Figures \autoref{fig:prif-stack} depicts a Fortran software stack in which a parallel runtime library such as Caffeine supportes compiled Fortran code by implementing PRIF.
+\autoref{fig:prif-stack} depicts a Fortran software stack in which a parallel runtime library such as Caffeine supportes compiled Fortran code by implementing PRIF.
 
 ![The parallel Fortran software stack enabled by the Caffeine parallel runtime PRIF implementation.\label{fig:prif-stack}](PRIF-software-stack-with-more.pdf){ width=100% }
 
