@@ -113,10 +113,13 @@ middleware.  Developed as part of the Exascale Computing Project funded by the
 United States Department of Energy (DOE), GASNet-EX facilitates communication 
 for PGAS programming models on supercomputes at DOE leadership computing
 facilities.  GASNet-EX often outperforms the widely used Message Passing
-Interface (MPI) communication library as Figure~\autoref{fig:Frontier-bw.png}
+Interface (MPI) communication library as Figure~\autoref{fig:Frontier-bw}
 shows for the Frontier supercomputer that currently ranked first on the Top 500
 list of the fastest general-purpose computers from November 2022 through
 November 2024.
+
+![Comparison of GASNet-EX and MPI bandwidth on the Frontier supercomputer.\label{fig:Frontier-bw}](Fronntier-bw.png){ width=100% }
+
 
 The GCC Fortran compiler (`gfortran`) uses the OpenCoarrays runtime library 
 to support mult-image execution.  The only maintained runtime in OpenCoarrays
