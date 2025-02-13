@@ -171,7 +171,7 @@ peer-reviewed publication motivating and describing PRIF [@bonachea2024prif].
 Future research will include investigating avenues for supporting the
 optimization of communications on specific categories of hardware.
 
-# Acknowledgements
+# Acknowledgments
 
 The Computer Languages and Systems Software (CLaSS) Group at Berkeley Lab [@class-site]
 has developed Caffeine on funding from the Exascale Computing Project (ECP) and the
