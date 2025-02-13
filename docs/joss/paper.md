@@ -155,6 +155,17 @@ compilers, both appear to be dormant. [@caf-2-site; @chapman2013experiences]
 OpenCoarrays and Caffeine are the only two actively maintained open-source
 runtimes and thus the two most suitable for research.  
 
+# Research and scholarly publications
+Caffeine has supported researching whether and how one can write a compiler's
+parallel runtime library in the language being compiled.  This research spawned
+a peer-reviewed publication describing the approach developed for Caffeine
+[@rouson2022caffeine]. Caffeine also inspired and supported researching whether
+and how one can define an interface to a compiler's parallel runtime in a
+compiler- and runtime-agnostic manner. The latter research produced a second
+peer-reviewed publication motivating and describing PRIF [@bonachea2024prif].
+Future research will include investigating avenues for supporting the
+optimization of communications on specific categories of hardware.
+
 # Acknowledgements
 
 The Computer Languages and Systems Software (CLaSS) Group at Berkeley Lab [@class-site]
