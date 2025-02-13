@@ -82,7 +82,7 @@ additional, minor multi-image extensions, including notified remote data access.
 
 Caffeine's initial target compilers include LLVM `flang` and LFortran, both of
 which have no existing multi-image parallel runtime and thus will need one to reach full
-compliance with the Fortran 2008, 2018, or 2023 versions of the Fortran standard.
+compliance with the 2008, 2018, or 2023 versions of the Fortran standard.
 The Caffeine project team has submitted the PRIF specification as a pull request
 on the `llvm-project` `git` repository and have confirmed through private
 correspondence the lead LFortran developer's interest in adopting PRIF when
