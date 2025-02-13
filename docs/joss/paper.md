@@ -147,8 +147,9 @@ version compiled for execution in distributed-memory.  A different version of th
 Intel compiler produces executable programs that work only in shared memory, but
 details of the corresponding communication substrate are not public.
 
-HPE's Cray Programming Environment (CPE) Fortran compiler uses a runtime.  The 
-CPE Fortran runtime uses HPE's proprietary DMAP communication library.
+HPE's Cray Compilation Environment (CCE) Fortran compiler uses a proprietary 
+closed-source runtime.  
+The CCE Fortran runtime targets HPE's proprietary DMAPP communication library.
 
 ## Research suitability
 Open-source development expands the ways in which software can support research.
