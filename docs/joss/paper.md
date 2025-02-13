@@ -94,13 +94,13 @@ At least eight implementations of Fortran's multi-image features have been
 developed:
 
 1. Caffeine,
-2. g95,
-3. Hewlett Packard Enterprise (HPE),
-4. Intel,
-5. Numerical Algorithms Group (NAG),
+2. g95 [@g95-site],
+3. HPE Cray Compiling Environment (CCE) Fortran compiler [@cce-site],
+4. Intel Fortran Compiler [@ifx-site],
+5. Numerical Algorithms Group (nAG) Fortran compiler [@nag-site],
 6. OpenCoarrays and the GNU Compiler Collection (GCC) [@fanfarillo2014opencoarrays],
-7. Rice University [@rice-caf-compiler], and
-8. University of Houston [@chapman2013experiences; @ge-2016].
+7. Rice University Coarray Fortran compiler[@rice-caf-compiler], and
+8. University of Houston OpenUH compiler [@chapman2013experiences; @ge-2016].
 
 One can view each of these along several axes from open- to closed-source, from
 portable to hardware-specific from research artifact to production-ready, and from
