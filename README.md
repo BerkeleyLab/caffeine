@@ -12,6 +12,34 @@ Interface ([MPI]) back end.
 
 ![Caffeine system stack diagram](https://github.com/BerkeleyLab/caffeine/wiki/img/caffeine-stack.gif)
 
+Statement of need
+-----------------
+
+The Fortran programming language standard added features supporting
+single-program, multiple-data (SPMD) parallel programming and loop
+parallelism beginning with Fortran 2008.  In Fortran, SPMD programming
+involves the creation of a fixed number of images (instances) of a
+program that execute asynchronously in shared or distributed memory, except
+where a program uses specific synchronization mechanisms.  Fortran's
+"coarray" distributed data structures offer a subscripted,
+multidimensional array notation defining a partitioned global address space
+(PGAS).  One image can use this notation for one-sided access to another
+image's slice of a coarray.
+
+Fortran 2018 greatly expanded this feature set to include such concepts as
+teams (groupings) of images, events (counting semaphores), collective
+subroutines and failed-image detection (fault tolerance). Fortran 2023 provided
+additional, minor multi-image extensions, including notified remote data access.
+
+Several popular Fortran compilers, including LLVM `flang` and LFortran, currently
+lack support for multi-image parallel execution. These features are a mandatory
+part of Fortran, and thus are an important part of reaching full compliance with
+the 2008, 2018, or 2023 versions of the Fortran standard.
+
+Caffeine aims to provide a portable, high-performance and open-source parallel
+runtime library that such compilers can target in code generation as part of
+their solution to support Fortran's multi-image parallel features.
+
 Prerequisites
 -------------
 ### Build prerequisites
@@ -59,7 +87,7 @@ The Caffeine parallel runtime is intended as an embedded compilation target
 library, to provide multi-image parallel runtime support to a Fortran compiler.
 As such, real usage of Caffeine is specific to the host Fortran compiler, and
 one should consult compiler-provided documentation regarding use of Caffeine
-for multi-image features.
+to back multi-image features.
 
 However we provide an [example hello world program](example/hello.F90), 
 written in Fortran, that simulates the PRIF calls a theoretical
