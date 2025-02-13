@@ -47,7 +47,7 @@ image's slice of a coarray.
 The CoArray Fortran Framework of Efficient
 Interfaces to Network Environments (Caffeine) provides a runtime library
 that supports Fortran's SPMD features [@rouson2022caffeine; @caffeine-site].
-Caffeine implements cross-process communication by building atop the 
+Caffeine implements inter-process communication by building atop the 
 GASNet-EX exascale networking middleware library [@gasnet-lcpc18; @gasnetex-spec].
 Caffeine is the first implementation of the compiler- and
 runtime-agnostic Parallel Runtime Interface for Fortran (PRIF) specification
@@ -130,7 +130,7 @@ In contrast, any compiler that targets PRIF can use the Caffeine runtime library
 
 ## Communication substrates
 One of Caffeine's most unique traits lies in its use of the GASNet-EX networking
-middleware.  Developed as part of the Exascale Computing Project funded by the
+middleware library.  Developed as part of the Exascale Computing Project funded by the
 United States Department of Energy (DOE), GASNet-EX facilitates communication 
 for PGAS programming models on supercomputers at DOE leadership computing
 facilities.  GASNet-EX often outperforms the widely used Message Passing
@@ -139,10 +139,14 @@ the Frontier supercomputer that ranked first from November 2022 through November
 2024 on the Top 500 list of the fastest general-purpose computers 
 
 ![Comparison of GASNet-EX and MPI bandwidth on the Frontier supercomputer, reproduced with permission from [@gasnet-perf-2023].\label{fig:Frontier-bw}](Frontier-bw){ width=100% }
+
+The University of Houston and Rice University compilers both implement
+inter-process communication by calling the GASNet-1 library [@gasnet-spec-1.1], 
+a predecessor to the modern GASNet-EX library used by Caffeine.
  
 By contrast, the GCC Fortran compiler (`gfortran`) supports multi-image execution
 by linking programs to the OpenCoarrays runtime library, which in turn uses MPI
-for inter-image communication. Similarly, the Intel compiler uses MPI in the
+for inter-process communication. Similarly, the Intel compiler uses MPI in the
 version compiled for execution in distributed-memory.  A different version of the
 Intel compiler produces executable programs that work only in shared memory, but
 details of the corresponding communication substrate are not public.
