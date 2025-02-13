@@ -35,7 +35,7 @@ bibliography: paper.bib
 
 The Fortran programming language standard added features supporting
 single-program, multiple-data (SPMD) parallel programming and loop
-parallelism beginning with [@fortran2008].  In Fortran, SPMD programming
+parallelism beginning with Fortran 2008 [@fortran2008].  In Fortran, SPMD programming
 involves the creation of a fixed number of images (instances) of a
 program that execute asynchronously in shared or distributed memory, except
 where a program uses specific synchronization mechanisms.  Fortran's
@@ -77,15 +77,15 @@ including multi-image execution, synchronization statements, coarrays, and more.
 Fortran 2018 greatly expanded this feature set to include such concepts as 
 teams (groupings) of images, events (counting semaphores), collective
 subroutines and failed-image detection (fault tolerance). Fortran 2023 provided
-additional, minor multi-image extensions, including notified remote data access.
-[@fortran2023]
+additional, minor multi-image extensions, including notified remote data access
+[@fortran2023].
 
 Caffeine's initial target compilers include LLVM `flang` and LFortran, both of
 which have no existing multi-image parallel runtime and thus will need one to reach full
 compliance with the 2008, 2018, or 2023 versions of the Fortran standard.
 The Caffeine project team has submitted the PRIF specification as a pull request
-on the `llvm-project` `git` repository and have confirmed through private
-correspondence the lead LFortran developer's interest in adopting PRIF when
+on the `llvm-project` `git` repository and through private correspondence have confirmed
+the lead LFortran developer's interest in adopting PRIF when
 LFortran begins work on enabling multi-image execution.
 
 # Comparisons
