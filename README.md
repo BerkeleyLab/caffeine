@@ -48,6 +48,19 @@ export GASNET_PSHM_NODES=8
 FC=<Fortran-compiler-path> CC=<C-compiler-path> CXX=<C++-compiler-path> ./build/run-fpm.sh run --example hello
 ```
 
+Example Usage
+-------------
+The Caffeine parallel runtime is intended as an embedded compilation target
+library, to provide multi-image parallel runtime support to a Fortran compiler.
+As such, real usage of Caffeine is specific to the host Fortran compiler, and
+one should consult compiler-provided documentation regarding use of Caffeine
+for multi-image features.
+
+However we provide an [example hello world program](example/hello.F90), 
+written in Fortran, that simulates the PRIF calls a theoretical
+source-to-source Fortran compiler might generate for a simple hello world
+program written using Fortran's multi-image features.
+
 Run tests
 ---------
 ```
