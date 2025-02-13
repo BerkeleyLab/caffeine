@@ -48,7 +48,7 @@ The CoArray Fortran Framework of Efficient
 Interfaces to Network Environments (Caffeine) provides a runtime library
 that supports Fortran's SPMD features [@rouson2022caffeine; @caffeine-site].
 Caffeine implements cross-process communication by building atop the 
-GASNet-EX exascale networking middleware library [@gasnet-lcpc18; @gasnetex-spec].  
+GASNet-EX exascale networking middleware library [@gasnet-lcpc18; @gasnetex-spec].
 Caffeine is the first implementation of the compiler- and
 runtime-agnostic Parallel Runtime Interface for Fortran (PRIF) specification
 [@bonachea2024prif; @prif-0.5].  Any compiler that targets PRIF can use any
