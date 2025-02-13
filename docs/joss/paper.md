@@ -152,7 +152,7 @@ Intel compiler produces executable programs that work only in shared memory, but
 details of the corresponding communication substrate are not public.
 
 HPE's Cray Compilation Environment (CCE) Fortran compiler uses a proprietary 
-closed-source runtime.  
+closed-source runtime.
 The CCE Fortran runtime targets HPE's proprietary DMAPP communication library.
 
 ## Research suitability
