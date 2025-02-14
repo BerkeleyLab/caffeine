@@ -86,7 +86,7 @@ Example Usage
 The Caffeine parallel runtime is intended as an embedded compilation target
 library, to provide multi-image parallel runtime support to a Fortran compiler.
 As such, real usage of Caffeine is specific to the host Fortran compiler, and
-one should consult compiler-provided documentation regarding use of Caffeine
+one should consult compiler-provided documentation regarding the use of Caffeine
 to back multi-image features.
 
 However we provide an [example hello world program](example/hello.F90), 
