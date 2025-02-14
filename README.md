@@ -139,8 +139,10 @@ Funding
 -------
 The Computer Languages and Systems Software ([CLaSS]) Group at [Berkeley Lab] has developed Caffeine development on funding from the Exascale Computing Project ([ECP]) and the Stewardship for Programming Systems and Tools ([S4PST]) project. 
 
-License
--------
+Support and Licensing
+---------------------
+See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines on reporting defects, feature requests and contributing to Caffeine.
+
 See [LICENSE.txt](LICENSE.txt) for usage terms and conditions.
 
 [GASNet-EX]: https://gasnet.lbl.gov
