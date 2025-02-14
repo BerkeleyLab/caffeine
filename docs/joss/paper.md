@@ -88,7 +88,7 @@ on the `llvm-project` `git` repository and through private correspondence have c
 the lead LFortran developer's interest in adopting PRIF when
 LFortran begins work on enabling multi-image execution.
 
-# Comparisons
+# State of the field
 
 At least eight implementations of Fortran's multi-image features have been
 developed:
