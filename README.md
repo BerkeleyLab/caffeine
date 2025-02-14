@@ -90,9 +90,9 @@ one should consult compiler-provided documentation regarding the use of Caffeine
 to back multi-image features.
 
 However we provide an [example hello world program](example/hello.F90), 
-written in Fortran, that simulates the PRIF calls a theoretical
-source-to-source Fortran compiler might generate for a simple hello world
-program written using Fortran's multi-image features.
+written in Fortran, simulating the PRIF calls that a theoretical
+source-to-source Fortran compiler might generate for a simple program written
+using Fortran's multi-image features to print a message from each image.
 
 Run tests
 ---------
