@@ -1,12 +1,5 @@
-<div align="center">
-
 Contributing to Caffeine
 --------------------------
-
-</div>
-
-- [Reporting Defects or Suggesting Features](#reporting-defects-or-suggesting-features)
-- [Contributing Code or Documentation](#contributing-code-or-documentation)
 
 ## Reporting Defects or Suggesting Features
 
