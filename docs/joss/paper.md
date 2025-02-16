@@ -99,11 +99,11 @@ developed:
 4. Intel Fortran Compiler [@ifx-site],
 5. Numerical Algorithms Group (nAG) Fortran compiler [@nag-site],
 6. OpenCoarrays and the GNU Compiler Collection (GCC) [@fanfarillo2014opencoarrays],
-7. Rice University Coarray Fortran compiler[@rice-caf-compiler], and
+7. Rice University Coarray Fortran compiler [@rice-caf-compiler], and
 8. University of Houston OpenUH compiler [@chapman2013experiences; @ge-2016].
 
 One can view each of these along several axes from open- to closed-source, from
-portable to hardware-specific from research artifact to production-ready, and from
+portable to hardware-specific, from research artifact to production-ready, and from
 dormant to actively developed.  One can also categorize each runtime in terms of
 the choice of communication substrate and the ability to switch substrates.  In
 each measure, Caffeine stands apart from some or all the other compilers.
@@ -117,7 +117,7 @@ development.
 ## Openness and portability
 
 As commercial products with proprietary, hardware-specific optimizations, the
-HPE, Intel, and NAG compilers all have closed-source runtime libraries.  Caffeine
+HPE, Intel, and nAG compilers all have closed-source runtime libraries.  Caffeine
 differs from such runtimes in its open-source development practices.  The
 openness of a project's source impacts other dimensions of comparison.  For
 example, openness impacts portability: compilers and runtimes delivered as
@@ -134,9 +134,9 @@ middleware library.  Developed as part of the Exascale Computing Project funded 
 United States Department of Energy (DOE), GASNet-EX facilitates communication 
 for PGAS programming models on supercomputers at DOE leadership computing
 facilities.  GASNet-EX often outperforms the widely used Message Passing
-Interface (MPI) communication library as \autoref{fig:Frontier-bw} shows for
-the Frontier supercomputer that ranked first from November 2022 through November
-2024 on the Top 500 list of the fastest general-purpose computers 
+Interface (MPI) communication library; \autoref{fig:Frontier-bw} compares
+communication performance on the Frontier supercomputer that ranked first from November 2022 through November
+2024 on the Top 500 list of the world's fastest general-purpose supercomputers.
 
 ![Comparison of GASNet-EX and MPI bandwidth on the Frontier supercomputer, reproduced with permission from [@gasnet-perf-2023].\label{fig:Frontier-bw}](Frontier-bw){ width=100% }
 
@@ -160,7 +160,7 @@ Open-source development expands the ways in which software can support research.
 For example, the ability to recompile a runtime library facilitates studying
 performance portability or studying the impact of different build configurations.
 Although the University of Houston and Rice University compilers are research
-compilers, both appear to be dormant. [@caf-2-site; @chapman2013experiences]
+compilers, both appear to be dormant [@caf-2-site; @chapman2013experiences].
 OpenCoarrays and Caffeine are the only two actively maintained open-source
 runtimes and thus the two most suitable for research.  
 
@@ -173,7 +173,7 @@ and how one can define an interface to a compiler's parallel runtime in a
 compiler- and runtime-agnostic manner. The latter research produced a second
 peer-reviewed publication motivating and describing PRIF [@bonachea2024prif].
 Future research will include investigating avenues for supporting the
-optimization of communications on specific categories of hardware.
+optimization of communication on specific categories of hardware.
 
 # Acknowledgments
 
