@@ -66,7 +66,7 @@ or specific interconnects.
 runtime library, such as Caffeine, supports compiled Fortran code by
 implementing PRIF.
 
-![The parallel Fortran software stack enabled by the Caffeine parallel runtime's implementation of PRIF.\label{fig:prif-stack}](PRIF-software-stack-with-more.pdf){ width=100% }
+![The parallel Fortran software stack enabled by the Caffeine parallel runtime's implementation of PRIF, reproduced with permission from [@bonachea2024prif].\label{fig:prif-stack}](PRIF-software-stack-with-more.pdf){ width=100% }
 
 # Statement of need
 
