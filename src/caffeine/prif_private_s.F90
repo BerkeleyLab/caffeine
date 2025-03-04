@@ -1,5 +1,8 @@
 ! Copyright (c), The Regents of the University of California
 ! Terms of use are as specified in LICENSE.txt
+
+#include "assert_macros.h"
+
 submodule(prif) prif_private_s
   use assert_m
   implicit none
@@ -244,13 +247,8 @@ contains
     integer(c_int), intent(in) :: image_num
     integer(c_intptr_t), intent(out) :: ptr
 
-    integer(c_int) :: num_img
 
-    ! TODO TEAMS: either move the assertion below into `caf_convert_base_addr()`
-    ! (avoiding the need to call prif_num_images here to fetch initial team size)
-    ! or cache the initial team size in a private module variable so we can just access it (issue #62)
-    call prif_num_images(num_images=num_img)
-    call assert(image_num > 0 .and. image_num <= num_img, "base_pointer: image_num not within valid range")
+    call_assert_describe(image_num > 0 .and. image_num <= initial_team%num_images, "base_pointer: image_num not within valid range")
     ptr = caf_convert_base_addr(coarray_handle%info%coarray_data, image_num)
   end subroutine
 
