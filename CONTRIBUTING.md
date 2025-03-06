@@ -40,8 +40,33 @@ To contribute, please follow these steps:
 - [ ] Watch for CI results on your PR and address any failures.
 - [ ] Please be patient and responsive to comments on your PR.
 
+## Current and Past Contributors
+
+Caffeine is an open-source project and welcomes community participation in the development process.
+Notable current and past contributors include:
+
+* [Dan Bonachea](https://go.lbl.gov/dan-bonachea)
+  [@bonachea](https://github.com/bonachea)
+  [![View ORCID record] 0000-0002-0724-9349](https://orcid.org/0000-0002-0724-9349)
+
+* [Katherine Rasmussen](https://go.lbl.gov/katherine-rasmussen)
+  [@ktras](https://github.com/ktras)
+  [![View ORCID record] 0000-0001-7974-1853](https://orcid.org/0000-0001-7974-1853)
+
+* [Brad Richardson](https://everythingfunctional.com/)
+  [@everythingfunctional](https://github.com/everythingfunctional)
+  [![View ORCID record] 0000-0002-3205-2169](https://orcid.org/0000-0002-3205-2169)
+
+* [Damian Rouson](https://go.lbl.gov/damian-rouson) 
+  [@rouson](https://github.com/rouson)
+  [![View ORCID record] 0000-0002-2344-868X](https://orcid.org/0000-0002-2344-868X)
+
+
+You can also browse the [full list of repository contributors](https://github.com/BerkeleyLab/caffeine/graphs/contributors).
+
 ---
 
 [Long or Frequently Used URLs]: #
+[View ORCID record]: https://github.com/BerkeleyLab/caffeine/wiki/img/ORCID-small.png
 [closed issues]: https://github.com/berkeleylab/caffeine/issues?q=is%3Aissue+is%3Aclosed
 [new issue]: https://github.com/berkeleylab/caffeine/issues/new
