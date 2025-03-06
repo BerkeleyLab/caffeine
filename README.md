@@ -137,7 +137,10 @@ Lawrence Berkeley National Laboratory Technical Report (LBNL-2001636), Dec 2024.
 
 Funding
 -------
-The Computer Languages and Systems Software ([CLaSS]) Group at [Berkeley Lab] has developed Caffeine development on funding from the Exascale Computing Project ([ECP]) and the Stewardship for Programming Systems and Tools ([S4PST]) project. 
+The Computer Languages and Systems Software ([CLaSS]) Group at [Berkeley Lab] has developed Caffeine 
+on funding from the Exascale Computing Project ([ECP](https://www.exascaleproject.org)) 
+and the Stewardship for Programming Systems and Tools ([S4PST](https://ornl.github.io/events/s4pst2023/)) project,
+part of the Consortium for the Advancement of Scientific Software ([CASS](https://cass.community/)).
 
 Support and Licensing
 ---------------------
@@ -148,11 +151,8 @@ See [LICENSE.txt](LICENSE.txt) for usage terms and conditions.
 [GASNet-EX]: https://gasnet.lbl.gov
 [CLaSS]: https://go.lbl.gov/class
 [Berkeley Lab]: https://lbl.gov
-[ECP]: https://www.exascaleproject.org
 [MPI]: https://www.mpi-forum.org
-[S4PST]: https://ornl.github.io/events/s4pst2023/
 [Homebrew]: https://brew.sh
-[GASNet-EX]: https://gasnet.lbl.gov
 [Fortran package manager]: https://github.com/fortran-lang/fpm
 [pkg-config]: https://www.freedesktop.org/wiki/Software/pkg-config/
 [realpath]: https://man7.org/linux/man-pages/man3/realpath.3.html
