@@ -7,6 +7,7 @@ submodule(prif:prif_private_s) coarray_access_s
 
 contains
 
+  ! _______________________ Contiguous Put RMA ____________________________
   module procedure prif_put
     integer(c_intptr_t) :: remote_base
 
@@ -42,6 +43,7 @@ contains
     call unimplemented("prif_put_indirect_with_notify_indirect")
   end procedure
 
+  ! _______________________ Contiguous Get RMA ____________________________
   module procedure prif_get
     integer(c_intptr_t) :: remote_base
 
@@ -64,16 +66,44 @@ contains
         size = size_in_bytes)
   end procedure
 
+  ! _______________________ Strided Get RMA ____________________________
   module procedure prif_get_strided
-    call unimplemented("prif_get_strided")
+    integer(c_intptr_t) :: remote_base
+
+    call base_pointer(coarray_handle, image_num, remote_base)
+    call prif_get_strided_indirect( &
+        image_num = image_num, &
+        remote_ptr = remote_base + offset, &
+        remote_stride = remote_stride, &
+        current_image_buffer = current_image_buffer, &
+        current_image_stride = current_image_stride, &
+        element_size = element_size, &
+        extent = extent, &
+        stat = stat, &
+        errmsg = errmsg, &
+        errmsg_alloc = errmsg_alloc)
   end procedure
 
   module procedure prif_get_strided_indirect
     call unimplemented("prif_get_strided_indirect")
   end procedure
 
+  ! _______________________ Strided Put RMA ____________________________
   module procedure prif_put_strided
-    call unimplemented("prif_put_strided")
+    integer(c_intptr_t) :: remote_base
+
+    call base_pointer(coarray_handle, image_num, remote_base)
+    call prif_put_strided_indirect( &
+        image_num = image_num, &
+        remote_ptr = remote_base + offset, &
+        remote_stride = remote_stride, &
+        current_image_buffer = current_image_buffer, &
+        current_image_stride = current_image_stride, &
+        element_size = element_size, &
+        extent = extent, &
+        stat = stat, &
+        errmsg = errmsg, &
+        errmsg_alloc = errmsg_alloc)
   end procedure
 
   module procedure prif_put_strided_indirect
