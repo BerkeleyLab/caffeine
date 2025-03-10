@@ -3,7 +3,7 @@ name: Build with gfortran
 on: [push, pull_request]
 
 jobs:
-  Build:
+  gfortran-build:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -11,28 +11,41 @@ jobs:
 
     env:
       PREFIX: install
+      GASNET_CONFIGURE_ARGS: --enable-rpath --enable-debug
 
     steps:
     - name: Checkout code
       uses: actions/checkout@v1
 
-    - uses: fortran-lang/setup-fpm@v6.0.1
+    - uses: fortran-lang/setup-fpm@main
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Install on Ubuntu
       if: contains(matrix.os, 'ubuntu')
       run: |
+        set -x
         sudo apt update
         sudo apt install -y build-essential gfortran-14 g++-14 pkg-config make
+        echo == TOOL VERSIONS ==
+        export GCC_VERSION=14
+        fpm --version
+        gfortran-${GCC_VERSION} --version
+        gcc-${GCC_VERSION} --version
         ./install.sh --prefix=${PREFIX}
 
     - name: Install on macOS
       if: contains(matrix.os, 'macos')
       run: |
+        set -x
+        echo == TOOL VERSIONS ==
+        export GCC_VERSION=14
+        fpm --version
+        gfortran-${GCC_VERSION} --version
+        gcc-${GCC_VERSION} --version
         ./install.sh --prefix=${PREFIX}
 
     - name: Run unit tests
       run: |
         export GASNET_PSHM_NODES=8
-        ./build/run-fpm.sh test -- -d
+        ./build/run-fpm.sh test --verbose -- -d
