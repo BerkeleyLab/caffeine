@@ -104,7 +104,7 @@ submodule(prif) prif_private_s
     end function
 
 
-    ! _______________________ RMA ____________________________
+    ! _______________________ Contiguous RMA ____________________________
     subroutine caf_put(image, dest, src, size) bind(c)
       !! void caf_put(int image, intptr_t dest, void* src, size_t size)
       import c_ptr, c_int, c_intptr_t, c_size_t
@@ -124,6 +124,46 @@ submodule(prif) prif_private_s
       integer(c_intptr_t), intent(in), value :: src
       integer(c_size_t), intent(in), value :: size
     end subroutine
+
+    ! _______________________ Strided RMA ____________________________
+    subroutine caf_put_strided(dims, image_num, remote_ptr, remote_stride, &
+                               current_image_buffer, current_image_stride, &
+                               element_size, extent) bind(c)
+      !! void caf_put_strided(int dims, int image_num, 
+      !!                      intptr_t remote_ptr, void* remote_stride, 
+      !!                      void *current_image_buffer, void * current_image_stride, 
+      !!                      size_t element_size, void *extent)
+      import c_ptr, c_int, c_intptr_t, c_size_t
+      implicit none
+      integer(c_int), intent(in), value :: dims
+      integer(c_int), intent(in), value :: image_num
+      integer(c_intptr_t), intent(in), value :: remote_ptr
+      type(c_ptr), intent(in), value :: remote_stride
+      type(c_ptr), intent(in), value :: current_image_buffer
+      type(c_ptr), intent(in), value :: current_image_stride
+      integer(c_size_t), intent(in), value :: element_size
+      type(c_ptr), intent(in), value :: extent
+    end subroutine
+
+    subroutine caf_get_strided(dims, image_num, remote_ptr, remote_stride, &
+                               current_image_buffer, current_image_stride, &
+                               element_size, extent) bind(c)
+      !! void caf_get_strided(int dims, int image_num, 
+      !!                      intptr_t remote_ptr, void* remote_stride, 
+      !!                      void *current_image_buffer, void * current_image_stride, 
+      !!                      size_t element_size, void *extent)
+      import c_ptr, c_int, c_intptr_t, c_size_t
+      implicit none
+      integer(c_int), intent(in), value :: dims
+      integer(c_int), intent(in), value :: image_num
+      integer(c_intptr_t), intent(in), value :: remote_ptr
+      type(c_ptr), intent(in), value :: remote_stride
+      type(c_ptr), intent(in), value :: current_image_buffer
+      type(c_ptr), intent(in), value :: current_image_stride
+      integer(c_size_t), intent(in), value :: element_size
+      type(c_ptr), intent(in), value :: extent
+    end subroutine
+
     ! __________________ Synchronization _____________________
 
     subroutine caf_sync_all() bind(C)

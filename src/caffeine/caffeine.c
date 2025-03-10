@@ -7,6 +7,7 @@
 #include <assert.h>
 #include <gasnetex.h>
 #include <gasnet_coll.h>
+#include <gasnet_vis.h>
 #include "gasnet_safe.h"
 #include <gasnet_tools.h>
 #include <ISO_Fortran_binding.h>
@@ -149,6 +150,7 @@ intptr_t caf_convert_base_addr(void* addr, int image)
    return (intptr_t)((byte*)segment_start_remote_image + offset);
 }
 
+// _______________________ Contiguous RMA ____________________________
 void caf_put(int image, intptr_t dest, void* src, size_t size)
 {
   gex_RMA_PutBlocking(myworldteam, image-1, (void*)dest, src, size, 0);
@@ -158,6 +160,31 @@ void caf_get(int image, void* dest, intptr_t src, size_t size)
 {
   gex_RMA_GetBlocking(myworldteam, dest, image-1, (void*)src, size, 0);
 }
+
+// _______________________ Strided RMA ____________________________
+void caf_put_strided(int dims, int image_num, 
+                     intptr_t remote_ptr, void* remote_stride, 
+                     void *current_image_buffer, void * current_image_stride, 
+                     size_t element_size, void *extent) {
+  gex_VIS_StridedPutBlocking(myworldteam, 
+                             image_num-1,
+                             (void *)remote_ptr, remote_stride,
+                             current_image_buffer, current_image_stride,
+                             element_size, extent, dims, 0);
+}
+
+void caf_get_strided(int dims, int image_num, 
+                     intptr_t remote_ptr, void* remote_stride, 
+                     void *current_image_buffer, void * current_image_stride,
+                     size_t element_size, void *extent) {
+  gex_VIS_StridedGetBlocking(myworldteam, 
+                             current_image_buffer, current_image_stride,
+                             image_num-1,
+                             (void *)remote_ptr, remote_stride,
+                             element_size, extent, dims, 0);
+}
+
+//-------------------------------------------------------------------
 
 void caf_sync_all()
 {
