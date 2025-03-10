@@ -35,15 +35,18 @@ contains
   end procedure
 
   module procedure prif_failed_images
-    call unimplemented("prif_failed_images")
+    ! no current support for detecting image failure
+    allocate(failed_images(0))
   end procedure
 
   module procedure prif_stopped_images
-    call unimplemented("prif_stopped_images")
+    ! no current support for detecting image stops
+    allocate(stopped_images(0))
   end procedure
 
   module procedure prif_image_status
-    call unimplemented("prif_image_status")
+    ! no current support for detecting image failure/stops
+    image_status = 0
   end procedure
 
 end submodule image_queries_s
