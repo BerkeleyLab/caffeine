@@ -11,6 +11,7 @@ jobs:
 
     env:
       PREFIX: install
+      GASNET_CONFIGURE_ARGS: --enable-rpath --enable-debug
 
     steps:
     - name: Checkout code
@@ -35,4 +36,4 @@ jobs:
     - name: Run unit tests
       run: |
         export GASNET_PSHM_NODES=8
-        ./build/run-fpm.sh test -- -d
+        ./build/run-fpm.sh test --verbose -- -d
