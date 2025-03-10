@@ -54,14 +54,14 @@ in the following sections.
 
 | Procedure | Status | Notes |
 |-----------|--------|-------|
-| `prif_num_images`    | **YES** |  |
-| `prif_num_images_with_team` | **YES** |  |
+| `prif_num_images`                   | **YES** |  |
+| `prif_num_images_with_team`         | **YES** |  |
 | `prif_num_images_with_team_number`  | no |  |
-| `prif_this_image_no_coarray` | **YES** |  |
+| `prif_this_image_no_coarray`        | **YES** |  |
 | `prif_this_image_with_coarray`, `prif_this_image_with_dim`  | no |  |
-| `prif_failed_images` | no |  |
-| `prif_stopped_images` | no |  |
-| `prif_image_status` | no |  |
+| `prif_failed_images`                | **YES** |  |
+| `prif_stopped_images`               | **YES** |  |
+| `prif_image_status`                 | **YES** |  |
 
 ---
 
