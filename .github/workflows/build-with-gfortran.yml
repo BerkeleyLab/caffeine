@@ -3,7 +3,7 @@ name: Build with gfortran
 on: [push, pull_request]
 
 jobs:
-  Build:
+  gfortran-build:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:

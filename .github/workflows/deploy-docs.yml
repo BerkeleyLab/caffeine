@@ -3,7 +3,7 @@ name: Build and Deploy Documentation
 on: [push, pull_request]
 
 jobs:
-  Build:
+  docs-build:
     runs-on: ubuntu-22.04
 
     steps:
