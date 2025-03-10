@@ -85,14 +85,14 @@ in the following sections.
 | Procedure | Status | Notes |
 |-----------|--------|-------|
 | `prif_set_context_data`, `prif_get_context_data` | no |  |
-| `prif_size_bytes` | no |  |
+| `prif_size_bytes`                                | **YES** |  |
 | `prif_lcobound_no_dim`, `prif_lcobound_with_dim` | no |  |
 | `prif_ucobound_no_dim`, `prif_ucobound_with_dim` | no |  |
-| `prif_coshape` | no |  |
-| `prif_local_data_pointer` | **YES** |  |
-| `prif_image_index` | **YES** |  |
-| `prif_image_index_with_team` | no |  |
-| `prif_image_index_with_team_number` | no |  |
+| `prif_coshape`                                   | no |  |
+| `prif_local_data_pointer`                        | **YES** |  |
+| `prif_image_index`                               | **YES** |  |
+| `prif_image_index_with_team`                     | no |  |
+| `prif_image_index_with_team_number`              | no |  |
 
 ---
 
