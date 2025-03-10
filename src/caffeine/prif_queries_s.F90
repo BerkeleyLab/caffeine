@@ -19,7 +19,7 @@ contains
   end procedure
 
   module procedure prif_size_bytes
-    call unimplemented("prif_size_bytes")
+    data_size = coarray_handle%info%coarray_size
   end procedure
 
 end submodule prif_queries_s
