@@ -2,7 +2,7 @@ module caf_allocate_test
   use prif, only : &
       prif_allocate_coarray, prif_deallocate_coarray, &
       prif_allocate, prif_deallocate, &
-      prif_coarray_handle, prif_num_images
+      prif_coarray_handle, prif_num_images, prif_size_bytes
   use veggies, only: result_t, test_item_t, assert_that, assert_equals, describe, it
   use iso_c_binding, only: &
       c_ptr, c_int, c_int64_t, c_size_t, c_funptr, c_null_funptr, &
@@ -37,6 +37,7 @@ contains
     type(prif_coarray_handle) :: coarray_handle
     type(c_ptr) :: allocated_memory
     integer, pointer :: local_slice
+    integer(c_size_t) :: data_size, query_size
 
     call prif_num_images(num_images=num_imgs)
     lcobounds(1) = 1
@@ -46,8 +47,9 @@ contains
     local_slice => null()
     result_ = assert_that(.not.associated(local_slice))
 
+    data_size = storage_size(dummy_element)/8
     call prif_allocate_coarray( &
-      lcobounds, ucobounds, int(storage_size(dummy_element)/8, c_size_t), c_null_funptr, &
+      lcobounds, ucobounds, data_size, c_null_funptr, &
       coarray_handle, allocated_memory)
 
     call c_f_pointer(allocated_memory, local_slice)
@@ -55,6 +57,9 @@ contains
 
     local_slice = 42
     result_ = result_ .and. assert_equals(42, local_slice)
+
+    call prif_size_bytes(coarray_handle, data_size=query_size)
+    result_ = result_ .and. assert_that(query_size == data_size, "prif_size_bytes is valid")
 
     call prif_deallocate_coarray([coarray_handle])
 
