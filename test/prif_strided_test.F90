@@ -50,7 +50,6 @@ contains
 
             write(result_string, '("At position (", I0, ",", I0, ") expected=", I0, " actual=", I0)') &
                   i, j, expected(i,j), actual(i,j)
-            !print *, result_string
 
             result_ = result_ .and. &
               assert_equals(expected(i,j), actual(i,j), result_string)
