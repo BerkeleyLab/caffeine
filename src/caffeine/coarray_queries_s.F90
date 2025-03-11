@@ -1,29 +1,67 @@
 ! Copyright (c), The Regents of the University of California
 ! Terms of use are as specified in LICENSE.txt
+
+#include "assert_macros.h"
+
 submodule(prif:prif_private_s) coarray_queries_s
+  use iso_c_binding, only: &
+      c_associated
 
   implicit none
 
 contains
+  ! verify state invariants for a coarray_handle
+  function coarray_handle_check(coarray_handle) result(result_)
+    implicit none
+    type(prif_coarray_handle), intent(in) :: coarray_handle
+    logical :: result_
+    type(prif_coarray_descriptor), pointer :: info
+    integer(c_int) :: i
+
+    call_assert(associated(coarray_handle%info))
+    info => coarray_handle%info
+    call_assert(info%corank >= 1)
+    call_assert(info%corank <= size(info%ucobounds))
+    call_assert(all([(info%lcobounds(i) <= info%ucobounds(i), i = 1, info%corank)]))
+    call_assert(info%coarray_size > 0)
+    call_assert(c_associated(info%coarray_data))
+
+    result_ = .true.
+  end function
 
   module procedure prif_lcobound_with_dim
-    call unimplemented("prif_lcobound_with_dim")
+    call_assert(coarray_handle_check(coarray_handle))
+    call_assert(dim >= 1 .and. dim <= coarray_handle%info%corank)
+
+    lcobound = coarray_handle%info%lcobounds(dim)
   end procedure
 
   module procedure prif_lcobound_no_dim
-    call unimplemented("prif_lcobound_no_dim")
+    call_assert(coarray_handle_check(coarray_handle))
+
+    lcobounds = coarray_handle%info%lcobounds(1:coarray_handle%info%corank)
   end procedure
 
   module procedure prif_ucobound_with_dim
-    call unimplemented("prif_ucobound_with_dim")
+    call_assert(coarray_handle_check(coarray_handle))
+    call_assert(dim >= 1 .and. dim <= coarray_handle%info%corank)
+
+    ucobound = coarray_handle%info%ucobounds(dim)
   end procedure
 
   module procedure prif_ucobound_no_dim
-    call unimplemented("prif_ucobound_no_dim")
+    call_assert(coarray_handle_check(coarray_handle))
+
+    ucobounds = coarray_handle%info%ucobounds(1:coarray_handle%info%corank)
   end procedure
 
   module procedure prif_coshape
-    call unimplemented("prif_coshape")
+    type(prif_coarray_descriptor), pointer :: info
+
+    call_assert(coarray_handle_check(coarray_handle))
+
+    info => coarray_handle%info
+    sizes = info%ucobounds(1:info%corank) - info%lcobounds(1:info%corank) + 1
   end procedure
 
   module procedure prif_image_index
