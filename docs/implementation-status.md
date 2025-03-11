@@ -113,20 +113,18 @@ in the following sections.
 ---
 
 ## Strided Coarray Access
-### Support = no
+### Support = partial
 
-<!---
 | Procedure | Status | Notes |
 |-----------|--------|-------|
-| `prif_get_strided`                               | no  |  |
-| `prif_get_strided_indirect`                      | no  |  |
-| `prif_put_strided`                               | no  |  |
-| `prif_put_strided_indirect`                      | no  |  |
-| `prif_put_strided_with_notify`                   | no  |  |
-| `prif_put_strided_with_notify_indirect`          | no  |  |
-| `prif_put_strided_indirect_with_notify`          | no  |  |
-| `prif_put_strided_indirect_with_notify_indirect` | no  |  |
--->
+| `prif_get_strided`                               | **YES**  |  |
+| `prif_get_strided_indirect`                      | **YES**  |  |
+| `prif_put_strided`                               | **YES**  |  |
+| `prif_put_strided_indirect`                      | **YES**  |  |
+| `prif_put_strided_with_notify`                   | no       |  |
+| `prif_put_strided_with_notify_indirect`          | no       |  |
+| `prif_put_strided_indirect_with_notify`          | no       |  |
+| `prif_put_strided_indirect_with_notify_indirect` | no       |  |
 
 ---
 
