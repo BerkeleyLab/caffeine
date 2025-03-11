@@ -13,6 +13,7 @@ module caf_rma_test
             prif_get, &
             prif_get_indirect, &
             prif_sync_all, &
+            prif_sync_memory, &
             prif_this_image_no_coarray
     use veggies, only: result_t, test_item_t, assert_equals, describe, it
 
@@ -65,6 +66,9 @@ contains
                 current_image_buffer = c_loc(me), &
                 size_in_bytes = c_sizeof(me))
         call prif_sync_all
+
+        ! superfluous, just to ensure prif_sync_memory is usable
+        call prif_sync_memory
 
         result_ = assert_equals(expected, local_slice)
 

@@ -164,12 +164,21 @@ submodule(prif) prif_private_s
       type(c_ptr), intent(in), value :: extent
     end subroutine
 
-    ! __________________ Synchronization _____________________
+    ! __________________ SYNC Statements _____________________
+
+    subroutine caf_sync_memory() bind(C)
+      !! void caf_sync_memory();
+    end subroutine
 
     subroutine caf_sync_all() bind(C)
       !! void caf_sync_all();
-      import c_int
-      implicit none
+    end subroutine
+
+    subroutine caf_sync_team(team) bind(C)
+      !! void caf_sync_team(gex_TM_t team);
+       import c_ptr
+       implicit none
+       type(c_ptr), value :: team
     end subroutine
 
     ! ______________ Collective Subroutines __________________

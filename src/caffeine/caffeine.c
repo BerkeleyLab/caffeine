@@ -186,11 +186,22 @@ void caf_get_strided(int dims, int image_num,
 
 //-------------------------------------------------------------------
 
+void caf_sync_memory() {
+  // we may eventually need more than this if/when we relax our memory model..
+  gasnett_local_mb();
+}
+
 void caf_sync_all()
 {
   gasnet_barrier_notify(0,GASNET_BARRIERFLAG_ANONYMOUS);
   gasnet_barrier_wait(0,GASNET_BARRIERFLAG_ANONYMOUS);
 }
+
+void caf_sync_team( gex_TM_t team ) {
+  gex_Event_Wait( gex_Coll_BarrierNB(team, 0) );
+}
+
+//-------------------------------------------------------------------
 
 void caf_co_reduce(
   CFI_cdesc_t* a_desc, int result_image, int num_elements, gex_Coll_ReduceFn_t user_op, void* client_data, gex_TM_t team
