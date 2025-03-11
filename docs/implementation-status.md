@@ -133,10 +133,10 @@ in the following sections.
 
 | Procedure | Status | Notes |
 |-----------|--------|-------|
-| `prif_sync_memory` | no        |  |
+| `prif_sync_memory` | **YES**   |  |
 | `prif_sync_all`    | **YES**   |  |
 | `prif_sync_images` | no        |  |
-| `prif_sync_team`   | no        |  |
+| `prif_sync_team`   | **YES**   |  |
 
 ---
 
