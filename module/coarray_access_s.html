@@ -89,7 +89,7 @@
      <li><i class="fa fa-list-ol"></i>
        <a data-toggle="tooltip"
     data-placement="bottom" data-html="true"
-    title=" 2.8% of total for modules and submodules.">57 statements</a>
+    title=" 4.6% of total for modules and submodules.">95 statements</a>
      </li> 
     <li><i class="fa fa-code"></i><a href="../src/coarray_access_s.F90"> Source File</a></li>
   </ul>
@@ -113,6 +113,15 @@
     <div id="sidebar">
   <h3>Contents</h3>
  
+<div class="panel panel-primary">
+  <div class="panel-heading text-left"><h3 class="panel-title"><a data-toggle="collapse" href="#subs-0">Subroutines</a></h3></div>
+  <div class="list-group">
+    <div id="subs-0" class="panel-collapse collapse">
+      <a class="list-group-item" href="../module/coarray_access_s.html#proc-get_strided_helper">get_strided_helper</a>
+      <a class="list-group-item" href="../module/coarray_access_s.html#proc-put_strided_helper">put_strided_helper</a>
+    </div>
+  </div>
+</div>
 <div class="panel panel-primary">
   <div class="panel-heading text-left"><h3 class="panel-title"><a data-toggle="collapse" href="#modprocs-0">Module Procedures</a></h3></div>
   <div id="modprocs-0" class="panel-collapse collapse">
@@ -312,6 +321,15 @@
       <h3>Contents</h3>
  
 <div class="panel panel-primary">
+  <div class="panel-heading text-left"><h3 class="panel-title"><a data-toggle="collapse" href="#subs-1">Subroutines</a></h3></div>
+  <div class="list-group">
+    <div id="subs-1" class="panel-collapse collapse">
+      <a class="list-group-item" href="../module/coarray_access_s.html#proc-get_strided_helper">get_strided_helper</a>
+      <a class="list-group-item" href="../module/coarray_access_s.html#proc-put_strided_helper">put_strided_helper</a>
+    </div>
+  </div>
+</div>
+<div class="panel panel-primary">
   <div class="panel-heading text-left"><h3 class="panel-title"><a data-toggle="collapse" href="#modprocs-1">Module Procedures</a></h3></div>
   <div id="modprocs-1" class="panel-collapse collapse">
     <div class="list-group">
@@ -345,6 +363,158 @@
     
     
 
+    <section>
+    <h2>Subroutines</h2>
+      <div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="proc-get_strided_helper"></span><h3>subroutine <a href='../proc/get_strided_helper.html'>get_strided_helper</a>(image_num, remote_ptr, remote_stride, current_image_buffer, current_image_stride, element_size, extent, stat, errmsg, errmsg_alloc)</h3></div>
+  <div class="panel-body">
+           
+<h4>Arguments</h4>      <table class="table table-striped varlist">
+<thead><tr><th>Type</th><th>Intent</th><th>Optional</th><th>Attributes</th><th></th><th>Name</th><th></th></thead>
+<tbody>
+<tr>
+  <td><span class="anchor" ></span>integer(kind=c_int),</td>
+<td>intent(in)</td>
+  <td></td>  <td></td><td>::</td>
+  <td><strong>image_num</strong></td><td></td>
+</tr>
+<tr>
+  <td><span class="anchor" ></span>integer(kind=c_intptr_t),</td>
+<td>intent(in)</td>
+  <td></td>  <td></td><td>::</td>
+  <td><strong>remote_ptr</strong></td><td></td>
+</tr>
+<tr>
+  <td><span class="anchor" ></span>integer(kind=c_ptrdiff_t),</td>
+<td>intent(in),</td>
+  <td></td>  <td>target, contiguous</td><td>::</td>
+  <td><strong>remote_stride</strong>(:)</td><td></td>
+</tr>
+<tr>
+  <td><span class="anchor" ></span>type(c_ptr),</td>
+<td>intent(in)</td>
+  <td></td>  <td></td><td>::</td>
+  <td><strong>current_image_buffer</strong></td><td></td>
+</tr>
+<tr>
+  <td><span class="anchor" ></span>integer(kind=c_ptrdiff_t),</td>
+<td>intent(in),</td>
+  <td></td>  <td>target, contiguous</td><td>::</td>
+  <td><strong>current_image_stride</strong>(:)</td><td></td>
+</tr>
+<tr>
+  <td><span class="anchor" ></span>integer(kind=c_size_t),</td>
+<td>intent(in)</td>
+  <td></td>  <td></td><td>::</td>
+  <td><strong>element_size</strong></td><td></td>
+</tr>
+<tr>
+  <td><span class="anchor" ></span>integer(kind=c_size_t),</td>
+<td>intent(in),</td>
+  <td></td>  <td>target, contiguous</td><td>::</td>
+  <td><strong>extent</strong>(:)</td><td></td>
+</tr>
+<tr>
+  <td><span class="anchor" ></span>integer(kind=c_int),</td>
+<td>intent(out),</td>
+  <td>optional</td>  <td></td><td>::</td>
+  <td><strong>stat</strong></td><td></td>
+</tr>
+<tr>
+  <td><span class="anchor" ></span>character(len=*),</td>
+<td>intent(inout),</td>
+  <td>optional</td>  <td></td><td>::</td>
+  <td><strong>errmsg</strong></td><td></td>
+</tr>
+<tr>
+  <td><span class="anchor" ></span>character(len=:),</td>
+<td>intent(inout),</td>
+  <td>optional</td>  <td>allocatable</td><td>::</td>
+  <td><strong>errmsg_alloc</strong></td><td></td>
+</tr>
+</tbody>
+</table>
+
+
+  </div>
+  </div>
+
+      <div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="proc-put_strided_helper"></span><h3>subroutine <a href='../proc/put_strided_helper.html'>put_strided_helper</a>(image_num, remote_ptr, remote_stride, current_image_buffer, current_image_stride, element_size, extent, stat, errmsg, errmsg_alloc)</h3></div>
+  <div class="panel-body">
+           
+<h4>Arguments</h4>      <table class="table table-striped varlist">
+<thead><tr><th>Type</th><th>Intent</th><th>Optional</th><th>Attributes</th><th></th><th>Name</th><th></th></thead>
+<tbody>
+<tr>
+  <td><span class="anchor" ></span>integer(kind=c_int),</td>
+<td>intent(in)</td>
+  <td></td>  <td></td><td>::</td>
+  <td><strong>image_num</strong></td><td></td>
+</tr>
+<tr>
+  <td><span class="anchor" ></span>integer(kind=c_intptr_t),</td>
+<td>intent(in)</td>
+  <td></td>  <td></td><td>::</td>
+  <td><strong>remote_ptr</strong></td><td></td>
+</tr>
+<tr>
+  <td><span class="anchor" ></span>integer(kind=c_ptrdiff_t),</td>
+<td>intent(in),</td>
+  <td></td>  <td>target, contiguous</td><td>::</td>
+  <td><strong>remote_stride</strong>(:)</td><td></td>
+</tr>
+<tr>
+  <td><span class="anchor" ></span>type(c_ptr),</td>
+<td>intent(in)</td>
+  <td></td>  <td></td><td>::</td>
+  <td><strong>current_image_buffer</strong></td><td></td>
+</tr>
+<tr>
+  <td><span class="anchor" ></span>integer(kind=c_ptrdiff_t),</td>
+<td>intent(in),</td>
+  <td></td>  <td>target, contiguous</td><td>::</td>
+  <td><strong>current_image_stride</strong>(:)</td><td></td>
+</tr>
+<tr>
+  <td><span class="anchor" ></span>integer(kind=c_size_t),</td>
+<td>intent(in)</td>
+  <td></td>  <td></td><td>::</td>
+  <td><strong>element_size</strong></td><td></td>
+</tr>
+<tr>
+  <td><span class="anchor" ></span>integer(kind=c_size_t),</td>
+<td>intent(in),</td>
+  <td></td>  <td>target, contiguous</td><td>::</td>
+  <td><strong>extent</strong>(:)</td><td></td>
+</tr>
+<tr>
+  <td><span class="anchor" ></span>integer(kind=c_int),</td>
+<td>intent(out),</td>
+  <td>optional</td>  <td></td><td>::</td>
+  <td><strong>stat</strong></td><td></td>
+</tr>
+<tr>
+  <td><span class="anchor" ></span>character(len=*),</td>
+<td>intent(inout),</td>
+  <td>optional</td>  <td></td><td>::</td>
+  <td><strong>errmsg</strong></td><td></td>
+</tr>
+<tr>
+  <td><span class="anchor" ></span>character(len=:),</td>
+<td>intent(inout),</td>
+  <td>optional</td>  <td>allocatable</td><td>::</td>
+  <td><strong>errmsg_alloc</strong></td><td></td>
+</tr>
+</tbody>
+</table>
+
+
+  </div>
+  </div>
+
+    </section>    
+    <br>
     
     
 
@@ -1544,7 +1714,7 @@
           <p class="text-right">
             Documentation generated by 
             <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
- on 2025-03-10 22:20            </p>
+ on 2025-03-11 04:37            </p>
         </div>
       </div>
       <br>
