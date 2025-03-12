@@ -1,7 +1,8 @@
 module caf_stop_test
     use prif, only: prif_this_image_no_coarray, prif_sync_all
     use veggies, only: test_item_t, describe, result_t, it, assert_that, assert_equals, succeed
-    use unit_test_parameters_m, only : expected_stop_code
+    use unit_test_parameters_m, only : expected_stop_code, &
+        image_one => subjob_setup, cmd_prefix => subjob_prefix
 
     implicit none
     private
@@ -22,15 +23,6 @@ contains
                 ])
     end function
 
-    function image_one() result(result_)
-        logical :: result_
-        integer :: me
-
-        call prif_sync_all()
-        call prif_this_image_no_coarray(this_image=me)
-        result_ = (me == 1)
-    end function 
-
     function exit_with_no_stop_code() result(result_)
         type(result_t) :: result_
         integer exit_status, cmd_stat
@@ -40,7 +32,7 @@ contains
         command_message = "exit_with_no_stop_code"
 
         call execute_command_line( &
-          command = "./build/run-fpm.sh run --example stop_with_no_code > /dev/null 2>&1", &
+          command = cmd_prefix//"./build/run-fpm.sh run --example stop_with_no_code > /dev/null 2>&1", &
           wait = .true., &
           exitstat = exit_status, &
           cmdstat = cmd_stat, &
@@ -62,7 +54,7 @@ contains
         command_message = "exit_with_integer_stop_code"
 
         call execute_command_line( &
-          command = "./build/run-fpm.sh run --example stop_with_integer_code > /dev/null 2>&1", &
+          command = cmd_prefix//"./build/run-fpm.sh run --example stop_with_integer_code > /dev/null 2>&1", &
           wait = .true., &
           exitstat = exit_status, &
           cmdstat = cmd_stat, &
@@ -84,7 +76,7 @@ contains
         command_message = "exit_with_character_stop_code"
 
         call execute_command_line( &
-          command = "./build/run-fpm.sh run --example stop_with_character_code > /dev/null 2>&1", &
+          command = cmd_prefix//"./build/run-fpm.sh run --example stop_with_character_code > /dev/null 2>&1", &
           wait = .true., &
           exitstat = exit_status, &
           cmdstat = cmd_stat, &
@@ -105,7 +97,7 @@ contains
 
       if (image_one()) then
         call execute_command_line( &
-          command = "./build/run-fpm.sh run --example register_stop_callback > /dev/null 2>&1", &
+          command = cmd_prefix//"./build/run-fpm.sh run --example register_stop_callback > /dev/null 2>&1", &
           wait = .true., &
           exitstat = exit_status, &
           cmdstat = cmd_stat, &
