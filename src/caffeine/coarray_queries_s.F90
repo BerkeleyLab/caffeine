@@ -105,4 +105,20 @@ contains
     call unimplemented("prif_image_index_with_team_number")
   end procedure
 
+  module procedure prif_local_data_pointer
+    local_data = coarray_handle%info%coarray_data
+  end procedure
+
+  module procedure prif_set_context_data
+    call unimplemented("prif_set_context_data")
+  end procedure
+
+  module procedure prif_get_context_data
+    call unimplemented("prif_get_context_data")
+  end procedure
+
+  module procedure prif_size_bytes
+    data_size = coarray_handle%info%coarray_size
+  end procedure
+
 end submodule coarray_queries_s
