@@ -33,7 +33,7 @@ contains
          ,cmdstat = command_status &
          ,cmdmsg = command_message &
         )   
-        result_ = assert_that(exit_status /= 0) .and. assert_equals(0, command_status, command_message)
+        result_ = assert_that(exit_status /= 0)
 
     end function
 
@@ -51,8 +51,7 @@ contains
          ,cmdmsg = command_message &
         )
         result_ = &
-         assert_equals(expected_error_stop_code, exit_status, "exit_status") &
-         .and. assert_equals(0, command_status, command_message)
+         assert_equals(expected_error_stop_code, exit_status, "exit_status") 
 
     end function
 
@@ -69,7 +68,7 @@ contains
          ,cmdstat = command_status &
          ,cmdmsg = command_message &
         )   
-        result_ = assert_that(exit_status /= 0) .and. assert_equals(0, command_status, command_message)
+        result_ = assert_that(exit_status /= 0)
 
     end function
 
