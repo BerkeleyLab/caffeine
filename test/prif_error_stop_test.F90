@@ -26,6 +26,8 @@ contains
         integer command_status
         character(len=max_message_len) command_message
 
+        command_message = "exit_with_no_stop_code"
+
         call execute_command_line( &
           command = "./build/run-fpm.sh run --example error_stop_with_no_code > /dev/null 2>&1" &
          ,wait = .true. &
@@ -33,7 +35,7 @@ contains
          ,cmdstat = command_status &
          ,cmdmsg = command_message &
         )   
-        result_ = assert_that(exit_status /= 0)
+        result_ = assert_that(exit_status /= 0, command_message)
 
     end function
 
@@ -43,6 +45,8 @@ contains
         integer command_status
         character(len=max_message_len) command_message
 
+        command_message = "exit_with_integer_stop_code"
+
         call execute_command_line( &
           command = "./build/run-fpm.sh run --example error_stop_with_integer_code > /dev/null 2>&1" &
          ,wait = .true. &
@@ -51,7 +55,7 @@ contains
          ,cmdmsg = command_message &
         )
         result_ = &
-         assert_equals(expected_error_stop_code, exit_status, "exit_status") 
+         assert_equals(expected_error_stop_code, exit_status, command_message) 
 
     end function
 
@@ -61,6 +65,8 @@ contains
         integer command_status
         character(len=max_message_len) command_message
 
+        command_message = "exit_with_character_stop_code"
+
         call execute_command_line( &
           command = "./build/run-fpm.sh run --example error_stop_with_character_code > /dev/null 2>&1" &
          ,wait = .true. &
@@ -68,7 +74,7 @@ contains
          ,cmdstat = command_status &
          ,cmdmsg = command_message &
         )   
-        result_ = assert_that(exit_status /= 0)
+        result_ = assert_that(exit_status /= 0, command_message)
 
     end function
 
