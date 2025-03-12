@@ -89,8 +89,8 @@ contains
         individual_tests = [individual_tests, caf_co_min_prif_co_min()]
         individual_tests = [individual_tests, caf_co_reduce_prif_co_reduce()]
         individual_tests = [individual_tests, caf_co_sum_prif_co_sum()]
-        individual_tests = [individual_tests, caf_error_stop_prif_this_image()]
 #endif
+        individual_tests = [individual_tests, caf_error_stop_prif_this_image()]
         individual_tests = [individual_tests, caf_image_index_prif_image_index()]
         individual_tests = [individual_tests, caf_num_images_prif_num_images()]
         individual_tests = [individual_tests, test_prif_image_queries()]
