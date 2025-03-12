@@ -40,9 +40,6 @@ contains
         use caf_coarray_inquiry_test, only: &
                 caf_coarray_inquiry_coarray_inquiry => &
                     test_coarray_inquiry
-        use caf_error_stop_test, only: &
-                caf_error_stop_prif_this_image => &
-                    test_prif_this_image
         use caf_image_index_test, only: &
                 caf_image_index_prif_image_index => &
                     test_prif_image_index
@@ -55,15 +52,14 @@ contains
                     test_prif_rma
         use caf_strided_test, only: &
                     test_prif_rma_strided
-        use caf_stop_test, only: &
-                caf_stop_prif_this_image => &
-                    test_prif_this_image
         use caf_teams_test, only: &
                 caf_teams_caf_teams => &
                     test_caf_teams
         use caf_this_image_test, only: &
                 caf_this_image_prif_this_image_no_coarray => &
                     test_prif_this_image_no_coarray
+        use caf_stop_test, only: test_prif_stop
+        use caf_error_stop_test, only: test_prif_error_stop
         use veggies, only: test_item_t, test_that, run_tests
 
 
@@ -109,8 +105,8 @@ contains
         individual_tests = [individual_tests, test_prif_rma_strided()]
         individual_tests = [individual_tests, caf_teams_caf_teams()]
         individual_tests = [individual_tests, caf_this_image_prif_this_image_no_coarray()]
-        individual_tests = [individual_tests, caf_stop_prif_this_image()]
-        individual_tests = [individual_tests, caf_error_stop_prif_this_image()]
+        individual_tests = [individual_tests, test_prif_stop()]
+        individual_tests = [individual_tests, test_prif_error_stop()]
 
         tests = test_that(individual_tests)
 
