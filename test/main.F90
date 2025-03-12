@@ -2,6 +2,7 @@
 ! DO NOT REGENERATE THIS FILE!
 program main
     use iso_c_binding, only : c_bool
+    use iso_fortran_env, only : OUTPUT_UNIT, ERROR_UNIT
     use prif, only : &
         prif_stop &
        ,prif_error_stop
@@ -75,10 +76,21 @@ contains
         allocate(individual_tests(0))
 
 #if __flang__
+    block
+        integer :: major, minor
+#     if defined(__flang_major__) && defined(__flang_minor__)
+        major = __flang_major__
+        minor = __flang_minor__
+#     else
+        major = -1
+        minor = -1
+#     endif
         print *, "-----------------------------------------------------------------"
-        print *, "WARNING: flang-new compiler detected."
+        print *, "WARNING: flang-new compiler detected, version:",major,".",minor
         print *, "WARNING: Skipping tests that are known to fail with this compiler"
         print *, "-----------------------------------------------------------------"
+        call flush(OUTPUT_UNIT)
+    end block
 #endif
         individual_tests = [individual_tests, a00_caffeinate_caffeinate()]
         individual_tests = [individual_tests, caf_allocate_prif_allocate()]
@@ -90,18 +102,20 @@ contains
         individual_tests = [individual_tests, caf_co_reduce_prif_co_reduce()]
         individual_tests = [individual_tests, caf_co_sum_prif_co_sum()]
 #endif
-        individual_tests = [individual_tests, caf_error_stop_prif_this_image()]
         individual_tests = [individual_tests, caf_image_index_prif_image_index()]
         individual_tests = [individual_tests, caf_num_images_prif_num_images()]
         individual_tests = [individual_tests, test_prif_image_queries()]
         individual_tests = [individual_tests, caf_rma_prif_rma()]
         individual_tests = [individual_tests, test_prif_rma_strided()]
-        individual_tests = [individual_tests, caf_stop_prif_this_image()]
         individual_tests = [individual_tests, caf_teams_caf_teams()]
         individual_tests = [individual_tests, caf_this_image_prif_this_image_no_coarray()]
+        individual_tests = [individual_tests, caf_stop_prif_this_image()]
+        individual_tests = [individual_tests, caf_error_stop_prif_this_image()]
 
         tests = test_that(individual_tests)
 
+        call flush(OUTPUT_UNIT)
+        call flush(ERROR_UNIT)
 
         passed = run_tests(tests)
 
