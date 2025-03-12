@@ -21,12 +21,13 @@ contains
 
     function exit_with_no_stop_code() result(result_)
         type(result_t) :: result_
-        integer exit_status
+        integer exit_status, cmd_stat
 
         call execute_command_line( &
           command = "./build/run-fpm.sh run --example stop_with_no_code > /dev/null 2>&1", &
           wait = .true., &
-          exitstat = exit_status &
+          exitstat = exit_status, &
+          cmdstat = cmd_stat &
         )
         result_ = assert_equals(0, exit_status)
 
@@ -34,12 +35,13 @@ contains
 
     function exit_with_integer_stop_code() result(result_)
         type(result_t) :: result_
-        integer exit_status
+        integer exit_status, cmd_stat
 
         call execute_command_line( &
           command = "./build/run-fpm.sh run --example stop_with_integer_code > /dev/null 2>&1", &
           wait = .true., &
-          exitstat = exit_status &
+          exitstat = exit_status, &
+          cmdstat = cmd_stat &
         )
         result_ = assert_equals(expected_stop_code, exit_status)
 
@@ -47,12 +49,13 @@ contains
 
     function exit_with_character_stop_code() result(result_)
         type(result_t) :: result_
-        integer exit_status
+        integer exit_status, cmd_stat
 
         call execute_command_line( &
           command = "./build/run-fpm.sh run --example stop_with_character_code > /dev/null 2>&1", &
           wait = .true., &
-          exitstat = exit_status &
+          exitstat = exit_status, &
+          cmdstat = cmd_stat &
         )   
         result_ = assert_equals(0, exit_status) ! the standard recommends zero exit status for character stop codes
 
@@ -61,12 +64,13 @@ contains
     function check_callback_invocation() result(result_)
       type(result_t) :: result_
 
-      integer :: exit_status
+      integer exit_status, cmd_stat
 
       call execute_command_line( &
         command = "./build/run-fpm.sh run --example register_stop_callback > /dev/null 2>&1", &
         wait = .true., &
-        exitstat = exit_status &
+        exitstat = exit_status, &
+        cmdstat = cmd_stat &
       )
       result_ = assert_equals(0, exit_status)
     end function
