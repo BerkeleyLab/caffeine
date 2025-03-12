@@ -96,9 +96,7 @@ contains
         individual_tests = [individual_tests, test_prif_image_queries()]
         individual_tests = [individual_tests, caf_rma_prif_rma()]
         individual_tests = [individual_tests, test_prif_rma_strided()]
-#if !__flang__
         individual_tests = [individual_tests, caf_stop_prif_this_image()]
-#endif
         individual_tests = [individual_tests, caf_teams_caf_teams()]
         individual_tests = [individual_tests, caf_this_image_prif_this_image_no_coarray()]
 
