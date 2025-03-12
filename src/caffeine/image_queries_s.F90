@@ -1,5 +1,8 @@
 ! Copyright (c), The Regents of the University of California
 ! Terms of use are as specified in LICENSE.txt
+
+#include "assert_macros.h"
+
 submodule(prif:prif_private_s) image_queries_s
 
   implicit none
@@ -27,10 +30,14 @@ contains
   end procedure
 
   module procedure prif_this_image_with_coarray
+    call_assert(coarray_handle_check(coarray_handle))
+
     call unimplemented("prif_this_image_with_coarray")
   end procedure
 
   module procedure prif_this_image_with_dim
+    call_assert(coarray_handle_check(coarray_handle))
+
     call unimplemented("prif_this_image_with_dim")
   end procedure
 

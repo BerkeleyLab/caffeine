@@ -4,30 +4,10 @@
 #include "assert_macros.h"
 
 submodule(prif:prif_private_s) coarray_queries_s
-  use iso_c_binding, only: &
-      c_associated
 
   implicit none
 
 contains
-  ! verify state invariants for a coarray_handle
-  function coarray_handle_check(coarray_handle) result(result_)
-    implicit none
-    type(prif_coarray_handle), intent(in) :: coarray_handle
-    logical :: result_
-    type(prif_coarray_descriptor), pointer :: info
-    integer(c_int) :: i
-
-    call_assert(associated(coarray_handle%info))
-    info => coarray_handle%info
-    call_assert(info%corank >= 1)
-    call_assert(info%corank <= size(info%ucobounds))
-    call_assert(all([(info%lcobounds(i) <= info%ucobounds(i), i = 1, info%corank)]))
-    call_assert(info%coarray_size > 0)
-    call_assert(c_associated(info%coarray_data))
-
-    result_ = .true.
-  end function
 
   module procedure prif_lcobound_with_dim
     call_assert(coarray_handle_check(coarray_handle))
@@ -69,6 +49,8 @@ contains
     integer(c_int) :: prior_size, num_img
     logical :: invalid_cosubscripts
 
+    call_assert(coarray_handle_check(coarray_handle))
+
     invalid_cosubscripts = .false.
 
     check_subscripts: do i = 1, size(sub)
@@ -98,26 +80,38 @@ contains
   end procedure
 
   module procedure prif_image_index_with_team
+    call_assert(coarray_handle_check(coarray_handle))
+
     call unimplemented("prif_image_index_with_team")
   end procedure
 
   module procedure prif_image_index_with_team_number
+    call_assert(coarray_handle_check(coarray_handle))
+
     call unimplemented("prif_image_index_with_team_number")
   end procedure
 
   module procedure prif_local_data_pointer
+    call_assert(coarray_handle_check(coarray_handle))
+
     local_data = coarray_handle%info%coarray_data
   end procedure
 
   module procedure prif_set_context_data
+    call_assert(coarray_handle_check(coarray_handle))
+
     call unimplemented("prif_set_context_data")
   end procedure
 
   module procedure prif_get_context_data
+    call_assert(coarray_handle_check(coarray_handle))
+
     call unimplemented("prif_get_context_data")
   end procedure
 
   module procedure prif_size_bytes
+    call_assert(coarray_handle_check(coarray_handle))
+
     data_size = coarray_handle%info%coarray_size
   end procedure
 

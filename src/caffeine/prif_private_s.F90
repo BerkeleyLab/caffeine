@@ -5,6 +5,7 @@
 
 submodule(prif) prif_private_s
   use assert_m
+  use iso_c_binding, only: c_associated
   implicit none
 
   type(team_data), target :: initial_team
@@ -296,7 +297,7 @@ contains
     integer(c_int), intent(in) :: image_num
     integer(c_intptr_t), intent(out) :: ptr
 
-
+    call_assert(coarray_handle_check(coarray_handle))
     call_assert_describe(image_num > 0 .and. image_num <= initial_team%num_images, "base_pointer: image_num not within valid range")
     ptr = caf_convert_base_addr(coarray_handle%info%coarray_data, image_num)
   end subroutine
@@ -314,6 +315,25 @@ contains
     else
       c_val = 0_c_int
     end if
+  end function
+
+  ! verify state invariants for a coarray_handle
+  function coarray_handle_check(coarray_handle) result(result_)
+    implicit none
+    type(prif_coarray_handle), intent(in) :: coarray_handle
+    logical :: result_
+    type(prif_coarray_descriptor), pointer :: info
+    integer(c_int) :: i
+
+    call_assert(associated(coarray_handle%info))
+    info => coarray_handle%info
+    call_assert(info%corank >= 1)
+    call_assert(info%corank <= size(info%ucobounds))
+    call_assert(all([(info%lcobounds(i) <= info%ucobounds(i), i = 1, info%corank)]))
+    call_assert(info%coarray_size > 0)
+    call_assert(c_associated(info%coarray_data))
+
+    result_ = .true.
   end function
 
   subroutine caf_establish_child_heap
