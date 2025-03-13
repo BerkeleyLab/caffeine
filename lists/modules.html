@@ -122,29 +122,38 @@
 <g id="module~~graph~~ModuleGraph" class="graph" transform="scale(1 1) rotate(0) translate(4 868)">
 <title>module~~graph~~ModuleGraph</title>
 <polygon fill="white" stroke="transparent" points="-4,4 -4,-868 492,-868 492,4 -4,4"/>
-<!-- module~teams_s -->
+<!-- module~prif_queries_s -->
 <g id="module~~graph~~ModuleGraph_node1" class="node">
-<title>module~teams_s</title>
-<g id="a_module~~graph~~ModuleGraph_node1"><a xlink:href=".././module/teams_s.html" xlink:title="teams_s">
-<polygon fill="#5bc0de" stroke="#5bc0de" points="445.5,-822 389.5,-822 389.5,-798 445.5,-798 445.5,-822"/>
-<text text-anchor="middle" x="417.5" y="-807.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">teams_s</text>
+<title>module~prif_queries_s</title>
+<g id="a_module~~graph~~ModuleGraph_node1"><a xlink:href=".././module/prif_queries_s.html" xlink:title="prif_queries_s">
+<polygon fill="#5bc0de" stroke="#5bc0de" points="460.5,-444 374.5,-444 374.5,-420 460.5,-420 460.5,-444"/>
+<text text-anchor="middle" x="417.5" y="-429.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">prif_queries_s</text>
 </a>
 </g>
 </g>
 <!-- module~prif_private_s -->
-<g id="module~~graph~~ModuleGraph_node6" class="node">
+<g id="module~~graph~~ModuleGraph_node12" class="node">
 <title>module~prif_private_s</title>
-<g id="a_module~~graph~~ModuleGraph_node6"><a xlink:href=".././module/prif_private_s.html" xlink:title="prif_private_s">
+<g id="a_module~~graph~~ModuleGraph_node12"><a xlink:href=".././module/prif_private_s.html" xlink:title="prif_private_s">
 <polygon fill="#5bc0de" stroke="#5bc0de" points="306,-423 222,-423 222,-399 306,-399 306,-423"/>
 <text text-anchor="middle" x="264" y="-408.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">prif_private_s</text>
 </a>
 </g>
 </g>
-<!-- module~teams_s&#45;&gt;module~prif_private_s -->
-<g id="module~~graph~~ModuleGraph_edge2" class="edge">
-<title>module~teams_s&#45;&gt;module~prif_private_s</title>
-<path fill="none" stroke="#ff0000" d="M389.27,-808.28C374.78,-805.94 357.77,-800.67 347,-789 298.14,-736.08 273.59,-506.41 266.91,-433.38"/>
-<polygon fill="#ff0000" stroke="#ff0000" points="270.37,-432.71 265.99,-423.06 263.39,-433.33 270.37,-432.71"/>
+<!-- module~prif_queries_s&#45;&gt;module~prif_private_s -->
+<g id="module~~graph~~ModuleGraph_edge1" class="edge">
+<title>module~prif_queries_s&#45;&gt;module~prif_private_s</title>
+<path fill="none" stroke="#ff0000" d="M374.3,-426.15C356.26,-423.65 335.05,-420.71 316.13,-418.09"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="316.58,-414.62 306.19,-416.71 315.61,-421.55 316.58,-414.62"/>
+</g>
+<!-- module~prif -->
+<g id="module~~graph~~ModuleGraph_node2" class="node">
+<title>module~prif</title>
+<g id="a_module~~graph~~ModuleGraph_node2"><a xlink:href=".././module/prif.html" xlink:title="prif">
+<polygon fill="#337ab7" stroke="#337ab7" points="177.5,-444 123.5,-444 123.5,-420 177.5,-420 177.5,-444"/>
+<text text-anchor="middle" x="150.5" y="-429.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">prif</text>
+</a>
+</g>
 </g>
 <!-- iso_c_binding -->
 <g id="module~~graph~~ModuleGraph_node24" class="node">
@@ -155,95 +164,179 @@
 </a>
 </g>
 </g>
+<!-- module~prif&#45;&gt;iso_c_binding -->
+<g id="module~~graph~~ModuleGraph_edge2" class="edge">
+<title>module~prif&#45;&gt;iso_c_binding</title>
+<path fill="none" stroke="#ff4200" stroke-dasharray="5,2" d="M123.45,-432C114.58,-432 104.34,-432 94.19,-432"/>
+<polygon fill="#ff4200" stroke="#ff4200" points="94.14,-428.5 84.14,-432 94.14,-435.5 94.14,-428.5"/>
+</g>
+<!-- module~allocation_s -->
+<g id="module~~graph~~ModuleGraph_node3" class="node">
+<title>module~allocation_s</title>
+<g id="a_module~~graph~~ModuleGraph_node3"><a xlink:href=".././module/allocation_s.html" xlink:title="allocation_s">
+<polygon fill="#5bc0de" stroke="#5bc0de" points="455.5,-780 379.5,-780 379.5,-756 455.5,-756 455.5,-780"/>
+<text text-anchor="middle" x="417.5" y="-765.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">allocation_s</text>
+</a>
+</g>
+</g>
+<!-- module~allocation_s&#45;&gt;module~prif_private_s -->
+<g id="module~~graph~~ModuleGraph_edge4" class="edge">
+<title>module~allocation_s&#45;&gt;module~prif_private_s</title>
+<path fill="none" stroke="#ff8500" d="M379.47,-764.12C367.67,-761.15 355.5,-755.97 347,-747 303.19,-700.75 275.67,-500.34 267.53,-433.09"/>
+<polygon fill="#ff8500" stroke="#ff8500" points="271.01,-432.67 266.36,-423.15 264.06,-433.49 271.01,-432.67"/>
+</g>
+<!-- module~allocation_s&#45;&gt;iso_c_binding -->
+<g id="module~~graph~~ModuleGraph_edge3" class="edge">
+<title>module~allocation_s&#45;&gt;iso_c_binding</title>
+<path fill="none" stroke="#ff8500" stroke-dasharray="5,2" d="M379.2,-771.24C348.37,-773.15 303.57,-774.13 265,-768"/>
+</g>
+<!-- module~notify_s -->
+<g id="module~~graph~~ModuleGraph_node4" class="node">
+<title>module~notify_s</title>
+<g id="a_module~~graph~~ModuleGraph_node4"><a xlink:href=".././module/notify_s.html" xlink:title="notify_s">
+<polygon fill="#5bc0de" stroke="#5bc0de" points="444.5,-402 390.5,-402 390.5,-378 444.5,-378 444.5,-402"/>
+<text text-anchor="middle" x="417.5" y="-387.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">notify_s</text>
+</a>
+</g>
+</g>
+<!-- module~notify_s&#45;&gt;module~prif_private_s -->
+<g id="module~~graph~~ModuleGraph_edge5" class="edge">
+<title>module~notify_s&#45;&gt;module~prif_private_s</title>
+<path fill="none" stroke="#ffc700" d="M390.46,-393.61C370.08,-396.43 341.12,-400.45 316.15,-403.91"/>
+<polygon fill="#ffc700" stroke="#ffc700" points="315.52,-400.46 306.1,-405.3 316.48,-407.4 315.52,-400.46"/>
+</g>
+<!-- module~events_s -->
+<g id="module~~graph~~ModuleGraph_node5" class="node">
+<title>module~events_s</title>
+<g id="a_module~~graph~~ModuleGraph_node5"><a xlink:href=".././module/events_s.html" xlink:title="events_s">
+<polygon fill="#5bc0de" stroke="#5bc0de" points="446.5,-360 388.5,-360 388.5,-336 446.5,-336 446.5,-360"/>
+<text text-anchor="middle" x="417.5" y="-345.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">events_s</text>
+</a>
+</g>
+</g>
+<!-- module~events_s&#45;&gt;module~prif_private_s -->
+<g id="module~~graph~~ModuleGraph_edge6" class="edge">
+<title>module~events_s&#45;&gt;module~prif_private_s</title>
+<path fill="none" stroke="#f3ff00" d="M388.37,-355.25C375.57,-358.87 360.33,-363.62 347,-369 329.31,-376.13 310.31,-385.74 295.05,-393.96"/>
+<polygon fill="#f3ff00" stroke="#f3ff00" points="293.18,-390.99 286.09,-398.86 296.54,-397.14 293.18,-390.99"/>
+</g>
+<!-- module~co_min_s -->
+<g id="module~~graph~~ModuleGraph_node6" class="node">
+<title>module~co_min_s</title>
+<g id="a_module~~graph~~ModuleGraph_node6"><a xlink:href=".././module/co_min_s.html" xlink:title="co_min_s">
+<polygon fill="#5bc0de" stroke="#5bc0de" points="448,-738 387,-738 387,-714 448,-714 448,-738"/>
+<text text-anchor="middle" x="417.5" y="-723.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">co_min_s</text>
+</a>
+</g>
+</g>
+<!-- module~co_min_s&#45;&gt;module~prif_private_s -->
+<g id="module~~graph~~ModuleGraph_edge8" class="edge">
+<title>module~co_min_s&#45;&gt;module~prif_private_s</title>
+<path fill="none" stroke="#b1ff00" d="M386.76,-723.54C372.98,-720.92 357.4,-715.63 347,-705 271.56,-627.93 264.24,-487.58 264.41,-433.28"/>
+<polygon fill="#b1ff00" stroke="#b1ff00" points="267.92,-433.1 264.54,-423.05 260.92,-433.01 267.92,-433.1"/>
+</g>
+<!-- module~co_min_s&#45;&gt;iso_c_binding -->
+<g id="module~~graph~~ModuleGraph_edge7" class="edge">
+<title>module~co_min_s&#45;&gt;iso_c_binding</title>
+<path fill="none" stroke="#b1ff00" stroke-dasharray="5,2" d="M386.68,-734.95C344.31,-747.57 271.1,-768.97 265,-768"/>
+</g>
+<!-- module~teams_s -->
+<g id="module~~graph~~ModuleGraph_node7" class="node">
+<title>module~teams_s</title>
+<g id="a_module~~graph~~ModuleGraph_node7"><a xlink:href=".././module/teams_s.html" xlink:title="teams_s">
+<polygon fill="#5bc0de" stroke="#5bc0de" points="445.5,-696 389.5,-696 389.5,-672 445.5,-672 445.5,-696"/>
+<text text-anchor="middle" x="417.5" y="-681.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">teams_s</text>
+</a>
+</g>
+</g>
+<!-- module~teams_s&#45;&gt;module~prif_private_s -->
+<g id="module~~graph~~ModuleGraph_edge10" class="edge">
+<title>module~teams_s&#45;&gt;module~prif_private_s</title>
+<path fill="none" stroke="#6eff00" d="M389.37,-681.79C375.09,-679.29 358.26,-674.02 347,-663 281.58,-598.95 268.32,-482.2 265.66,-433.39"/>
+<polygon fill="#6eff00" stroke="#6eff00" points="269.15,-433.11 265.21,-423.28 262.15,-433.42 269.15,-433.11"/>
+</g>
 <!-- module~teams_s&#45;&gt;iso_c_binding -->
-<g id="module~~graph~~ModuleGraph_edge1" class="edge">
+<g id="module~~graph~~ModuleGraph_edge9" class="edge">
 <title>module~teams_s&#45;&gt;iso_c_binding</title>
-<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M389.25,-801.65C352.5,-790.52 288.92,-771.8 265,-768"/>
+<path fill="none" stroke="#6eff00" stroke-dasharray="5,2" d="M389.22,-689.81C376.03,-693.21 360.23,-698.21 347,-705 306.11,-725.99 310.85,-764.88 265,-768"/>
+<path fill="none" stroke="#6eff00" stroke-dasharray="5,2" d="M263,-768C112.49,-778.25 59.25,-531.17 46.37,-454.41"/>
+<polygon fill="#6eff00" stroke="#6eff00" points="49.79,-453.69 44.75,-444.37 42.88,-454.8 49.79,-453.69"/>
 </g>
 <!-- module~co_sum_s -->
-<g id="module~~graph~~ModuleGraph_node2" class="node">
+<g id="module~~graph~~ModuleGraph_node8" class="node">
 <title>module~co_sum_s</title>
-<g id="a_module~~graph~~ModuleGraph_node2"><a xlink:href=".././module/co_sum_s.html" xlink:title="co_sum_s">
-<polygon fill="#5bc0de" stroke="#5bc0de" points="449.5,-654 385.5,-654 385.5,-630 449.5,-630 449.5,-654"/>
-<text text-anchor="middle" x="417.5" y="-639.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">co_sum_s</text>
+<g id="a_module~~graph~~ModuleGraph_node8"><a xlink:href=".././module/co_sum_s.html" xlink:title="co_sum_s">
+<polygon fill="#5bc0de" stroke="#5bc0de" points="449.5,-318 385.5,-318 385.5,-294 449.5,-294 449.5,-318"/>
+<text text-anchor="middle" x="417.5" y="-303.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">co_sum_s</text>
 </a>
 </g>
 </g>
 <!-- module~co_sum_s&#45;&gt;module~prif_private_s -->
-<g id="module~~graph~~ModuleGraph_edge3" class="edge">
+<g id="module~~graph~~ModuleGraph_edge11" class="edge">
 <title>module~co_sum_s&#45;&gt;module~prif_private_s</title>
-<path fill="none" stroke="#ff4200" d="M385.46,-638.71C372.23,-635.89 357.46,-630.67 347,-621 291.46,-569.67 273.04,-476.18 267.35,-433.43"/>
-<polygon fill="#ff4200" stroke="#ff4200" points="270.8,-432.75 266.12,-423.24 263.85,-433.59 270.8,-432.75"/>
+<path fill="none" stroke="#2cff00" d="M385.34,-311.86C372.83,-315.1 358.64,-319.94 347,-327 319.5,-343.69 294.74,-371.73 279.8,-390.78"/>
+<polygon fill="#2cff00" stroke="#2cff00" points="276.94,-388.75 273.65,-398.82 282.5,-393.01 276.94,-388.75"/>
 </g>
 <!-- module~coarray_access_s -->
-<g id="module~~graph~~ModuleGraph_node3" class="node">
+<g id="module~~graph~~ModuleGraph_node9" class="node">
 <title>module~coarray_access_s</title>
-<g id="a_module~~graph~~ModuleGraph_node3"><a xlink:href=".././module/coarray_access_s.html" xlink:title="coarray_access_s">
-<polygon fill="#5bc0de" stroke="#5bc0de" points="470.5,-780 364.5,-780 364.5,-756 470.5,-756 470.5,-780"/>
-<text text-anchor="middle" x="417.5" y="-765.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">coarray_access_s</text>
+<g id="a_module~~graph~~ModuleGraph_node9"><a xlink:href=".././module/coarray_access_s.html" xlink:title="coarray_access_s">
+<polygon fill="#5bc0de" stroke="#5bc0de" points="470.5,-108 364.5,-108 364.5,-84 470.5,-84 470.5,-108"/>
+<text text-anchor="middle" x="417.5" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">coarray_access_s</text>
 </a>
 </g>
 </g>
 <!-- module~coarray_access_s&#45;&gt;module~prif_private_s -->
-<g id="module~~graph~~ModuleGraph_edge5" class="edge">
+<g id="module~~graph~~ModuleGraph_edge13" class="edge">
 <title>module~coarray_access_s&#45;&gt;module~prif_private_s</title>
-<path fill="none" stroke="#ff8500" d="M364.41,-758.96C357.91,-756.01 351.85,-752.12 347,-747 303.19,-700.75 275.67,-500.34 267.53,-433.09"/>
-<polygon fill="#ff8500" stroke="#ff8500" points="271.01,-432.67 266.36,-423.15 264.06,-433.49 271.01,-432.67"/>
+<path fill="none" stroke="#00ff16" d="M364.21,-105.35C357.82,-108.25 351.85,-112.05 347,-117 271.56,-194.07 264.24,-334.42 264.41,-388.72"/>
+<polygon fill="#00ff16" stroke="#00ff16" points="260.92,-388.99 264.54,-398.95 267.92,-388.9 260.92,-388.99"/>
 </g>
 <!-- module~coarray_access_s&#45;&gt;iso_c_binding -->
-<g id="module~~graph~~ModuleGraph_edge4" class="edge">
+<g id="module~~graph~~ModuleGraph_edge12" class="edge">
 <title>module~coarray_access_s&#45;&gt;iso_c_binding</title>
-<path fill="none" stroke="#ff8500" stroke-dasharray="5,2" d="M364.3,-772.02C334.94,-773.28 297.73,-773.2 265,-768"/>
+<path fill="none" stroke="#00ff16" stroke-dasharray="5,2" d="M367.21,-83.97C337.67,-78.07 299.31,-72.66 265,-75"/>
 </g>
 <!-- module~co_reduce_s -->
-<g id="module~~graph~~ModuleGraph_node4" class="node">
+<g id="module~~graph~~ModuleGraph_node10" class="node">
 <title>module~co_reduce_s</title>
-<g id="a_module~~graph~~ModuleGraph_node4"><a xlink:href=".././module/co_reduce_s.html" xlink:title="co_reduce_s">
-<polygon fill="#5bc0de" stroke="#5bc0de" points="456.5,-738 378.5,-738 378.5,-714 456.5,-714 456.5,-738"/>
-<text text-anchor="middle" x="417.5" y="-723.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">co_reduce_s</text>
+<g id="a_module~~graph~~ModuleGraph_node10"><a xlink:href=".././module/co_reduce_s.html" xlink:title="co_reduce_s">
+<polygon fill="#5bc0de" stroke="#5bc0de" points="456.5,-66 378.5,-66 378.5,-42 456.5,-42 456.5,-66"/>
+<text text-anchor="middle" x="417.5" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">co_reduce_s</text>
 </a>
 </g>
 </g>
 <!-- module~co_reduce_s&#45;&gt;module~prif_private_s -->
-<g id="module~~graph~~ModuleGraph_edge7" class="edge">
+<g id="module~~graph~~ModuleGraph_edge15" class="edge">
 <title>module~co_reduce_s&#45;&gt;module~prif_private_s</title>
-<path fill="none" stroke="#ffc700" d="M378.19,-721.59C366.86,-718.55 355.29,-713.47 347,-705 271.56,-627.93 264.24,-487.58 264.41,-433.28"/>
-<polygon fill="#ffc700" stroke="#ffc700" points="267.92,-433.1 264.54,-423.05 260.92,-433.01 267.92,-433.1"/>
+<path fill="none" stroke="#00ff58" d="M378.38,-58.16C366.93,-61.17 355.24,-66.31 347,-75 303.19,-121.25 275.67,-321.66 267.53,-388.91"/>
+<polygon fill="#00ff58" stroke="#00ff58" points="264.06,-388.51 266.36,-398.85 271.01,-389.33 264.06,-388.51"/>
 </g>
 <!-- module~co_reduce_s&#45;&gt;iso_c_binding -->
-<g id="module~~graph~~ModuleGraph_edge6" class="edge">
+<g id="module~~graph~~ModuleGraph_edge14" class="edge">
 <title>module~co_reduce_s&#45;&gt;iso_c_binding</title>
-<path fill="none" stroke="#ffc700" stroke-dasharray="5,2" d="M378.25,-737.46C335.28,-750.2 270.71,-768.91 265,-768"/>
+<path fill="none" stroke="#00ff58" stroke-dasharray="5,2" d="M378.36,-60.79C347.82,-65.86 303.81,-72.36 265,-75"/>
 </g>
 <!-- module~co_broadcast_s -->
-<g id="module~~graph~~ModuleGraph_node5" class="node">
+<g id="module~~graph~~ModuleGraph_node11" class="node">
 <title>module~co_broadcast_s</title>
-<g id="a_module~~graph~~ModuleGraph_node5"><a xlink:href=".././module/co_broadcast_s.html" xlink:title="co_broadcast_s">
-<polygon fill="#5bc0de" stroke="#5bc0de" points="464.5,-612 370.5,-612 370.5,-588 464.5,-588 464.5,-612"/>
-<text text-anchor="middle" x="417.5" y="-597.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">co_broadcast_s</text>
+<g id="a_module~~graph~~ModuleGraph_node11"><a xlink:href=".././module/co_broadcast_s.html" xlink:title="co_broadcast_s">
+<polygon fill="#5bc0de" stroke="#5bc0de" points="464.5,-276 370.5,-276 370.5,-252 464.5,-252 464.5,-276"/>
+<text text-anchor="middle" x="417.5" y="-261.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">co_broadcast_s</text>
 </a>
 </g>
 </g>
 <!-- module~co_broadcast_s&#45;&gt;module~prif_private_s -->
-<g id="module~~graph~~ModuleGraph_edge8" class="edge">
+<g id="module~~graph~~ModuleGraph_edge16" class="edge">
 <title>module~co_broadcast_s&#45;&gt;module~prif_private_s</title>
-<path fill="none" stroke="#f3ff00" d="M370.39,-591.91C361.96,-588.88 353.72,-584.72 347,-579 301.08,-539.92 278.62,-469.09 269.76,-433.16"/>
-<polygon fill="#f3ff00" stroke="#f3ff00" points="273.12,-432.15 267.43,-423.21 266.3,-433.75 273.12,-432.15"/>
-</g>
-<!-- module~prif -->
-<g id="module~~graph~~ModuleGraph_node14" class="node">
-<title>module~prif</title>
-<g id="a_module~~graph~~ModuleGraph_node14"><a xlink:href=".././module/prif.html" xlink:title="prif">
-<polygon fill="#337ab7" stroke="#337ab7" points="177.5,-444 123.5,-444 123.5,-420 177.5,-420 177.5,-444"/>
-<text text-anchor="middle" x="150.5" y="-429.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">prif</text>
-</a>
-</g>
+<path fill="none" stroke="#00ff9b" d="M370.2,-273.02C361.97,-275.96 353.86,-279.86 347,-285 310.37,-312.48 285.43,-361.48 273.37,-389.59"/>
+<polygon fill="#00ff9b" stroke="#00ff9b" points="270.09,-388.35 269.51,-398.92 276.56,-391.02 270.09,-388.35"/>
 </g>
 <!-- module~prif_private_s&#45;&gt;module~prif -->
-<g id="module~~graph~~ModuleGraph_edge10" class="edge">
+<g id="module~~graph~~ModuleGraph_edge18" class="edge">
 <title>module~prif_private_s&#45;&gt;module~prif</title>
-<path fill="none" stroke="#b1ff00" d="M221.8,-418.76C210.61,-420.87 198.58,-423.13 187.69,-425.18"/>
-<polygon fill="#b1ff00" stroke="#b1ff00" points="186.84,-421.78 177.66,-427.07 188.14,-428.66 186.84,-421.78"/>
+<path fill="none" stroke="#00ffdd" d="M221.8,-418.76C210.61,-420.87 198.58,-423.13 187.69,-425.18"/>
+<polygon fill="#00ffdd" stroke="#00ffdd" points="186.84,-421.78 177.66,-427.07 188.14,-428.66 186.84,-421.78"/>
 </g>
 <!-- assert_m -->
 <g id="module~~graph~~ModuleGraph_node25" class="node">
@@ -252,290 +345,196 @@
 <text text-anchor="middle" x="150.5" y="-387.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">assert_m</text>
 </g>
 <!-- module~prif_private_s&#45;&gt;assert_m -->
-<g id="module~~graph~~ModuleGraph_edge9" class="edge">
-<title>module~prif_private_s&#45;&gt;assert_m</title>
-<path fill="none" stroke="#b1ff00" stroke-dasharray="5,2" d="M221.8,-403.24C211.76,-401.35 201.05,-399.33 191.09,-397.46"/>
-<polygon fill="#b1ff00" stroke="#b1ff00" points="191.52,-393.98 181.04,-395.56 190.22,-400.85 191.52,-393.98"/>
-</g>
-<!-- module~coarray_queries_s -->
-<g id="module~~graph~~ModuleGraph_node7" class="node">
-<title>module~coarray_queries_s</title>
-<g id="a_module~~graph~~ModuleGraph_node7"><a xlink:href=".././module/coarray_queries_s.html" xlink:title="coarray_queries_s">
-<polygon fill="#5bc0de" stroke="#5bc0de" points="472,-570 363,-570 363,-546 472,-546 472,-570"/>
-<text text-anchor="middle" x="417.5" y="-555.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">coarray_queries_s</text>
-</a>
-</g>
-</g>
-<!-- module~coarray_queries_s&#45;&gt;module~prif_private_s -->
-<g id="module~~graph~~ModuleGraph_edge11" class="edge">
-<title>module~coarray_queries_s&#45;&gt;module~prif_private_s</title>
-<path fill="none" stroke="#6eff00" d="M363,-546.13C357.31,-543.64 351.84,-540.63 347,-537 310.37,-509.52 285.43,-460.52 273.37,-432.41"/>
-<polygon fill="#6eff00" stroke="#6eff00" points="276.56,-430.98 269.51,-423.08 270.09,-433.65 276.56,-430.98"/>
-</g>
-<!-- module~critical_s -->
-<g id="module~~graph~~ModuleGraph_node8" class="node">
-<title>module~critical_s</title>
-<g id="a_module~~graph~~ModuleGraph_node8"><a xlink:href=".././module/critical_s.html" xlink:title="critical_s">
-<polygon fill="#5bc0de" stroke="#5bc0de" points="447,-528 388,-528 388,-504 447,-504 447,-528"/>
-<text text-anchor="middle" x="417.5" y="-513.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">critical_s</text>
-</a>
-</g>
-</g>
-<!-- module~critical_s&#45;&gt;module~prif_private_s -->
-<g id="module~~graph~~ModuleGraph_edge12" class="edge">
-<title>module~critical_s&#45;&gt;module~prif_private_s</title>
-<path fill="none" stroke="#2cff00" d="M387.75,-510.75C374.68,-507.52 359.39,-502.52 347,-495 319.5,-478.31 294.74,-450.27 279.8,-431.22"/>
-<polygon fill="#2cff00" stroke="#2cff00" points="282.5,-428.99 273.65,-423.18 276.94,-433.25 282.5,-428.99"/>
-</g>
-<!-- module~atomic_s -->
-<g id="module~~graph~~ModuleGraph_node9" class="node">
-<title>module~atomic_s</title>
-<g id="a_module~~graph~~ModuleGraph_node9"><a xlink:href=".././module/atomic_s.html" xlink:title="atomic_s">
-<polygon fill="#5bc0de" stroke="#5bc0de" points="447.5,-486 387.5,-486 387.5,-462 447.5,-462 447.5,-486"/>
-<text text-anchor="middle" x="417.5" y="-471.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">atomic_s</text>
-</a>
-</g>
-</g>
-<!-- module~atomic_s&#45;&gt;module~prif_private_s -->
-<g id="module~~graph~~ModuleGraph_edge13" class="edge">
-<title>module~atomic_s&#45;&gt;module~prif_private_s</title>
-<path fill="none" stroke="#00ff16" d="M387.36,-466.46C374.77,-462.88 359.98,-458.23 347,-453 329.31,-445.87 310.31,-436.26 295.05,-428.04"/>
-<polygon fill="#00ff16" stroke="#00ff16" points="296.54,-424.86 286.09,-423.14 293.18,-431.01 296.54,-424.86"/>
-</g>
-<!-- module~allocation_s -->
-<g id="module~~graph~~ModuleGraph_node10" class="node">
-<title>module~allocation_s</title>
-<g id="a_module~~graph~~ModuleGraph_node10"><a xlink:href=".././module/allocation_s.html" xlink:title="allocation_s">
-<polygon fill="#5bc0de" stroke="#5bc0de" points="455.5,-696 379.5,-696 379.5,-672 455.5,-672 455.5,-696"/>
-<text text-anchor="middle" x="417.5" y="-681.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">allocation_s</text>
-</a>
-</g>
-</g>
-<!-- module~allocation_s&#45;&gt;module~prif_private_s -->
-<g id="module~~graph~~ModuleGraph_edge15" class="edge">
-<title>module~allocation_s&#45;&gt;module~prif_private_s</title>
-<path fill="none" stroke="#00ff58" d="M379.48,-679.66C367.83,-676.64 355.74,-671.55 347,-663 281.58,-598.95 268.32,-482.2 265.66,-433.39"/>
-<polygon fill="#00ff58" stroke="#00ff58" points="269.15,-433.11 265.21,-423.28 262.15,-433.42 269.15,-433.11"/>
-</g>
-<!-- module~allocation_s&#45;&gt;iso_c_binding -->
-<g id="module~~graph~~ModuleGraph_edge14" class="edge">
-<title>module~allocation_s&#45;&gt;iso_c_binding</title>
-<path fill="none" stroke="#00ff58" stroke-dasharray="5,2" d="M379.46,-692.5C368.68,-695.69 357.09,-699.82 347,-705 306.11,-725.99 310.85,-764.88 265,-768"/>
-<path fill="none" stroke="#00ff58" stroke-dasharray="5,2" d="M263,-768C112.49,-778.25 59.25,-531.17 46.37,-454.41"/>
-<polygon fill="#00ff58" stroke="#00ff58" points="49.79,-453.69 44.75,-444.37 42.88,-454.8 49.79,-453.69"/>
-</g>
-<!-- module~co_max_s -->
-<g id="module~~graph~~ModuleGraph_node11" class="node">
-<title>module~co_max_s</title>
-<g id="a_module~~graph~~ModuleGraph_node11"><a xlink:href=".././module/co_max_s.html" xlink:title="co_max_s">
-<polygon fill="#5bc0de" stroke="#5bc0de" points="449.5,-108 385.5,-108 385.5,-84 449.5,-84 449.5,-108"/>
-<text text-anchor="middle" x="417.5" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">co_max_s</text>
-</a>
-</g>
-</g>
-<!-- module~co_max_s&#45;&gt;module~prif_private_s -->
 <g id="module~~graph~~ModuleGraph_edge17" class="edge">
-<title>module~co_max_s&#45;&gt;module~prif_private_s</title>
-<path fill="none" stroke="#00ff9b" d="M385.35,-98.74C371.93,-101.44 357.05,-106.73 347,-117 271.56,-194.07 264.24,-334.42 264.41,-388.72"/>
-<polygon fill="#00ff9b" stroke="#00ff9b" points="260.92,-388.99 264.54,-398.95 267.92,-388.9 260.92,-388.99"/>
-</g>
-<!-- module~co_max_s&#45;&gt;iso_c_binding -->
-<g id="module~~graph~~ModuleGraph_edge16" class="edge">
-<title>module~co_max_s&#45;&gt;iso_c_binding</title>
-<path fill="none" stroke="#00ff9b" stroke-dasharray="5,2" d="M385.41,-94.77C354.76,-93.84 306.59,-93.17 265,-96"/>
-</g>
-<!-- module~alias_s -->
-<g id="module~~graph~~ModuleGraph_node12" class="node">
-<title>module~alias_s</title>
-<g id="a_module~~graph~~ModuleGraph_node12"><a xlink:href=".././module/alias_s.html" xlink:title="alias_s">
-<polygon fill="#5bc0de" stroke="#5bc0de" points="444.5,-444 390.5,-444 390.5,-420 444.5,-420 444.5,-444"/>
-<text text-anchor="middle" x="417.5" y="-429.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">alias_s</text>
-</a>
-</g>
-</g>
-<!-- module~alias_s&#45;&gt;module~prif_private_s -->
-<g id="module~~graph~~ModuleGraph_edge18" class="edge">
-<title>module~alias_s&#45;&gt;module~prif_private_s</title>
-<path fill="none" stroke="#00ffdd" d="M390.46,-428.39C370.08,-425.57 341.12,-421.55 316.15,-418.09"/>
-<polygon fill="#00ffdd" stroke="#00ffdd" points="316.48,-414.6 306.1,-416.7 315.52,-421.54 316.48,-414.6"/>
-</g>
-<!-- module~events_s -->
-<g id="module~~graph~~ModuleGraph_node13" class="node">
-<title>module~events_s</title>
-<g id="a_module~~graph~~ModuleGraph_node13"><a xlink:href=".././module/events_s.html" xlink:title="events_s">
-<polygon fill="#5bc0de" stroke="#5bc0de" points="446.5,-402 388.5,-402 388.5,-378 446.5,-378 446.5,-402"/>
-<text text-anchor="middle" x="417.5" y="-387.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">events_s</text>
-</a>
-</g>
-</g>
-<!-- module~events_s&#45;&gt;module~prif_private_s -->
-<g id="module~~graph~~ModuleGraph_edge19" class="edge">
-<title>module~events_s&#45;&gt;module~prif_private_s</title>
-<path fill="none" stroke="#00ddff" d="M388.36,-393.9C368.14,-396.7 340.32,-400.56 316.21,-403.9"/>
-<polygon fill="#00ddff" stroke="#00ddff" points="315.56,-400.46 306.14,-405.3 316.53,-407.39 315.56,-400.46"/>
-</g>
-<!-- module~prif&#45;&gt;iso_c_binding -->
-<g id="module~~graph~~ModuleGraph_edge20" class="edge">
-<title>module~prif&#45;&gt;iso_c_binding</title>
-<path fill="none" stroke="#009bff" stroke-dasharray="5,2" d="M123.45,-432C114.58,-432 104.34,-432 94.19,-432"/>
-<polygon fill="#009bff" stroke="#009bff" points="94.14,-428.5 84.14,-432 94.14,-435.5 94.14,-428.5"/>
-</g>
-<!-- module~program_startup_s -->
-<g id="module~~graph~~ModuleGraph_node15" class="node">
-<title>module~program_startup_s</title>
-<g id="a_module~~graph~~ModuleGraph_node15"><a xlink:href=".././module/program_startup_s.html" xlink:title="program_startup_s">
-<polygon fill="#5bc0de" stroke="#5bc0de" points="473.5,-360 361.5,-360 361.5,-336 473.5,-336 473.5,-360"/>
-<text text-anchor="middle" x="417.5" y="-345.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">program_startup_s</text>
-</a>
-</g>
-</g>
-<!-- module~program_startup_s&#45;&gt;module~prif_private_s -->
-<g id="module~~graph~~ModuleGraph_edge21" class="edge">
-<title>module~program_startup_s&#45;&gt;module~prif_private_s</title>
-<path fill="none" stroke="#0058ff" d="M372.34,-360.04C363.83,-362.72 355.07,-365.75 347,-369 329.31,-376.13 310.31,-385.74 295.05,-393.96"/>
-<polygon fill="#0058ff" stroke="#0058ff" points="293.18,-390.99 286.09,-398.86 296.54,-397.14 293.18,-390.99"/>
+<title>module~prif_private_s&#45;&gt;assert_m</title>
+<path fill="none" stroke="#00ffdd" stroke-dasharray="5,2" d="M221.8,-403.24C211.76,-401.35 201.05,-399.33 191.09,-397.46"/>
+<polygon fill="#00ffdd" stroke="#00ffdd" points="191.52,-393.98 181.04,-395.56 190.22,-400.85 191.52,-393.98"/>
 </g>
 <!-- module~unit_test_parameters_m -->
-<g id="module~~graph~~ModuleGraph_node16" class="node">
+<g id="module~~graph~~ModuleGraph_node13" class="node">
 <title>module~unit_test_parameters_m</title>
-<g id="a_module~~graph~~ModuleGraph_node16"><a xlink:href=".././module/unit_test_parameters_m.html" xlink:title="unit_test_parameters_m">
+<g id="a_module~~graph~~ModuleGraph_node13"><a xlink:href=".././module/unit_test_parameters_m.html" xlink:title="unit_test_parameters_m">
 <polygon fill="#337ab7" stroke="#337ab7" points="488,-864 347,-864 347,-840 488,-840 488,-864"/>
 <text text-anchor="middle" x="417.5" y="-849.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">unit_test_parameters_m</text>
 </a>
 </g>
 </g>
-<!-- module~locks_s -->
+<!-- module~coarray_queries_s -->
+<g id="module~~graph~~ModuleGraph_node14" class="node">
+<title>module~coarray_queries_s</title>
+<g id="a_module~~graph~~ModuleGraph_node14"><a xlink:href=".././module/coarray_queries_s.html" xlink:title="coarray_queries_s">
+<polygon fill="#5bc0de" stroke="#5bc0de" points="472,-234 363,-234 363,-210 472,-210 472,-234"/>
+<text text-anchor="middle" x="417.5" y="-219.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">coarray_queries_s</text>
+</a>
+</g>
+</g>
+<!-- module~coarray_queries_s&#45;&gt;module~prif_private_s -->
+<g id="module~~graph~~ModuleGraph_edge19" class="edge">
+<title>module~coarray_queries_s&#45;&gt;module~prif_private_s</title>
+<path fill="none" stroke="#009bff" d="M362.89,-233.13C357.15,-235.76 351.7,-239 347,-243 301.08,-282.08 278.62,-352.91 269.76,-388.84"/>
+<polygon fill="#009bff" stroke="#009bff" points="266.3,-388.25 267.43,-398.79 273.12,-389.85 266.3,-388.25"/>
+</g>
+<!-- module~critical_s -->
+<g id="module~~graph~~ModuleGraph_node15" class="node">
+<title>module~critical_s</title>
+<g id="a_module~~graph~~ModuleGraph_node15"><a xlink:href=".././module/critical_s.html" xlink:title="critical_s">
+<polygon fill="#5bc0de" stroke="#5bc0de" points="447,-192 388,-192 388,-168 447,-168 447,-192"/>
+<text text-anchor="middle" x="417.5" y="-177.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">critical_s</text>
+</a>
+</g>
+</g>
+<!-- module~critical_s&#45;&gt;module~prif_private_s -->
+<g id="module~~graph~~ModuleGraph_edge20" class="edge">
+<title>module~critical_s&#45;&gt;module~prif_private_s</title>
+<path fill="none" stroke="#0058ff" d="M387.9,-182.79C374.07,-185.48 358.11,-190.73 347,-201 291.46,-252.33 273.04,-345.82 267.35,-388.57"/>
+<polygon fill="#0058ff" stroke="#0058ff" points="263.85,-388.41 266.12,-398.76 270.8,-389.25 263.85,-388.41"/>
+</g>
+<!-- module~atomic_s -->
+<g id="module~~graph~~ModuleGraph_node16" class="node">
+<title>module~atomic_s</title>
+<g id="a_module~~graph~~ModuleGraph_node16"><a xlink:href=".././module/atomic_s.html" xlink:title="atomic_s">
+<polygon fill="#5bc0de" stroke="#5bc0de" points="447.5,-150 387.5,-150 387.5,-126 447.5,-126 447.5,-150"/>
+<text text-anchor="middle" x="417.5" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">atomic_s</text>
+</a>
+</g>
+</g>
+<!-- module~atomic_s&#45;&gt;module~prif_private_s -->
+<g id="module~~graph~~ModuleGraph_edge21" class="edge">
+<title>module~atomic_s&#45;&gt;module~prif_private_s</title>
+<path fill="none" stroke="#0016ff" d="M387.3,-140.59C373.49,-143.23 357.72,-148.51 347,-159 281.58,-223.05 268.32,-339.8 265.66,-388.61"/>
+<polygon fill="#0016ff" stroke="#0016ff" points="262.15,-388.58 265.21,-398.72 269.15,-388.89 262.15,-388.58"/>
+</g>
+<!-- module~co_max_s -->
 <g id="module~~graph~~ModuleGraph_node17" class="node">
+<title>module~co_max_s</title>
+<g id="a_module~~graph~~ModuleGraph_node17"><a xlink:href=".././module/co_max_s.html" xlink:title="co_max_s">
+<polygon fill="#5bc0de" stroke="#5bc0de" points="449.5,-24 385.5,-24 385.5,0 449.5,0 449.5,-24"/>
+<text text-anchor="middle" x="417.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">co_max_s</text>
+</a>
+</g>
+</g>
+<!-- module~co_max_s&#45;&gt;module~prif_private_s -->
+<g id="module~~graph~~ModuleGraph_edge23" class="edge">
+<title>module~co_max_s&#45;&gt;module~prif_private_s</title>
+<path fill="none" stroke="#2c00ff" d="M385.42,-14.4C371.86,-17.03 356.83,-22.35 347,-33 298.14,-85.92 273.59,-315.59 266.91,-388.62"/>
+<polygon fill="#2c00ff" stroke="#2c00ff" points="263.39,-388.67 265.99,-398.94 270.37,-389.29 263.39,-388.67"/>
+</g>
+<!-- module~co_max_s&#45;&gt;iso_c_binding -->
+<g id="module~~graph~~ModuleGraph_edge22" class="edge">
+<title>module~co_max_s&#45;&gt;iso_c_binding</title>
+<path fill="none" stroke="#2c00ff" stroke-dasharray="5,2" d="M385.3,-20.13C373.17,-23.63 359.27,-28.05 347,-33 309.03,-48.32 305.85,-72.22 265,-75"/>
+<path fill="none" stroke="#2c00ff" stroke-dasharray="5,2" d="M263,-75C105.85,-85.7 57.19,-333.31 45.89,-409.74"/>
+<polygon fill="#2c00ff" stroke="#2c00ff" points="42.41,-409.34 44.48,-419.73 49.34,-410.31 42.41,-409.34"/>
+</g>
+<!-- module~alias_s -->
+<g id="module~~graph~~ModuleGraph_node18" class="node">
+<title>module~alias_s</title>
+<g id="a_module~~graph~~ModuleGraph_node18"><a xlink:href=".././module/alias_s.html" xlink:title="alias_s">
+<polygon fill="#5bc0de" stroke="#5bc0de" points="444.5,-654 390.5,-654 390.5,-630 444.5,-630 444.5,-654"/>
+<text text-anchor="middle" x="417.5" y="-639.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">alias_s</text>
+</a>
+</g>
+</g>
+<!-- module~alias_s&#45;&gt;module~prif_private_s -->
+<g id="module~~graph~~ModuleGraph_edge24" class="edge">
+<title>module~alias_s&#45;&gt;module~prif_private_s</title>
+<path fill="none" stroke="#6e00ff" d="M390.3,-639.65C375.95,-637.12 358.76,-631.86 347,-621 291.46,-569.67 273.04,-476.18 267.35,-433.43"/>
+<polygon fill="#6e00ff" stroke="#6e00ff" points="270.8,-432.75 266.12,-423.24 263.85,-433.59 270.8,-432.75"/>
+</g>
+<!-- module~program_startup_s -->
+<g id="module~~graph~~ModuleGraph_node19" class="node">
+<title>module~program_startup_s</title>
+<g id="a_module~~graph~~ModuleGraph_node19"><a xlink:href=".././module/program_startup_s.html" xlink:title="program_startup_s">
+<polygon fill="#5bc0de" stroke="#5bc0de" points="473.5,-612 361.5,-612 361.5,-588 473.5,-588 473.5,-612"/>
+<text text-anchor="middle" x="417.5" y="-597.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">program_startup_s</text>
+</a>
+</g>
+</g>
+<!-- module~program_startup_s&#45;&gt;module~prif_private_s -->
+<g id="module~~graph~~ModuleGraph_edge25" class="edge">
+<title>module~program_startup_s&#45;&gt;module~prif_private_s</title>
+<path fill="none" stroke="#b100ff" d="M361.49,-588.21C356.27,-585.71 351.32,-582.68 347,-579 301.08,-539.92 278.62,-469.09 269.76,-433.16"/>
+<polygon fill="#b100ff" stroke="#b100ff" points="273.12,-432.15 267.43,-423.21 266.3,-433.75 273.12,-432.15"/>
+</g>
+<!-- module~locks_s -->
+<g id="module~~graph~~ModuleGraph_node20" class="node">
 <title>module~locks_s</title>
-<g id="a_module~~graph~~ModuleGraph_node17"><a xlink:href=".././module/locks_s.html" xlink:title="locks_s">
-<polygon fill="#5bc0de" stroke="#5bc0de" points="444.5,-318 390.5,-318 390.5,-294 444.5,-294 444.5,-318"/>
-<text text-anchor="middle" x="417.5" y="-303.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">locks_s</text>
+<g id="a_module~~graph~~ModuleGraph_node20"><a xlink:href=".././module/locks_s.html" xlink:title="locks_s">
+<polygon fill="#5bc0de" stroke="#5bc0de" points="444.5,-570 390.5,-570 390.5,-546 444.5,-546 444.5,-570"/>
+<text text-anchor="middle" x="417.5" y="-555.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">locks_s</text>
 </a>
 </g>
 </g>
 <!-- module~locks_s&#45;&gt;module~prif_private_s -->
-<g id="module~~graph~~ModuleGraph_edge22" class="edge">
+<g id="module~~graph~~ModuleGraph_edge26" class="edge">
 <title>module~locks_s&#45;&gt;module~prif_private_s</title>
-<path fill="none" stroke="#2c00ff" d="M390.45,-310.6C376.82,-313.79 360.25,-318.96 347,-327 319.5,-343.69 294.74,-371.73 279.8,-390.78"/>
-<polygon fill="#2c00ff" stroke="#2c00ff" points="276.94,-388.75 273.65,-398.82 282.5,-393.01 276.94,-388.75"/>
+<path fill="none" stroke="#f300ff" d="M390.43,-554.56C376.47,-551.68 359.6,-546.46 347,-537 310.37,-509.52 285.43,-460.52 273.37,-432.41"/>
+<polygon fill="#f300ff" stroke="#f300ff" points="276.56,-430.98 269.51,-423.08 270.09,-433.65 276.56,-430.98"/>
 </g>
 <!-- module~sychronization_s -->
-<g id="module~~graph~~ModuleGraph_node18" class="node">
+<g id="module~~graph~~ModuleGraph_node21" class="node">
 <title>module~sychronization_s</title>
-<g id="a_module~~graph~~ModuleGraph_node18"><a xlink:href=".././module/sychronization_s.html" xlink:title="sychronization_s">
-<polygon fill="#5bc0de" stroke="#5bc0de" points="467.5,-276 367.5,-276 367.5,-252 467.5,-252 467.5,-276"/>
-<text text-anchor="middle" x="417.5" y="-261.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">sychronization_s</text>
+<g id="a_module~~graph~~ModuleGraph_node21"><a xlink:href=".././module/sychronization_s.html" xlink:title="sychronization_s">
+<polygon fill="#5bc0de" stroke="#5bc0de" points="467.5,-528 367.5,-528 367.5,-504 467.5,-504 467.5,-528"/>
+<text text-anchor="middle" x="417.5" y="-513.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">sychronization_s</text>
 </a>
 </g>
 </g>
 <!-- module~sychronization_s&#45;&gt;module~prif_private_s -->
-<g id="module~~graph~~ModuleGraph_edge23" class="edge">
+<g id="module~~graph~~ModuleGraph_edge27" class="edge">
 <title>module~sychronization_s&#45;&gt;module~prif_private_s</title>
-<path fill="none" stroke="#6e00ff" d="M367.3,-274.1C360.08,-276.9 353.05,-280.46 347,-285 310.37,-312.48 285.43,-361.48 273.37,-389.59"/>
-<polygon fill="#6e00ff" stroke="#6e00ff" points="270.09,-388.35 269.51,-398.92 276.56,-391.02 270.09,-388.35"/>
-</g>
-<!-- module~notify_s -->
-<g id="module~~graph~~ModuleGraph_node19" class="node">
-<title>module~notify_s</title>
-<g id="a_module~~graph~~ModuleGraph_node19"><a xlink:href=".././module/notify_s.html" xlink:title="notify_s">
-<polygon fill="#5bc0de" stroke="#5bc0de" points="444.5,-234 390.5,-234 390.5,-210 444.5,-210 444.5,-234"/>
-<text text-anchor="middle" x="417.5" y="-219.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">notify_s</text>
-</a>
-</g>
-</g>
-<!-- module~notify_s&#45;&gt;module~prif_private_s -->
-<g id="module~~graph~~ModuleGraph_edge24" class="edge">
-<title>module~notify_s&#45;&gt;module~prif_private_s</title>
-<path fill="none" stroke="#b100ff" d="M390.29,-224.78C376.12,-227.46 359.1,-232.71 347,-243 301.08,-282.08 278.62,-352.91 269.76,-388.84"/>
-<polygon fill="#b100ff" stroke="#b100ff" points="266.3,-388.25 267.43,-398.79 273.12,-389.85 266.3,-388.25"/>
+<path fill="none" stroke="#ff00c7" d="M367.3,-504.55C360.24,-501.94 353.25,-498.79 347,-495 319.5,-478.31 294.74,-450.27 279.8,-431.22"/>
+<polygon fill="#ff00c7" stroke="#ff00c7" points="282.5,-428.99 273.65,-423.18 276.94,-433.25 282.5,-428.99"/>
 </g>
 <!-- module~image_queries_s -->
-<g id="module~~graph~~ModuleGraph_node20" class="node">
+<g id="module~~graph~~ModuleGraph_node22" class="node">
 <title>module~image_queries_s</title>
-<g id="a_module~~graph~~ModuleGraph_node20"><a xlink:href=".././module/image_queries_s.html" xlink:title="image_queries_s">
-<polygon fill="#5bc0de" stroke="#5bc0de" points="468.5,-192 366.5,-192 366.5,-168 468.5,-168 468.5,-192"/>
-<text text-anchor="middle" x="417.5" y="-177.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">image_queries_s</text>
+<g id="a_module~~graph~~ModuleGraph_node22"><a xlink:href=".././module/image_queries_s.html" xlink:title="image_queries_s">
+<polygon fill="#5bc0de" stroke="#5bc0de" points="468.5,-486 366.5,-486 366.5,-462 468.5,-462 468.5,-486"/>
+<text text-anchor="middle" x="417.5" y="-471.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">image_queries_s</text>
 </a>
 </g>
 </g>
 <!-- module~image_queries_s&#45;&gt;module~prif_private_s -->
-<g id="module~~graph~~ModuleGraph_edge25" class="edge">
+<g id="module~~graph~~ModuleGraph_edge28" class="edge">
 <title>module~image_queries_s&#45;&gt;module~prif_private_s</title>
-<path fill="none" stroke="#f300ff" d="M366.43,-189.05C359.32,-191.99 352.55,-195.87 347,-201 291.46,-252.33 273.04,-345.82 267.35,-388.57"/>
-<polygon fill="#f300ff" stroke="#f300ff" points="263.85,-388.41 266.12,-398.76 270.8,-389.25 263.85,-388.41"/>
+<path fill="none" stroke="#ff0085" d="M372.34,-461.96C363.83,-459.28 355.07,-456.25 347,-453 329.31,-445.87 310.31,-436.26 295.05,-428.04"/>
+<polygon fill="#ff0085" stroke="#ff0085" points="296.54,-424.86 286.09,-423.14 293.18,-431.01 296.54,-424.86"/>
 </g>
 <!-- module~program_termination_s -->
-<g id="module~~graph~~ModuleGraph_node21" class="node">
+<g id="module~~graph~~ModuleGraph_node23" class="node">
 <title>module~program_termination_s</title>
-<g id="a_module~~graph~~ModuleGraph_node21"><a xlink:href=".././module/program_termination_s.html" xlink:title="program_termination_s">
-<polygon fill="#5bc0de" stroke="#5bc0de" points="485.5,-66 349.5,-66 349.5,-42 485.5,-42 485.5,-66"/>
-<text text-anchor="middle" x="417.5" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">program_termination_s</text>
+<g id="a_module~~graph~~ModuleGraph_node23"><a xlink:href=".././module/program_termination_s.html" xlink:title="program_termination_s">
+<polygon fill="#5bc0de" stroke="#5bc0de" points="485.5,-822 349.5,-822 349.5,-798 485.5,-798 485.5,-822"/>
+<text text-anchor="middle" x="417.5" y="-807.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">program_termination_s</text>
 </a>
 </g>
 </g>
 <!-- module~program_termination_s&#45;&gt;module~prif_private_s -->
-<g id="module~~graph~~ModuleGraph_edge28" class="edge">
+<g id="module~~graph~~ModuleGraph_edge31" class="edge">
 <title>module~program_termination_s&#45;&gt;module~prif_private_s</title>
-<path fill="none" stroke="#ff00c7" d="M358.31,-66.18C354.14,-68.62 350.29,-71.52 347,-75 303.19,-121.25 275.67,-321.66 267.53,-388.91"/>
-<polygon fill="#ff00c7" stroke="#ff00c7" points="264.06,-388.51 266.36,-398.85 271.01,-389.33 264.06,-388.51"/>
+<path fill="none" stroke="#ff0042" d="M358.21,-797.91C354.06,-795.46 350.25,-792.52 347,-789 298.14,-736.08 273.59,-506.41 266.91,-433.38"/>
+<polygon fill="#ff0042" stroke="#ff0042" points="270.37,-432.71 265.99,-423.06 263.39,-433.33 270.37,-432.71"/>
 </g>
 <!-- module~program_termination_s&#45;&gt;iso_c_binding -->
-<g id="module~~graph~~ModuleGraph_edge27" class="edge">
+<g id="module~~graph~~ModuleGraph_edge29" class="edge">
 <title>module~program_termination_s&#45;&gt;iso_c_binding</title>
-<path fill="none" stroke="#ff00c7" stroke-dasharray="5,2" d="M376.19,-66.08C335.2,-78.22 276.16,-95.24 265,-96"/>
-<path fill="none" stroke="#ff00c7" stroke-dasharray="5,2" d="M263,-96C213.56,-99.37 186.07,-60.5 151.5,-96"/>
+<path fill="none" stroke="#ff0042" stroke-dasharray="5,2" d="M376.96,-797.95C339.68,-786.78 286.43,-771.41 265,-768"/>
 </g>
 <!-- iso_fortran_env -->
 <g id="module~~graph~~ModuleGraph_node26" class="node">
 <title>iso_fortran_env</title>
 <g id="a_module~~graph~~ModuleGraph_node26"><a xlink:href="https://gcc.gnu.org/onlinedocs/gfortran/ISO_005fFORTRAN_005fENV.html" xlink:title="iso_fortran_env">
-<polygon fill="#337ab7" stroke="#337ab7" points="311,-68 217,-68 217,-44 311,-44 311,-68"/>
-<text text-anchor="middle" x="264" y="-53.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">iso_fortran_env</text>
+<polygon fill="#337ab7" stroke="#337ab7" points="311,-822 217,-822 217,-798 311,-798 311,-822"/>
+<text text-anchor="middle" x="264" y="-807.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">iso_fortran_env</text>
 </a>
 </g>
 </g>
 <!-- module~program_termination_s&#45;&gt;iso_fortran_env -->
-<g id="module~~graph~~ModuleGraph_edge26" class="edge">
-<title>module~program_termination_s&#45;&gt;iso_fortran_env</title>
-<path fill="none" stroke="#ff00c7" stroke-dasharray="5,2" d="M349.17,-54.89C339.87,-55.01 330.39,-55.14 321.32,-55.26"/>
-<polygon fill="#ff00c7" stroke="#ff00c7" points="321.23,-51.76 311.27,-55.39 321.32,-58.76 321.23,-51.76"/>
-</g>
-<!-- module~prif_queries_s -->
-<g id="module~~graph~~ModuleGraph_node22" class="node">
-<title>module~prif_queries_s</title>
-<g id="a_module~~graph~~ModuleGraph_node22"><a xlink:href=".././module/prif_queries_s.html" xlink:title="prif_queries_s">
-<polygon fill="#5bc0de" stroke="#5bc0de" points="460.5,-150 374.5,-150 374.5,-126 460.5,-126 460.5,-150"/>
-<text text-anchor="middle" x="417.5" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">prif_queries_s</text>
-</a>
-</g>
-</g>
-<!-- module~prif_queries_s&#45;&gt;module~prif_private_s -->
-<g id="module~~graph~~ModuleGraph_edge29" class="edge">
-<title>module~prif_queries_s&#45;&gt;module~prif_private_s</title>
-<path fill="none" stroke="#ff0085" d="M374.42,-143.78C364.41,-146.9 354.48,-151.68 347,-159 281.58,-223.05 268.32,-339.8 265.66,-388.61"/>
-<polygon fill="#ff0085" stroke="#ff0085" points="262.15,-388.58 265.21,-398.72 269.15,-388.89 262.15,-388.58"/>
-</g>
-<!-- module~co_min_s -->
-<g id="module~~graph~~ModuleGraph_node23" class="node">
-<title>module~co_min_s</title>
-<g id="a_module~~graph~~ModuleGraph_node23"><a xlink:href=".././module/co_min_s.html" xlink:title="co_min_s">
-<polygon fill="#5bc0de" stroke="#5bc0de" points="448,-24 387,-24 387,0 448,0 448,-24"/>
-<text text-anchor="middle" x="417.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">co_min_s</text>
-</a>
-</g>
-</g>
-<!-- module~co_min_s&#45;&gt;module~prif_private_s -->
-<g id="module~~graph~~ModuleGraph_edge31" class="edge">
-<title>module~co_min_s&#45;&gt;module~prif_private_s</title>
-<path fill="none" stroke="#ff0042" d="M386.83,-14.14C372.91,-16.67 357.17,-21.98 347,-33 298.14,-85.92 273.59,-315.59 266.91,-388.62"/>
-<polygon fill="#ff0042" stroke="#ff0042" points="263.39,-388.67 265.99,-398.94 270.37,-389.29 263.39,-388.67"/>
-</g>
-<!-- module~co_min_s&#45;&gt;iso_c_binding -->
 <g id="module~~graph~~ModuleGraph_edge30" class="edge">
-<title>module~co_min_s&#45;&gt;iso_c_binding</title>
-<path fill="none" stroke="#ff0042" stroke-dasharray="5,2" d="M386.9,-9.82C346.54,-8.05 272.88,-9.22 217,-35 180.88,-51.67 179.25,-67.5 151.5,-96"/>
-<path fill="none" stroke="#ff0042" stroke-dasharray="5,2" d="M149.5,-96C59.81,-185.58 45.54,-350.19 43.36,-409.75"/>
-<polygon fill="#ff0042" stroke="#ff0042" points="39.85,-409.81 43.07,-419.91 46.85,-410.01 39.85,-409.81"/>
+<title>module~program_termination_s&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#ff0042" stroke-dasharray="5,2" d="M349.17,-810C339.87,-810 330.39,-810 321.32,-810"/>
+<polygon fill="#ff0042" stroke="#ff0042" points="321.27,-806.5 311.27,-810 321.27,-813.5 321.27,-806.5"/>
 </g>
 </g>
 </svg>
@@ -611,7 +610,7 @@
           <p class="text-right">
             Documentation generated by 
             <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
- on 2025-03-13 04:39            </p>
+ on 2025-03-13 16:36            </p>
         </div>
       </div>
       <br>
