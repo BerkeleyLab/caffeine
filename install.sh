@@ -275,7 +275,7 @@ echo "PKG_CONFIG_PATH=$PKG_CONFIG_PATH"
 
 FPM_FC="$($REALPATH $(command -v $FC))"
 if [[ $FPM_FC == *flang* ]]; then
-  FPM_FC=${FPM_FC/flang-20/flang-new}
+  FPM_FC=${FPM_FC/flang-[1-9][0-9]*/flang-new}
 fi
 FPM_CC="$($REALPATH $(command -v $CC))"
 
