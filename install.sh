@@ -421,15 +421,26 @@ RUN_FPM_SH="build/run-fpm.sh"
 cat << EOF > $RUN_FPM_SH
 #!/bin/sh
 #-- DO NOT EDIT -- created by caffeine/install.sh
+fpm="${FPM}"
 fpm_sub_cmd=\$1; shift
-"${FPM}" "\$fpm_sub_cmd" \\
---profile debug \\
---flag "$compiler_flag" \\
---compiler "`$PKG_CONFIG caffeine --variable=CAFFEINE_FPM_FC`"   \\
---c-compiler "`$PKG_CONFIG caffeine --variable=CAFFEINE_FPM_CC`" \\
---c-flag "`$PKG_CONFIG caffeine --variable=CAFFEINE_FPM_CFLAGS`" \\
---link-flag "`$PKG_CONFIG caffeine --variable=CAFFEINE_FPM_LDFLAGS`" \\
-"\$@"
+if echo "--help -help --version -version --list -list new update list clean publish" | grep -w -q -e "\$fpm_sub_cmd" ; then
+  set -x
+  exec \$fpm "\$fpm_sub_cmd" "\$@"
+elif echo "build test run install" | grep -w -q -e "\$fpm_sub_cmd" ; then
+  set -x
+  exec \$fpm "\$fpm_sub_cmd" \\
+  --profile debug \\
+  --flag "$compiler_flag" \\
+  --compiler "`$PKG_CONFIG caffeine --variable=CAFFEINE_FPM_FC`"   \\
+  --c-compiler "`$PKG_CONFIG caffeine --variable=CAFFEINE_FPM_CC`" \\
+  --c-flag "`$PKG_CONFIG caffeine --variable=CAFFEINE_FPM_CFLAGS`" \\
+  --link-flag "`$PKG_CONFIG caffeine --variable=CAFFEINE_FPM_LDFLAGS`" \\
+  "\$@"
+else
+  echo "ERROR: Unrecognized fpm subcommand \$fpm_sub_cmd"
+  \$fpm list
+  exit 1
+fi
 EOF
 chmod u+x $RUN_FPM_SH
 
