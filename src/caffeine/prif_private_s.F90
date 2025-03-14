@@ -322,16 +322,16 @@ contains
     implicit none
     type(prif_coarray_handle), intent(in) :: coarray_handle
     logical :: result_
-    type(prif_coarray_descriptor), pointer :: info
     integer(c_int) :: i
 
     call_assert(associated(coarray_handle%info))
-    info => coarray_handle%info
-    call_assert(info%corank >= 1)
-    call_assert(info%corank <= size(info%ucobounds))
-    call_assert(all([(info%lcobounds(i) <= info%ucobounds(i), i = 1, info%corank)]))
-    call_assert(info%coarray_size > 0)
-    call_assert(c_associated(info%coarray_data))
+    associate(info => coarray_handle%info)
+      call_assert(info%corank >= 1)
+      call_assert(info%corank <= size(info%ucobounds))
+      call_assert(all([(info%lcobounds(i) <= info%ucobounds(i), i = 1, info%corank)]))
+      call_assert(info%coarray_size > 0)
+      call_assert(c_associated(info%coarray_data))
+    end associate
 
     result_ = .true.
   end function
