@@ -36,12 +36,12 @@ contains
   end procedure
 
   module procedure prif_coshape
-    type(prif_coarray_descriptor), pointer :: info
 
     call_assert(coarray_handle_check(coarray_handle))
 
-    info => coarray_handle%info
-    sizes = info%ucobounds(1:info%corank) - info%lcobounds(1:info%corank) + 1
+    associate(info => coarray_handle%info)
+      sizes = info%ucobounds(1:info%corank) - info%lcobounds(1:info%corank) + 1
+    end associate
   end procedure
 
   module procedure prif_image_index
