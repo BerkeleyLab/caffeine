@@ -318,19 +318,23 @@ contains
   end function
 
   ! verify state invariants for a coarray_handle
+  ! Note this function validates invariants with deliberately UNconditional assertions
+  ! Suggested caller usage for conditional validation is: 
+  !   call_assert(coarray_handle_check(coarray_handle))
   elemental impure function coarray_handle_check(coarray_handle) result(result_)
     implicit none
     type(prif_coarray_handle), intent(in) :: coarray_handle
     logical :: result_
     integer(c_int) :: i
 
-    call_assert(associated(coarray_handle%info))
+    call assert_always(associated(coarray_handle%info), "unassociated info pointer in prif_coarray_handle")
     associate(info => coarray_handle%info)
-      call_assert(info%corank >= 1)
-      call_assert(info%corank <= size(info%ucobounds))
-      call_assert(all([(info%lcobounds(i) <= info%ucobounds(i), i = 1, info%corank)]))
-      call_assert(info%coarray_size > 0)
-      call_assert(c_associated(info%coarray_data))
+      call assert_always(info%corank >= 1, "invalid corank in prif_coarray_handle")
+      call assert_always(info%corank <= size(info%ucobounds), "invalid corank in prif_coarray_handle")
+      call assert_always(all([(info%lcobounds(i) <= info%ucobounds(i), i = 1, info%corank)]), &
+                         "invalid cobounds in prif_coarray_handle")
+      call assert_always(info%coarray_size > 0, "invalid data size in prif_coarray_handle")
+      call assert_always(c_associated(info%coarray_data), "invalid data pointer in prif_coarray_handle")
     end associate
 
     result_ = .true.
