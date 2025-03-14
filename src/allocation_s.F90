@@ -1,12 +1,14 @@
 ! Copyright (c), The Regents of the University of California
 ! Terms of use are as specified in LICENSE.txt
+
+#include "assert_macros.h"
+
 submodule(prif:prif_private_s) allocation_s
   use iso_c_binding, only: &
       c_sizeof, &
       c_f_pointer, &
       c_f_procpointer, &
       c_loc, &
-      c_associated, &
       c_null_funptr
 
   implicit none
@@ -57,6 +59,8 @@ contains
     if (caf_have_child_teams()) then
       call caf_establish_child_heap
     end if
+
+    call_assert(coarray_handle_check(coarray_handle))
   end procedure
 
   module procedure prif_allocate
@@ -96,6 +100,8 @@ contains
         call prif_error_stop(.false._c_bool, stop_code_char=unallocated_message)
       end if
     end if
+    call_assert(all(coarray_handle_check(coarray_handles)))
+
     ! TODO: invoke finalizers from coarray_handles(:)%info%final_func
     ! do i = 1, num_handles
     !   if (coarray_handles(i)%info%final_func /= c_null_funptr) then
