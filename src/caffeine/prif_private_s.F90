@@ -318,7 +318,7 @@ contains
   end function
 
   ! verify state invariants for a coarray_handle
-  function coarray_handle_check(coarray_handle) result(result_)
+  elemental impure function coarray_handle_check(coarray_handle) result(result_)
     implicit none
     type(prif_coarray_handle), intent(in) :: coarray_handle
     logical :: result_

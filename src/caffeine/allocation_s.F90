@@ -100,9 +100,7 @@ contains
         call prif_error_stop(.false._c_bool, stop_code_char=unallocated_message)
       end if
     end if
-    do i = 1, num_handles
-      call_assert(coarray_handle_check(coarray_handles(i)))
-    end do
+    call_assert(all(coarray_handle_check(coarray_handles)))
 
     ! TODO: invoke finalizers from coarray_handles(:)%info%final_func
     ! do i = 1, num_handles
