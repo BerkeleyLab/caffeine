@@ -54,14 +54,14 @@ in the following sections.
 
 | Procedure | Status | Notes |
 |-----------|--------|-------|
-| `prif_num_images`    | **YES** |  |
-| `prif_num_images_with_team` | **YES** |  |
+| `prif_num_images`                   | **YES** |  |
+| `prif_num_images_with_team`         | **YES** |  |
 | `prif_num_images_with_team_number`  | no |  |
-| `prif_this_image_no_coarray` | **YES** |  |
+| `prif_this_image_no_coarray`        | **YES** |  |
 | `prif_this_image_with_coarray`, `prif_this_image_with_dim`  | no |  |
-| `prif_failed_images` | no |  |
-| `prif_stopped_images` | no |  |
-| `prif_image_status` | no |  |
+| `prif_failed_images`                | **YES** |  |
+| `prif_stopped_images`               | **YES** |  |
+| `prif_image_status`                 | **YES** |  |
 
 ---
 
@@ -85,18 +85,18 @@ in the following sections.
 | Procedure | Status | Notes |
 |-----------|--------|-------|
 | `prif_set_context_data`, `prif_get_context_data` | no |  |
-| `prif_size_bytes` | no |  |
-| `prif_lcobound_no_dim`, `prif_lcobound_with_dim` | no |  |
-| `prif_ucobound_no_dim`, `prif_ucobound_with_dim` | no |  |
-| `prif_coshape` | no |  |
-| `prif_local_data_pointer` | **YES** |  |
-| `prif_image_index` | **YES** |  |
-| `prif_image_index_with_team` | no |  |
-| `prif_image_index_with_team_number` | no |  |
+| `prif_size_bytes`                                | **YES** |  |
+| `prif_lcobound_no_dim`, `prif_lcobound_with_dim` | **YES** |  |
+| `prif_ucobound_no_dim`, `prif_ucobound_with_dim` | **YES** |  |
+| `prif_coshape`                                   | **YES** |  |
+| `prif_local_data_pointer`                        | **YES** |  |
+| `prif_image_index`                               | **YES** |  |
+| `prif_image_index_with_team`                     | no |  |
+| `prif_image_index_with_team_number`              | no |  |
 
 ---
 
-## Continguous Coarray Access
+## Contiguous Coarray Access
 ### Support = partial
 
 | Procedure | Status | Notes |
@@ -133,10 +133,10 @@ in the following sections.
 
 | Procedure | Status | Notes |
 |-----------|--------|-------|
-| `prif_sync_memory` | no        |  |
+| `prif_sync_memory` | **YES**   |  |
 | `prif_sync_all`    | **YES**   |  |
 | `prif_sync_images` | no        |  |
-| `prif_sync_team`   | no        |  |
+| `prif_sync_team`   | **YES**   |  |
 
 ---
 

@@ -48,6 +48,7 @@ contains
         use caf_num_images_test, only: &
                 caf_num_images_prif_num_images => &
                     test_prif_num_images
+        use caf_image_queries_test, only: test_prif_image_queries
         use caf_rma_test, only: &
                 caf_rma_prif_rma => &
                     test_prif_rma
@@ -92,6 +93,7 @@ contains
 #endif
         individual_tests = [individual_tests, caf_image_index_prif_image_index()]
         individual_tests = [individual_tests, caf_num_images_prif_num_images()]
+        individual_tests = [individual_tests, test_prif_image_queries()]
         individual_tests = [individual_tests, caf_rma_prif_rma()]
         individual_tests = [individual_tests, test_prif_rma_strided()]
 #if !__flang__

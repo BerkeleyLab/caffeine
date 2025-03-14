@@ -50,6 +50,9 @@ contains
         result_ = result_ .and. &
           assert_equals(int(n), -1, "prif_get_team retrieves current initial team")
 
+        ! ensure prif_sync_team is usable
+        call prif_sync_team(team=initial_team)
+
         x = 0 ! clear outputs
         call prif_num_images_with_team(team=initial_team, num_images=x)
         result_ = result_ .and. &
@@ -88,6 +91,10 @@ contains
                     initial_num_imgs/2 + mod(initial_num_imgs,2)*(int(which_team)-1), &
                     num_imgs, &
                     "Team has correct number of images")
+
+            ! ensure prif_sync_team is usable
+            call prif_sync_team(team=team)
+            call prif_sync_team(team=initial_team)
 
             x = 0 ! clear outputs
             call prif_num_images_with_team(team=team, num_images=x)
@@ -161,6 +168,10 @@ contains
             call prif_deallocate_coarray(coarrays(2:2))
 
         call prif_end_team()
+
+        ! ensure prif_sync_team is usable
+        call prif_sync_team(team=team)
+        call prif_sync_team(team=initial_team)
 
         t = prif_team_type() ; n = 0 ! clear outputs
         call prif_get_team(team=t)

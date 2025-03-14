@@ -5,6 +5,7 @@
 
 submodule(prif) prif_private_s
   use assert_m
+  use iso_c_binding, only: c_associated
   implicit none
 
   type(team_data), target :: initial_team
@@ -164,12 +165,21 @@ submodule(prif) prif_private_s
       type(c_ptr), intent(in), value :: extent
     end subroutine
 
-    ! __________________ Synchronization _____________________
+    ! __________________ SYNC Statements _____________________
+
+    subroutine caf_sync_memory() bind(C)
+      !! void caf_sync_memory();
+    end subroutine
 
     subroutine caf_sync_all() bind(C)
       !! void caf_sync_all();
-      import c_int
-      implicit none
+    end subroutine
+
+    subroutine caf_sync_team(team) bind(C)
+      !! void caf_sync_team(gex_TM_t team);
+       import c_ptr
+       implicit none
+       type(c_ptr), value :: team
     end subroutine
 
     ! ______________ Collective Subroutines __________________
@@ -287,7 +297,7 @@ contains
     integer(c_int), intent(in) :: image_num
     integer(c_intptr_t), intent(out) :: ptr
 
-
+    call_assert(coarray_handle_check(coarray_handle))
     call_assert_describe(image_num > 0 .and. image_num <= initial_team%num_images, "base_pointer: image_num not within valid range")
     ptr = caf_convert_base_addr(coarray_handle%info%coarray_data, image_num)
   end subroutine
@@ -305,6 +315,29 @@ contains
     else
       c_val = 0_c_int
     end if
+  end function
+
+  ! verify state invariants for a coarray_handle
+  ! Note this function validates invariants with deliberately UNconditional assertions
+  ! Suggested caller usage for conditional validation is: 
+  !   call_assert(coarray_handle_check(coarray_handle))
+  elemental impure function coarray_handle_check(coarray_handle) result(result_)
+    implicit none
+    type(prif_coarray_handle), intent(in) :: coarray_handle
+    logical :: result_
+    integer(c_int) :: i
+
+    call assert_always(associated(coarray_handle%info), "unassociated info pointer in prif_coarray_handle")
+    associate(info => coarray_handle%info)
+      call assert_always(info%corank >= 1, "invalid corank in prif_coarray_handle")
+      call assert_always(info%corank <= size(info%ucobounds), "invalid corank in prif_coarray_handle")
+      call assert_always(all([(info%lcobounds(i) <= info%ucobounds(i), i = 1, info%corank)]), &
+                         "invalid cobounds in prif_coarray_handle")
+      call assert_always(info%coarray_size > 0, "invalid data size in prif_coarray_handle")
+      call assert_always(c_associated(info%coarray_data), "invalid data pointer in prif_coarray_handle")
+    end associate
+
+    result_ = .true.
   end function
 
   subroutine caf_establish_child_heap

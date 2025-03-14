@@ -14,6 +14,8 @@ contains
   module procedure prif_put
     integer(c_intptr_t) :: remote_base
 
+    call_assert(coarray_handle_check(coarray_handle))
+
     call base_pointer(coarray_handle, image_num, remote_base)
     call prif_put_indirect( &
         image_num = image_num, &
@@ -49,6 +51,8 @@ contains
   ! _______________________ Contiguous Get RMA ____________________________
   module procedure prif_get
     integer(c_intptr_t) :: remote_base
+
+    call_assert(coarray_handle_check(coarray_handle))
 
     call base_pointer(coarray_handle, image_num, remote_base)
     call prif_get_indirect( &
@@ -104,6 +108,8 @@ contains
 
   module procedure prif_get_strided
     integer(c_intptr_t) :: remote_base
+
+    call_assert(coarray_handle_check(coarray_handle))
 
     call base_pointer(coarray_handle, image_num, remote_base)
     call prif_get_strided_indirect( &
@@ -168,6 +174,8 @@ contains
 
   module procedure prif_put_strided
     integer(c_intptr_t) :: remote_base
+
+    call_assert(coarray_handle_check(coarray_handle))
 
     call base_pointer(coarray_handle, image_num, remote_base)
     call prif_put_strided_indirect( &

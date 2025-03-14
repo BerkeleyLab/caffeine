@@ -1,14 +1,14 @@
 ! Copyright (c), The Regents of the University of California
 ! Terms of use are as specified in LICENSE.txt
-submodule(prif:prif_private_s) sychronization_s
+submodule(prif:prif_private_s) sync_stmt_s
 
   implicit none
 
 contains
 
   module procedure prif_sync_all
-    !TODO: handle optional args stat, errmsg, errmsg_alloc
     call caf_sync_all
+    if (present(stat)) stat = 0
   end procedure
 
   module procedure prif_sync_images
@@ -16,11 +16,13 @@ contains
   end procedure
 
   module procedure prif_sync_team
-    call unimplemented("prif_sync_team")
+    call caf_sync_team(team%info%gex_team)
+    if (present(stat)) stat = 0
   end procedure
 
   module procedure prif_sync_memory
-    call unimplemented("prif_sync_memory")
+    call caf_sync_memory
+    if (present(stat)) stat = 0
   end procedure
 
 end submodule
