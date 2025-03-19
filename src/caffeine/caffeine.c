@@ -10,6 +10,7 @@
 #include <gasnet_vis.h>
 #include "gasnet_safe.h"
 #include <gasnet_tools.h>
+#include <gasnet_portable_platform.h>
 #include <ISO_Fortran_binding.h>
 #include "../dlmalloc/dl_malloc_caf.h"
 #include "../dlmalloc/dl_malloc.h"
@@ -28,12 +29,12 @@ static gex_TM_t myworldteam;
 typedef void(*final_func_ptr)(void*, size_t) ;
 typedef uint8_t byte;
 
-#if __GNUC__ >= 12
-  #define float_Complex_workaround  CFI_type_float_Complex
-  #define double_Complex_workaround CFI_type_double_Complex
-#else
+#if PLATFORM_COMPILER_GNU && PLATFORM_COMPILER_VERSION_LT(12,0,0)
   #define float_Complex_workaround  2052
   #define double_Complex_workaround 4100
+#else
+  #define float_Complex_workaround  CFI_type_float_Complex
+  #define double_Complex_workaround CFI_type_double_Complex
 #endif
 
 // ---------------------------------------------------
