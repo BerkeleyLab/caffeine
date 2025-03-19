@@ -50,6 +50,8 @@ The `install.sh` script uses the following packages:
 * [pkg-config]
 * [realpath]
 * [make]
+* [git]
+* [curl]
 
 The script will invoke these if present in a user's `PATH`.
 If not present, the script will ask permission to use [Homebrew] to install the relevant package.
@@ -157,3 +159,6 @@ See [LICENSE.txt](LICENSE.txt) for usage terms and conditions.
 [pkg-config]: https://www.freedesktop.org/wiki/Software/pkg-config/
 [realpath]: https://man7.org/linux/man-pages/man3/realpath.3.html
 [make]: https://www.gnu.org/software/make/
+[git]: https://git-scm.com
+[curl]: https://curl.se
+
