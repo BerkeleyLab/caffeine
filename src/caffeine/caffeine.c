@@ -118,7 +118,7 @@ void* caf_allocate(mspace heap, size_t bytes)
    return allocated_space;
 }
 
-void* caf_allocate_remaining(mspace heap, void** allocated_space, size_t* allocated_size)
+void caf_allocate_remaining(mspace heap, void** allocated_space, size_t* allocated_size)
 {
   // The following doesn't necessarily give us all remaining space
   // nor necessarily the largest open space, but in practice is likely
