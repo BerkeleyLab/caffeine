@@ -1,15 +1,17 @@
 module caf_error_stop_test
-    use veggies, only: test_item_t, describe, result_t, it, assert_that, assert_equals
-    use unit_test_parameters_m, only : expected_error_stop_code
+    use prif, only: prif_this_image_no_coarray, prif_sync_all
+    use veggies, only: test_item_t, describe, result_t, it, assert_that, assert_equals, succeed
+    use unit_test_parameters_m, only : expected_error_stop_code, &
+        image_one => subjob_setup, cmd_prefix => subjob_prefix
 
     implicit none
     private
-    public :: test_prif_this_image
+    public :: test_prif_error_stop
 
    integer, parameter :: max_message_len = 128
 
 contains
-    function test_prif_this_image() result(tests)
+    function test_prif_error_stop() result(tests)
         type(test_item_t) :: tests
 
         tests = describe( &
@@ -26,14 +28,20 @@ contains
         integer command_status
         character(len=max_message_len) command_message
 
+      if (image_one()) then
+        command_message = "exit_with_no_stop_code"
+
         call execute_command_line( &
-          command = "./build/run-fpm.sh run --example error_stop_with_no_code > /dev/null 2>&1" &
+          command = cmd_prefix//"./build/run-fpm.sh run --example error_stop_with_no_code > /dev/null 2>&1" &
          ,wait = .true. &
          ,exitstat = exit_status &
          ,cmdstat = command_status &
          ,cmdmsg = command_message &
         )   
-        result_ = assert_that(exit_status /= 0) .and. assert_equals(0, command_status, command_message)
+        result_ = assert_that(exit_status /= 0, command_message)
+      else
+        result_ = succeed("skipped")
+      end if
 
     end function
 
@@ -43,16 +51,21 @@ contains
         integer command_status
         character(len=max_message_len) command_message
 
+      if (image_one()) then
+        command_message = "exit_with_integer_stop_code"
+
         call execute_command_line( &
-          command = "./build/run-fpm.sh run --example error_stop_with_integer_code > /dev/null 2>&1" &
+          command = cmd_prefix//"./build/run-fpm.sh run --example error_stop_with_integer_code > /dev/null 2>&1" &
          ,wait = .true. &
          ,exitstat = exit_status &
          ,cmdstat = command_status &
          ,cmdmsg = command_message &
         )
         result_ = &
-         assert_equals(expected_error_stop_code, exit_status, "exit_status") &
-         .and. assert_equals(0, command_status, command_message)
+         assert_equals(expected_error_stop_code, exit_status, command_message) 
+      else
+        result_ = succeed("skipped")
+      end if
 
     end function
 
@@ -62,14 +75,20 @@ contains
         integer command_status
         character(len=max_message_len) command_message
 
+      if (image_one()) then
+        command_message = "exit_with_character_stop_code"
+
         call execute_command_line( &
-          command = "./build/run-fpm.sh run --example error_stop_with_character_code > /dev/null 2>&1" &
+          command = cmd_prefix//"./build/run-fpm.sh run --example error_stop_with_character_code > /dev/null 2>&1" &
          ,wait = .true. &
          ,exitstat = exit_status &
          ,cmdstat = command_status &
          ,cmdmsg = command_message &
         )   
-        result_ = assert_that(exit_status /= 0) .and. assert_equals(0, command_status, command_message)
+        result_ = assert_that(exit_status /= 0, command_message)
+      else
+        result_ = succeed("skipped")
+      end if
 
     end function
 

@@ -2,6 +2,7 @@
 ! DO NOT REGENERATE THIS FILE!
 program main
     use iso_c_binding, only : c_bool
+    use iso_fortran_env, only : OUTPUT_UNIT, ERROR_UNIT
     use prif, only : &
         prif_stop &
        ,prif_error_stop
@@ -39,9 +40,6 @@ contains
         use caf_coarray_inquiry_test, only: &
                 caf_coarray_inquiry_coarray_inquiry => &
                     test_coarray_inquiry
-        use caf_error_stop_test, only: &
-                caf_error_stop_prif_this_image => &
-                    test_prif_this_image
         use caf_image_index_test, only: &
                 caf_image_index_prif_image_index => &
                     test_prif_image_index
@@ -54,15 +52,14 @@ contains
                     test_prif_rma
         use caf_strided_test, only: &
                     test_prif_rma_strided
-        use caf_stop_test, only: &
-                caf_stop_prif_this_image => &
-                    test_prif_this_image
         use caf_teams_test, only: &
                 caf_teams_caf_teams => &
                     test_caf_teams
         use caf_this_image_test, only: &
                 caf_this_image_prif_this_image_no_coarray => &
                     test_prif_this_image_no_coarray
+        use caf_stop_test, only: test_prif_stop
+        use caf_error_stop_test, only: test_prif_error_stop
         use veggies, only: test_item_t, test_that, run_tests
 
 
@@ -75,10 +72,21 @@ contains
         allocate(individual_tests(0))
 
 #if __flang__
+    block
+        integer :: major, minor
+#     if defined(__flang_major__) && defined(__flang_minor__)
+        major = __flang_major__
+        minor = __flang_minor__
+#     else
+        major = -1
+        minor = -1
+#     endif
         print *, "-----------------------------------------------------------------"
-        print *, "WARNING: flang-new compiler detected."
+        print *, "WARNING: flang-new compiler detected, version:",major,".",minor
         print *, "WARNING: Skipping tests that are known to fail with this compiler"
         print *, "-----------------------------------------------------------------"
+        call flush(OUTPUT_UNIT)
+    end block
 #endif
         individual_tests = [individual_tests, a00_caffeinate_caffeinate()]
         individual_tests = [individual_tests, caf_allocate_prif_allocate()]
@@ -89,21 +97,21 @@ contains
         individual_tests = [individual_tests, caf_co_min_prif_co_min()]
         individual_tests = [individual_tests, caf_co_reduce_prif_co_reduce()]
         individual_tests = [individual_tests, caf_co_sum_prif_co_sum()]
-        individual_tests = [individual_tests, caf_error_stop_prif_this_image()]
 #endif
         individual_tests = [individual_tests, caf_image_index_prif_image_index()]
         individual_tests = [individual_tests, caf_num_images_prif_num_images()]
         individual_tests = [individual_tests, test_prif_image_queries()]
         individual_tests = [individual_tests, caf_rma_prif_rma()]
         individual_tests = [individual_tests, test_prif_rma_strided()]
-#if !__flang__
-        individual_tests = [individual_tests, caf_stop_prif_this_image()]
-#endif
         individual_tests = [individual_tests, caf_teams_caf_teams()]
         individual_tests = [individual_tests, caf_this_image_prif_this_image_no_coarray()]
+        individual_tests = [individual_tests, test_prif_stop()]
+        individual_tests = [individual_tests, test_prif_error_stop()]
 
         tests = test_that(individual_tests)
 
+        call flush(OUTPUT_UNIT)
+        call flush(ERROR_UNIT)
 
         passed = run_tests(tests)
 

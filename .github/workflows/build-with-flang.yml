@@ -15,6 +15,7 @@ jobs:
       FC: flang-new
       CC: clang
       GASNET_CONFIGURE_ARGS: --enable-rpath --enable-debug
+      SUBJOB_PREFIX: GASNET_PSHM_NODES=2
 
     steps:
     - name: Checkout code
