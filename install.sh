@@ -52,6 +52,7 @@ the latest versions using Homebrew:
   GCC $GCC_VERSION
   GASNet-EX $GASNET_VERSION
   fpm
+  git (used by fpm to clone dependencies)
   pkg-config
   realpath (Homebrew coreutils)
   GNU Make (Homebrew coreutils)
@@ -118,6 +119,12 @@ fi
 
 if command -v fpm > /dev/null 2>&1; then
   FPM=`which fpm`
+fi
+
+if ! command -v git > /dev/null 2>&1; then
+  echo "git not found. Building Caffeine requires fpm, which uses git to install dependencies."
+  echo "Please install git, ensur it is in your PATH, and rerun ./install.sh"
+  exit 1
 fi
 
 ask_permission_to_use_homebrew()
@@ -198,7 +205,7 @@ if [ -z ${FC+x} ] || [ -z ${CC+x} ] || [ -z ${CXX+x} ] || [ -z ${PKG_CONFIG+x} ]
     exit_if_user_declines "brew"
 
     if ! command -v curl > /dev/null 2>&1; then
-      echo "No download mechanism found. Please install curl and rerun ./install.sh"
+      echo "curl not found. Please install curl, ensure it is in your PATH, and rerun ./install.sh"
       exit 1
     fi
 
