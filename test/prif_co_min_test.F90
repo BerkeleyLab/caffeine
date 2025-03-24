@@ -91,23 +91,22 @@ contains
 
     function check_character() result(result_)
         type(result_t) result_
-        result_ = succeed("skip for now")
-        ! character(len=*), parameter :: values(*) = &
-        !     [ "To be   ","or not  " &
-        !     , "to      ","be.     " &
-        !     , "that    ","is      " &
-        !     , "the     ","question"]
-        ! integer :: me, ni, i
-        ! character(len=len(values)) :: my_val, expected
+        character(len=*), parameter :: values(*) = &
+            [ "To be   ","or not  " &
+            , "to      ","be.     " &
+            , "that    ","is      " &
+            , "the     ","question"]
+        integer :: me, ni, i
+        character(len=len(values)) :: my_val, expected
 
-        ! call prif_this_image_no_coarray(this_image=me)
-        ! call prif_num_images(ni)
+        call prif_this_image_no_coarray(this_image=me)
+        call prif_num_images(ni)
 
-        ! my_val = values(mod(me-1, size(values))+1)
-        ! call prif_co_min_character(my_val)
+        my_val = values(mod(me-1, size(values))+1)
+        call prif_co_min_character(my_val)
 
-        ! expected = minval([(values(mod(i-1,size(values))+1), i = 1, ni)])
-        ! result_ = assert_equals(expected, my_val)
+        expected = minval([(values(mod(i-1,size(values))+1), i = 1, ni)])
+        result_ = assert_equals(expected, my_val)
     end function
 
 end module caf_co_min_test
