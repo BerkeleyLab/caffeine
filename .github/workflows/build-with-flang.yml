@@ -16,6 +16,7 @@ jobs:
       CC: clang
       GASNET_CONFIGURE_ARGS: --enable-rpath --enable-debug
       SUBJOB_PREFIX: GASNET_PSHM_NODES=2
+      GASNET_PSHM_NODES: 8
 
     steps:
     - name: Checkout code
@@ -39,7 +40,15 @@ jobs:
         export FPM_CC=$CC
         ./install.sh
 
+    - name: Run examples
+      run: |
+        set -x
+        ./build/run-fpm.sh run --verbose --example hello
+        ./build/run-fpm.sh run --verbose --example stop_with_no_code
+        ( set +e ; ./build/run-fpm.sh run --verbose --example stop_with_integer_code ; test $? = 99 )
+        ( set +e ; ./build/run-fpm.sh run --verbose --example error_stop_with_integer_code ; test $? = 100 )
+
     - name: Run unit tests
       run: |
-        export GASNET_PSHM_NODES=8
+        set -x
         ./build/run-fpm.sh test --verbose -- -d
