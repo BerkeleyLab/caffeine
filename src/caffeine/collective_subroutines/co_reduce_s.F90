@@ -27,15 +27,19 @@ contains
     integer(c_int), intent(out), optional :: stat
     character(len=*), intent(inout), optional :: errmsg
     character(len=:), intent(inout), allocatable, optional :: errmsg_alloc
+    type(c_funptr) :: funptr 
 
     if (present(stat)) stat=0
-    call_assert_describe(associated(operation_wrapper), "caf_co_reduce: associated(operation)")
+    call_assert_describe(associated(operation_wrapper), "prif_co_reduce: associated(operation_wrapper)")
+
+    funptr = c_funloc(operation_wrapper)
+    call_assert(c_associated(funptr))
 
     call caf_co_reduce( &
         a, &
         optional_value(result_image), &
         int(product(shape(a)), c_size_t), &
-        c_funloc(operation_wrapper), &
+        funptr, &
         cdata, &
         current_team%info%gex_team)
   end subroutine
