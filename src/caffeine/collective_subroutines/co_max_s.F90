@@ -27,34 +27,39 @@ contains
           current_team%info%gex_team)
   end subroutine
 
+  subroutine char_max_wrapper(arg1, arg2_and_out, count, cdata) bind(C)
+    type(c_ptr), intent(in), value :: arg1, arg2_and_out
+    integer(c_size_t), intent(in), value :: count
+    type(c_ptr), intent(in), value :: cdata
+
+    integer(c_size_t), pointer :: char_len
+    integer(c_size_t) :: i
+
+    if (count == 0) return
+    call c_f_pointer(cdata, char_len)
+    block
+      character(len=char_len,kind=c_char), pointer :: lhs(:), rhs_and_result(:)
+      call c_f_pointer(arg1, lhs, [count])
+      call c_f_pointer(arg2_and_out, rhs_and_result, [count])
+      do i = 1, count
+        if (lhs(i) >= rhs_and_result(i)) rhs_and_result(i) = lhs(i)
+      end do
+    end block
+  end subroutine
+
   module procedure prif_co_max_character
+    integer(c_size_t), target :: char_len
+    procedure(prif_operation_wrapper_interface), pointer :: op
+
+    char_len = len(a)
+    op => char_max_wrapper
+#if defined(__GFORTRAN__) && 0
+    ! gfortran 13.2 (sometimes?) crashes on the call below
+    ! internal compiler error: in make_decl_rtl, at varasm.cc:1442
     call unimplemented("prif_co_max_character")
-    ! integer(c_size_t), target :: char_len
-    ! procedure(prif_operation_wrapper_interface), pointer :: op
-
-    ! char_len = len(a)
-    ! op => char_max_wrapper
-    ! call prif_co_reduce(a, op, c_loc(char_len), result_image, stat, errmsg, errmsg_alloc)
+#else
+    call prif_co_reduce(a, op, c_loc(char_len), result_image, stat, errmsg, errmsg_alloc)
+#endif
   end procedure
-
-  ! subroutine char_max_wrapper(arg1, arg2_and_out, count, cdata) bind(C)
-  !   type(c_ptr), intent(in), value :: arg1, arg2_and_out
-  !   integer(c_size_t), intent(in), value :: count
-  !   type(c_ptr), intent(in), value :: cdata
-
-  !   integer(c_size_t), pointer :: char_len
-  !   integer(c_size_t) :: i
-
-  !   if (count == 0) return
-  !   call c_f_pointer(cdata, char_len)
-  !   block
-  !     character(len=char_len,kind=c_char), pointer :: lhs(:), rhs_and_result(:)
-  !     call c_f_pointer(arg1, lhs, [count])
-  !     call c_f_pointer(arg2_and_out, rhs_and_result, [count])
-  !     do i = 1, count
-  !       if (lhs(i) <= rhs_and_result(i)) rhs_and_result(i) = lhs(i)
-  !     end do
-  !   end block
-  ! end subroutine
 
 end submodule co_max_s
