@@ -1,6 +1,6 @@
 name = "caffeine"
 version = "0.5.0"
-license = "BSD"
+license = "BSD-3-Clause-LBNL"
 author = ["Damian Rouson", "Brad Richardson", "Katherine Rasmussen", "Dan Bonachea"]
 maintainer = "fortran@lbl.gov"
 copyright = "2021-2025 The Regents of the University of California, through Lawrence Berkeley National Laboratory"
