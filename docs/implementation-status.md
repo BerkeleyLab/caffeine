@@ -42,7 +42,7 @@ in the following sections.
 | Procedure | Status | Notes |
 |-----------|--------|-------|
 | `prif_init` | **YES** |  |
-| `prif_stop`, `prif_error_stop` | **YES* |  |
+| `prif_stop`, `prif_error_stop` | **YES** |  |
 | `prif_fail_image` | no |  |
 | `prif_register_stop_callback` | **YES** |  |
 
