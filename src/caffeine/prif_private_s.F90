@@ -277,10 +277,7 @@ contains
     type(c_ptr), intent(in) :: ptr
     integer(c_intptr_t) :: as_int
 
-    ! the following snippet ensures at compile time that c_ptr and
-    ! c_intptr_t are actually the same size
-    integer, parameter :: int_ptr_check = merge(c_intptr_t, 0, storage_size(ptr) == storage_size(as_int))
-    integer(int_ptr_check), parameter :: unused = 0_int_ptr_check
+    call_assert(storage_size(ptr) == storage_size(as_int))
 
     as_int = transfer(ptr, as_int)
   end function
