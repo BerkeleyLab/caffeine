@@ -417,7 +417,7 @@ user_compiler_flags="${CPPFLAGS:-} ${FFLAGS:-}"
 
 compiler_version=$($FPM_FC --version)
 if [[ $compiler_version == *llvm* ]]; then
-  compiler_flag="-mmlir -allow-assumed-rank -g -Ofast"
+  compiler_flag="-g"
 else
   compiler_flag="-g -O3 -ffree-line-length-0 -Wno-unused-dummy-argument"
 fi
