@@ -10,8 +10,6 @@ contains
     function test_prif_this_image_no_coarray() result(tests)
         type(test_item_t) :: tests
     
-        integer, parameter :: initiation_success = 0
-
         tests = describe( &
           "The prif_this_image_no_coarray function result", &
           [ it("is the proper member of the set {1,2,...,num_images()} when invoked as this_image()", check_this_image_set) &
@@ -22,6 +20,8 @@ contains
         type(result_t) :: result_
         integer, allocatable :: image_numbers(:)
         integer i, me, ni
+
+        allocate(image_numbers(0))
 
         call prif_this_image_no_coarray(this_image=me)
         call prif_num_images(num_images=ni)
