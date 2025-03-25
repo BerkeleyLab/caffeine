@@ -7,10 +7,10 @@ module caf_co_reduce_test
   private
   public :: test_prif_co_reduce
 
-  ! type :: pair
-  !   integer :: fst
-  !   real :: snd
-  ! end type
+  type :: pair
+    integer :: fst
+    real :: snd
+  end type
 
   ! type :: array(length)
   !   integer, len :: length = 2
@@ -37,88 +37,104 @@ contains
 
   function check_logical() result(result_)
     type(result_t) :: result_
-    result_ = succeed("skip for now")
+    logical :: val
+    integer :: me
+    procedure(prif_operation_wrapper_interface), pointer :: op
+    op => and_wrapper
 
-    ! logical :: val
-    ! procedure(prif_operation_wrapper_interface), pointer :: op
-    ! op => and_wrapper
+    val = .true.
+    call prif_co_reduce(val, op, c_null_ptr)
+    result_ = assert_that(val)
 
-    ! val = .true.
-    ! call prif_co_reduce(val, op, c_null_ptr)
-    ! result_ = assert_that(val)
-
-    ! val = .false.
-    ! call prif_co_reduce(val, op, c_null_ptr)
-    ! result_ = result_.and.assert_not(val)
+    call prif_this_image_no_coarray(this_image=me)
+    if (me == 1) then
+      val = .false.
+    end if
+    call prif_co_reduce(val, op, c_null_ptr)
+    result_ = result_.and.assert_not(val)
   end function
 
-  ! subroutine and_wrapper(arg1, arg2_and_out, count, cdata) bind(C)
-  !   type(c_ptr), intent(in), value :: arg1, arg2_and_out
-  !   integer(c_size_t), intent(in), value :: count
-  !   type(c_ptr), intent(in), value :: cdata
+  subroutine and_wrapper(arg1, arg2_and_out, count, cdata) bind(C)
+    type(c_ptr), intent(in), value :: arg1, arg2_and_out
+    integer(c_size_t), intent(in), value :: count
+    type(c_ptr), intent(in), value :: cdata
 
-  !   logical, pointer :: lhs(:), rhs_and_result(:)
-  !   integer(c_size_t) :: i
+    logical, pointer :: lhs(:), rhs_and_result(:)
+    integer(c_size_t) :: i
 
-  !   if (count == 0) return
-  !   call c_f_pointer(arg1, lhs, [count])
-  !   call c_f_pointer(arg2_and_out, rhs_and_result, [count])
-  !   do i = 1, count
-  !     rhs_and_result(i) = lhs(i).and.rhs_and_result(i)
-  !   end do
-  ! end subroutine
+    if (count == 0) return
+    call c_f_pointer(arg1, lhs, [count])
+    call c_f_pointer(arg2_and_out, rhs_and_result, [count])
+    do i = 1, count
+      rhs_and_result(i) = lhs(i).and.rhs_and_result(i)
+    end do
+  end subroutine
 
   function check_derived_type_reduction() result(result_)
     type(result_t) :: result_
-    result_ = succeed("skip for now")
-    
-    ! type(pair), parameter :: values(*,*) = reshape( &
-    !     [ pair(1, 53.), pair(3, 47.) &
-    !     , pair(5, 43.), pair(7, 41.) &
-    !     , pair(11, 37.), pair(13, 31.) &
-    !     , pair(17, 29.), pair(19, 23.) &
-    !     ], &
-    !     [2, 4])
-    ! integer :: me, ni, i
-    ! type(pair), dimension(size(values,1)) :: my_val, expected
-    ! procedure(prif_operation_wrapper_interface), pointer :: op
+    type(pair), parameter :: values(*,*) = reshape( &
+        [ pair(1, 53.), pair(3, 47.) &
+        , pair(5, 43.), pair(7, 41.) &
+        , pair(11, 37.), pair(13, 31.) &
+        , pair(17, 29.), pair(19, 23.) &
+        ], &
+        [2, 4])
+    integer :: me, ni, i
+    type(pair), dimension(size(values,1)) :: my_val, expected
+    type(pair), dimension(:,:), allocatable :: tmp
+    procedure(prif_operation_wrapper_interface), pointer :: op
 
-    ! op => pair_adder
-    ! call prif_this_image_no_coarray(this_image=me)
-    ! call prif_num_images(ni)
+    op => pair_adder
+    call prif_this_image_no_coarray(this_image=me)
+    call prif_num_images(ni)
 
-    ! my_val = values(:, mod(me-1, size(values,2))+1)
-    ! call prif_co_reduce(my_val, op, c_null_ptr)
+    my_val = values(:, mod(me-1, size(values,2))+1)
+    call prif_co_reduce(my_val, op, c_null_ptr)
 
-    ! expected = reduce(reshape([(values(:, mod(i-1,size(values,2))+1), i = 1, ni)], [size(values,1),ni]), add_pair, dim=2)
-    ! result_ = &
-    !     assert_equals(expected%fst, my_val%fst) &
-    !     .and. assert_equals(real(expected%snd, kind=kind(0.d0)), real(my_val%snd, kind=kind(0.d0)))
+    allocate(tmp(size(values,1),ni))
+    tmp = reshape([(values(:, mod(i-1,size(values,2))+1), i = 1, ni)], [size(values,1),ni])
+#if defined(__GFORTRAN__)
+    ! gfortran 14 lacks the F18 intrinsic REDUCE()
+    block
+      integer :: j
+      do i = 1, size(tmp,1)
+        expected(i) = tmp(i,1)
+        do j = 2, size(tmp,2)
+          expected(i) = add_pair(expected(i), tmp(i,j))
+        end do
+      end do
+    end block
+#else
+    expected = reduce(tmp, add_pair, dim=2)
+#endif
+    result_ = &
+        assert_equals(expected%fst, my_val%fst) &
+        .and. assert_equals(real(expected%snd, kind=kind(0.d0)), real(my_val%snd, kind=kind(0.d0)))
   end function
 
-  ! pure function add_pair(lhs, rhs) result(total)
-  !   type(pair), intent(in) :: lhs, rhs
-  !   type(pair) :: total
+  pure function add_pair(lhs, rhs) result(total)
+    type(pair), intent(in) :: lhs, rhs
+    type(pair) :: total
 
-  !   total%fst = lhs%fst + rhs%fst
-  !   total%snd = lhs%snd + rhs%snd
-  ! end function
+    total%fst = lhs%fst + rhs%fst
+    total%snd = lhs%snd + rhs%snd
+  end function
 
-  ! subroutine pair_adder(arg1, arg2_and_out, count, cdata) bind(C)
-  !   type(c_ptr), intent(in), value :: arg1, arg2_and_out
-  !   integer(c_size_t), intent(in), value :: count
-  !   type(c_ptr), intent(in), value :: cdata
+  subroutine pair_adder(arg1, arg2_and_out, count, cdata) bind(C)
+    type(c_ptr), intent(in), value :: arg1, arg2_and_out
+    integer(c_size_t), intent(in), value :: count
+    type(c_ptr), intent(in), value :: cdata
 
-  !   type(pair), pointer :: lhs(:), rhs_and_result(:)
-  !   integer(c_size_t) :: i
+    type(pair), pointer :: lhs(:), rhs_and_result(:)
+    integer(c_size_t) :: i
 
-  !   if (count == 0) return
-  !   call c_f_pointer(arg1, lhs, [count])
-  !   call c_f_pointer(arg2_and_out, rhs_and_result, [count])
-  !   do i = 1, count
-  !     rhs_and_result(i) = add_pair(lhs(i), rhs_and_result(i))
-  !   end do
-  ! end subroutine
+    if (count == 0) return
+    call c_f_pointer(arg1, lhs, [count])
+    call c_f_pointer(arg2_and_out, rhs_and_result, [count])
+    do i = 1, count
+      rhs_and_result(i) = add_pair(lhs(i), rhs_and_result(i))
+    end do
+  end subroutine
 
   function check_type_parameter_reduction() result(result_)
     type(result_t) :: result_
