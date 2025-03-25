@@ -54,7 +54,8 @@ The `install.sh` script uses the following packages:
 * [curl]
 
 The script will invoke these if present in a user's `PATH`.
-If not present, the script will ask permission to use [Homebrew] to install the relevant package.
+If not present, the script will ask permission to use [Homebrew] to install the relevant package
+or, in some cases, ask the user to install the package.
 
 Caffeine leverages the following non-parallel features of Fortran to simplify the writing of a portable, compact runtime-library that supports Fortran's parallel features:
 
