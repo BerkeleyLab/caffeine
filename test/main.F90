@@ -88,7 +88,7 @@ contains
         call flush(OUTPUT_UNIT)
     end block
 #endif
-        individual_tests = [individual_tests, a00_caffeinate_caffeinate()]
+        individual_tests = [a00_caffeinate_caffeinate()]
         individual_tests = [individual_tests, caf_allocate_prif_allocate()]
         individual_tests = [individual_tests, caf_coarray_inquiry_coarray_inquiry()]
         individual_tests = [individual_tests, caf_co_broadcast_prif_co_broadcast()]

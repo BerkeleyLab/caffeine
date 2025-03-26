@@ -80,8 +80,8 @@ contains
     !   end subroutine
     ! end interface
     integer :: i, num_handles
-    integer(c_int) :: local_stat
-    character(len=:), allocatable :: local_errmsg
+    !integer(c_int) :: local_stat
+    !character(len=:), allocatable :: local_errmsg
     ! procedure(coarray_cleanup_i), pointer :: coarray_cleanup
     character(len=*), parameter :: unallocated_message = "Attempted to deallocate unallocated coarray"
 
