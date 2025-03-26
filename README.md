@@ -40,12 +40,12 @@ Caffeine aims to provide a portable, high-performance and open-source parallel
 runtime library that such compilers can target in code generation as part of
 their solution to support Fortran's multi-image parallel features.
 
-Prerequisites
+Prerequisites & Dependencies
 -------------
 ### Build prerequisites
 The `install.sh` script uses the following packages:
 * Fortran and C compilers
-* [GASNet-EX] exascale networking middleware
+    * We regularly test with: gfortran v14 and LLVM Flang 20
 * [Fortran package manager] `fpm`
 * [pkg-config]
 * [realpath]
@@ -56,6 +56,16 @@ The `install.sh` script uses the following packages:
 The script will invoke these if present in a user's `PATH`.
 If not present, the script will ask permission to use [Homebrew] to install the relevant package
 or, in some cases, ask the user to install the package.
+
+### Build dependencies
+
+Caffeine also depends on the following packages that will be automatically installed as part
+of the build process.
+
+* [GASNet-EX] exascale networking middleware
+* [assert](https://github.com/BerkeleyLab/assert)
+* [veggies](https://github.com/everythingfunctional/veggies)
+* [iso_varying_string](https://github.com/everythingfunctional/iso_varying_string)
 
 Caffeine leverages the following non-parallel features of Fortran to simplify the writing of a portable, compact runtime-library that supports Fortran's parallel features:
 
