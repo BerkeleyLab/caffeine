@@ -45,6 +45,7 @@ Prerequisites
 ### Build prerequisites
 The `install.sh` script uses the following packages:
 * Fortran and C compilers
+    * We regularly test with: gfortran v14 and LLVM Flang 20
 * [GASNet-EX] exascale networking middleware
 * [Fortran package manager] `fpm`
 * [pkg-config]
