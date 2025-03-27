@@ -246,23 +246,82 @@ void caf_co_broadcast(CFI_cdesc_t * a_desc, int source_image, int num_elements, 
   gex_Event_Wait(ev);
 }
 
-void caf_co_max(CFI_cdesc_t* a_desc, int result_image, size_t num_elements, gex_TM_t team)
-{
-  gex_DT_t a_type;
+//-------------------------------------------------------------------
+// Typed computational collective subroutines
+//-------------------------------------------------------------------
 
-  switch (a_desc->type)
-  {
-    case CFI_type_int32_t:          a_type = GEX_DT_I32; break;
-    case CFI_type_int64_t:          a_type = GEX_DT_I64; break;
-    case CFI_type_float:            a_type = GEX_DT_FLT; break;
-    case CFI_type_double:           a_type = GEX_DT_DBL; break;
-    default:
-      gasnett_fatalerror("Unrecognized type: %d", (int)a_desc->type);
+// Convert CFI_cdesc_t to the corresponding GEX reduction data type
+// returns the size of the native type
+static size_t CFI_to_GEX_DT(CFI_type_t cfi_type, gex_DT_t *gex_dt, int *complex_scale) {
+  assert(gex_dt);
+
+  if_pf (complex_scale) *complex_scale = 1;
+
+  switch (cfi_type) {
+    // real cases
+    case CFI_type_float:            *gex_dt = GEX_DT_FLT; return 4;
+    case CFI_type_double:           *gex_dt = GEX_DT_DBL; return 8;
+
+    // complex cases
+    case float_Complex_workaround:  *gex_dt = GEX_DT_FLT; 
+      if (!complex_scale) gasnett_fatalerror("This operation does not support complex types");
+      *complex_scale = 2;
+      return 8;
+    case double_Complex_workaround: *gex_dt = GEX_DT_DBL; 
+      if (!complex_scale) gasnett_fatalerror("This operation does not support complex types");
+      *complex_scale = 2;
+      return 16;
+    // no support for CFI_type_long_double or CFI_type_long_double_Complex
   }
 
-  char* a_address = (char*) a_desc->base_addr;
+  // integer types
+  #define CFI_INT_CASE(cfi_type_constant, c_type) \
+    else if (cfi_type == cfi_type_constant) { \
+      if (sizeof(c_type) == 4) *gex_dt = GEX_DT_I32;  \
+      else if (sizeof(c_type) > 8) \
+         gasnett_fatalerror("Unsupported wide integer type: %d", (int)cfi_type); \
+      else                     *gex_dt = GEX_DT_I64;  \
+      return sizeof(c_type); \
+    }
+  // these must be handled outside the switch because there are duplicates
+  // for the same reason, start with the most likely candidates
+  if (0) ;
+  CFI_INT_CASE(CFI_type_int64_t, int64_t)
+  CFI_INT_CASE(CFI_type_int32_t, int32_t)
+  CFI_INT_CASE(CFI_type_int16_t, int16_t)
+  CFI_INT_CASE(CFI_type_int8_t, int8_t)
+  CFI_INT_CASE(CFI_type_Bool, _Bool)
+  CFI_INT_CASE(CFI_type_char, char)
+  CFI_INT_CASE(CFI_type_signed_char, signed char)
+  CFI_INT_CASE(CFI_type_short, short int)
+  CFI_INT_CASE(CFI_type_int, int)
+  CFI_INT_CASE(CFI_type_long, long int)
+  CFI_INT_CASE(CFI_type_long_long, long long int)
+  CFI_INT_CASE(CFI_type_size_t, size_t)
+  CFI_INT_CASE(CFI_type_int_least8_t, int_least8_t)
+  CFI_INT_CASE(CFI_type_int_least16_t, int_least16_t)
+  CFI_INT_CASE(CFI_type_int_least32_t, int_least32_t)
+  CFI_INT_CASE(CFI_type_int_least64_t, int_least64_t)
+  CFI_INT_CASE(CFI_type_int_fast8_t, int_fast8_t)
+  CFI_INT_CASE(CFI_type_int_fast16_t, int_fast16_t)
+  CFI_INT_CASE(CFI_type_int_fast32_t, int_fast32_t)
+  CFI_INT_CASE(CFI_type_int_fast64_t, int_fast64_t)
+  CFI_INT_CASE(CFI_type_intmax_t, intmax_t)
+  CFI_INT_CASE(CFI_type_intptr_t, intptr_t)
+  CFI_INT_CASE(CFI_type_ptrdiff_t, ptrdiff_t)
+  #undef CFI_INT_CASE
 
+  gasnett_fatalerror("Unrecognized type: %d", (int)cfi_type);
+}
+
+void caf_co_max(CFI_cdesc_t* a_desc, int result_image, size_t num_elements, gex_TM_t team) {
+  gex_DT_t a_type;
+  size_t elem_sz = CFI_to_GEX_DT(a_desc->type, &a_type, NULL);
+  assert(elem_sz == 4 || elem_sz == 8);
+
+  char* a_address = (char*) a_desc->base_addr;
   size_t c_sizeof_a = a_desc->elem_len;
+  assert(c_sizeof_a == elem_sz);
 
   gex_Event_t ev;
 
@@ -274,23 +333,14 @@ void caf_co_max(CFI_cdesc_t* a_desc, int result_image, size_t num_elements, gex_
   gex_Event_Wait(ev);
 }
 
-void caf_co_min(CFI_cdesc_t* a_desc, int result_image, size_t num_elements, gex_TM_t team)
-{
+void caf_co_min(CFI_cdesc_t* a_desc, int result_image, size_t num_elements, gex_TM_t team) {
   gex_DT_t a_type;
-
-  switch (a_desc->type)
-  {
-    case CFI_type_int32_t:          a_type = GEX_DT_I32; break;
-    case CFI_type_int64_t:          a_type = GEX_DT_I64; break;
-    case CFI_type_float:            a_type = GEX_DT_FLT; break;
-    case CFI_type_double:           a_type = GEX_DT_DBL; break;
-    default:
-      gasnett_fatalerror("Unrecognized type: %d", (int)a_desc->type);
-  }
+  size_t elem_sz = CFI_to_GEX_DT(a_desc->type, &a_type, NULL);
+  assert(elem_sz == 4 || elem_sz == 8);
 
   char* a_address = (char*) a_desc->base_addr;
-
   size_t c_sizeof_a = a_desc->elem_len;
+  assert(c_sizeof_a == elem_sz);
 
   gex_Event_t ev;
 
@@ -302,25 +352,22 @@ void caf_co_min(CFI_cdesc_t* a_desc, int result_image, size_t num_elements, gex_
   gex_Event_Wait(ev);
 }
 
-void caf_co_sum(CFI_cdesc_t* a_desc, int result_image, size_t num_elements, gex_TM_t team)
-{
+void caf_co_sum(CFI_cdesc_t* a_desc, int result_image, size_t num_elements, gex_TM_t team) {
   gex_DT_t a_type;
-
-  size_t c_sizeof_a = a_desc->elem_len;
-
-  switch (a_desc->type)
-  {
-    case CFI_type_int32_t:          a_type = GEX_DT_I32; break;
-    case CFI_type_int64_t:          a_type = GEX_DT_I64; break;
-    case CFI_type_float:            a_type = GEX_DT_FLT; break;
-    case CFI_type_double:           a_type = GEX_DT_DBL; break;
-    case float_Complex_workaround:  a_type = GEX_DT_FLT; num_elements *= 2; c_sizeof_a /= 2; break;
-    case double_Complex_workaround: a_type = GEX_DT_DBL; num_elements *= 2; c_sizeof_a /= 2; break;
-    default:
-      gasnett_fatalerror("Unrecognized type: %d", (int)a_desc->type);
-  }
+  int complex_scale;
+  size_t elem_sz = CFI_to_GEX_DT(a_desc->type, &a_type, &complex_scale);
+  assert(elem_sz == 4 || elem_sz == 8 || elem_sz == 16);
 
   char* a_address = (char*) a_desc->base_addr;
+  size_t c_sizeof_a = a_desc->elem_len;
+  assert(c_sizeof_a == elem_sz);
+
+  if (complex_scale != 1) {
+    assert(complex_scale == 2);
+    assert(c_sizeof_a == 8 || c_sizeof_a == 16);
+    c_sizeof_a >>= 1;
+    num_elements <<= 1; 
+  }
 
   gex_Event_t ev;
 
@@ -332,6 +379,7 @@ void caf_co_sum(CFI_cdesc_t* a_desc, int result_image, size_t num_elements, gex_
   gex_Event_Wait(ev);
 }
 
+//-------------------------------------------------------------------
 void caf_form_team(gex_TM_t current_team, gex_TM_t* new_team, int64_t team_number, int new_index)
 {
    // GASNet color argument is int (32-bit), check for value truncation:
