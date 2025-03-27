@@ -10,6 +10,7 @@
 #include <gasnet_vis.h>
 #include "gasnet_safe.h"
 #include <gasnet_tools.h>
+#include <gasnet_portable_platform.h>
 #include <ISO_Fortran_binding.h>
 #include "../dlmalloc/dl_malloc_caf.h"
 #include "../dlmalloc/dl_malloc.h"
@@ -28,12 +29,12 @@ static gex_TM_t myworldteam;
 typedef void(*final_func_ptr)(void*, size_t) ;
 typedef uint8_t byte;
 
-#if __GNUC__ >= 12
-  #define float_Complex_workaround  CFI_type_float_Complex
-  #define double_Complex_workaround CFI_type_double_Complex
-#else
+#if PLATFORM_COMPILER_GNU && PLATFORM_COMPILER_VERSION_LT(12,0,0)
   #define float_Complex_workaround  2052
   #define double_Complex_workaround 4100
+#else
+  #define float_Complex_workaround  CFI_type_float_Complex
+  #define double_Complex_workaround CFI_type_double_Complex
 #endif
 
 // ---------------------------------------------------
@@ -117,7 +118,7 @@ void* caf_allocate(mspace heap, size_t bytes)
    return allocated_space;
 }
 
-void* caf_allocate_remaining(mspace heap, void** allocated_space, size_t* allocated_size)
+void caf_allocate_remaining(mspace heap, void** allocated_space, size_t* allocated_size)
 {
   // The following doesn't necessarily give us all remaining space
   // nor necessarily the largest open space, but in practice is likely
@@ -204,9 +205,18 @@ void caf_sync_team( gex_TM_t team ) {
 //-------------------------------------------------------------------
 
 void caf_co_reduce(
-  CFI_cdesc_t* a_desc, int result_image, int num_elements, gex_Coll_ReduceFn_t user_op, void* client_data, gex_TM_t team
-)
-{
+  CFI_cdesc_t* a_desc, int result_image, size_t num_elements, gex_Coll_ReduceFn_t user_op, void* client_data, gex_TM_t team
+) {
+  assert(a_desc);
+  assert(result_image >= 0);
+  assert(num_elements > 0);
+  assert(user_op);
+#if PLATFORM_COMPILER_GNU
+  // gfortran 13.2 c_funloc is non-compliant
+  // it erroneously generates a non-callable pointer to a pointer to the subroutine
+  // Here we undo that incorrect extra level of indirection
+  user_op = *(gex_Coll_ReduceFn_t *)user_op; 
+#endif
   char* a_address = (char*) a_desc->base_addr;
   size_t c_sizeof_a = a_desc->elem_len;
   gex_Event_t ev;
@@ -236,81 +246,178 @@ void caf_co_broadcast(CFI_cdesc_t * a_desc, int source_image, int num_elements, 
   gex_Event_Wait(ev);
 }
 
-void caf_co_max(CFI_cdesc_t* a_desc, int result_image, size_t num_elements, gex_TM_t team)
-{
-  gex_DT_t a_type;
+//-------------------------------------------------------------------
+// Typed computational collective subroutines
+//-------------------------------------------------------------------
 
-  switch (a_desc->type)
-  {
-    case CFI_type_int32_t:          a_type = GEX_DT_I32; break;
-    case CFI_type_int64_t:          a_type = GEX_DT_I64; break;
-    case CFI_type_float:            a_type = GEX_DT_FLT; break;
-    case CFI_type_double:           a_type = GEX_DT_DBL; break;
-    default:
-      gasnett_fatalerror("Unrecognized type: %d", (int)a_desc->type);
+// Convert CFI_cdesc_t to the corresponding GEX reduction data type
+// returns the size of the native type
+static size_t CFI_to_GEX_DT(CFI_type_t cfi_type, gex_DT_t *gex_dt, int *complex_scale) {
+  assert(gex_dt);
+
+  if_pf (complex_scale) *complex_scale = 1;
+
+  switch (cfi_type) {
+    // real cases
+    case CFI_type_float:            *gex_dt = GEX_DT_FLT; return 4;
+    case CFI_type_double:           *gex_dt = GEX_DT_DBL; return 8;
+
+    // complex cases
+    case float_Complex_workaround:  *gex_dt = GEX_DT_FLT; 
+      if (!complex_scale) gasnett_fatalerror("This operation does not support complex types");
+      *complex_scale = 2;
+      return 8;
+    case double_Complex_workaround: *gex_dt = GEX_DT_DBL; 
+      if (!complex_scale) gasnett_fatalerror("This operation does not support complex types");
+      *complex_scale = 2;
+      return 16;
+    // no support for CFI_type_long_double or CFI_type_long_double_Complex
   }
 
-  char* a_address = (char*) a_desc->base_addr;
+  // integer types
+  #define CFI_INT_CASE(cfi_type_constant, c_type) \
+    else if (cfi_type == cfi_type_constant) { \
+      if (sizeof(c_type) == 4) *gex_dt = GEX_DT_I32;  \
+      else if (sizeof(c_type) > 8) \
+         gasnett_fatalerror("Unsupported wide integer type: %d", (int)cfi_type); \
+      else                     *gex_dt = GEX_DT_I64;  \
+      return sizeof(c_type); \
+    }
+  // these must be handled outside the switch because there are duplicates
+  // for the same reason, start with the most likely candidates
+  if (0) ;
+  CFI_INT_CASE(CFI_type_int64_t, int64_t)
+  CFI_INT_CASE(CFI_type_int32_t, int32_t)
+  CFI_INT_CASE(CFI_type_int16_t, int16_t)
+  CFI_INT_CASE(CFI_type_int8_t, int8_t)
+  CFI_INT_CASE(CFI_type_Bool, _Bool)
+  CFI_INT_CASE(CFI_type_char, char)
+  CFI_INT_CASE(CFI_type_signed_char, signed char)
+  CFI_INT_CASE(CFI_type_short, short int)
+  CFI_INT_CASE(CFI_type_int, int)
+  CFI_INT_CASE(CFI_type_long, long int)
+  CFI_INT_CASE(CFI_type_long_long, long long int)
+  CFI_INT_CASE(CFI_type_size_t, size_t)
+  CFI_INT_CASE(CFI_type_int_least8_t, int_least8_t)
+  CFI_INT_CASE(CFI_type_int_least16_t, int_least16_t)
+  CFI_INT_CASE(CFI_type_int_least32_t, int_least32_t)
+  CFI_INT_CASE(CFI_type_int_least64_t, int_least64_t)
+  CFI_INT_CASE(CFI_type_int_fast8_t, int_fast8_t)
+  CFI_INT_CASE(CFI_type_int_fast16_t, int_fast16_t)
+  CFI_INT_CASE(CFI_type_int_fast32_t, int_fast32_t)
+  CFI_INT_CASE(CFI_type_int_fast64_t, int_fast64_t)
+  CFI_INT_CASE(CFI_type_intmax_t, intmax_t)
+  CFI_INT_CASE(CFI_type_intptr_t, intptr_t)
+  CFI_INT_CASE(CFI_type_ptrdiff_t, ptrdiff_t)
+  #undef CFI_INT_CASE
 
+  gasnett_fatalerror("Unrecognized type: %d", (int)cfi_type);
+}
+
+// widen an 8- or 16-bit integer array to 64-bit 
+static int64_t *widen_from_array(CFI_cdesc_t* a_desc, size_t num_elements) {
+  assert(a_desc);
+  int64_t *res = malloc(8 * num_elements);
+  assert(res);
+  if (a_desc->elem_len == 1) {
+    int8_t *src = a_desc->base_addr;
+    for (size_t i=0; i < num_elements; i++) res[i] = src[i];
+  } else if (a_desc->elem_len == 2) {
+    int16_t *src = a_desc->base_addr;
+    for (size_t i=0; i < num_elements; i++) res[i] = src[i];
+  } else gasnett_fatalerror("Logic error in widen_from_array: %i", a_desc->elem_len);
+  return res;
+}
+
+// narrow a 64-bit integer array result back to 8- or 16-bit
+static void narrow_to_array(CFI_cdesc_t* a_desc, int64_t *src, size_t num_elements) {
+  assert(a_desc);
+  assert(src);
+  if (a_desc->elem_len == 1) {
+    int8_t *dst = a_desc->base_addr;
+    for (size_t i=0; i < num_elements; i++) dst[i] = src[i];
+  } else if (a_desc->elem_len == 2) {
+    int16_t *dst = a_desc->base_addr;
+    for (size_t i=0; i < num_elements; i++) dst[i] = src[i];
+  } else gasnett_fatalerror("Logic error in narrow_to_array: %i", a_desc->elem_len);
+  free(src);
+}
+
+void caf_co_max(CFI_cdesc_t* a_desc, int result_image, size_t num_elements, gex_TM_t team) {
+  gex_DT_t a_type;
+  size_t elem_sz = CFI_to_GEX_DT(a_desc->type, &a_type, NULL);
+
+  int64_t * bb = NULL;
+  void * a_address =  a_desc->base_addr;
   size_t c_sizeof_a = a_desc->elem_len;
+  assert(c_sizeof_a == elem_sz);
+
+  if_pf(elem_sz < 4) {
+    bb = widen_from_array(a_desc, num_elements);
+    assert(a_type == GEX_DT_I64);
+    c_sizeof_a = 8;
+    a_address = bb;
+  }
 
   gex_Event_t ev;
-
   if (result_image) {
     ev = gex_Coll_ReduceToOneNB(team, result_image-1, a_address, a_address, a_type, c_sizeof_a, num_elements, GEX_OP_MAX, NULL, NULL, 0);
   } else {
     ev = gex_Coll_ReduceToAllNB(team,                 a_address, a_address, a_type, c_sizeof_a, num_elements, GEX_OP_MAX, NULL, NULL, 0);
   }
   gex_Event_Wait(ev);
+
+  if_pf(bb) narrow_to_array(a_desc, bb, num_elements);
 }
 
-void caf_co_min(CFI_cdesc_t* a_desc, int result_image, size_t num_elements, gex_TM_t team)
-{
+void caf_co_min(CFI_cdesc_t* a_desc, int result_image, size_t num_elements, gex_TM_t team) {
   gex_DT_t a_type;
+  size_t elem_sz = CFI_to_GEX_DT(a_desc->type, &a_type, NULL);
 
-  switch (a_desc->type)
-  {
-    case CFI_type_int32_t:          a_type = GEX_DT_I32; break;
-    case CFI_type_int64_t:          a_type = GEX_DT_I64; break;
-    case CFI_type_float:            a_type = GEX_DT_FLT; break;
-    case CFI_type_double:           a_type = GEX_DT_DBL; break;
-    default:
-      gasnett_fatalerror("Unrecognized type: %d", (int)a_desc->type);
+  int64_t * bb = NULL;
+  void * a_address =  a_desc->base_addr;
+  size_t c_sizeof_a = a_desc->elem_len;
+  assert(c_sizeof_a == elem_sz);
+
+  if_pf(elem_sz < 4) {
+    bb = widen_from_array(a_desc, num_elements);
+    assert(a_type == GEX_DT_I64);
+    c_sizeof_a = 8;
+    a_address = bb;
   }
 
-  char* a_address = (char*) a_desc->base_addr;
-
-  size_t c_sizeof_a = a_desc->elem_len;
-
   gex_Event_t ev;
-
   if (result_image) {
     ev = gex_Coll_ReduceToOneNB(team, result_image-1, a_address, a_address, a_type, c_sizeof_a, num_elements, GEX_OP_MIN, NULL, NULL, 0);
   } else {
     ev = gex_Coll_ReduceToAllNB(team,                 a_address, a_address, a_type, c_sizeof_a, num_elements, GEX_OP_MIN, NULL, NULL, 0);
   }
   gex_Event_Wait(ev);
+
+  if_pf(bb) narrow_to_array(a_desc, bb, num_elements);
 }
 
-void caf_co_sum(CFI_cdesc_t* a_desc, int result_image, size_t num_elements, gex_TM_t team)
-{
+void caf_co_sum(CFI_cdesc_t* a_desc, int result_image, size_t num_elements, gex_TM_t team) {
   gex_DT_t a_type;
+  int complex_scale;
+  size_t elem_sz = CFI_to_GEX_DT(a_desc->type, &a_type, &complex_scale);
 
+  int64_t * bb = NULL;
+  void * a_address =  a_desc->base_addr;
   size_t c_sizeof_a = a_desc->elem_len;
+  assert(c_sizeof_a == elem_sz);
 
-  switch (a_desc->type)
-  {
-    case CFI_type_int32_t:          a_type = GEX_DT_I32; break;
-    case CFI_type_int64_t:          a_type = GEX_DT_I64; break;
-    case CFI_type_float:            a_type = GEX_DT_FLT; break;
-    case CFI_type_double:           a_type = GEX_DT_DBL; break;
-    case float_Complex_workaround:  a_type = GEX_DT_FLT; num_elements *= 2; c_sizeof_a /= 2; break;
-    case double_Complex_workaround: a_type = GEX_DT_DBL; num_elements *= 2; c_sizeof_a /= 2; break;
-    default:
-      gasnett_fatalerror("Unrecognized type: %d", (int)a_desc->type);
+  if_pf (complex_scale != 1) {
+    assert(complex_scale == 2);
+    assert(c_sizeof_a == 8 || c_sizeof_a == 16);
+    c_sizeof_a >>= 1;
+    num_elements <<= 1; 
+  } else if_pf(elem_sz < 4) {
+    bb = widen_from_array(a_desc, num_elements);
+    assert(a_type == GEX_DT_I64);
+    c_sizeof_a = 8;
+    a_address = bb;
   }
-
-  char* a_address = (char*) a_desc->base_addr;
 
   gex_Event_t ev;
 
@@ -320,19 +427,11 @@ void caf_co_sum(CFI_cdesc_t* a_desc, int result_image, size_t num_elements, gex_
     ev = gex_Coll_ReduceToAllNB(team,                 a_address, a_address, a_type, c_sizeof_a, num_elements, GEX_OP_ADD, NULL, NULL, 0);
   }
   gex_Event_Wait(ev);
+
+  if_pf(bb) narrow_to_array(a_desc, bb, num_elements);
 }
 
-bool caf_same_cfi_type(CFI_cdesc_t* a_desc, CFI_cdesc_t* b_desc)
-{
-  if (a_desc->type == b_desc->type) return true;
-  return false;
-}
-
-size_t caf_elem_len(CFI_cdesc_t* a_desc)
-{
-  return a_desc->elem_len;
-}
-
+//-------------------------------------------------------------------
 void caf_form_team(gex_TM_t current_team, gex_TM_t* new_team, int64_t team_number, int new_index)
 {
    // GASNet color argument is int (32-bit), check for value truncation:
@@ -340,28 +439,3 @@ void caf_form_team(gex_TM_t current_team, gex_TM_t* new_team, int64_t team_numbe
   gex_TM_Split(new_team, current_team, team_number, new_index, NULL, 0, GEX_FLAG_TM_NO_SCRATCH);
 }
 
-bool caf_numeric_type(CFI_cdesc_t* a_desc)
-{
-  switch (a_desc->type)
-  {
-    case CFI_type_int32_t:          return true;
-    case CFI_type_int64_t:          return true;
-    case CFI_type_float:            return true;
-    case CFI_type_double:           return true;
-    case float_Complex_workaround:  return true;
-    case double_Complex_workaround: return true;
-    default:                        return false;
-  }
-}
-
-#ifdef __GNUC__
-bool caf_is_f_string(CFI_cdesc_t* a_desc){
-  if ( (a_desc->type - 5) % 256 == 0) return true;
-  return false;
-}
-#else // The code below is untested but believed to conform with the Fortran 2018 standard.
-bool caf_is_f_string(CFI_cdesc_t* a_desc){
-  if (a_desc->type == CFI_type_char) return true;
-  return false;
-}
-#endif

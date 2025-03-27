@@ -195,17 +195,17 @@ in the following sections.
 ---
 
 ## Collectives
-### Support = partial (...)
+### Support = **YES**
 
 | Procedure | Status | Notes |
 |-----------|--------|-------|
-| `prif_co_broadcast` | **YES** |  |
-| `prif_co_max`       | *partial* | only supports 32-bit and 64-bit numeric types |
-| `prif_co_max_character` | no | procedure not yet added to Caffeine |
-| `prif_co_min`       | *partial* | only supports 32-bit and 64-bit numeric types |
-| `prif_co_min_character` | no | procedure not yet added to Caffeine |
-| `prif_co_sum`       | *partial* | only supports 32-bit and 64-bit numeric types |
-| `prif_co_reduce`    | *partial* | only supports intrinsic types (no support for derived types), interface not yet updated to v0.5 |
+| `prif_co_broadcast`     | **YES** |  |
+| `prif_co_max`           | **YES** |  |
+| `prif_co_max_character` | **YES** |  |
+| `prif_co_min`           | **YES** |  |
+| `prif_co_min_character` | **YES** |  |
+| `prif_co_sum`           | **YES** |  |
+| `prif_co_reduce`        | **YES** |  |
 
 ---
 
