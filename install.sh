@@ -14,6 +14,7 @@ USAGE:
  --prefix=PREFIX    Install library into 'PREFIX' directory
  --prereqs          Display a list of prerequisite software.
                     Default prefix='\$HOME/.local/bin'
+ --verbose          Show verbose build commands
 
 All unrecognized arguments will be passed to GASNet's configure.
 
@@ -41,6 +42,7 @@ EOF
 
 GCC_VERSION=${GCC_VERSION:=14}
 GASNET_VERSION="stable"
+VERBOSE=""
 
 list_prerequisites()
 {
@@ -79,6 +81,10 @@ while [ "$1" != "" ]; do
             ;;
         --prefix)
             PREFIX=$VALUE
+            ;;
+        --verbose)
+            VERBOSE="--verbose"
+            set -x
             ;;
         *)
             # We pass the unmodified argument to GASNet configure
@@ -452,7 +458,7 @@ fi
 EOF
 chmod u+x $RUN_FPM_SH
 
-./$RUN_FPM_SH build
+./$RUN_FPM_SH build $VERBOSE
 
 cat << EOF
 
