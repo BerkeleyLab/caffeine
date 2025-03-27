@@ -9,6 +9,7 @@ submodule(prif:prif_private_s) allocation_s
       c_f_pointer, &
       c_f_procpointer, &
       c_loc, &
+      c_null_ptr, &
       c_null_funptr
 
   implicit none
@@ -54,6 +55,7 @@ contains
     coarray_handle%info%lcobounds(1:size(lcobounds)) = lcobounds
     coarray_handle%info%ucobounds(1:size(ucobounds)) = ucobounds
     call add_to_team_list(coarray_handle)
+    coarray_handle%info%reserved = c_null_ptr
     coarray_handle%info%p_context_data = c_loc(coarray_handle%info%reserved)
 
     allocated_memory = coarray_handle%info%coarray_data
