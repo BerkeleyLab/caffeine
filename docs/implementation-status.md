@@ -66,25 +66,25 @@ in the following sections.
 ---
 
 ## Storage Management
-### Support = partial (no support for coarray aliases)
+### Support = partial
 
 | Procedure | Status | Notes |
 |-----------|--------|-------|
 | `prif_allocate_coarray`    | **YES** |  |
-| `prif_allocate`    | **YES** |  |
-| `prif_deallocate_coarray`    | *partial* | no `final_func` arg support |
-| `prif_deallocate`    | **YES** |  |
-| `prif_alias_create`    | no |  |
-| `prif_alias_destroy`    | no |  |
+| `prif_allocate`            | **YES** |  |
+| `prif_deallocate_coarray`  | *partial* | no `final_func` arg support |
+| `prif_deallocate`          | **YES** |  |
+| `prif_alias_create`        | **YES** |  |
+| `prif_alias_destroy`       | **YES** |  |
 
 ---
 
 ## Coarray Queries
-### Support = partial (only support for `prif_image_index`)
+### Support = partial
 
 | Procedure | Status | Notes |
 |-----------|--------|-------|
-| `prif_set_context_data`, `prif_get_context_data` | no |  |
+| `prif_set_context_data`, `prif_get_context_data` | **YES** |  |
 | `prif_size_bytes`                                | **YES** |  |
 | `prif_lcobound_no_dim`, `prif_lcobound_with_dim` | **YES** |  |
 | `prif_ucobound_no_dim`, `prif_ucobound_with_dim` | **YES** |  |
@@ -129,7 +129,7 @@ in the following sections.
 ---
 
 ## SYNC Statements
-### Support = partial ( only support for `prif_sync_all`)
+### Support = partial
 
 | Procedure | Status | Notes |
 |-----------|--------|-------|
