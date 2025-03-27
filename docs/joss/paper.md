@@ -102,8 +102,8 @@ developed:
 7. Rice University Coarray Fortran compiler [@rice-caf-compiler], and
 8. University of Houston OpenUH compiler [@chapman2013experiences; @ge-2016].
 
-One can view each of these along several axes from open- to closed-source, from
-portable to hardware-specific, from research artifact to production-ready, and from
+One can view these along several axes: open- to closed-source,
+portable to hardware-specific, research artifact to production-ready, and
 dormant to actively developed.  One can also categorize each runtime in terms of
 the choice of communication substrate and the ability to switch substrates.  In
 each measure, Caffeine stands apart from some or all the other compilers.
