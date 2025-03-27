@@ -17,18 +17,34 @@ jobs:
         include:
           - os: ubuntu-24.04
             compiler: flang
-            version: new
+            version: 20
             CC: clang
             CXX: clang++
-            container: gmao/llvm-flang:latest
+            # https://hub.docker.com/r/phhargrove/llvm-flang/tags
+            container: phhargrove/llvm-flang:20.1.0-1
             SUBJOB_PREFIX: GASNET_PSHM_NODES=2
+          - os: ubuntu-24.04
+            compiler: flang
+            version: 19
+            CC: clang
+            CXX: clang++
+            # https://hub.docker.com/r/phhargrove/llvm-flang/tags
+            container: phhargrove/llvm-flang:19.1.1-1
+            SUBJOB_PREFIX: GASNET_PSHM_NODES=2
+#          - os: ubuntu-24.04
+#            compiler: flang
+#            version: new
+#            CC: clang
+#            CXX: clang++
+#            container: gmao/llvm-flang:latest
+#            SUBJOB_PREFIX: GASNET_PSHM_NODES=2
 
     container:
       image: ${{ matrix.container }}
 
     env:
       GCC_VERSION: ${{ matrix.version }}
-      FC: ${{ matrix.compiler }}-${{ matrix.version }}
+      FC: ${{ matrix.compiler }}
       CC: ${{ matrix.CC }}
       CXX: ${{ matrix.CXX }}
       PREFIX: install
@@ -48,7 +64,7 @@ jobs:
         sudo apt install -y build-essential gfortran-${GCC_VERSION} g++-${GCC_VERSION} pkg-config make
 
     - name: Install Ubuntu Container Dependencies
-      if: ${{ contains(matrix.os, 'ubuntu') && matrix.container != '' }}
+      if: ${{ contains(matrix.os, 'ubuntu') && contains(matrix.container, 'gmao') }}
       run: |
         set -x
         apt update
@@ -62,6 +78,11 @@ jobs:
     - name: Setup Compilers
       run: |
         set -x
+        if test "$FC" = "flang" ; then \
+          echo "FC=flang-new" >> "$GITHUB_ENV" ; \
+        else \
+          echo "FC=gfortran-${GCC_VERSION}" >> "$GITHUB_ENV" ; \
+        fi
         if test "$CC" = "gcc" ; then echo "CC=gcc-${GCC_VERSION}" >> "$GITHUB_ENV" ; fi
         if test "$CXX" = "g++" ; then echo "CXX=g++-${GCC_VERSION}" >> "$GITHUB_ENV" ; fi
 
