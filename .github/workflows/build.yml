@@ -1,0 +1,112 @@
+name: Build
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    name: ${{ matrix.compiler }}-${{ matrix.version }} (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-13, macos-14, ubuntu-24.04]
+        compiler: [ gfortran ]
+        version: [ 13, 14 ]
+        CC: [ gcc ]
+        CXX: [ g++ ]
+        include:
+          - os: ubuntu-24.04
+            compiler: flang
+            version: new
+            CC: clang
+            CXX: clang++
+            container: gmao/llvm-flang:latest
+            SUBJOB_PREFIX: GASNET_PSHM_NODES=2
+
+    container:
+      image: ${{ matrix.container }}
+
+    env:
+      GCC_VERSION: ${{ matrix.version }}
+      FC: ${{ matrix.compiler }}-${{ matrix.version }}
+      CC: ${{ matrix.CC }}
+      CXX: ${{ matrix.CXX }}
+      PREFIX: install
+      GASNET_CONFIGURE_ARGS: --enable-rpath --enable-debug
+      GASNET_PSHM_NODES: 8
+      SUBJOB_PREFIX: ${{ matrix.SUBJOB_PREFIX }}
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v1
+
+    - name: Install Ubuntu Native Dependencies
+      if: ${{ contains(matrix.os, 'ubuntu') && matrix.container == '' }}
+      run: |
+        set -x
+        sudo apt update
+        sudo apt install -y build-essential gfortran-${GCC_VERSION} g++-${GCC_VERSION} pkg-config make
+
+    - name: Install Ubuntu Container Dependencies
+      if: ${{ contains(matrix.os, 'ubuntu') && matrix.container != '' }}
+      run: |
+        set -x
+        apt update
+        apt install -y build-essential pkg-config make
+
+    - name: Install macOS Dependencies
+      if: contains(matrix.os, 'macos') && 0
+      run: |
+        set -x
+
+    - name: Setup Compilers
+      run: |
+        set -x
+        if test "$CC" = "gcc" ; then echo "CC=gcc-${GCC_VERSION}" >> "$GITHUB_ENV" ; fi
+        if test "$CXX" = "g++" ; then echo "CXX=g++-${GCC_VERSION}" >> "$GITHUB_ENV" ; fi
+
+    - name: Setup FPM
+      uses: fortran-lang/setup-fpm@main
+      if: ${{ matrix.os != 'macos-14' }}
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Build FPM
+      if: ${{ matrix.os == 'macos-14' }} # no arm64 fpm distro, build from source
+      run: |
+        set -x
+        curl --retry 5 -LOsS https://github.com/fortran-lang/fpm/releases/download/v0.11.0/fpm-0.11.0.F90
+        mkdir fpm-temp
+        gfortran-14 -o fpm-temp/fpm fpm-0.11.0.F90
+        echo "PATH=${PWD}/fpm-temp:${PATH}" >> "$GITHUB_ENV"
+
+    - name: Version info
+      run: |
+        echo == TOOL VERSIONS ==
+        set -x
+        uname -a
+        if test -r /etc/os-release ; then cat /etc/os-release ; fi
+        ${FC} --version
+        ${CC} --version
+        ${CXX} --version
+        fpm --version
+
+    - name: Build Caffeine (install.sh)
+      run: |
+        echo "FC=${FC} CC=${CC} CXX=${CXX}"
+        set -x
+        ./install.sh --prefix=${PREFIX}
+
+    - name: Run examples
+      run: |
+        set -x
+        ./build/run-fpm.sh run --verbose --example hello
+        ./build/run-fpm.sh run --verbose --example stop_with_no_code
+        ( set +e ; ./build/run-fpm.sh run --verbose --example stop_with_integer_code ; test $? = 99 )
+        ( set +e ; ./build/run-fpm.sh run --verbose --example error_stop_with_integer_code ; test $? = 100 )
+
+    - name: Run unit tests
+      run: |
+        set -x
+        ./build/run-fpm.sh test --verbose -- -d
+
