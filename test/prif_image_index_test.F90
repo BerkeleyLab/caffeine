@@ -24,11 +24,12 @@ contains
 
         type(prif_coarray_handle) :: coarray_handle
         type(c_ptr) :: allocated_memory
-        integer(c_int) :: answer
+        integer(c_int) :: answer, ni
+        call prif_num_images(num_images=ni)
 
         call prif_allocate_coarray( &
                 lcobounds = [1_c_int64_t], &
-                ucobounds = [2_c_int64_t], &
+                ucobounds = [ni+2_c_int64_t], &
                 size_in_bytes = 1_c_size_t, &
                 final_func = c_null_funptr, &
                 coarray_handle = coarray_handle, &
@@ -43,11 +44,12 @@ contains
 
         type(prif_coarray_handle) :: coarray_handle
         type(c_ptr) :: allocated_memory
-        integer(c_int) :: answer
+        integer(c_int) :: answer, ni
+        call prif_num_images(num_images=ni)
 
         call prif_allocate_coarray( &
                 lcobounds = [2_c_int64_t, 3_c_int64_t], &
-                ucobounds = [3_c_int64_t, 4_c_int64_t], &
+                ucobounds = [3_c_int64_t, ni+4_c_int64_t], &
                 size_in_bytes = 1_c_size_t, &
                 final_func = c_null_funptr, &
                 coarray_handle = coarray_handle, &
@@ -62,11 +64,12 @@ contains
 
         type(prif_coarray_handle) :: coarray_handle
         type(c_ptr) :: allocated_memory
-        integer(c_int) :: answer
+        integer(c_int) :: answer, ni
+        call prif_num_images(num_images=ni)
 
         call prif_allocate_coarray( &
                 lcobounds = [-2_c_int64_t, 2_c_int64_t], &
-                ucobounds = [2_c_int64_t, 6_c_int64_t], &
+                ucobounds = [2_c_int64_t, ni+6_c_int64_t], &
                 size_in_bytes = 1_c_size_t, &
                 final_func = c_null_funptr, &
                 coarray_handle = coarray_handle, &
@@ -82,11 +85,11 @@ contains
         type(prif_coarray_handle) :: coarray_handle
         type(c_ptr) :: allocated_memory
         integer(c_int) :: answer, ni
-
         call prif_num_images(num_images=ni)
+
         call prif_allocate_coarray( &
                 lcobounds = [1_c_int64_t, 2_c_int64_t], &
-                ucobounds = [2_c_int64_t, 3_c_int64_t], &
+                ucobounds = [2_c_int64_t, ni+3_c_int64_t], &
                 size_in_bytes = 1_c_size_t, &
                 final_func = c_null_funptr, &
                 coarray_handle = coarray_handle, &
