@@ -9,7 +9,6 @@ submodule(prif:prif_private_s) allocation_s
       c_f_pointer, &
       c_f_procpointer, &
       c_loc, &
-      c_null_ptr, &
       c_null_funptr
 
   implicit none
@@ -26,6 +25,9 @@ contains
     integer(c_size_t) :: descriptor_size, total_size
     type(prif_coarray_descriptor) :: unused
     type(prif_coarray_descriptor), pointer :: unused2(:)
+
+    call_assert(size(lcobounds) == size(ucobounds))
+    call_assert(product(ucobounds - lcobounds + 1) >= current_team%info%num_images)
 
     me = current_team%info%this_image
     if (caf_have_child_teams()) then
