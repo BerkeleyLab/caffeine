@@ -3,8 +3,9 @@ module caf_allocate_test
       prif_allocate_coarray, prif_deallocate_coarray, &
       prif_allocate, prif_deallocate, &
       prif_coarray_handle, prif_num_images, prif_size_bytes, &
-      prif_set_context_data, prif_get_context_data
-  use veggies, only: result_t, test_item_t, assert_that, assert_equals, describe, it
+      prif_set_context_data, prif_get_context_data, prif_local_data_pointer, &
+      prif_alias_create, prif_alias_destroy
+  use veggies, only: result_t, test_item_t, assert_that, assert_equals, describe, it, succeed
   use iso_c_binding, only: &
       c_ptr, c_int, c_int64_t, c_size_t, c_funptr, c_null_funptr, &
       c_f_pointer, c_null_ptr, c_loc, c_sizeof, c_associated
@@ -96,6 +97,46 @@ contains
     call prif_deallocate(c_loc(local_slice))
   end function
 
+  function assert_aliased(h1, h2) result(result_)
+    type(result_t) :: result_
+    type(prif_coarray_handle) :: h1, h2
+    type(c_ptr) :: p1, p2
+    integer(c_size_t) :: s1, s2
+    type(c_ptr) :: c1, c2, cx
+    integer, save, target :: dummy(10)
+    integer, save :: di = 1
+
+    result_ = succeed("")
+
+    call prif_local_data_pointer(h1, p1)
+    call prif_local_data_pointer(h2, p2)
+    result_ = result_ .and. &
+      assert_that(c_associated(p1, p2))
+
+    call prif_size_bytes(h1, s1)
+    call prif_size_bytes(h2, s2)
+    result_ = result_ .and. &
+      assert_equals(int(s1), int(s2))
+
+    cx = c_loc(dummy(di))
+    di = mod(di,size(dummy)) + 1
+
+    call prif_set_context_data(h1, cx)
+    call prif_get_context_data(h1, c1)
+    result_ = result_ .and. &
+      assert_that(c_associated(c1, cx))
+
+    call prif_get_context_data(h2, c2)
+    result_ = result_ .and. &
+      assert_that(c_associated(c2, cx))
+
+    call prif_set_context_data(h2, c_null_ptr)
+    call prif_get_context_data(h1, c1)
+    result_ = result_ .and. &
+      assert_that(.not. c_associated(c1))
+
+  end function
+
   function check_allocate_integer_array_coarray_with_corank2() result(result_)
     type(result_t) :: result_
 
@@ -147,6 +188,36 @@ contains
         call prif_get_context_data(coarray_handle, actual)
         result_ = result_ .and. &
           assert_that(c_associated(expect, actual), "prif_{set,get}_context_data are working")
+      end do
+    end block
+
+    block ! check aliasing creation
+      integer i, j
+      integer, parameter :: lim = 10
+      type(prif_coarray_handle) :: a(lim)
+      integer(c_int64_t) :: lco(1), uco(1)
+      a(1) = coarray_handle
+      do i=2, lim
+        lco(1) = i
+        uco(1) = i + num_imgs
+        call prif_alias_create(a(i-1), lco, uco, a(i))
+        result_ = result_ .and. &
+          assert_aliased(a(i-1), a(i)) 
+        do j = i+1,lim
+          lco(1) = j
+          uco(1) = j + num_imgs
+          call prif_alias_create(a(i), lco, uco, a(j))
+          result_ = result_ .and. &
+            assert_aliased(a(i), a(j)) 
+          result_ = result_ .and. &
+            assert_aliased(a(j), coarray_handle) 
+        end do
+        do j = i+1,lim
+          call prif_alias_destroy(a(j))
+        end do
+      end do
+      do i=2, lim
+        call prif_alias_destroy(a(i))
       end do
     end block
 
