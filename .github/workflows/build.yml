@@ -116,7 +116,7 @@ jobs:
       run: |
         echo "FC=${FC} CC=${CC} CXX=${CXX}"
         set -x
-        ./install.sh --prefix=${PREFIX}
+        ./install.sh --prefix=${PREFIX} --verbose
 
     - name: Run examples
       run: |
