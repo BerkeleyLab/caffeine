@@ -28,6 +28,7 @@ jobs:
             version: 19
             CC: clang
             CXX: clang++
+            FFLAGS: -mmlir -allow-assumed-rank
             # https://hub.docker.com/r/phhargrove/llvm-flang/tags
             container: phhargrove/llvm-flang:19.1.1-1
             SUBJOB_PREFIX: GASNET_PSHM_NODES=2
@@ -47,6 +48,7 @@ jobs:
       FC: ${{ matrix.compiler }}
       CC: ${{ matrix.CC }}
       CXX: ${{ matrix.CXX }}
+      FFLAGS: ${{ matrix.FFLAGS }}
       PREFIX: install
       GASNET_CONFIGURE_ARGS: --enable-rpath --enable-debug
       GASNET_PSHM_NODES: 8
@@ -114,12 +116,14 @@ jobs:
 
     - name: Build Caffeine (install.sh)
       run: |
-        echo "FC=${FC} CC=${CC} CXX=${CXX}"
+        for var in FC CC CXX FFLAGS CPPFLAGS CFLAGS LDFLAGS LIBS GASNET_CONFIGURE_ARGS ; do \
+            eval echo "$var=\$$var"; done
         set -x
         ./install.sh --prefix=${PREFIX} --verbose
 
     - name: Run examples
       run: |
+        echo GASNET_PSHM_NODES=${GASNET_PSHM_NODES}
         set -x
         ./build/run-fpm.sh run --verbose --example hello
         ./build/run-fpm.sh run --verbose --example stop_with_no_code
@@ -128,6 +132,8 @@ jobs:
 
     - name: Run unit tests
       run: |
+        echo GASNET_PSHM_NODES=${GASNET_PSHM_NODES}
+        echo SUBJOB_PREFIX=${SUBJOB_PREFIX}
         set -x
         ./build/run-fpm.sh test --verbose -- -d
 
