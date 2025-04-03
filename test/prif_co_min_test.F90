@@ -159,7 +159,10 @@ contains
         my_val = values(mod(me-1, size(values))+1)
         call prif_co_min_character(my_val)
 
-        expected = minval([(values(mod(i-1,size(values))+1), i = 1, ni)])
+        ! issue #205: workaround flang optimizer bug with a temp
+        associate(tmp => [(values(mod(i-1,size(values))+1), i = 1, ni)])
+          expected = minval(tmp)
+        end associate
         result_ = assert_equals(expected, my_val)
     end function
 
