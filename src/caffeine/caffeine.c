@@ -212,7 +212,7 @@ void caf_co_reduce(
   assert(num_elements > 0);
   assert(user_op);
 #if PLATFORM_COMPILER_GNU
-  // gfortran 13.2 c_funloc is non-compliant
+  // gfortran 13.2 & 14 - c_funloc is non-compliant
   // it erroneously generates a non-callable pointer to a pointer to the subroutine
   // Here we undo that incorrect extra level of indirection
   user_op = *(gex_Coll_ReduceFn_t *)user_op; 
@@ -250,7 +250,7 @@ void caf_co_broadcast(CFI_cdesc_t * a_desc, int source_image, int num_elements, 
 // Typed computational collective subroutines
 //-------------------------------------------------------------------
 
-// Convert CFI_cdesc_t to the corresponding GEX reduction data type
+// Convert CFI_type_t to the corresponding GEX reduction data type
 // returns the size of the native type
 static size_t CFI_to_GEX_DT(CFI_type_t cfi_type, gex_DT_t *gex_dt, int *complex_scale) {
   assert(gex_dt);
