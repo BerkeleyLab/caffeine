@@ -1,3 +1,8 @@
+! Copyright (c), The Regents of the University of California
+! Terms of use are as specified in LICENSE.txt
+
+#include "assert_macros.h"
+
 submodule(prif:prif_private_s)  co_broadcast_s
 
   implicit none
@@ -5,6 +10,7 @@ submodule(prif:prif_private_s)  co_broadcast_s
 contains
 
   module procedure prif_co_broadcast
+    call_assert(source_image >= 1 .and. source_image <= current_team%info%num_images)
     call contiguous_co_broadcast(a, source_image, stat, errmsg, errmsg_alloc)
   end procedure
 

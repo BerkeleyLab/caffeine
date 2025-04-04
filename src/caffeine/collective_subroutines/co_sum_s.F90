@@ -1,5 +1,8 @@
 ! Copyright (c), The Regents of the University of California
 ! Terms of use are as specified in LICENSE.txt
+
+#include "assert_macros.h"
+
 submodule(prif:prif_private_s) co_sum_s
 
   implicit none
@@ -7,6 +10,9 @@ submodule(prif:prif_private_s) co_sum_s
 contains
 
   module procedure prif_co_sum
+    if (present(result_image)) then
+      call_assert(result_image >= 1 .and. result_image <= current_team%info%num_images)
+    endif
     call contiguous_co_sum(a, result_image, stat, errmsg, errmsg_alloc)
   end procedure
 

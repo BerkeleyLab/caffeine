@@ -1,5 +1,8 @@
 ! Copyright (c), The Regents of the University of California
 ! Terms of use are as specified in LICENSE.txt
+
+#include "assert_macros.h"
+
 submodule(prif:prif_private_s) co_max_s
   use iso_c_binding, only: c_loc, c_f_pointer
   implicit none
@@ -7,6 +10,9 @@ submodule(prif:prif_private_s) co_max_s
 contains
 
   module procedure prif_co_max
+    if (present(result_image)) then
+      call_assert(result_image >= 1 .and. result_image <= current_team%info%num_images)
+    endif
     call contiguous_co_max(a, result_image, stat, errmsg, errmsg_alloc)
   end procedure
 

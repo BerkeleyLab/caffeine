@@ -16,6 +16,10 @@ contains
     integer(c_int), intent(out), optional :: stat
     character(len=*), intent(inout), optional :: errmsg
     character(len=:), intent(inout), allocatable, optional :: errmsg_alloc
+    if (present(result_image)) then
+      call_assert(result_image >= 1 .and. result_image <= current_team%info%num_images)
+    endif
+    call_assert_describe(associated(operation_wrapper), "prif_co_reduce: associated(operation_wrapper)")
     call contiguous_co_reduce(a, operation_wrapper, cdata, result_image, stat, errmsg, errmsg_alloc)
   end subroutine
 
@@ -30,7 +34,6 @@ contains
     type(c_funptr) :: funptr 
 
     if (present(stat)) stat=0
-    call_assert_describe(associated(operation_wrapper), "prif_co_reduce: associated(operation_wrapper)")
 
     funptr = c_funloc(operation_wrapper)
     call_assert(c_associated(funptr))
