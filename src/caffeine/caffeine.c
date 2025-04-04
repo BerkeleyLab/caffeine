@@ -29,14 +29,6 @@ static gex_TM_t myworldteam;
 typedef void(*final_func_ptr)(void*, size_t) ;
 typedef uint8_t byte;
 
-#if PLATFORM_COMPILER_GNU && PLATFORM_COMPILER_VERSION_LT(12,0,0)
-  #define float_Complex_workaround  2052
-  #define double_Complex_workaround 4100
-#else
-  #define float_Complex_workaround  CFI_type_float_Complex
-  #define double_Complex_workaround CFI_type_double_Complex
-#endif
-
 // ---------------------------------------------------
 int caf_this_image(gex_TM_t gex_team)
 {
@@ -263,11 +255,11 @@ static size_t CFI_to_GEX_DT(CFI_type_t cfi_type, gex_DT_t *gex_dt, int *complex_
     case CFI_type_double:           *gex_dt = GEX_DT_DBL; return 8;
 
     // complex cases
-    case float_Complex_workaround:  *gex_dt = GEX_DT_FLT; 
+    case CFI_type_float_Complex:  *gex_dt = GEX_DT_FLT; 
       if (!complex_scale) gasnett_fatalerror("This operation does not support complex types");
       *complex_scale = 2;
       return 8;
-    case double_Complex_workaround: *gex_dt = GEX_DT_DBL; 
+    case CFI_type_double_Complex: *gex_dt = GEX_DT_DBL; 
       if (!complex_scale) gasnett_fatalerror("This operation does not support complex types");
       *complex_scale = 2;
       return 16;
