@@ -343,92 +343,55 @@ static void narrow_to_array(CFI_cdesc_t* a_desc, int64_t *src, size_t num_elemen
   free(src);
 }
 
-void caf_co_max(CFI_cdesc_t* a_desc, int result_image, size_t num_elements, gex_TM_t team) {
-  gex_DT_t a_type;
-  size_t elem_sz = CFI_to_GEX_DT(a_desc->type, &a_type, NULL);
+GASNETT_INLINE(caf_co_common)
+void caf_co_common(CFI_cdesc_t* a_desc, int result_image, size_t num_elements, gex_TM_t team, gex_OP_t g_op) {
 
-  int64_t * bb = NULL;
-  void * a_address =  a_desc->base_addr;
-  size_t c_sizeof_a = a_desc->elem_len;
-  assert(c_sizeof_a == elem_sz);
+  int complex_scale = 1;
+  gex_DT_t g_dt;
+  size_t elem_sz = CFI_to_GEX_DT(a_desc->type, &g_dt, 
+                                 (g_op == GEX_OP_ADD ? &complex_scale : NULL));
 
-  if_pf(elem_sz < 4) {
-    bb = widen_from_array(a_desc, num_elements);
-    assert(a_type == GEX_DT_I64);
-    c_sizeof_a = 8;
-    a_address = bb;
+  int64_t * bounce_buffer = NULL;
+  void * g_addr =  a_desc->base_addr;
+  size_t g_elem_sz = a_desc->elem_len;
+  assert(g_elem_sz == elem_sz);
+
+  if_pf (complex_scale != 1) { // complex input, only permitted in prif_co_sum
+    assert(g_op == GEX_OP_ADD);
+    assert(complex_scale == 2);
+    assert(g_elem_sz == 8 || g_elem_sz == 16);
+    g_elem_sz >>= 1;
+    num_elements <<= 1; 
+  } else if_pf(elem_sz < 4) {
+    bounce_buffer = widen_from_array(a_desc, num_elements);
+    assert(g_dt == GEX_DT_I64);
+    g_elem_sz = 8;
+    g_addr = bounce_buffer;
   }
 
   gex_Event_t ev;
   if (result_image) {
-    ev = gex_Coll_ReduceToOneNB(team, result_image-1, a_address, a_address, a_type, c_sizeof_a, num_elements, GEX_OP_MAX, NULL, NULL, 0);
+    ev = gex_Coll_ReduceToOneNB(team, result_image-1, g_addr, g_addr, g_dt, g_elem_sz, num_elements, g_op, NULL, NULL, 0);
   } else {
-    ev = gex_Coll_ReduceToAllNB(team,                 a_address, a_address, a_type, c_sizeof_a, num_elements, GEX_OP_MAX, NULL, NULL, 0);
+    ev = gex_Coll_ReduceToAllNB(team,                 g_addr, g_addr, g_dt, g_elem_sz, num_elements, g_op, NULL, NULL, 0);
   }
   gex_Event_Wait(ev);
 
-  if_pf(bb) narrow_to_array(a_desc, bb, num_elements);
+  if_pf(bounce_buffer) narrow_to_array(a_desc, bounce_buffer, num_elements);
+}
+
+
+
+void caf_co_max(CFI_cdesc_t* a_desc, int result_image, size_t num_elements, gex_TM_t team) {
+  caf_co_common(a_desc, result_image, num_elements, team, GEX_OP_MAX);
 }
 
 void caf_co_min(CFI_cdesc_t* a_desc, int result_image, size_t num_elements, gex_TM_t team) {
-  gex_DT_t a_type;
-  size_t elem_sz = CFI_to_GEX_DT(a_desc->type, &a_type, NULL);
-
-  int64_t * bb = NULL;
-  void * a_address =  a_desc->base_addr;
-  size_t c_sizeof_a = a_desc->elem_len;
-  assert(c_sizeof_a == elem_sz);
-
-  if_pf(elem_sz < 4) {
-    bb = widen_from_array(a_desc, num_elements);
-    assert(a_type == GEX_DT_I64);
-    c_sizeof_a = 8;
-    a_address = bb;
-  }
-
-  gex_Event_t ev;
-  if (result_image) {
-    ev = gex_Coll_ReduceToOneNB(team, result_image-1, a_address, a_address, a_type, c_sizeof_a, num_elements, GEX_OP_MIN, NULL, NULL, 0);
-  } else {
-    ev = gex_Coll_ReduceToAllNB(team,                 a_address, a_address, a_type, c_sizeof_a, num_elements, GEX_OP_MIN, NULL, NULL, 0);
-  }
-  gex_Event_Wait(ev);
-
-  if_pf(bb) narrow_to_array(a_desc, bb, num_elements);
+  caf_co_common(a_desc, result_image, num_elements, team, GEX_OP_MIN);
 }
 
 void caf_co_sum(CFI_cdesc_t* a_desc, int result_image, size_t num_elements, gex_TM_t team) {
-  gex_DT_t a_type;
-  int complex_scale;
-  size_t elem_sz = CFI_to_GEX_DT(a_desc->type, &a_type, &complex_scale);
-
-  int64_t * bb = NULL;
-  void * a_address =  a_desc->base_addr;
-  size_t c_sizeof_a = a_desc->elem_len;
-  assert(c_sizeof_a == elem_sz);
-
-  if_pf (complex_scale != 1) {
-    assert(complex_scale == 2);
-    assert(c_sizeof_a == 8 || c_sizeof_a == 16);
-    c_sizeof_a >>= 1;
-    num_elements <<= 1; 
-  } else if_pf(elem_sz < 4) {
-    bb = widen_from_array(a_desc, num_elements);
-    assert(a_type == GEX_DT_I64);
-    c_sizeof_a = 8;
-    a_address = bb;
-  }
-
-  gex_Event_t ev;
-
-  if (result_image) {
-    ev = gex_Coll_ReduceToOneNB(team, result_image-1, a_address, a_address, a_type, c_sizeof_a, num_elements, GEX_OP_ADD, NULL, NULL, 0);
-  } else {
-    ev = gex_Coll_ReduceToAllNB(team,                 a_address, a_address, a_type, c_sizeof_a, num_elements, GEX_OP_ADD, NULL, NULL, 0);
-  }
-  gex_Event_Wait(ev);
-
-  if_pf(bb) narrow_to_array(a_desc, bb, num_elements);
+  caf_co_common(a_desc, result_image, num_elements, team, GEX_OP_ADD);
 }
 
 //-------------------------------------------------------------------
