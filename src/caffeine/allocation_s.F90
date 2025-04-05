@@ -26,6 +26,9 @@ contains
     type(prif_coarray_descriptor) :: unused
     type(prif_coarray_descriptor), pointer :: unused2(:)
 
+    call_assert(size(lcobounds) == size(ucobounds))
+    call_assert(product(ucobounds - lcobounds + 1) >= current_team%info%num_images)
+
     me = current_team%info%this_image
     if (caf_have_child_teams()) then
       ! Free the child team space to make sure we have space to allocate the coarray
@@ -54,6 +57,8 @@ contains
     coarray_handle%info%lcobounds(1:size(lcobounds)) = lcobounds
     coarray_handle%info%ucobounds(1:size(ucobounds)) = ucobounds
     call add_to_team_list(coarray_handle)
+    coarray_handle%info%reserved = c_null_ptr
+    coarray_handle%info%p_context_data = c_loc(coarray_handle%info%reserved)
 
     allocated_memory = coarray_handle%info%coarray_data
     if (caf_have_child_teams()) then

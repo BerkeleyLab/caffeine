@@ -4,6 +4,8 @@
 #include "assert_macros.h"
 
 submodule(prif:prif_private_s) coarray_queries_s
+  use iso_c_binding, only: &
+      c_f_pointer
 
   implicit none
 
@@ -98,15 +100,19 @@ contains
   end procedure
 
   module procedure prif_set_context_data
+    type(c_ptr), pointer :: array_context_data
     call_assert(coarray_handle_check(coarray_handle))
 
-    call unimplemented("prif_set_context_data")
+    call c_f_pointer(coarray_handle%info%p_context_data, array_context_data)
+    array_context_data = context_data
   end procedure
 
   module procedure prif_get_context_data
+    type(c_ptr), pointer :: array_context_data
     call_assert(coarray_handle_check(coarray_handle))
 
-    call unimplemented("prif_get_context_data")
+    call c_f_pointer(coarray_handle%info%p_context_data, array_context_data)
+    context_data = array_context_data
   end procedure
 
   module procedure prif_size_bytes
