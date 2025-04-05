@@ -47,7 +47,7 @@ module prif
   public :: prif_atomic_ref_int, prif_atomic_ref_int_indirect, prif_atomic_ref_logical, prif_atomic_ref_logical_indirect
 
   integer(c_int), parameter, public :: PRIF_VERSION_MAJOR = 0
-  integer(c_int), parameter, public :: PRIF_VERSION_MINOR = 4
+  integer(c_int), parameter, public :: PRIF_VERSION_MINOR = 5
 
   integer(c_int), parameter, public :: PRIF_ATOMIC_INT_KIND = selected_int_kind(18)
 
