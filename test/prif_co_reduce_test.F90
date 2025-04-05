@@ -1,11 +1,28 @@
 module caf_co_reduce_test
-  use prif, only : prif_co_reduce, prif_num_images, prif_this_image_no_coarray, prif_error_stop
-  use veggies, only : result_t, test_item_t, assert_equals, describe, it, assert_that, assert_equals
-  use iso_c_binding, only : c_bool, c_funloc, c_char, c_double, c_int64_t
+  use iso_c_binding, only: c_ptr, c_funptr, c_size_t, c_f_pointer, c_f_procpointer, c_funloc, c_loc, c_null_ptr
+  use prif, only : prif_co_reduce, prif_num_images, prif_this_image_no_coarray, prif_operation_wrapper_interface
+  use veggies, only : result_t, test_item_t, assert_equals, assert_not, assert_that, describe, it, succeed
 
   implicit none
   private
   public :: test_prif_co_reduce
+
+  type :: pair
+    integer :: fst
+    real :: snd
+  end type
+
+#if HAVE_PARAM_DERIVED
+  type :: array(length)
+    integer, len :: length = 2
+    integer :: elements(length)
+  end type
+
+  type :: reduction_context_data
+    type(c_funptr) :: user_op
+    integer :: length
+  end type
+#endif
 
 contains
 
@@ -14,236 +31,189 @@ contains
 
     tests = describe( &
       "The prif_co_reduce subroutine", &
-      [ it("finds the alphabetically first length-5 string with result_image present", alphabetically_1st_size1_string_array) &
-       ,it("sums default integer scalars with no optional arguments present", sum_default_integer_scalars) &
-       ,it("sums integer(c_int64_t) scalars with no optional arguments present", sum_c_int64_t_scalars) &
-       ,it("multiplies default real scalars with all optional arguments present", multiply_default_real_scalars) &
-       ,it("multiplies real(c_double) scalars with all optional arguments present", multiply_c_double_scalars) &
-       ,it("performs a collective .and. operation across logical scalars", reports_on_consensus) &
-       ,it("sums default complex scalars with a stat-variable present", sum_default_complex_scalars) &
-       ,it("sums complex(c_double) scalars with a stat-variable present", sum_complex_c_double_scalars) &
-       ,it("sums default integer elements of a 2D array across images", sum_integer_array_elements) &
-    ])
+      [ it("can be used to implement logical and reduction", check_logical) &
+      , it("can be used for reduction on simple derived types", check_derived_type_reduction) &
+#if HAVE_PARAM_DERIVED
+      , it("can be used for reduction on derived types with length type parameters", check_type_parameter_reduction) &
+#endif
+      ])
   end function
 
-  function alphabetically_1st_size1_string_array() result(result_)
-    type(result_t) result_
-    character(len=5, kind=c_char), parameter :: names(*) = ["larry","harry","carey","betty","tommy","billy"]
-    character(len=len(names), kind=c_char) :: my_name(1)
-    character(len=len(names)) :: expected_name
-    integer :: me, num_imgs
+  function check_logical() result(result_)
+    type(result_t) :: result_
+    logical :: val
+    integer :: me
+    procedure(prif_operation_wrapper_interface), pointer :: op
+    op => and_wrapper
+
+    val = .true.
+    call prif_co_reduce(val, op, c_null_ptr)
+    result_ = assert_that(val)
 
     call prif_this_image_no_coarray(this_image=me)
-    associate(periodic_index => 1 + mod(me-1,size(names)))
-      my_name(1) = names(periodic_index)
-      call prif_co_reduce(my_name, c_funloc(alphabetize))
-    end associate
-
-    call prif_num_images(num_images=num_imgs)
-    expected_name = minval(names(1:min(num_imgs, size(names))), dim=1)
-    result_ = assert_that(all(expected_name == my_name))
-
-  contains
-
-    function alphabetize(lhs, rhs) result(first_alphabetically)
-      character(len=5), intent(in) :: lhs, rhs
-      character(len=5) :: first_alphabetically
-
-      first_alphabetically = min(lhs,rhs)
-    end function
-
+    if (me == 1) then
+      val = .false.
+    end if
+    call prif_co_reduce(val, op, c_null_ptr)
+    result_ = result_.and.assert_not(val)
   end function
 
-  function sum_integer_array_elements() result(result_)
-    type(result_t) result_
-    integer status_, num_imgs
-    integer, parameter :: input_array(*,*) = reshape([1, 2, 3, 4], [2, 2])
-    integer array(2,2)
+  subroutine and_wrapper(arg1, arg2_and_out, count, cdata) bind(C)
+    type(c_ptr), intent(in), value :: arg1, arg2_and_out
+    integer(c_size_t), intent(in), value :: count
+    type(c_ptr), intent(in), value :: cdata
 
-    array = input_array
-    call prif_co_reduce(array, c_funloc(add_integers))
-    call prif_num_images(num_images=num_imgs)
-    result_ = assert_that(all(num_imgs*input_array==array))
+    logical, pointer :: lhs(:), rhs_and_result(:)
+    integer(c_size_t) :: i
 
-  contains
+    if (count == 0) return
+    call c_f_pointer(arg1, lhs, [count])
+    call c_f_pointer(arg2_and_out, rhs_and_result, [count])
+    do i = 1, count
+      rhs_and_result(i) = lhs(i).and.rhs_and_result(i)
+    end do
+  end subroutine
 
-    pure function add_integers(lhs, rhs) result(total)
-      integer, intent(in) :: lhs, rhs
-      integer total
-      total = lhs + rhs
-    end function
+  function check_derived_type_reduction() result(result_)
+    type(result_t) :: result_
+    type(pair), parameter :: values(*,*) = reshape( &
+        [ pair(1, 53.), pair(3, 47.) &
+        , pair(5, 43.), pair(7, 41.) &
+        , pair(11, 37.), pair(13, 31.) &
+        , pair(17, 29.), pair(19, 23.) &
+        ], &
+        [2, 4])
+    integer :: me, ni, i
+    type(pair), dimension(size(values,1)) :: my_val, expected
+    type(pair), dimension(:,:), allocatable :: tmp
+    procedure(prif_operation_wrapper_interface), pointer :: op
 
-  end function
-
-  function sum_complex_c_double_scalars() result(result_)
-    type(result_t) result_
-    integer status_, num_imgs
-    complex(c_double) z
-    complex(c_double), parameter :: z_input=(1._c_double, 1._c_double)
-
-    z = z_input
-    call prif_co_reduce(z, c_funloc(add_complex), stat=status_)
-    call prif_num_images(num_images=num_imgs)
-    result_ = assert_equals(real(num_imgs*z_input, c_double), real(z, c_double)) .and. assert_equals(0, status_)
-
-  contains
-
-    pure function add_complex(lhs, rhs) result(total)
-      complex(c_double), intent(in) :: lhs, rhs
-      complex(c_double) total
-      total = lhs + rhs
-    end function
-
-  end function
-
-  function sum_default_complex_scalars() result(result_)
-    type(result_t) result_
-    integer status_, num_imgs
-    complex z
-    complex, parameter :: z_input=(1.,1.)
-
-    z = z_input
-    call prif_co_reduce(z, c_funloc(add_complex), stat=status_)
-    call prif_num_images(num_images=num_imgs)
-    result_ = assert_equals(dble(num_imgs*z_input), dble(z)) .and. assert_equals(0, status_)
-
-  contains
-
-    pure function add_complex(lhs, rhs) result(total)
-      complex, intent(in) :: lhs, rhs
-      complex total
-      total = lhs + rhs
-    end function
-
-  end function
-
-  function sum_default_integer_scalars() result(result_)
-    type(result_t) result_
-    integer i, num_imgs
-
-    i = 1
-    call prif_co_reduce(i, c_funloc(add))
-    call prif_num_images(num_images=num_imgs)
-    result_ = assert_equals(num_imgs, i)
-
-  contains
-
-    pure function add(lhs, rhs) result(total)
-      integer, intent(in) :: lhs, rhs
-      integer total
-      total = lhs + rhs
-    end function
-
-  end function
-
-  function sum_c_int64_t_scalars() result(result_)
-    type(result_t) result_
-    integer(c_int64_t) i
-    integer :: num_imgs
-
-    i = 1_c_int64_t
-    call prif_co_reduce(i, c_funloc(add))
-    call prif_num_images(num_images=num_imgs)
-    result_ = assert_that(int(num_imgs, c_int64_t)==i)
-
-  contains
-
-    pure function add(lhs, rhs) result(total)
-      integer(c_int64_t), intent(in) :: lhs, rhs
-      integer(c_int64_t) total
-      total = lhs + rhs
-    end function
-
-  end function
-
-  function reports_on_consensus() result(result_)
-    type(result_t) result_
-    logical(c_bool) one_false, one_true, all_true
-    logical(c_bool), parameter :: c_true=.true._c_bool, c_false=.false._c_bool
-    logical ans1, ans2, ans3
-    integer :: me, num_imgs
-
+    op => pair_adder
     call prif_this_image_no_coarray(this_image=me)
-    one_false = merge(c_false, c_true, me==1)
-    call prif_co_reduce(one_false, c_funloc(logical_and))
+    call prif_num_images(ni)
 
-    call prif_this_image_no_coarray(this_image=me)
-    one_true = merge(c_true, c_false, me==1)
-    call prif_co_reduce(one_true, c_funloc(logical_and))
+    my_val = values(:, mod(me-1, size(values,2))+1)
+    call prif_co_reduce(my_val, op, c_null_ptr)
 
-    all_true = c_true
-    call prif_co_reduce(all_true, c_funloc(logical_and))
-    call prif_num_images(num_images=num_imgs)
-
-    ans1 = one_false .eqv. c_false
-    ans2 = one_true  .eqv. merge(c_true,c_false,num_imgs==1)
-    ans3 = all_true  .eqv. c_true
-    result_ = assert_that(ans1) .and. &
-              assert_that(ans2) .and. &
-              assert_that(ans3)
-  contains
-
-    pure function logical_and(lhs, rhs) result(lhs_and_rhs)
-      logical(c_bool), intent(in) :: lhs, rhs
-      logical(c_bool) lhs_and_rhs
-      lhs_and_rhs = lhs .and. rhs
-    end function
-
+    allocate(tmp(size(values,1),ni))
+    tmp = reshape([(values(:, mod(i-1,size(values,2))+1), i = 1, ni)], [size(values,1),ni])
+#if defined(__GFORTRAN__)
+    ! gfortran 14 lacks the F18 intrinsic REDUCE()
+    block
+      integer :: j
+      do i = 1, size(tmp,1)
+        expected(i) = tmp(i,1)
+        do j = 2, size(tmp,2)
+          expected(i) = add_pair(expected(i), tmp(i,j))
+        end do
+      end do
+    end block
+#else
+    expected = reduce(tmp, add_pair, dim=2)
+#endif
+    result_ = &
+        assert_equals(expected%fst, my_val%fst) &
+        .and. assert_equals(real(expected%snd, kind=kind(0.d0)), real(my_val%snd, kind=kind(0.d0)))
   end function
 
-  function multiply_c_double_scalars() result(result_)
-    type(result_t) result_
-    real(c_double) p
-    integer j, status_, me, num_imgs
-    character(len=:), allocatable :: error_message
+  pure function add_pair(lhs, rhs) result(total)
+    type(pair), intent(in) :: lhs, rhs
+    type(pair) :: total
 
-    error_message = "unused"
-    call prif_this_image_no_coarray(this_image=me)
-    p = real(me,c_double)
-    call prif_co_reduce(p, c_funloc(multiply_doubles), result_image=1, stat=status_, errmsg=error_message)
-    call prif_num_images(num_images=num_imgs)
-    associate(expected_result => merge( product([(real(j,c_double), j = 1, num_imgs)]), real(me,c_double), me==1 ))
-      result_ = &
-        assert_equals(expected_result, real(p,c_double)) .and. &
-        assert_equals(0, status_) .and. &
-        assert_equals("unused", error_message)
-    end associate
-
-  contains
-
-    pure function multiply_doubles(lhs, rhs) result(product_)
-      real(c_double), intent(in) :: lhs, rhs
-      real(c_double) product_
-      product_ = lhs * rhs
-    end function
-
+    total%fst = lhs%fst + rhs%fst
+    total%snd = lhs%snd + rhs%snd
   end function
 
-  function multiply_default_real_scalars() result(result_)
-    type(result_t) result_
-    real p
-    integer j, status_, me, num_imgs
-    character(len=:), allocatable :: error_message
+  subroutine pair_adder(arg1, arg2_and_out, count, cdata) bind(C)
+    type(c_ptr), intent(in), value :: arg1, arg2_and_out
+    integer(c_size_t), intent(in), value :: count
+    type(c_ptr), intent(in), value :: cdata
 
-    error_message = "unused"
+    type(pair), pointer :: lhs(:), rhs_and_result(:)
+    integer(c_size_t) :: i
+
+    if (count == 0) return
+    call c_f_pointer(arg1, lhs, [count])
+    call c_f_pointer(arg2_and_out, rhs_and_result, [count])
+    do i = 1, count
+      rhs_and_result(i) = add_pair(lhs(i), rhs_and_result(i))
+    end do
+  end subroutine
+
+#if HAVE_PARAM_DERIVED
+! As of LLVM20, flang does not implement the types used by this test:
+! flang/lib/Lower/ConvertType.cpp:482: not yet implemented: parameterized derived types
+! error: Actual argument associated with TYPE(*) dummy argument 'a=' may not have a parameterized derived type
+
+! Gfortran 14.2 also lacks the type support for this test:
+! Error: Derived type 'pdtarray' at (1) is being used before it is defined
+
+  function check_type_parameter_reduction() result(result_)
+    type(result_t) :: result_
+    type(array), parameter :: values(*,*) = reshape( &
+        [ array(elements=[1, 53]), array(elements=[3, 47]) &
+        , array(elements=[5, 43]), array(elements=[7, 41]) &
+        , array(elements=[11, 37]), array(elements=[13, 31]) &
+        , array(elements=[17, 29]), array(elements=[19, 23]) &
+        ], &
+        [2, 4])
+    integer :: me, ni, i
+    type(array(values%length)), dimension(size(values,1)) :: my_val, expected
+    procedure(prif_operation_wrapper_interface), pointer :: op
+    type(reduction_context_data), target :: context
+
+    op => array_wrapper
+    context%user_op = c_funloc(add_array)
+    context%length = values%length
     call prif_this_image_no_coarray(this_image=me)
-    p = real(me)
-    call prif_co_reduce(p, c_funloc(multiply), result_image=1, stat=status_, errmsg=error_message)
-    call prif_num_images(num_images=num_imgs)
-    associate(expected_result => merge( product([(dble(j), j = 1, num_imgs)]), dble(me), me==1 ))
-      result_ = &
-        assert_equals(expected_result, dble(p)) .and. &
-        assert_equals(0, status_) .and. &
-        assert_equals("unused", error_message)
-    end associate
+    call prif_num_images(ni)
 
-  contains
+    my_val = values(:, mod(me-1, size(values,2))+1)
+    call prif_co_reduce(my_val, op, c_loc(context))
 
-    pure function multiply(lhs, rhs) result(product_)
-      real, intent(in) :: lhs, rhs
-      real product_
-      product_ = lhs * rhs
-    end function
-
+    expected = reduce(reshape([(values(:, mod(i-1,size(values,2))+1), i = 1, ni)], [size(values,1),ni]), add_array, dim=2)
+    do i = 1, size(expected)
+      result_ = result_.and.assert_equals(expected(i)%elements, my_val(i)%elements)
+    end do
   end function
+
+  pure function add_array(lhs, rhs) result(total)
+    type(array), intent(in) :: lhs, rhs
+    type(array) :: total
+
+    total%elements = lhs%elements + rhs%elements
+  end function
+
+  subroutine array_wrapper(arg1, arg2_and_out, count, cdata) bind(C)
+    type(c_ptr), intent(in), value :: arg1, arg2_and_out
+    integer(c_size_t), intent(in), value :: count
+    type(c_ptr), intent(in), value :: cdata
+
+    type(reduction_context_data), pointer :: context
+
+    if (count == 0) return
+    call c_f_pointer(cdata, context)
+    block
+      abstract interface
+        pure function op_interface(lhs, rhs) result(res)
+          import :: array, context
+          implicit none
+          type(array(context%length)), intent(in) :: lhs, rhs
+          type(array(context%length)) :: res
+        end function
+      end interface
+      procedure(op_interface), pointer :: op
+      type(array(context%length)), pointer :: lhs(:), rhs_and_result(:)
+      integer(c_size_t) :: i
+
+      call c_f_procpointer(context%user_op, op)
+      call c_f_pointer(arg1, lhs, [count])
+      call c_f_pointer(arg2_and_out, rhs_and_result, [count])
+      do i = 1, count
+        rhs_and_result(i) = op(lhs(i), rhs_and_result(i))
+      end do
+    end block
+  end subroutine
+#endif /* HAVE_PARAM_DERIVED */
+
 end module caf_co_reduce_test

@@ -1,6 +1,7 @@
 module caf_co_min_test
-    use prif, only : prif_co_min, prif_num_images, prif_this_image_no_coarray, prif_num_images
-    use veggies, only: result_t, test_item_t, assert_equals, describe, it, assert_that, assert_equals, succeed
+    use iso_c_binding, only: c_int8_t, c_int16_t, c_int32_t, c_int64_t, c_float, c_double
+    use prif, only : prif_co_min, prif_co_min_character, prif_this_image_no_coarray, prif_num_images
+    use veggies, only: result_t, test_item_t, assert_equals, describe, it, succeed
 
     implicit none
     private
@@ -11,137 +12,158 @@ contains
         type(test_item_t) tests
 
         tests = describe( &
-          "The prif_co_min subroutine computes the minimum", &
-          [ it("default integer scalar with stat argument present", min_default_integer_scalars) &
-           ,it("integer(c_int64_t) scalar with no optional arguments present", min_c_int64_scalars) &
-           ,it("default integer 1D array elements with no optional arguments present", min_default_integer_1D_array) &
-           ,it("default integer 7D array elements with stat argument present", min_default_integer_7D_array) &
-           ,it("default real scalars with stat argument present", min_default_real_scalars) &
-           ,it("double precision 2D array elements with no optional arguments present", min_double_precision_2D_array) &
-           ,it("length-5 string with no optional arguments", &
-               alphabetically_1st_scalar_string) &
-           ,it("elements across images with 2D arrays of strings", min_elements_in_2D_string_arrays) &
-        ])
+          "The prif_co_min subroutine computes the minimum value across images for corresponding elements for", &
+          [ it("a 1D default integer array", check_default_integer) &
+          , it("a 1D 8-bit integer array", check_8_bit_integer) &
+          , it("a 1D 16-bit integer array", check_16_bit_integer) &
+          , it("32-bit integer scalars", check_32_bit_integer) &
+          , it("a 1D 64-bit integer array", check_64_bit_integer) &
+          , it("a 2D 32-bit real array", check_32_bit_real) &
+          , it("a 1D 64-bit real array", check_64_bit_real) &
+          , it("a character scalar", check_character) &
+          ])
     end function
 
-    function min_default_integer_scalars() result(result_)
-        type(result_t) result_
-        integer i, status_, me, num_imgs
+    function check_default_integer() result(result_)
+        type(result_t) :: result_
 
-        status_ = -1
+        integer, parameter :: values(*,*) = reshape([1, -19, 5, 13, 11, 7, 17, 3], [2, 4])
+        integer :: me, ni, i
+        integer, dimension(size(values,1)) :: my_val, expected
+
         call prif_this_image_no_coarray(this_image=me)
-        i = -me
-        call prif_co_min(i, stat=status_)
-        call prif_num_images(num_images=num_imgs)
-        result_ = assert_equals(-num_imgs, i) .and. assert_equals(0, status_)
+        call prif_num_images(ni)
+
+        my_val = values(:, mod(me-1, size(values,2))+1)
+        call prif_co_min(my_val)
+
+        expected = minval(reshape([(values(:, mod(i-1,size(values,2))+1), i = 1, ni)], [size(values,1),ni]), dim=2)
+        result_ = assert_equals(int(expected), int(my_val))
     end function
 
-    function min_c_int64_scalars() result(result_)
-        use iso_c_binding, only : c_int64_t
-        type(result_t) result_
-        integer(c_int64_t) i
-        integer :: me
+    function check_8_bit_integer() result(result_)
+        type(result_t) :: result_
+
+        integer(c_int8_t), parameter :: values(*,*) = reshape(int([1, -19, 5, 13, 11, 7, 17, 3],c_int8_t), [2, 4])
+        integer :: me, ni, i
+        integer(c_int8_t), dimension(size(values,1)) :: my_val, expected
 
         call prif_this_image_no_coarray(this_image=me)
-        i = me
-        call prif_co_min(i)
-        result_ = assert_equals(1, int(i))
+        call prif_num_images(ni)
+
+        my_val = values(:, mod(me-1, size(values,2))+1)
+        call prif_co_min(my_val)
+
+        expected = minval(reshape([(values(:, mod(i-1,size(values,2))+1), i = 1, ni)], [size(values,1),ni]), dim=2)
+        result_ = assert_equals(int(expected), int(my_val))
     end function
 
-    function min_default_integer_1D_array() result(result_)
-        type(result_t) result_
-        integer i, me, num_imgs
-        integer, allocatable :: array(:)
+    function check_16_bit_integer() result(result_)
+        type(result_t) :: result_
+
+        integer(c_int16_t), parameter :: values(*,*) = reshape(int([1, -19, 5, 13, 11, 7, 17, 3],c_int16_t), [2, 4])
+        integer :: me, ni, i
+        integer(c_int16_t), dimension(size(values,1)) :: my_val, expected
 
         call prif_this_image_no_coarray(this_image=me)
-        call prif_num_images(num_images=num_imgs)
-        associate(sequence_ => me*[(i, i=1, num_imgs)])
-          array = sequence_
-          call prif_co_min(array)
-          associate(min_sequence => [(i, i=1, num_imgs)])
-            result_ = assert_that(all(min_sequence == array))
-          end associate
+        call prif_num_images(ni)
+
+        my_val = values(:, mod(me-1, size(values,2))+1)
+        call prif_co_min(my_val)
+
+        expected = minval(reshape([(values(:, mod(i-1,size(values,2))+1), i = 1, ni)], [size(values,1),ni]), dim=2)
+        result_ = assert_equals(int(expected), int(my_val))
+    end function
+
+    function check_32_bit_integer() result(result_)
+        type(result_t) :: result_
+
+        integer(c_int32_t), parameter :: values(*) = [1, -19, 5, 13, 11, 7, 17, 3]
+        integer :: me, ni, i
+        integer(c_int32_t) :: my_val, expected
+
+        call prif_this_image_no_coarray(this_image=me)
+        call prif_num_images(ni)
+
+        my_val = values(mod(me-1, size(values))+1)
+        call prif_co_min(my_val)
+
+        expected = minval([(values(mod(i-1,size(values))+1), i = 1, ni)])
+        result_ = assert_equals(expected, my_val)
+    end function
+
+    function check_64_bit_integer() result(result_)
+        type(result_t) :: result_
+
+        integer(c_int64_t), parameter :: values(*,*) = reshape([1, -19, 5, 13, 11, 7, 17, 3], [2, 4])
+        integer :: me, ni, i
+        integer(c_int64_t), dimension(size(values,1)) :: my_val, expected
+
+        call prif_this_image_no_coarray(this_image=me)
+        call prif_num_images(ni)
+
+        my_val = values(:, mod(me-1, size(values,2))+1)
+        call prif_co_min(my_val)
+
+        expected = minval(reshape([(values(:, mod(i-1,size(values,2))+1), i = 1, ni)], [size(values,1),ni]), dim=2)
+        result_ = assert_equals(int(expected), int(my_val))
+    end function
+
+    function check_32_bit_real() result(result_)
+        type(result_t) :: result_
+
+        real(c_float), parameter :: values(*,*,*) = reshape([1, 19, 5, 13, 11, 7, 17, 3], [2,2,2])
+        integer :: me, ni, i
+        real(c_float), dimension(size(values,1), size(values,2)) :: my_val, expected
+
+        call prif_this_image_no_coarray(this_image=me)
+        call prif_num_images(ni)
+
+        my_val = values(:, :, mod(me-1, size(values,3))+1)
+        call prif_co_min(my_val)
+
+        expected = minval(reshape([(values(:,:,mod(i-1,size(values,3))+1), i = 1, ni)], [size(values,1), size(values,2), ni]), dim=3)
+        result_ = assert_equals(real(expected,kind=c_double), real(my_val,kind=c_double))
+    end function
+
+    function check_64_bit_real() result(result_)
+        type(result_t) :: result_
+
+        real(c_double), parameter :: values(*,*) = reshape([1, 19, 5, 13, 11, 7, 17, 3], [2, 4])
+        integer :: me, ni, i
+        real(c_double), dimension(size(values,1)) :: my_val, expected
+
+        call prif_this_image_no_coarray(this_image=me)
+        call prif_num_images(ni)
+
+        my_val = values(:, mod(me-1, size(values,2))+1)
+        call prif_co_min(my_val)
+
+        expected = minval(reshape([(values(:, mod(i-1,size(values,2))+1), i = 1, ni)], [size(values,1),ni]), dim=2)
+        result_ = assert_equals(expected, my_val)
+    end function
+
+    function check_character() result(result_)
+        type(result_t) result_
+        character(len=*), parameter :: values(*) = &
+            [ "To be   ","or not  " &
+            , "to      ","be.     " &
+            , "that    ","is      " &
+            , "the     ","question"]
+        integer :: me, ni, i
+        character(len=len(values)) :: my_val, expected
+
+        call prif_this_image_no_coarray(this_image=me)
+        call prif_num_images(ni)
+
+        my_val = values(mod(me-1, size(values))+1)
+        call prif_co_min_character(my_val)
+
+        ! issue #205: workaround flang optimizer bug with a temp
+        associate(tmp => [(values(mod(i-1,size(values))+1), i = 1, ni)])
+          expected = minval(tmp)
         end associate
-    end function
-
-    function min_default_integer_7D_array() result(result_)
-        type(result_t) result_
-        integer array(2,1,1, 1,1,1, 2), status_, me, num_imgs
-
-        status_ = -1
-        call prif_this_image_no_coarray(this_image=me)
-        array = 3 - me
-        call prif_co_min(array, stat=status_)
-        call prif_num_images(num_images=num_imgs)
-        result_ = assert_that(all(array == 3 - num_imgs)) .and. assert_equals(0, status_)
-    end function
-
-    function min_default_real_scalars() result(result_)
-        type(result_t) result_
-        real scalar
-        real, parameter :: pi = 3.141592654
-        integer status_, me, num_imgs
-
-        status_ = -1
-        call prif_this_image_no_coarray(this_image=me)
-        scalar = -pi*me
-        call prif_co_min(scalar, stat=status_)
-        call prif_num_images(num_images=num_imgs)
-        result_ = assert_equals(-dble(pi*num_imgs), dble(scalar) ) .and. assert_equals(0, status_)
-    end function
-
-    function min_double_precision_2D_array() result(result_)
-        type(result_t) result_
-        double precision, allocatable :: array(:,:)
-        double precision, parameter :: tent(*,*) = dble(reshape(-[0,1,2,3,2,1], [3,2]))
-        integer :: me, num_imgs
-
-        call prif_this_image_no_coarray(this_image=me)
-        array = tent*dble(me)
-        call prif_co_min(array)
-        call prif_num_images(num_images=num_imgs)
-        result_ = assert_that(all(array==tent*num_imgs))
-    end function
-
-    function min_elements_in_2D_string_arrays() result(result_)
-      type(result_t) result_
-      character(len=*), parameter :: script(*,*,*) = reshape( &
-          [ "To be   ","or not  "   & ! images with odd image
-          , "to      ","be.     "   & ! numbers get this slice
-                                      ! ----------------------
-          , "that    ","is      "   & ! images with even image
-          , "the     ","question"], & ! numbers get this slice
-          [2,2,2])
-      character(len=len(script)), dimension(size(script,1),size(script,2)) :: slice
-      integer me, ni
-
-      call prif_this_image_no_coarray(this_image=me)
-      call prif_num_images(ni)
-      associate(slice_number => mod(me-1,size(script,3)) + 1)
-        slice = script(:,:,slice_number)
-      end associate
-      call prif_co_min(slice)
-      associate(expected => minval(script(:,:,1:min(ni,size(script,3))), dim=3))
-        result_ = assert_that(all(expected == slice),"all(expected == scramlet)")
-      end associate
-    end function
-
-    function alphabetically_1st_scalar_string() result(result_)
-      type(result_t) result_
-      integer, parameter :: length = len("to party!")
-      character(len=length), parameter :: words(*) = [character(len=length):: "Loddy","doddy","we","like","to party!"]
-      character(len=length) :: my_word, expected_word
-      integer :: me, num_imgs
-
-      call prif_this_image_no_coarray(this_image=me)
-      associate(periodic_index => 1 + mod(me-1,size(words)))
-        my_word = words(periodic_index)
-        call prif_co_min(my_word)
-      end associate
-
-      call prif_num_images(num_images=num_imgs)
-      expected_word = minval(words(1:min(num_imgs, size(words))), dim=1)
-      result_ = assert_equals(expected_word, my_word)
+        result_ = assert_equals(expected, my_val)
     end function
 
 end module caf_co_min_test
