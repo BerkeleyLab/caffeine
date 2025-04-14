@@ -141,7 +141,7 @@ contains
     type(result_t) :: result_
 
     ! Allocate memory for an integer scalar single corank coarray, such as the following decl
-    ! integer :: coarr(10)[4][*]
+    ! integer :: coarr(10)[4,*]
 
     integer(kind=c_int64_t), dimension(2) :: lcobounds, ucobounds
     integer :: dummy_element, num_imgs, i
@@ -171,9 +171,7 @@ contains
     call c_f_pointer(allocated_memory, local_slice, [10])
     result_ = result_ .and. assert_that(associated(local_slice))
 
-    do i = 1,10 
-      local_slice(i) = i*i
-    end do
+    local_slice = [(i*i, i = 1, 10)] 
     do i = 1,10 
       result_ = result_ .and. assert_equals(i*i, local_slice(i))
     end do
