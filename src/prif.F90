@@ -1080,6 +1080,8 @@ module prif
     type(c_funptr) :: final_func
     type(c_ptr) :: previous_handle = c_null_ptr, next_handle = c_null_ptr
     integer(c_int64_t) :: lcobounds(15), ucobounds(15)
+    type(c_ptr) :: p_context_data
+    type(c_ptr) :: reserved
   end type
 
   type, private :: team_data
