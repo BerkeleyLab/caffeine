@@ -22,7 +22,7 @@ enum {
 
 static gex_Client_t myclient;
 static gex_EP_t myep;
-static gex_Rank_t rank, size;
+static gex_Rank_t myproc, numprocs;
 static gex_Segment_t mysegment;
 static gex_TM_t myworldteam;
 
@@ -47,7 +47,10 @@ void caf_caffeinate(
   mspace* non_symmetric_heap,
   gex_TM_t* initial_team
 ) {
-  GASNET_SAFE(gex_Client_Init(&myclient, &myep, initial_team, "caffeine", NULL, NULL, 0));
+  GASNET_SAFE(gex_Client_Init(&myclient, &myep, &myworldteam, "caffeine", NULL, NULL, 0));
+  myproc   = gex_TM_QueryRank(myworldteam);
+  numprocs = gex_TM_QuerySize(myworldteam);
+  *initial_team = myworldteam;
 
   // query largest possible segment GASNet can give us of the same size across all processes:
   size_t max_seg = gasnet_getMaxGlobalSegmentSize();
@@ -63,7 +66,7 @@ void caf_caffeinate(
   // TODO: issue a console warning here instead of silently capping
   segsz = MIN(segsz,max_seg);
 
-  GASNET_SAFE(gex_Segment_Attach(&mysegment, *initial_team, segsz));
+  GASNET_SAFE(gex_Segment_Attach(&mysegment, myworldteam, segsz));
 
   *symmetric_heap_start = (intptr_t)gex_Segment_QueryAddr(mysegment);
   size_t total_heap_size = gex_Segment_QuerySize(mysegment);
@@ -79,13 +82,12 @@ void caf_caffeinate(
   *symmetric_heap_size = total_heap_size - non_symmetric_heap_size;
   intptr_t non_symmetric_heap_start = *symmetric_heap_start + *symmetric_heap_size;
 
-  if (caf_this_image(*initial_team) == 1) {
+  if (myproc == 0) {
     *symmetric_heap = create_mspace_with_base((void*)*symmetric_heap_start, *symmetric_heap_size, 0);
     mspace_set_footprint_limit(*symmetric_heap, *symmetric_heap_size);
   }
   *non_symmetric_heap = create_mspace_with_base((void*)non_symmetric_heap_start, non_symmetric_heap_size, 0);
   mspace_set_footprint_limit(*non_symmetric_heap, non_symmetric_heap_size);
-  myworldteam = *initial_team;
 }
 
 void caf_decaffeinate(int exit_code)
