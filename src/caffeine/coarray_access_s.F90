@@ -15,6 +15,7 @@ contains
     integer(c_intptr_t) :: remote_base
 
     call_assert(coarray_handle_check(coarray_handle))
+    call_assert(offset >= 0)
 
     call base_pointer(coarray_handle, image_num, remote_base)
     call prif_put_indirect( &
@@ -25,6 +26,8 @@ contains
   end procedure
 
   module procedure prif_put_indirect
+    call_assert_describe(image_num > 0 .and. image_num <= initial_team%num_images, "image_num not within valid range")
+
     call caf_put( &
         image = image_num, &
         dest = remote_ptr, &
@@ -53,6 +56,7 @@ contains
     integer(c_intptr_t) :: remote_base
 
     call_assert(coarray_handle_check(coarray_handle))
+    call_assert(offset >= 0)
 
     call base_pointer(coarray_handle, image_num, remote_base)
     call prif_get_indirect( &
@@ -66,6 +70,8 @@ contains
   end procedure
 
   module procedure prif_get_indirect
+    call_assert_describe(image_num > 0 .and. image_num <= initial_team%num_images, "image_num not within valid range")
+
     call caf_get( &
         image = image_num, &
         dest = current_image_buffer, &
@@ -90,6 +96,7 @@ contains
     character(len=*), intent(inout), optional :: errmsg
     character(len=:), intent(inout), allocatable, optional :: errmsg_alloc
 
+    call_assert_describe(image_num > 0 .and. image_num <= initial_team%num_images, "image_num not within valid range")
     call_assert(size(remote_stride) == size(extent))
     call_assert(size(current_image_stride) == size(extent))
 
@@ -110,6 +117,7 @@ contains
     integer(c_intptr_t) :: remote_base
 
     call_assert(coarray_handle_check(coarray_handle))
+    call_assert(offset >= 0)
 
     call base_pointer(coarray_handle, image_num, remote_base)
     call prif_get_strided_indirect( &
@@ -156,6 +164,7 @@ contains
     character(len=*), intent(inout), optional :: errmsg
     character(len=:), intent(inout), allocatable, optional :: errmsg_alloc
 
+    call_assert_describe(image_num > 0 .and. image_num <= initial_team%num_images, "image_num not within valid range")
     call_assert(size(remote_stride) == size(extent))
     call_assert(size(current_image_stride) == size(extent))
 
@@ -176,6 +185,7 @@ contains
     integer(c_intptr_t) :: remote_base
 
     call_assert(coarray_handle_check(coarray_handle))
+    call_assert(offset >= 0)
 
     call base_pointer(coarray_handle, image_num, remote_base)
     call prif_put_strided_indirect( &
