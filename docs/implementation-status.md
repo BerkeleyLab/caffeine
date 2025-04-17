@@ -167,17 +167,15 @@ in the following sections.
 ---
 
 ## Events and Notifications
-### Support = no
+### Support = yes
 
-<!---
 | Procedure | Status | Notes |
 |-----------|--------|-------|
-| `prif_event_post`          | no  |  |
-| `prif_event_post_indirect` | no  |  |
-| `prif_event_wait`          | no  |  |
-| `prif_event_query`         | no  |  |
-| `prif_notify_wait`         | no  |  |
--->
+| `prif_event_post`          | **YES** |  |
+| `prif_event_post_indirect` | **YES** |  |
+| `prif_event_wait`          | **YES** |  |
+| `prif_event_query`         | **YES** |  |
+| `prif_notify_wait`         | **YES** |  |
 
 ---
 
