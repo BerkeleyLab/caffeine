@@ -49,7 +49,7 @@ module prif
   integer(c_int), parameter, public :: PRIF_VERSION_MAJOR = 0
   integer(c_int), parameter, public :: PRIF_VERSION_MINOR = 5
 
-  integer(c_int), parameter, public :: PRIF_ATOMIC_INT_KIND = selected_int_kind(18)
+  integer(c_int), parameter, public :: PRIF_ATOMIC_INT_KIND = c_int64_t
 
 #if HAVE_SELECTED_LOGICAL_KIND
   integer(c_int), parameter, public :: PRIF_ATOMIC_LOGICAL_KIND = selected_logical_kind(32)
@@ -72,8 +72,7 @@ module prif
 
   type, public :: prif_event_type
     private
-    ! TODO: actual implementation
-    integer :: unimplemented_feature_placeholder = 0
+    integer(PRIF_ATOMIC_INT_KIND) :: counter = 0
   end type
 
   type, public :: prif_lock_type

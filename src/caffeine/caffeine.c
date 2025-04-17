@@ -8,6 +8,7 @@
 #include <gasnetex.h>
 #include <gasnet_coll.h>
 #include <gasnet_vis.h>
+#include <gasnet_ratomic.h>
 #include "gasnet_safe.h"
 #include <gasnet_tools.h>
 #include <gasnet_portable_platform.h>
@@ -28,6 +29,8 @@ static gex_TM_t myworldteam;
 
 typedef void(*final_func_ptr)(void*, size_t) ;
 typedef uint8_t byte;
+
+static void event_init(void);
 
 // ---------------------------------------------------
 int caf_this_image(gex_TM_t gex_team)
@@ -88,6 +91,8 @@ void caf_caffeinate(
   }
   *non_symmetric_heap = create_mspace_with_base((void*)non_symmetric_heap_start, non_symmetric_heap_size, 0);
   mspace_set_footprint_limit(*non_symmetric_heap, non_symmetric_heap_size);
+
+  event_init();
 }
 
 void caf_decaffeinate(int exit_code)
@@ -189,6 +194,63 @@ void caf_sync_memory() {
 void caf_sync_team( gex_TM_t team ) {
   gex_Event_Wait( gex_Coll_BarrierNB(team, 0) );
 }
+
+// _______________________ Events ____________________________
+
+static gex_AD_t event_AD = GEX_AD_INVALID;
+
+static void event_init(void) {
+  assert(event_AD == GEX_AD_INVALID);
+
+  // create the event AD and request CPU/AM transport
+  gex_AD_Create(&event_AD, myworldteam, GEX_DT_I64, 
+                GEX_OP_GET | GEX_OP_INC | GEX_OP_FSUB, 
+                GEX_FLAG_AD_FAVOR_MY_RANK);
+
+  assert(event_AD != GEX_AD_INVALID);
+}
+
+void caf_event_post(int image, intptr_t event_var_ptr) {
+  assert(event_AD != GEX_AD_INVALID);
+  assert(event_var_ptr);
+
+  gex_AD_OpNBI_I64(event_AD, NULL, 
+                   image-1, (void *)event_var_ptr, 
+                   GEX_OP_INC, 0, 0, 0);
+
+}
+
+void caf_event_query(void *event_var_ptr, int64_t *count) {
+  assert(event_AD != GEX_AD_INVALID);
+  assert(event_var_ptr);
+  assert(count);
+
+  gex_Event_Wait(
+    gex_AD_OpNB_I64(event_AD, count, 
+                    myproc, event_var_ptr,
+                    GEX_OP_GET, 0, 0, 0)
+  );
+}
+
+void caf_event_wait(void *event_var_ptr, int64_t threshold) {
+  assert(event_AD != GEX_AD_INVALID);
+  assert(event_var_ptr);
+  assert(threshold >= 1);
+
+  int64_t cnt = 0;
+  while (caf_event_query(event_var_ptr, &cnt), cnt < threshold) {
+    // TODO: wait hook?
+    gasnet_AMPoll();
+  }
+
+  gex_Event_Wait(
+    gex_AD_OpNB_I64(event_AD, &cnt, 
+                    myproc, event_var_ptr,
+                    GEX_OP_FSUB, threshold, 0, 0)
+  );
+  assert(cnt >= threshold);
+}
+
 
 //-------------------------------------------------------------------
 
