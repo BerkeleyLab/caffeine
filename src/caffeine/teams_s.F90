@@ -56,6 +56,8 @@ contains
   end procedure
 
   module procedure prif_form_team
+    call prif_sync_memory
+
     ! indicates this is the first time we're creating a child team
     if (.not.caf_have_child_teams()) then
       allocate(current_team%info%child_heap_info)

@@ -39,6 +39,9 @@ contains
     else
       block_offset = 0
     end if
+    call prif_sync_memory ! end the current segment
+    ! Use a co_sum to aggregate broadcasing the information from image 1
+    ! together with the team barrier spec-required by coarray allocation
     call prif_co_sum(block_offset)
     if (me /= 1) whole_block = as_c_ptr(current_team%info%heap_start + block_offset)
 
