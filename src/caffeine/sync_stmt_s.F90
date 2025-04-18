@@ -7,7 +7,7 @@ submodule(prif:prif_private_s) sync_stmt_s
 contains
 
   module procedure prif_sync_all
-    call caf_sync_all
+    call caf_sync_team(current_team%info%gex_team)
     if (present(stat)) stat = 0
   end procedure
 

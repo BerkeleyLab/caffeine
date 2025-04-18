@@ -184,12 +184,6 @@ void caf_sync_memory() {
   gasnett_local_mb();
 }
 
-void caf_sync_all()
-{
-  gasnet_barrier_notify(0,GASNET_BARRIERFLAG_ANONYMOUS);
-  gasnet_barrier_wait(0,GASNET_BARRIERFLAG_ANONYMOUS);
-}
-
 void caf_sync_team( gex_TM_t team ) {
   gex_Event_Wait( gex_Coll_BarrierNB(team, 0) );
 }
