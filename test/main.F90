@@ -52,6 +52,8 @@ contains
                     test_prif_rma
         use caf_strided_test, only: &
                     test_prif_rma_strided
+        use caf_event_test, only: &
+                    test_prif_event
         use caf_teams_test, only: &
                 caf_teams_caf_teams => &
                     test_caf_teams
@@ -103,6 +105,7 @@ contains
         individual_tests = [individual_tests, test_prif_rma_strided()]
         individual_tests = [individual_tests, caf_teams_caf_teams()]
         individual_tests = [individual_tests, caf_this_image_prif_this_image_no_coarray()]
+        individual_tests = [individual_tests, test_prif_event()]
         individual_tests = [individual_tests, test_prif_stop()]
         individual_tests = [individual_tests, test_prif_error_stop()]
 
