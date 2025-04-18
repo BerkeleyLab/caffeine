@@ -19,6 +19,7 @@ contains
     if (caf_have_child_teams()) then ! need to establish heap for child teams
       call caf_establish_child_heap
     end if
+    call prif_sync_all ! child team sync required by F23 11.1.5.2
   end procedure
 
   module procedure prif_end_team
@@ -43,8 +44,12 @@ contains
         call c_f_pointer(tmp_data%next_handle, tmp_data)
       end do
       call prif_deallocate_coarray(teams_coarrays, stat, errmsg, errmsg_alloc)
+      nullify(current_team%info%coarrays)
+    else
+      ! child team sync required by F23 11.1.5.2,
+      ! because we skipped the prif_deallocate_coarray call above that includes same
+      call prif_sync_all
     end if
-    nullify(current_team%info%coarrays)
 
     ! set the current team back to the parent team
     current_team%info => current_team%info%parent_team
