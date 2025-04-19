@@ -97,34 +97,34 @@ in the following sections.
 ---
 
 ## Contiguous Coarray Access
-### Support = partial
+### Support = **YES**
 
 | Procedure | Status | Notes |
 |-----------|--------|-------|
-| `prif_get`                               | **YES**   |  |
-| `prif_get_indirect`                      | **YES**   |  |
-| `prif_put`                               | **YES**   |  |
-| `prif_put_indirect`                      | **YES**   |  |
-| `prif_put_with_notify`                   | no        |  |
-| `prif_put_with_notify_indirect`          | no        |  |
-| `prif_put_indirect_with_notify`          | no        |  |
-| `prif_put_indirect_with_notify_indirect` | no        |  |
+| `prif_get`                               | **YES** |  |
+| `prif_get_indirect`                      | **YES** |  |
+| `prif_put`                               | **YES** |  |
+| `prif_put_indirect`                      | **YES** |  |
+| `prif_put_with_notify`                   | **YES** |  |
+| `prif_put_with_notify_indirect`          | **YES** |  |
+| `prif_put_indirect_with_notify`          | **YES** |  |
+| `prif_put_indirect_with_notify_indirect` | **YES** |  |
 
 ---
 
 ## Strided Coarray Access
-### Support = partial
+### Support = **YES**
 
 | Procedure | Status | Notes |
 |-----------|--------|-------|
-| `prif_get_strided`                               | **YES**  |  |
-| `prif_get_strided_indirect`                      | **YES**  |  |
-| `prif_put_strided`                               | **YES**  |  |
-| `prif_put_strided_indirect`                      | **YES**  |  |
-| `prif_put_strided_with_notify`                   | no       |  |
-| `prif_put_strided_with_notify_indirect`          | no       |  |
-| `prif_put_strided_indirect_with_notify`          | no       |  |
-| `prif_put_strided_indirect_with_notify_indirect` | no       |  |
+| `prif_get_strided`                               | **YES** |  |
+| `prif_get_strided_indirect`                      | **YES** |  |
+| `prif_put_strided`                               | **YES** |  |
+| `prif_put_strided_indirect`                      | **YES** |  |
+| `prif_put_strided_with_notify`                   | **YES** |  |
+| `prif_put_strided_with_notify_indirect`          | **YES** |  |
+| `prif_put_strided_indirect_with_notify`          | **YES** |  |
+| `prif_put_strided_indirect_with_notify_indirect` | **YES** |  |
 
 ---
 
@@ -167,7 +167,7 @@ in the following sections.
 ---
 
 ## Events and Notifications
-### Support = yes
+### Support = **YES**
 
 | Procedure | Status | Notes |
 |-----------|--------|-------|
