@@ -221,11 +221,13 @@ static void event_init(void) {
   assert(event_AD != GEX_AD_INVALID);
 }
 
-void caf_event_post(int image, intptr_t event_var_ptr) {
+void caf_event_post(int image, intptr_t event_var_ptr, int segment_boundary) {
   assert(event_AD != GEX_AD_INVALID);
   assert(event_var_ptr);
 
-  caf_segment_release();
+  if (segment_boundary) {
+    caf_segment_release();
+  }
 
   gex_AD_OpNBI_I64(event_AD, NULL, 
                    image-1, (void *)event_var_ptr, 
@@ -250,12 +252,14 @@ void caf_event_query(void *event_var_ptr, int64_t *count) {
   );
 }
 
-void caf_event_wait(void *event_var_ptr, int64_t threshold) {
+void caf_event_wait(void *event_var_ptr, int64_t threshold, int segment_boundary) {
   assert(event_AD != GEX_AD_INVALID);
   assert(event_var_ptr);
   assert(threshold >= 1);
 
-  caf_segment_release();
+  if (segment_boundary) {
+    caf_sync_memory();
+  }
 
   int64_t cnt = 0;
   while (caf_event_query(event_var_ptr, &cnt), cnt < threshold) {

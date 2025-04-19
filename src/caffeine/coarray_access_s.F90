@@ -14,7 +14,6 @@ contains
   module procedure prif_put
     integer(c_intptr_t) :: remote_base
 
-    call_assert(coarray_handle_check(coarray_handle))
     call_assert(offset >= 0)
 
     call base_pointer(coarray_handle, image_num, remote_base)
@@ -22,7 +21,8 @@ contains
         image_num = image_num, &
         remote_ptr = remote_base + offset, &
         current_image_buffer = current_image_buffer, &
-        size_in_bytes = size_in_bytes)
+        size_in_bytes = size_in_bytes, &
+        stat = stat, errmsg = errmsg, errmsg_alloc = errmsg_alloc)
   end procedure
 
   module procedure prif_put_indirect
@@ -33,29 +33,76 @@ contains
         dest = remote_ptr, &
         src = current_image_buffer, &
         size = size_in_bytes)
+
+    if (present(stat)) stat = 0
   end procedure
 
   module procedure prif_put_with_notify
-    call unimplemented("prif_put_with_notify")
+    integer(c_intptr_t) :: remote_base
+    integer(c_intptr_t) :: notify_remote_base
+
+    call_assert(offset >= 0)
+    call_assert(notify_offset >= 0)
+
+    call base_pointer(coarray_handle, image_num, remote_base)
+    call base_pointer(notify_coarray_handle, image_num, notify_remote_base)
+
+    call prif_put_indirect_with_notify_indirect( &
+        image_num = image_num, &
+        remote_ptr = remote_base + offset, &
+        current_image_buffer = current_image_buffer, &
+        size_in_bytes = size_in_bytes, &
+        notify_ptr = notify_remote_base + notify_offset, &
+        stat = stat, errmsg = errmsg, errmsg_alloc = errmsg_alloc)
   end procedure
 
   module procedure prif_put_with_notify_indirect
-    call unimplemented("prif_put_with_notify_indirect")
+    integer(c_intptr_t) :: remote_base
+
+    call_assert(offset >= 0)
+
+    call base_pointer(coarray_handle, image_num, remote_base)
+    call prif_put_indirect_with_notify_indirect( &
+        image_num = image_num, &
+        remote_ptr = remote_base + offset, &
+        current_image_buffer = current_image_buffer, &
+        size_in_bytes = size_in_bytes, &
+        notify_ptr = notify_ptr, &
+        stat = stat, errmsg = errmsg, errmsg_alloc = errmsg_alloc)
   end procedure
 
   module procedure prif_put_indirect_with_notify
-    call unimplemented("prif_put_indirect_with_notify")
+    integer(c_intptr_t) :: notify_remote_base
+
+    call_assert(notify_offset >= 0)
+
+    call base_pointer(notify_coarray_handle, image_num, notify_remote_base)
+    call prif_put_indirect_with_notify_indirect( &
+        image_num = image_num, &
+        remote_ptr = remote_ptr, &
+        current_image_buffer = current_image_buffer, &
+        size_in_bytes = size_in_bytes, &
+        notify_ptr = notify_remote_base + notify_offset, &
+        stat = stat, errmsg = errmsg, errmsg_alloc = errmsg_alloc)
   end procedure
 
   module procedure prif_put_indirect_with_notify_indirect
-    call unimplemented("prif_put_indirect_with_notify_indirect")
+    call_assert_describe(image_num > 0 .and. image_num <= initial_team%num_images, "image_num not within valid range")
+
+    call caf_put( &
+        image = image_num, &
+        dest = remote_ptr, &
+        src = current_image_buffer, &
+        size = size_in_bytes)
+    call caf_event_post(image_num, notify_ptr, 0)
+
+    if (present(stat)) stat = 0
   end procedure
 
   ! _______________________ Contiguous Get RMA ____________________________
   module procedure prif_get
     integer(c_intptr_t) :: remote_base
 
-    call_assert(coarray_handle_check(coarray_handle))
     call_assert(offset >= 0)
 
     call base_pointer(coarray_handle, image_num, remote_base)
@@ -116,7 +163,6 @@ contains
   module procedure prif_get_strided
     integer(c_intptr_t) :: remote_base
 
-    call_assert(coarray_handle_check(coarray_handle))
     call_assert(offset >= 0)
 
     call base_pointer(coarray_handle, image_num, remote_base)
@@ -184,7 +230,6 @@ contains
   module procedure prif_put_strided
     integer(c_intptr_t) :: remote_base
 
-    call_assert(coarray_handle_check(coarray_handle))
     call_assert(offset >= 0)
 
     call base_pointer(coarray_handle, image_num, remote_base)
@@ -196,9 +241,7 @@ contains
         current_image_stride = current_image_stride, &
         element_size = element_size, &
         extent = extent, &
-        stat = stat, &
-        errmsg = errmsg, &
-        errmsg_alloc = errmsg_alloc)
+        stat = stat, errmsg = errmsg, errmsg_alloc = errmsg_alloc)
   end procedure
 
   module procedure prif_put_strided_indirect
@@ -210,25 +253,80 @@ contains
         current_image_stride = current_image_stride, &
         element_size = element_size, &
         extent = extent, &
-        stat = stat, &
-        errmsg = errmsg, &
-        errmsg_alloc = errmsg_alloc)
+        stat = stat, errmsg = errmsg, errmsg_alloc = errmsg_alloc)
   end procedure
 
   module procedure prif_put_strided_with_notify
-    call unimplemented("prif_put_strided_with_notify")
+    integer(c_intptr_t) :: remote_base
+    integer(c_intptr_t) :: notify_remote_base
+
+    call_assert(offset >= 0)
+    call_assert(notify_offset >= 0)
+
+    call base_pointer(coarray_handle, image_num, remote_base)
+    call base_pointer(notify_coarray_handle, image_num, notify_remote_base)
+
+    call prif_put_strided_indirect_with_notify_indirect( &
+        image_num = image_num, &
+        remote_ptr = remote_base + offset, &
+        remote_stride = remote_stride, &
+        current_image_buffer = current_image_buffer, &
+        current_image_stride = current_image_stride, &
+        element_size = element_size, &
+        extent = extent, &
+        notify_ptr = notify_remote_base + notify_offset, &
+        stat = stat, errmsg = errmsg, errmsg_alloc = errmsg_alloc)
   end procedure
 
   module procedure prif_put_strided_with_notify_indirect
-    call unimplemented("prif_put_strided_with_notify_indirect")
+    integer(c_intptr_t) :: remote_base
+
+    call_assert(offset >= 0)
+
+    call base_pointer(coarray_handle, image_num, remote_base)
+
+    call prif_put_strided_indirect_with_notify_indirect( &
+        image_num = image_num, &
+        remote_ptr = remote_base + offset, &
+        remote_stride = remote_stride, &
+        current_image_buffer = current_image_buffer, &
+        current_image_stride = current_image_stride, &
+        element_size = element_size, &
+        extent = extent, &
+        notify_ptr = notify_ptr, &
+        stat = stat, errmsg = errmsg, errmsg_alloc = errmsg_alloc)
   end procedure
 
   module procedure prif_put_strided_indirect_with_notify
-    call unimplemented("prif_put_strided_indirect_with_notify")
+    integer(c_intptr_t) :: notify_remote_base
+
+    call_assert(notify_offset >= 0)
+
+    call base_pointer(notify_coarray_handle, image_num, notify_remote_base)
+
+    call prif_put_strided_indirect_with_notify_indirect( &
+        image_num = image_num, &
+        remote_ptr = remote_ptr, &
+        remote_stride = remote_stride, &
+        current_image_buffer = current_image_buffer, &
+        current_image_stride = current_image_stride, &
+        element_size = element_size, &
+        extent = extent, &
+        notify_ptr = notify_remote_base + notify_offset, &
+        stat = stat, errmsg = errmsg, errmsg_alloc = errmsg_alloc)
   end procedure
 
   module procedure prif_put_strided_indirect_with_notify_indirect
-    call unimplemented("prif_put_strided_indirect_with_notify_indirect")
+    call put_strided_helper( &
+        image_num = image_num, &
+        remote_ptr = remote_ptr, &
+        remote_stride = remote_stride, &
+        current_image_buffer = current_image_buffer, &
+        current_image_stride = current_image_stride, &
+        element_size = element_size, &
+        extent = extent, &
+        stat = stat, errmsg = errmsg, errmsg_alloc = errmsg_alloc)
+    call caf_event_post(image_num, notify_ptr, 0)
   end procedure
 
 end submodule coarray_access_s

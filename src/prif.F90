@@ -89,8 +89,7 @@ module prif
 
   type, public :: prif_notify_type
     private
-    ! TODO: actual implementation
-    integer :: unimplemented_feature_placeholder = 0
+    integer(PRIF_ATOMIC_INT_KIND) :: counter = 0
   end type
 
   type, public :: prif_coarray_handle
