@@ -194,22 +194,24 @@ submodule(prif) prif_private_s
     end subroutine
 
     ! _______________________ Events  ____________________________
-    subroutine caf_event_post(image, event_var_ptr, segment_boundary) bind(c)
-      !! void caf_event_post(int image, intptr_t event_var_ptr, int segment_boundary)
+    subroutine caf_event_post(image, event_var_ptr, segment_boundary, release_fence) bind(c)
+      !! void caf_event_post(int image, intptr_t event_var_ptr, int segment_boundary, int release_fence)
       import c_int, c_intptr_t
       implicit none
       integer(c_int), intent(in), value :: image
       integer(c_intptr_t), intent(in), value :: event_var_ptr
       integer(c_int), intent(in), value :: segment_boundary
+      integer(c_int), intent(in), value :: release_fence
     end subroutine
 
-    subroutine caf_event_wait(event_var_ptr, threshold, segment_boundary) bind(c)
-      !! void caf_event_wait(void *event_var_ptr, int64_t threshold, int segment_boundary)
+    subroutine caf_event_wait(event_var_ptr, threshold, segment_boundary, acquire_fence) bind(c)
+      !! void caf_event_wait(void *event_var_ptr, int64_t threshold, int segment_boundary, int acquire_fence)
       import c_int64_t, c_ptr, c_int
       implicit none
       type(c_ptr), intent(in), value :: event_var_ptr
       integer(c_int64_t), intent(in), value :: threshold
       integer(c_int), intent(in), value :: segment_boundary
+      integer(c_int), intent(in), value :: acquire_fence
     end subroutine
 
     subroutine caf_event_query(event_var_ptr, count) bind(c)

@@ -221,7 +221,7 @@ static void event_init(void) {
   assert(event_AD != GEX_AD_INVALID);
 }
 
-void caf_event_post(int image, intptr_t event_var_ptr, int segment_boundary) {
+void caf_event_post(int image, intptr_t event_var_ptr, int segment_boundary, int release_fence) {
   assert(event_AD != GEX_AD_INVALID);
   assert(event_var_ptr);
 
@@ -232,7 +232,7 @@ void caf_event_post(int image, intptr_t event_var_ptr, int segment_boundary) {
   gex_AD_OpNBI_I64(event_AD, NULL, 
                    image-1, (void *)event_var_ptr, 
                    GEX_OP_INC, 0, 0, 
-                   GEX_FLAG_AD_REL);
+                   (release_fence ? GEX_FLAG_AD_REL : 0));
 
   // We've issued the post increment as an NBI operation,
   // allowing this call to return before the increment
@@ -252,7 +252,7 @@ void caf_event_query(void *event_var_ptr, int64_t *count) {
   );
 }
 
-void caf_event_wait(void *event_var_ptr, int64_t threshold, int segment_boundary) {
+void caf_event_wait(void *event_var_ptr, int64_t threshold, int segment_boundary, int acquire_fence) {
   assert(event_AD != GEX_AD_INVALID);
   assert(event_var_ptr);
   assert(threshold >= 1);
@@ -271,7 +271,7 @@ void caf_event_wait(void *event_var_ptr, int64_t threshold, int segment_boundary
     gex_AD_OpNB_I64(event_AD, &cnt, 
                     myproc, event_var_ptr,
                     GEX_OP_FSUB, threshold, 0,
-                    GEX_FLAG_AD_ACQ)
+                    (acquire_fence ? GEX_FLAG_AD_ACQ : 0))
   );
   assert(cnt >= threshold);
 }
