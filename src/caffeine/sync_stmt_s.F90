@@ -1,7 +1,8 @@
 ! Copyright (c), The Regents of the University of California
 ! Terms of use are as specified in LICENSE.txt
 submodule(prif:prif_private_s) sync_stmt_s
-
+  ! DO NOT ADD USE STATEMENTS HERE
+  ! All use statements belong in prif_private_s.F90
   implicit none
 
 contains

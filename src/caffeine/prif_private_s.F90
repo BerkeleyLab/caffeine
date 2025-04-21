@@ -5,7 +5,22 @@
 
 submodule(prif) prif_private_s
   use assert_m
-  use iso_c_binding, only: c_associated
+
+  use iso_fortran_env, only : &
+        output_unit, &
+        error_unit
+
+  use iso_c_binding, only: &
+        c_associated, &
+        c_f_pointer, &
+        c_f_procpointer, &
+        c_funloc, &
+        c_loc, &
+        c_null_funptr, &
+        c_sizeof, &
+        ! DOB: The following is a gfortran-14 bug workaround. No idea why this works...
+        c_funptr_ => c_funptr
+
   implicit none
 
   type(team_data), target :: initial_team
@@ -40,7 +55,7 @@ submodule(prif) prif_private_s
 
     pure subroutine caf_fatal_error(str) bind(C)
       !! void caf_fatal_error( const CFI_cdesc_t* Fstr )
-      use iso_c_binding, only : c_char
+      import c_char
       implicit none
       character(kind=c_char,len=:), pointer, intent(in) :: str
     end subroutine

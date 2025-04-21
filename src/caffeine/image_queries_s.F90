@@ -4,7 +4,8 @@
 #include "assert_macros.h"
 
 submodule(prif:prif_private_s) image_queries_s
-
+  ! DO NOT ADD USE STATEMENTS HERE
+  ! All use statements belong in prif_private_s.F90
   implicit none
 
 contains
