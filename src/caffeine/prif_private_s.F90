@@ -171,10 +171,6 @@ submodule(prif) prif_private_s
       !! void caf_sync_memory();
     end subroutine
 
-    subroutine caf_sync_all() bind(C)
-      !! void caf_sync_all();
-    end subroutine
-
     subroutine caf_sync_team(team) bind(C)
       !! void caf_sync_team(gex_TM_t team);
        import c_ptr

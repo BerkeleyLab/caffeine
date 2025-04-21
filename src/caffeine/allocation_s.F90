@@ -56,6 +56,8 @@ contains
     coarray_handle%info%final_func = final_func
     coarray_handle%info%lcobounds(1:size(lcobounds)) = lcobounds
     coarray_handle%info%ucobounds(1:size(ucobounds)) = ucobounds
+    coarray_handle%info%previous_handle = c_null_ptr
+    coarray_handle%info%next_handle = c_null_ptr
     call add_to_team_list(coarray_handle)
     coarray_handle%info%reserved = c_null_ptr
     coarray_handle%info%p_context_data = c_loc(coarray_handle%info%reserved)
@@ -150,6 +152,9 @@ contains
   subroutine add_to_team_list(coarray_handle)
     type(prif_coarray_handle), intent(in) :: coarray_handle
 
+    call_assert(.not.c_associated(coarray_handle%info%previous_handle))
+    call_assert(.not.c_associated(coarray_handle%info%next_handle))
+
     if (associated(current_team%info%coarrays)) then
       current_team%info%coarrays%previous_handle = c_loc(coarray_handle%info)
       coarray_handle%info%next_handle = c_loc(current_team%info%coarrays)
@@ -162,9 +167,9 @@ contains
 
     type(prif_coarray_descriptor), pointer :: tmp_data
 
-    if (&
-        .not.c_associated(coarray_handle%info%previous_handle) &
+    if (      .not.c_associated(coarray_handle%info%previous_handle) &
         .and. .not.c_associated(coarray_handle%info%next_handle)) then
+      call_assert(associated(current_team%info%coarrays, coarray_handle%info))
       nullify(current_team%info%coarrays)
       return
     end if
@@ -172,6 +177,7 @@ contains
       call c_f_pointer(coarray_handle%info%previous_handle, tmp_data)
       tmp_data%next_handle = coarray_handle%info%next_handle
     else
+      call_assert(associated(current_team%info%coarrays, coarray_handle%info))
       call c_f_pointer(coarray_handle%info%next_handle, current_team%info%coarrays)
     end if
     if (c_associated(coarray_handle%info%next_handle)) then
