@@ -200,6 +200,9 @@ submodule(prif) prif_private_s
 
     ! __________________ SYNC Statements _____________________
 
+    module subroutine sync_init()
+    end subroutine
+
     subroutine caf_sync_memory() bind(C)
       !! void caf_sync_memory();
     end subroutine
