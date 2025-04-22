@@ -1,7 +1,8 @@
 ! Copyright (c), The Regents of the University of California
 ! Terms of use are as specified in LICENSE.txt
 submodule(prif:prif_private_s) program_termination_s
-  use iso_fortran_env, only : output_unit, error_unit
+  ! DO NOT ADD USE STATEMENTS HERE
+  ! All use statements belong in prif_private_s.F90
   implicit none
 
   type :: callback_entry

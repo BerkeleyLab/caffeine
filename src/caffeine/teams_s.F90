@@ -1,8 +1,8 @@
 ! Copyright (c), The Regents of the University of California
 ! Terms of use are as specified in LICENSE.txt
 submodule(prif:prif_private_s) teams_s
-  use iso_c_binding, only: c_null_funptr, c_f_pointer, c_loc
-
+  ! DO NOT ADD USE STATEMENTS HERE
+  ! All use statements belong in prif_private_s.F90
   implicit none
 contains
 

@@ -4,13 +4,8 @@
 #include "assert_macros.h"
 
 submodule(prif:prif_private_s) allocation_s
-  use iso_c_binding, only: &
-      c_sizeof, &
-      c_f_pointer, &
-      c_f_procpointer, &
-      c_loc, &
-      c_null_funptr
-
+  ! DO NOT ADD USE STATEMENTS HERE
+  ! All use statements belong in prif_private_s.F90
   implicit none
 
 contains
