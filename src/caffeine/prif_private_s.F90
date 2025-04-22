@@ -77,6 +77,24 @@ submodule(prif) prif_private_s
       integer(c_int) caf_num_images
     end function
 
+    function caf_image_to_initial(gex_team, image_num) bind(C)
+      !! int caf_image_to_initial(gex_TM_t tm, int image_num)
+      import c_ptr, c_int
+      implicit none
+      type(c_ptr), value :: gex_team
+      integer(c_int), value :: image_num
+      integer(c_int) caf_image_to_initial
+    end function
+
+    function caf_image_from_initial(gex_team, image_num) bind(C)
+      !! int caf_image_from_initial(gex_TM_t tm, int image_num)
+      import c_ptr, c_int
+      implicit none
+      type(c_ptr), value :: gex_team
+      integer(c_int), value :: image_num
+      integer(c_int) caf_image_from_initial
+    end function
+
     ! _________________ Memory allocation ____________________
 
     function caf_allocate(mspace, bytes) result(ptr) bind(c)

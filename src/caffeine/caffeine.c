@@ -33,13 +33,28 @@ typedef uint8_t byte;
 static void event_init(void);
 
 // ---------------------------------------------------
-int caf_this_image(gex_TM_t gex_team)
-{
-  return gex_TM_QueryRank(gex_team) + 1;
+int caf_this_image(gex_TM_t tm) {
+  return gex_TM_QueryRank(tm) + 1;
 }
-int caf_num_images(gex_TM_t gex_team)
-{
-  return gex_TM_QuerySize(gex_team);
+int caf_num_images(gex_TM_t tm) {
+  return gex_TM_QuerySize(tm);
+}
+
+// Given team and corresponding image_num, return image number in the initial team
+int caf_image_to_initial(gex_TM_t tm, int image_num) {
+  assert(image_num >= 1);
+  assert(image_num <= gex_TM_QuerySize(tm));
+  gex_Rank_t proc = gex_TM_TranslateRankToJobrank(tm, image_num-1);
+  return proc + 1;
+}
+// Given image number in the initial team, return image number corresponding to given team
+int caf_image_from_initial(gex_TM_t tm, int image_num) {
+  assert(image_num >= 1);
+  assert(image_num <= numprocs);
+  gex_Rank_t proc = gex_TM_TranslateJobrankToRank(tm, image_num-1);
+  // GEX_RANK_INVALID indicates the provided image_num in initial team is not part of tm
+  assert(proc != GEX_RANK_INVALID); 
+  return proc + 1;
 }
 // ---------------------------------------------------
 // NOTE: gex_TM_T is a typedef to a C pointer, so the `gex_TM_t* initial_team` arg in the C signature matches the BIND(C) interface of an `intent(out)` arg of type `c_ptr` for the same argument
