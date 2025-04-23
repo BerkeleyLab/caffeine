@@ -240,14 +240,21 @@ void caf_event_post(int image, intptr_t event_var_ptr, int segment_boundary, int
   assert(event_AD != GEX_AD_INVALID);
   assert(event_var_ptr);
 
+  // arrange for requested fencing
+  gex_Flags_t flags;
   if (segment_boundary) {
     caf_segment_release();
+    flags = GEX_FLAG_AD_REL | GEX_FLAG_AD_ACQ;
+  } else if (release_fence) {
+    flags = GEX_FLAG_AD_REL;
+  } else {
+    flags = 0;
   }
 
   gex_AD_OpNBI_I64(event_AD, NULL, 
                    image-1, (void *)event_var_ptr, 
                    GEX_OP_INC, 0, 0, 
-                   (release_fence ? GEX_FLAG_AD_REL : 0));
+                   flags);
 
   // We've issued the post increment as an NBI operation,
   // allowing this call to return before the increment
@@ -272,8 +279,16 @@ void caf_event_wait(void *event_var_ptr, int64_t threshold, int segment_boundary
   assert(event_var_ptr);
   assert(threshold >= 1);
 
+  // arrange for requested fencing
+  gex_Flags_t flags;
   if (segment_boundary) {
-    caf_sync_memory();
+    caf_segment_release();
+    gasnett_local_wmb(); // release fence synchronously (before wait loop)
+    flags = GEX_FLAG_AD_ACQ;
+  } else if (acquire_fence) {
+    flags = GEX_FLAG_AD_ACQ;
+  } else {
+    flags = 0;
   }
 
   int64_t cnt = 0;
@@ -286,7 +301,7 @@ void caf_event_wait(void *event_var_ptr, int64_t threshold, int segment_boundary
     gex_AD_OpNB_I64(event_AD, &cnt, 
                     myproc, event_var_ptr,
                     GEX_OP_FSUB, threshold, 0,
-                    (acquire_fence ? GEX_FLAG_AD_ACQ : 0))
+                    flags)
   );
   assert(cnt >= threshold);
 }
