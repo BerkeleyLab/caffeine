@@ -193,6 +193,33 @@ submodule(prif) prif_private_s
        type(c_ptr), value :: team
     end subroutine
 
+    ! _______________________ Events  ____________________________
+    subroutine caf_event_post(image, event_var_ptr, segment_boundary) bind(c)
+      !! void caf_event_post(int image, intptr_t event_var_ptr, int segment_boundary)
+      import c_int, c_intptr_t
+      implicit none
+      integer(c_int), intent(in), value :: image
+      integer(c_intptr_t), intent(in), value :: event_var_ptr
+      integer(c_int), intent(in), value :: segment_boundary
+    end subroutine
+
+    subroutine caf_event_wait(event_var_ptr, threshold, segment_boundary) bind(c)
+      !! void caf_event_wait(void *event_var_ptr, int64_t threshold, int segment_boundary)
+      import c_int64_t, c_ptr, c_int
+      implicit none
+      type(c_ptr), intent(in), value :: event_var_ptr
+      integer(c_int64_t), intent(in), value :: threshold
+      integer(c_int), intent(in), value :: segment_boundary
+    end subroutine
+
+    subroutine caf_event_query(event_var_ptr, count) bind(c)
+      !! void caf_event_query(void *event_var_ptr, int64_t *count)
+      import c_int64_t, c_ptr
+      implicit none
+      type(c_ptr), intent(in), value :: event_var_ptr
+      integer(c_int64_t), intent(out) :: count
+    end subroutine
+
     ! ______________ Collective Subroutines __________________
 
      subroutine caf_co_broadcast(a, source_image, Nelem, team) bind(C)

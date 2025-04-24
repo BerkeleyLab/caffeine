@@ -8,6 +8,7 @@
 #include <gasnetex.h>
 #include <gasnet_coll.h>
 #include <gasnet_vis.h>
+#include <gasnet_ratomic.h>
 #include "gasnet_safe.h"
 #include <gasnet_tools.h>
 #include <gasnet_portable_platform.h>
@@ -22,12 +23,14 @@ enum {
 
 static gex_Client_t myclient;
 static gex_EP_t myep;
-static gex_Rank_t rank, size;
+static gex_Rank_t myproc, numprocs;
 static gex_Segment_t mysegment;
 static gex_TM_t myworldteam;
 
 typedef void(*final_func_ptr)(void*, size_t) ;
 typedef uint8_t byte;
+
+static void event_init(void);
 
 // ---------------------------------------------------
 int caf_this_image(gex_TM_t gex_team)
@@ -47,7 +50,10 @@ void caf_caffeinate(
   mspace* non_symmetric_heap,
   gex_TM_t* initial_team
 ) {
-  GASNET_SAFE(gex_Client_Init(&myclient, &myep, initial_team, "caffeine", NULL, NULL, 0));
+  GASNET_SAFE(gex_Client_Init(&myclient, &myep, &myworldteam, "caffeine", NULL, NULL, 0));
+  myproc   = gex_TM_QueryRank(myworldteam);
+  numprocs = gex_TM_QuerySize(myworldteam);
+  *initial_team = myworldteam;
 
   // query largest possible segment GASNet can give us of the same size across all processes:
   size_t max_seg = gasnet_getMaxGlobalSegmentSize();
@@ -63,7 +69,7 @@ void caf_caffeinate(
   // TODO: issue a console warning here instead of silently capping
   segsz = MIN(segsz,max_seg);
 
-  GASNET_SAFE(gex_Segment_Attach(&mysegment, *initial_team, segsz));
+  GASNET_SAFE(gex_Segment_Attach(&mysegment, myworldteam, segsz));
 
   *symmetric_heap_start = (intptr_t)gex_Segment_QueryAddr(mysegment);
   size_t total_heap_size = gex_Segment_QuerySize(mysegment);
@@ -79,13 +85,14 @@ void caf_caffeinate(
   *symmetric_heap_size = total_heap_size - non_symmetric_heap_size;
   intptr_t non_symmetric_heap_start = *symmetric_heap_start + *symmetric_heap_size;
 
-  if (caf_this_image(*initial_team) == 1) {
+  if (myproc == 0) {
     *symmetric_heap = create_mspace_with_base((void*)*symmetric_heap_start, *symmetric_heap_size, 0);
     mspace_set_footprint_limit(*symmetric_heap, *symmetric_heap_size);
   }
   *non_symmetric_heap = create_mspace_with_base((void*)non_symmetric_heap_start, non_symmetric_heap_size, 0);
   mspace_set_footprint_limit(*non_symmetric_heap, non_symmetric_heap_size);
-  myworldteam = *initial_team;
+
+  event_init();
 }
 
 void caf_decaffeinate(int exit_code)
@@ -179,14 +186,96 @@ void caf_get_strided(int dims, int image_num,
 
 //-------------------------------------------------------------------
 
+// caf_segment_release() is invoked whenever this image is ending a
+// segment, to flush any pending actions that are specified to be
+// ordered before a subsequent segment.
+void caf_segment_release() {
+  // synchronize caf_event_post:
+  gex_NBI_Wait(GEX_EC_RMW, 0);
+}
+
 void caf_sync_memory() {
-  // we may eventually need more than this if/when we relax our memory model..
+  caf_segment_release();
+
   gasnett_local_mb();
 }
 
 void caf_sync_team( gex_TM_t team ) {
+  caf_segment_release();
+
   gex_Event_Wait( gex_Coll_BarrierNB(team, 0) );
 }
+
+// _______________________ Events ____________________________
+
+static gex_AD_t event_AD = GEX_AD_INVALID;
+
+static void event_init(void) {
+  assert(event_AD == GEX_AD_INVALID);
+
+  // create the event AD and request CPU/AM transport
+  gex_AD_Create(&event_AD, myworldteam, GEX_DT_I64, 
+                GEX_OP_GET | GEX_OP_INC | GEX_OP_FSUB, 
+                GEX_FLAG_AD_FAVOR_MY_RANK);
+
+  assert(event_AD != GEX_AD_INVALID);
+}
+
+void caf_event_post(int image, intptr_t event_var_ptr, int segment_boundary) {
+  assert(event_AD != GEX_AD_INVALID);
+  assert(event_var_ptr);
+
+  if (segment_boundary) {
+    caf_segment_release();
+  }
+
+  gex_AD_OpNBI_I64(event_AD, NULL, 
+                   image-1, (void *)event_var_ptr, 
+                   GEX_OP_INC, 0, 0, 
+                   GEX_FLAG_AD_REL);
+
+  // We've issued the post increment as an NBI operation,
+  // allowing this call to return before the increment
+  // is acknowledged by the remote side.
+  // This will later be synchronized in caf_segment_release()
+}
+
+void caf_event_query(void *event_var_ptr, int64_t *count) {
+  assert(event_AD != GEX_AD_INVALID);
+  assert(event_var_ptr);
+  assert(count);
+
+  gex_Event_Wait(
+    gex_AD_OpNB_I64(event_AD, count, 
+                    myproc, event_var_ptr,
+                    GEX_OP_GET, 0, 0, 0)
+  );
+}
+
+void caf_event_wait(void *event_var_ptr, int64_t threshold, int segment_boundary) {
+  assert(event_AD != GEX_AD_INVALID);
+  assert(event_var_ptr);
+  assert(threshold >= 1);
+
+  if (segment_boundary) {
+    caf_sync_memory();
+  }
+
+  int64_t cnt = 0;
+  while (caf_event_query(event_var_ptr, &cnt), cnt < threshold) {
+    // issue #222 : TODO: we probably want to insert a wait hook here
+    gasnet_AMPoll();
+  }
+
+  gex_Event_Wait(
+    gex_AD_OpNB_I64(event_AD, &cnt, 
+                    myproc, event_var_ptr,
+                    GEX_OP_FSUB, threshold, 0,
+                    GEX_FLAG_AD_ACQ)
+  );
+  assert(cnt >= threshold);
+}
+
 
 //-------------------------------------------------------------------
 
