@@ -65,7 +65,7 @@ contains
         call prif_num_images(num_images=num_imgs)
         call prif_this_image_no_coarray(this_image=me)
 
-        ! event_type :: evt[*]
+        ! type(event_type) :: evt[*]
         call prif_allocate_coarray( &
                 lcobounds = [1_c_int64_t], &
                 ucobounds = [int(num_imgs,c_int64_t)], &
@@ -155,7 +155,7 @@ contains
         call prif_num_images(num_images=num_imgs)
         call prif_this_image_no_coarray(this_image=me)
 
-        ! event_type :: evt[*]
+        ! type(event_type) :: evt[*]
         call prif_allocate_coarray( &
                 lcobounds = [1_c_int64_t], &
                 ucobounds = [int(num_imgs,c_int64_t)], &
@@ -255,7 +255,7 @@ contains
         call prif_num_images(num_images=num_imgs)
         call prif_this_image_no_coarray(this_image=me)
 
-        ! notify_type :: evt[*]
+        ! type(notify_type) :: evt[*]
         call prif_allocate_coarray( &
                 lcobounds = [1_c_int64_t], &
                 ucobounds = [int(num_imgs,c_int64_t)], &
@@ -309,7 +309,7 @@ contains
 
               ! image 1 writes back a coarray value to each image with notify
               do j=1,num_imgs
-                ! ctr(1)[j] = i
+                ! ctr(1)[j, notify=evt] = i
                 call prif_put_strided_with_notify( &
                   image_num = j, &
                   coarray_handle = coarray_handle_ctr, &

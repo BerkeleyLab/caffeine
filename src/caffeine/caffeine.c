@@ -263,7 +263,7 @@ void caf_event_wait(void *event_var_ptr, int64_t threshold, int segment_boundary
 
   int64_t cnt = 0;
   while (caf_event_query(event_var_ptr, &cnt), cnt < threshold) {
-    // TODO: wait hook?
+    // issue #222 : TODO: we probably want to insert a wait hook here
     gasnet_AMPoll();
   }
 
