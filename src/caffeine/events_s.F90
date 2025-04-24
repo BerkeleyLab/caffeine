@@ -26,7 +26,8 @@ contains
   module procedure prif_event_post_indirect
     call_assert_describe(image_num > 0 .and. image_num <= initial_team%num_images, "image_num not within valid range")
 
-    call caf_event_post(image_num, event_var_ptr, 1)
+    call caf_event_post(image_num, event_var_ptr, &
+           segment_boundary=1, release_fence=1)
 
     if (present(stat)) stat = 0
   end procedure
@@ -39,7 +40,8 @@ contains
     else
       threshold = 1
     endif
-    call caf_event_wait(event_var_ptr, threshold, 1)
+    call caf_event_wait(event_var_ptr, threshold, &
+           segment_boundary=1, acquire_fence=1)
 
     if (present(stat)) stat = 0
   end procedure
@@ -58,7 +60,8 @@ contains
     else
       threshold = 1
     endif
-    call caf_event_wait(notify_var_ptr, threshold, 0)
+    call caf_event_wait(notify_var_ptr, threshold, &
+           segment_boundary=0, acquire_fence=1)
 
     if (present(stat)) stat = 0
   end procedure

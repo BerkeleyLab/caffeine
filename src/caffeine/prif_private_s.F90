@@ -77,6 +77,24 @@ submodule(prif) prif_private_s
       integer(c_int) caf_num_images
     end function
 
+    function caf_image_to_initial(gex_team, image_num) bind(C)
+      !! int caf_image_to_initial(gex_TM_t tm, int image_num)
+      import c_ptr, c_int
+      implicit none
+      type(c_ptr), value :: gex_team
+      integer(c_int), value :: image_num
+      integer(c_int) caf_image_to_initial
+    end function
+
+    function caf_image_from_initial(gex_team, image_num) bind(C)
+      !! int caf_image_from_initial(gex_TM_t tm, int image_num)
+      import c_ptr, c_int
+      implicit none
+      type(c_ptr), value :: gex_team
+      integer(c_int), value :: image_num
+      integer(c_int) caf_image_from_initial
+    end function
+
     ! _________________ Memory allocation ____________________
 
     function caf_allocate(mspace, bytes) result(ptr) bind(c)
@@ -182,6 +200,9 @@ submodule(prif) prif_private_s
 
     ! __________________ SYNC Statements _____________________
 
+    module subroutine sync_init()
+    end subroutine
+
     subroutine caf_sync_memory() bind(C)
       !! void caf_sync_memory();
     end subroutine
@@ -194,22 +215,24 @@ submodule(prif) prif_private_s
     end subroutine
 
     ! _______________________ Events  ____________________________
-    subroutine caf_event_post(image, event_var_ptr, segment_boundary) bind(c)
-      !! void caf_event_post(int image, intptr_t event_var_ptr, int segment_boundary)
+    subroutine caf_event_post(image, event_var_ptr, segment_boundary, release_fence) bind(c)
+      !! void caf_event_post(int image, intptr_t event_var_ptr, int segment_boundary, int release_fence)
       import c_int, c_intptr_t
       implicit none
       integer(c_int), intent(in), value :: image
       integer(c_intptr_t), intent(in), value :: event_var_ptr
       integer(c_int), intent(in), value :: segment_boundary
+      integer(c_int), intent(in), value :: release_fence
     end subroutine
 
-    subroutine caf_event_wait(event_var_ptr, threshold, segment_boundary) bind(c)
-      !! void caf_event_wait(void *event_var_ptr, int64_t threshold, int segment_boundary)
+    subroutine caf_event_wait(event_var_ptr, threshold, segment_boundary, acquire_fence) bind(c)
+      !! void caf_event_wait(void *event_var_ptr, int64_t threshold, int segment_boundary, int acquire_fence)
       import c_int64_t, c_ptr, c_int
       implicit none
       type(c_ptr), intent(in), value :: event_var_ptr
       integer(c_int64_t), intent(in), value :: threshold
       integer(c_int), intent(in), value :: segment_boundary
+      integer(c_int), intent(in), value :: acquire_fence
     end subroutine
 
     subroutine caf_event_query(event_var_ptr, count) bind(c)

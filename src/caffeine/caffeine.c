@@ -33,13 +33,28 @@ typedef uint8_t byte;
 static void event_init(void);
 
 // ---------------------------------------------------
-int caf_this_image(gex_TM_t gex_team)
-{
-  return gex_TM_QueryRank(gex_team) + 1;
+int caf_this_image(gex_TM_t tm) {
+  return gex_TM_QueryRank(tm) + 1;
 }
-int caf_num_images(gex_TM_t gex_team)
-{
-  return gex_TM_QuerySize(gex_team);
+int caf_num_images(gex_TM_t tm) {
+  return gex_TM_QuerySize(tm);
+}
+
+// Given team and corresponding image_num, return image number in the initial team
+int caf_image_to_initial(gex_TM_t tm, int image_num) {
+  assert(image_num >= 1);
+  assert(image_num <= gex_TM_QuerySize(tm));
+  gex_Rank_t proc = gex_TM_TranslateRankToJobrank(tm, image_num-1);
+  return proc + 1;
+}
+// Given image number in the initial team, return image number corresponding to given team
+int caf_image_from_initial(gex_TM_t tm, int image_num) {
+  assert(image_num >= 1);
+  assert(image_num <= numprocs);
+  gex_Rank_t proc = gex_TM_TranslateJobrankToRank(tm, image_num-1);
+  // GEX_RANK_INVALID indicates the provided image_num in initial team is not part of tm
+  assert(proc != GEX_RANK_INVALID); 
+  return proc + 1;
 }
 // ---------------------------------------------------
 // NOTE: gex_TM_T is a typedef to a C pointer, so the `gex_TM_t* initial_team` arg in the C signature matches the BIND(C) interface of an `intent(out)` arg of type `c_ptr` for the same argument
@@ -221,18 +236,25 @@ static void event_init(void) {
   assert(event_AD != GEX_AD_INVALID);
 }
 
-void caf_event_post(int image, intptr_t event_var_ptr, int segment_boundary) {
+void caf_event_post(int image, intptr_t event_var_ptr, int segment_boundary, int release_fence) {
   assert(event_AD != GEX_AD_INVALID);
   assert(event_var_ptr);
 
+  // arrange for requested fencing
+  gex_Flags_t flags;
   if (segment_boundary) {
     caf_segment_release();
+    flags = GEX_FLAG_AD_REL | GEX_FLAG_AD_ACQ;
+  } else if (release_fence) {
+    flags = GEX_FLAG_AD_REL;
+  } else {
+    flags = 0;
   }
 
   gex_AD_OpNBI_I64(event_AD, NULL, 
                    image-1, (void *)event_var_ptr, 
                    GEX_OP_INC, 0, 0, 
-                   GEX_FLAG_AD_REL);
+                   flags);
 
   // We've issued the post increment as an NBI operation,
   // allowing this call to return before the increment
@@ -252,13 +274,21 @@ void caf_event_query(void *event_var_ptr, int64_t *count) {
   );
 }
 
-void caf_event_wait(void *event_var_ptr, int64_t threshold, int segment_boundary) {
+void caf_event_wait(void *event_var_ptr, int64_t threshold, int segment_boundary, int acquire_fence) {
   assert(event_AD != GEX_AD_INVALID);
   assert(event_var_ptr);
   assert(threshold >= 1);
 
+  // arrange for requested fencing
+  gex_Flags_t flags;
   if (segment_boundary) {
-    caf_sync_memory();
+    caf_segment_release();
+    gasnett_local_wmb(); // release fence synchronously (before wait loop)
+    flags = GEX_FLAG_AD_ACQ;
+  } else if (acquire_fence) {
+    flags = GEX_FLAG_AD_ACQ;
+  } else {
+    flags = 0;
   }
 
   int64_t cnt = 0;
@@ -271,7 +301,7 @@ void caf_event_wait(void *event_var_ptr, int64_t threshold, int segment_boundary
     gex_AD_OpNB_I64(event_AD, &cnt, 
                     myproc, event_var_ptr,
                     GEX_OP_FSUB, threshold, 0,
-                    GEX_FLAG_AD_ACQ)
+                    flags)
   );
   assert(cnt >= threshold);
 }

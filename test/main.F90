@@ -47,6 +47,7 @@ contains
                 caf_num_images_prif_num_images => &
                     test_prif_num_images
         use caf_image_queries_test, only: test_prif_image_queries
+        use caf_sync_images_test, only: test_prif_sync_images
         use caf_rma_test, only: &
                 caf_rma_prif_rma => &
                     test_prif_rma
@@ -106,6 +107,7 @@ contains
         individual_tests = [individual_tests, caf_teams_caf_teams()]
         individual_tests = [individual_tests, caf_this_image_prif_this_image_no_coarray()]
         individual_tests = [individual_tests, test_prif_event()]
+        individual_tests = [individual_tests, test_prif_sync_images()]
         individual_tests = [individual_tests, test_prif_stop()]
         individual_tests = [individual_tests, test_prif_error_stop()]
 

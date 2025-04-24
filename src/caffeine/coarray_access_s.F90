@@ -94,7 +94,8 @@ contains
         dest = remote_ptr, &
         src = current_image_buffer, &
         size = size_in_bytes)
-    call caf_event_post(image_num, notify_ptr, 0)
+    call caf_event_post(image_num, notify_ptr, &
+           segment_boundary=0, release_fence=1)
 
     if (present(stat)) stat = 0
   end procedure
@@ -326,7 +327,8 @@ contains
         element_size = element_size, &
         extent = extent, &
         stat = stat, errmsg = errmsg, errmsg_alloc = errmsg_alloc)
-    call caf_event_post(image_num, notify_ptr, 0)
+    call caf_event_post(image_num, notify_ptr, &
+           segment_boundary=0, release_fence=1)
   end procedure
 
 end submodule coarray_access_s

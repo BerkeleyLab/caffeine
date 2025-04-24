@@ -129,14 +129,14 @@ in the following sections.
 ---
 
 ## SYNC Statements
-### Support = partial
+### Support = **YES**
 
 | Procedure | Status | Notes |
 |-----------|--------|-------|
-| `prif_sync_memory` | **YES**   |  |
-| `prif_sync_all`    | **YES**   |  |
-| `prif_sync_images` | no        |  |
-| `prif_sync_team`   | **YES**   |  |
+| `prif_sync_memory` | **YES** |  |
+| `prif_sync_all`    | **YES** |  |
+| `prif_sync_images` | **YES** |  |
+| `prif_sync_team`   | **YES** |  |
 
 ---
 
