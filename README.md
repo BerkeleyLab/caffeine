@@ -129,7 +129,7 @@ Publications
 
 Damian Rouson, Dan Bonachea.   
 "[**Caffeine: CoArray Fortran Framework of Efficient Interfaces to Network Environments**](https://github.com/BerkeleyLab/caffeine/wiki/pubs/Caffeine_for_LLVM-2022.pdf)",     
-Proceedings of the [Eighth Annual Workshop on the LLVM Compiler Infrastructure in HPC (LLVM-HPC2022)](https://llvm-hpc-2022-workshop.github.io), November 2022.    
+Proceedings of the [Eighth Annual Workshop on the LLVM Compiler Infrastructure in HPC (LLVM-HPC2022)](https://web.archive.org/web/20230605003029/https://llvm-hpc-2022-workshop.github.io/), November 2022.    
 Paper: <https://doi.org/10.25344/S4459B>     
 [Talk Slides](https://github.com/BerkeleyLab/caffeine/wiki/pubs/Caffeine_for_LLVM-2022-Slides.pdf)
 
@@ -137,7 +137,7 @@ Paper: <https://doi.org/10.25344/S4459B>
 
 Dan Bonachea, Katherine Rasmussen, Brad Richardson, Damian Rouson.    
 "[**Parallel Runtime Interface for Fortran (PRIF): A Multi-Image Solution for LLVM Flang**](https://github.com/BerkeleyLab/caffeine/wiki/pubs/LLVM-HPC24_PRIF.pdf)",     
-Proceedings of the [Tenth Annual Workshop on the LLVM Compiler Infrastructure in HPC (LLVM-HPC2024)](https://llvm-hpc-2024-workshop.github.io/), November 2024.    
+Proceedings of the [Tenth Annual Workshop on the LLVM Compiler Infrastructure in HPC (LLVM-HPC2024)](https://web.archive.org/web/20241006163246/https://llvm-hpc-2024-workshop.github.io/), November 2024.    
 Paper: <https://doi.org/10.25344/S4N017>    
 [Talk Slides](https://github.com/BerkeleyLab/caffeine/wiki/pubs/LLVM-HPC24_PRIF_Slides.pdf)
 
