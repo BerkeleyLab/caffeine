@@ -8,7 +8,7 @@ more details about the implementation of the various PRIF features, please see t
 following sections:
 
 - [Named Constants](#Named-Constants)
-- [`stat` and `errmsg` support](#stat-and-errmsg-support) - NO support yet
+- [`stat` and `errmsg` support](#stat-and-errmsg-support)
 - [Program Startup and Shutdown](#Program-Startup-and-Shutdown)
 - [Image Queries](#Image-Queries)
 - [Storage Management](#Storage-Management)
@@ -23,6 +23,8 @@ following sections:
 - [Collectives](#Collectives)
 - [Atomic Memory Operations](#Atomic-Memory-Operations)
 
+The priorites for feature implementation and addressing known defects is communicated by
+the labels in the Caffeine [issue tracker](https://github.com/BerkeleyLab/caffeine/issues).
 
 ## Named Constants
 
@@ -31,13 +33,10 @@ all of the PRIF-specific constants.
 
 ## `stat` and `errmsg` support
 
-Many PRIF procedures have optional arguments `stat`, `errmsg`, and `errmsg_alloc`. There is no
-support for these optional arguments in Caffeine yet and this is not represented in the tables
-in the following sections.
-
+Many PRIF procedures have optional arguments `stat`, `errmsg`, and `errmsg_alloc`. These arguments
+are accepted, but in some cases, the associated runtime behavior is not fully implemented.
 
 ## Program Startup and Shutdown
-### Support = partial
 
 | Procedure | Status | Notes |
 |-----------|--------|-------|
@@ -50,7 +49,6 @@ in the following sections.
 ---
 
 ## Image Queries
-### Support = partial
 
 | Procedure | Status | Notes |
 |-----------|--------|-------|
@@ -66,7 +64,6 @@ in the following sections.
 ---
 
 ## Storage Management
-### Support = partial
 
 | Procedure | Status | Notes |
 |-----------|--------|-------|
@@ -80,7 +77,6 @@ in the following sections.
 ---
 
 ## Coarray Queries
-### Support = partial
 
 | Procedure | Status | Notes |
 |-----------|--------|-------|
@@ -97,7 +93,6 @@ in the following sections.
 ---
 
 ## Contiguous Coarray Access
-### Support = **YES**
 
 | Procedure | Status | Notes |
 |-----------|--------|-------|
@@ -113,7 +108,6 @@ in the following sections.
 ---
 
 ## Strided Coarray Access
-### Support = **YES**
 
 | Procedure | Status | Notes |
 |-----------|--------|-------|
@@ -129,7 +123,6 @@ in the following sections.
 ---
 
 ## SYNC Statements
-### Support = **YES**
 
 | Procedure | Status | Notes |
 |-----------|--------|-------|
@@ -141,7 +134,6 @@ in the following sections.
 ---
 
 ## Locks and Unlocks
-### Support = no
 
 <!---
 | Procedure | Status | Notes |
@@ -167,7 +159,6 @@ in the following sections.
 ---
 
 ## Events and Notifications
-### Support = **YES**
 
 | Procedure | Status | Notes |
 |-----------|--------|-------|
@@ -180,7 +171,6 @@ in the following sections.
 ---
 
 ## Teams
-### Support = **YES** 
 
 | Procedure | Status | Notes |
 |-----------|--------|-------|
@@ -193,7 +183,6 @@ in the following sections.
 ---
 
 ## Collectives
-### Support = **YES**
 
 | Procedure | Status | Notes |
 |-----------|--------|-------|
@@ -208,7 +197,6 @@ in the following sections.
 ---
 
 ## Atomic Memory Operations
-### Support = no
 
 <!---
 | Procedure | Status | Notes |
