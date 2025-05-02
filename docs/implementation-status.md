@@ -134,6 +134,7 @@ are accepted, but in some cases, the associated runtime behavior is not fully im
 ---
 
 ## Locks and Unlocks
+### Support = no
 
 <!---
 | Procedure | Status | Notes |
@@ -197,6 +198,7 @@ are accepted, but in some cases, the associated runtime behavior is not fully im
 ---
 
 ## Atomic Memory Operations
+### Support = no
 
 <!---
 | Procedure | Status | Notes |
