@@ -88,7 +88,7 @@ are accepted, but in some cases, the associated runtime behavior is not fully im
 | `prif_local_data_pointer`                        | **YES** |  |
 | `prif_image_index`                               | **YES** |  |
 | `prif_image_index_with_team`                     | **YES** |  |
-| `prif_image_index_with_team_number`              | no |  |
+| `prif_image_index_with_team_number`              | *partial* | no support for sibling teams |
 
 ---
 
