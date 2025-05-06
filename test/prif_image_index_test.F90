@@ -5,7 +5,8 @@ module caf_image_index_test
                     prif_team_type, prif_get_team, &
                     prif_this_image_no_coarray, &
                     prif_form_team, prif_change_team, prif_end_team, &
-                    prif_image_index_with_team, prif_num_images_with_team
+                    prif_image_index_with_team, prif_image_index_with_team_number, &
+                    prif_num_images_with_team
     use veggies, only: result_t, test_item_t, assert_equals, describe, it, succeed
 
     implicit none
@@ -165,9 +166,21 @@ contains
           result_ = result_ .and. &
             assert_equals(1_c_int, answer)
 
+          call prif_image_index_with_team_number(coarray_handle, &
+                              [0_c_int64_t, 2_c_int64_t], &
+                              team_number=-1_c_int64_t, image_index=answer)
+          result_ = result_ .and. &
+            assert_equals(1_c_int, answer)
+
           call prif_image_index_with_team(coarray_handle, &
                               [0_c_int64_t, 2_c_int64_t], &
                               team=child_team, image_index=answer)
+          result_ = result_ .and. &
+            assert_equals(1_c_int, answer)
+
+          call prif_image_index_with_team_number(coarray_handle, &
+                              [0_c_int64_t, 2_c_int64_t], &
+                              team_number=which_team, image_index=answer)
           result_ = result_ .and. &
             assert_equals(1_c_int, answer)
 
@@ -183,9 +196,21 @@ contains
           result_ = result_ .and. &
             assert_equals(merge(3_c_int,0_c_int,ni >= 3), answer)
 
+          call prif_image_index_with_team_number(coarray_handle, &
+                              [0_c_int64_t, 3_c_int64_t], &
+                              team_number=-1_c_int64_t, image_index=answer)
+          result_ = result_ .and. &
+            assert_equals(merge(3_c_int,0_c_int,ni >= 3), answer)
+
           call prif_image_index_with_team(coarray_handle, &
                               [0_c_int64_t, 3_c_int64_t], &
                               team=child_team, image_index=answer)
+          result_ = result_ .and. &
+            assert_equals(merge(3_c_int,0_c_int,cni >= 3), answer)
+
+          call prif_image_index_with_team_number(coarray_handle, &
+                              [0_c_int64_t, 3_c_int64_t], &
+                              team_number=which_team, image_index=answer)
           result_ = result_ .and. &
             assert_equals(merge(3_c_int,0_c_int,cni >= 3), answer)
 
