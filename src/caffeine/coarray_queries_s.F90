@@ -93,9 +93,13 @@ contains
   end procedure
 
   module procedure prif_image_index_with_team_number
-    call_assert(coarray_handle_check(coarray_handle))
-
-    call unimplemented("prif_image_index_with_team_number")
+    if (team_number == -1) then
+      call image_index_helper(coarray_handle, sub, initial_team%num_images, image_index)
+    else if (team_number == current_team%info%team_number) then
+      call image_index_helper(coarray_handle, sub, current_team%info%num_images, image_index)
+    else
+      call unimplemented("prif_image_index_with_team_number: no support for sibling teams")
+    end if 
   end procedure
 
   module procedure prif_local_data_pointer
