@@ -45,9 +45,15 @@ contains
     end associate
   end procedure
 
-  module procedure prif_image_index
+  subroutine image_index_helper(coarray_handle, sub, num_images, image_index)
+    implicit none
+    type(prif_coarray_handle), intent(in) :: coarray_handle
+    integer(c_int64_t), intent(in) :: sub(:)
+    integer(c_int), intent(in) :: num_images
+    integer(c_int), intent(out) :: image_index
+
     integer :: dim, i
-    integer(c_int) :: prior_size, num_img
+    integer(c_int) :: prior_size
     logical :: invalid_cosubscripts
 
     call_assert(coarray_handle_check(coarray_handle))
@@ -74,16 +80,17 @@ contains
        end do
     end if
 
-    call prif_num_images(num_images=num_img)
-    if (invalid_cosubscripts .or. image_index .gt. num_img) then
+    if (invalid_cosubscripts .or. image_index .gt. num_images) then
        image_index = 0
     end if
+  end subroutine
+
+  module procedure prif_image_index
+    call image_index_helper(coarray_handle, sub, current_team%info%num_images, image_index)
   end procedure
 
   module procedure prif_image_index_with_team
-    call_assert(coarray_handle_check(coarray_handle))
-
-    call unimplemented("prif_image_index_with_team")
+    call image_index_helper(coarray_handle, sub, team%info%num_images, image_index)
   end procedure
 
   module procedure prif_image_index_with_team_number
