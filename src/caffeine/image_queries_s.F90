@@ -19,7 +19,13 @@ contains
   end procedure
 
   module procedure prif_num_images_with_team_number
-    call unimplemented("prif_num_images_with_team_number")
+    if (team_number == -1) then
+      num_images = initial_team%num_images 
+    else if (team_number == current_team%info%team_number) then
+      num_images = current_team%info%num_images
+    else
+      call unimplemented("prif_num_images_with_team_number: no support for sibling teams")
+    end if
   end procedure
 
   module procedure prif_this_image_no_coarray
