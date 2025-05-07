@@ -6,8 +6,10 @@ module caf_image_index_test
                     prif_this_image_no_coarray, &
                     prif_form_team, prif_change_team, prif_end_team, &
                     prif_image_index_with_team, prif_image_index_with_team_number, &
+                    prif_this_image_with_coarray, prif_this_image_with_dim, &
+                    prif_lcobound_no_dim, prif_ucobound_no_dim, &
                     prif_num_images_with_team
-    use veggies, only: result_t, test_item_t, assert_equals, describe, it, succeed
+    use veggies, only: result_t, test_item_t, assert_equals, assert_that, describe, it, succeed
 
     implicit none
     private
@@ -27,6 +29,39 @@ contains
           ])
     end function
 
+    function check_this_image_coarray(coarray_handle, corank, team) result(result_)
+        type(prif_coarray_handle) :: coarray_handle
+        integer(c_int) :: corank
+        type(prif_team_type), optional :: team
+        type(result_t) :: result_
+
+        integer(c_int64_t) :: co, cosubscripts(corank), colbound(corank), coubound(corank)
+        integer(c_int) :: i, me
+
+        result_ = succeed("")
+
+        call prif_lcobound_no_dim(coarray_handle, colbound)
+        call prif_ucobound_no_dim(coarray_handle, coubound)
+        call prif_this_image_no_coarray(team, me)
+
+        call prif_this_image_with_coarray(coarray_handle, team=team, cosubscripts=cosubscripts)
+        do i=1,corank
+          call prif_this_image_with_dim(coarray_handle, dim=i, team=team, cosubscript=co)
+          result_ = result_ .and. assert_equals(int(co), int(cosubscripts(i)))
+
+          result_ = result_ .and. assert_that(co >= colbound(i))
+          result_ = result_ .and. assert_that(co <= coubound(i))
+        end do
+
+        ! verify reverse mapping
+        if (present(team)) then
+          call prif_image_index_with_team(coarray_handle, cosubscripts, team, i)
+        else
+          call prif_image_index(coarray_handle, cosubscripts, i)
+        end if
+        result_ = result_ .and. assert_equals(i, me)
+    end function
+
     function check_simple_case() result(result_)
         type(result_t) :: result_
 
@@ -44,6 +79,10 @@ contains
                 allocated_memory = allocated_memory)
         call prif_image_index(coarray_handle, [1_c_int64_t], image_index=answer)
         result_ = assert_equals(1_c_int, answer)
+
+        result_ = result_ .and. &
+          check_this_image_coarray(coarray_handle, 1)
+
         call prif_deallocate_coarray([coarray_handle])
     end function
 
@@ -64,6 +103,10 @@ contains
                 allocated_memory = allocated_memory)
         call prif_image_index(coarray_handle, [2_c_int64_t, 3_c_int64_t], image_index=answer)
         result_ = assert_equals(1_c_int, answer)
+
+        result_ = result_ .and. &
+          check_this_image_coarray(coarray_handle, 2)
+
         call prif_deallocate_coarray([coarray_handle])
     end function
 
@@ -84,6 +127,10 @@ contains
                 allocated_memory = allocated_memory)
         call prif_image_index(coarray_handle, [-1_c_int64_t, 1_c_int64_t], image_index=answer)
         result_ = assert_equals(0_c_int, answer)
+
+        result_ = result_ .and. &
+          check_this_image_coarray(coarray_handle, 2)
+
         call prif_deallocate_coarray([coarray_handle])
     end function
 
@@ -104,6 +151,10 @@ contains
                 allocated_memory = allocated_memory)
         call prif_image_index(coarray_handle, [1_c_int64_t, 3_c_int64_t], image_index=answer)
         result_ = assert_equals(merge(3_c_int,0_c_int,ni >= 3), answer)
+
+        result_ = result_ .and. &
+          check_this_image_coarray(coarray_handle, 2)
+
         call prif_deallocate_coarray([coarray_handle])
     end function
 
@@ -128,6 +179,10 @@ contains
                            [2_c_int64_t, 1_c_int64_t, 1_c_int64_t], &
                            team=initial_team, image_index=answer)
         result_ = assert_equals(merge(8_c_int,0_c_int,ni >= 8), answer)
+
+        result_ = result_ .and. &
+          check_this_image_coarray(coarray_handle, 3)
+
         call prif_deallocate_coarray([coarray_handle])
     end function
 
@@ -219,6 +274,11 @@ contains
                               image_index=answer)
           result_ = result_ .and. &
             assert_equals(merge(3_c_int,0_c_int,cni >= 3), answer)
+
+          result_ = result_ .and. &
+            check_this_image_coarray(coarray_handle, 2, initial_team)
+          result_ = result_ .and. &
+            check_this_image_coarray(coarray_handle, 2, child_team)
 
         call prif_end_team()
         call prif_deallocate_coarray([coarray_handle])
