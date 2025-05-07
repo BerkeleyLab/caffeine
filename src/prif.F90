@@ -499,7 +499,7 @@ module prif
       implicit none
       type(prif_coarray_handle), intent(in) :: coarray_handle
       integer(c_int64_t), intent(in) :: sub(:)
-      integer(c_int), intent(in) :: team_number
+      integer(c_int64_t), intent(in) :: team_number
       integer(c_int), intent(out) :: image_index
     end subroutine
 
