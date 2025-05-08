@@ -102,6 +102,61 @@ contains
     end if 
   end procedure
 
+  !---------------------------------------------------------------------
+
+  subroutine initial_index_helper(coarray_handle, sub, team, initial_team_index)
+    implicit none
+    type(prif_coarray_handle), intent(in) :: coarray_handle
+    integer(c_int64_t), intent(in) :: sub(:)
+    type(prif_team_type), intent(in) :: team
+    integer(c_int), intent(out) :: initial_team_index
+
+    integer :: dim
+    integer(c_int) :: prior_size, image_index
+
+    call_assert(coarray_handle_check(coarray_handle))
+
+    associate (info => coarray_handle%info) 
+      call_assert(size(sub) == info%corank)
+      call_assert(sub(1) .ge. info%lcobounds(1) .and. sub(1) .le. info%ucobounds(1))
+      image_index = 1 + INT(sub(1) - info%lcobounds(1), c_int)
+      prior_size = 1
+      ! Future work: values of prior_size are invariant across calls w/ the same coarray_handle
+      !  We could store them in the coarray metadata at allocation rather than redundantly
+      ! computing them here, which would accelerate calls with corank > 1 by removing
+      ! corank multiply/add operations and the loop-carried dependence
+      do dim = 2, size(sub)
+        prior_size = prior_size * INT(info%ucobounds(dim-1) - info%lcobounds(dim-1) + 1, c_int)
+        call_assert(sub(dim) .ge. info%lcobounds(dim) .and. sub(dim) .le. info%ucobounds(dim))
+        image_index = image_index + INT(sub(dim) - info%lcobounds(dim), c_int) * prior_size
+       end do
+    end associate
+
+    call_assert(image_index .le. team%info%num_images)
+    initial_team_index = caf_image_to_initial(team%info%gex_team, image_index)
+    call_assert(initial_team_index .ge. 1 .and. initial_team_index .le. initial_team%num_images)
+  end subroutine
+
+  module procedure prif_initial_team_index
+    call initial_index_helper(coarray_handle, sub, current_team, initial_team_index)
+  end procedure
+
+  module procedure prif_initial_team_index_with_team
+    call initial_index_helper(coarray_handle, sub, team, initial_team_index)
+  end procedure
+
+  module procedure prif_initial_team_index_with_team_number
+    if (team_number == -1) then
+      call initial_index_helper(coarray_handle, sub, prif_team_type(initial_team), initial_team_index)
+    else if (team_number == current_team%info%team_number) then
+      call initial_index_helper(coarray_handle, sub, current_team, initial_team_index)
+    else
+      call unimplemented("prif_initial_team_index_with_team_number: no support for sibling teams")
+    end if 
+  end procedure
+
+  !---------------------------------------------------------------------
+
   module procedure prif_local_data_pointer
     call_assert(coarray_handle_check(coarray_handle))
 
