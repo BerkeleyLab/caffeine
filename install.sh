@@ -417,10 +417,8 @@ user_compiler_flags="${CPPFLAGS:-} ${FFLAGS:-}"
 
 compiler_version=$($FPM_FC --version)
 if [[ $compiler_version == *flang* ]]; then
-  echo "--------> flang"
   compiler_flag="-g -O3"
 else # assume gfortran
-  echo "--------> assume gfortran"
   compiler_flag="-g -O3 -ffree-line-length-0 -Wno-unused-dummy-argument"
 fi
 compiler_flag+=" -DASSERT_MULTI_IMAGE -DASSERT_PARALLEL_CALLBACKS"
