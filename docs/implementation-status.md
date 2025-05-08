@@ -89,6 +89,9 @@ are accepted, but in some cases, the associated runtime behavior is not fully im
 | `prif_image_index`                               | **YES** |  |
 | `prif_image_index_with_team`                     | **YES** |  |
 | `prif_image_index_with_team_number`              | *partial* | no support for sibling teams |
+| `prif_initial_team_index`                        | **YES** |  |
+| `prif_initial_team_index_with_team`              | **YES** |  |
+| `prif_initial_team_index_with_team_number`       | *partial* | no support for sibling teams |
 
 ---
 
