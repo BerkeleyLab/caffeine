@@ -416,7 +416,7 @@ exit_if_pkg_config_pc_file_missing "caffeine"
 user_compiler_flags="${CPPFLAGS:-} ${FFLAGS:-}"
 
 compiler_version=$($FPM_FC --version)
-if [[ $compiler_version == flang* ]]; then
+if [[ $compiler_version == *flang* ]]; then
   compiler_flag="-g -O3"
 else # assume gfortran
   compiler_flag="-g -O3 -ffree-line-length-0 -Wno-unused-dummy-argument"
