@@ -9,11 +9,14 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [macos-13, macos-14, ubuntu-24.04]
+        os: [macos-13, macos-14, macos-15, ubuntu-24.04]
         compiler: [ gfortran ]
         version: [ 13, 14 ]
         CC: [ gcc ]
         CXX: [ g++ ]
+        exclude:
+          - os: macos-15 # gcc-13 broken on macos-15
+            version: 13
         include:
           - os: ubuntu-24.04
             compiler: flang
@@ -90,12 +93,13 @@ jobs:
 
     - name: Setup FPM
       uses: fortran-lang/setup-fpm@main
-      if: ${{ matrix.os != 'macos-14' }}
+      if: ${{ !contains(matrix.os, 'macos') || matrix.os == 'macos-13' }}
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Build FPM
-      if: ${{ matrix.os == 'macos-14' }} # no arm64 fpm distro, build from source
+      # no macos-arm64 fpm distro, build from source
+      if: ${{ contains(matrix.os, 'macos') && matrix.os != 'macos-13' }} 
       run: |
         set -x
         curl --retry 5 -LOsS https://github.com/fortran-lang/fpm/releases/download/v0.11.0/fpm-0.11.0.F90
