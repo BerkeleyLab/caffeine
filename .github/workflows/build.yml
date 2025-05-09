@@ -18,6 +18,21 @@ jobs:
           - os: macos-15 # gcc-13 broken on macos-15
             version: 13
         include:
+          - os: macos-13
+            compiler: flang
+            version: 20
+            CC:  clang
+            CXX: clang++
+          - os: macos-14
+            compiler: flang
+            version: 20
+            CC:  clang
+            CXX: clang++
+          - os: macos-15
+            compiler: flang
+            version: 20
+            CC:  clang
+            CXX: clang++
           - os: ubuntu-24.04
             compiler: flang
             version: 20
@@ -76,9 +91,23 @@ jobs:
         apt install -y build-essential pkg-config make
 
     - name: Install macOS Dependencies
-      if: contains(matrix.os, 'macos') && 0
+      if: contains(matrix.os, 'macos') && matrix.compiler == 'flang'
       run: |
         set -x
+        brew update
+        brew install llvm@${GCC_VERSION} flang
+        # workaround issue #228: clang cannot find homebrew flang's C header
+        #for p in /opt/homebrew /usr/local ; do find $p/Cellar/flang -name ISO_Fortran_binding.h 2>/dev/null || true ; done
+        for p in /opt/homebrew /usr/local ; do \
+          if test -d $p ; then \
+            dir=$(find $p/Cellar/flang -name ISO_Fortran_binding.h | head -1) ; \
+          fi ; \
+          if test -n "$dir" ; then break ; fi ; \
+        done
+        dir=$(dirname ${dir} )
+        echo "CFLAGS=-I${dir} ${CFLAGS}" >> "$GITHUB_ENV"
+        # Prepend homebrew clang to PATH:
+        echo "PATH=/opt/homebrew/opt/llvm/bin:${PATH}" >> "$GITHUB_ENV"
 
     - name: Setup Compilers
       run: |
