@@ -2,6 +2,10 @@ name: Build
 
 on: [push, pull_request]
 
+defaults:
+  run:
+    shell: bash
+
 jobs:
   build:
     name: ${{ matrix.compiler }}-${{ matrix.version }} (${{ matrix.os }})
@@ -9,25 +13,31 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [macos-13, macos-14, ubuntu-24.04]
+        os: [macos-13, macos-14, macos-15, ubuntu-24.04]
         compiler: [ gfortran ]
         version: [ 13, 14 ]
-        CC: [ gcc ]
-        CXX: [ g++ ]
+        exclude:
+          - os: macos-15 # gcc-13 broken on macos-15
+            version: 13
         include:
+          - os: macos-13
+            compiler: flang
+            version: 20
+          - os: macos-14
+            compiler: flang
+            version: 20
+          - os: macos-15
+            compiler: flang
+            version: 20
           - os: ubuntu-24.04
             compiler: flang
             version: 20
-            CC: clang
-            CXX: clang++
             # https://hub.docker.com/r/phhargrove/llvm-flang/tags
             container: phhargrove/llvm-flang:20.1.0-1
             SUBJOB_PREFIX: GASNET_PSHM_NODES=2
           - os: ubuntu-24.04
             compiler: flang
             version: 19
-            CC: clang
-            CXX: clang++
             FFLAGS: -mmlir -allow-assumed-rank
             # https://hub.docker.com/r/phhargrove/llvm-flang/tags
             container: phhargrove/llvm-flang:19.1.1-1
@@ -35,8 +45,6 @@ jobs:
 #          - os: ubuntu-24.04
 #            compiler: flang
 #            version: new
-#            CC: clang
-#            CXX: clang++
 #            container: gmao/llvm-flang:latest
 #            SUBJOB_PREFIX: GASNET_PSHM_NODES=2
 
@@ -44,10 +52,7 @@ jobs:
       image: ${{ matrix.container }}
 
     env:
-      GCC_VERSION: ${{ matrix.version }}
-      FC: ${{ matrix.compiler }}
-      CC: ${{ matrix.CC }}
-      CXX: ${{ matrix.CXX }}
+      COMPILER_VERSION: ${{ matrix.version }}
       FFLAGS: ${{ matrix.FFLAGS }}
       PREFIX: install
       GASNET_CONFIGURE_ARGS: --enable-rpath --enable-debug
@@ -55,6 +60,22 @@ jobs:
       SUBJOB_PREFIX: ${{ matrix.SUBJOB_PREFIX }}
 
     steps:
+    - name: Set gfortran variables
+      if: matrix.compiler == 'gfortran'
+      run: |
+        set -x
+        echo "FC=gfortran-${COMPILER_VERSION}" >> "$GITHUB_ENV"
+        echo "CC=gcc-${COMPILER_VERSION}" >> "$GITHUB_ENV"
+        echo "CXX=g++-${COMPILER_VERSION}" >> "$GITHUB_ENV"
+
+    - name: Set flang variables
+      if: matrix.compiler == 'flang'
+      run: |
+        set -x
+        echo "FC=flang-new" >> "$GITHUB_ENV" 
+        echo "CC=clang" >> "$GITHUB_ENV"
+        echo "CXX=clang++" >> "$GITHUB_ENV"
+
     - name: Checkout code
       uses: actions/checkout@v1
 
@@ -63,7 +84,7 @@ jobs:
       run: |
         set -x
         sudo apt update
-        sudo apt install -y build-essential gfortran-${GCC_VERSION} g++-${GCC_VERSION} pkg-config make
+        sudo apt install -y build-essential gfortran-${COMPILER_VERSION} g++-${COMPILER_VERSION} pkg-config make
 
     - name: Install Ubuntu Container Dependencies
       if: ${{ contains(matrix.os, 'ubuntu') && contains(matrix.container, 'gmao') }}
@@ -73,29 +94,26 @@ jobs:
         apt install -y build-essential pkg-config make
 
     - name: Install macOS Dependencies
-      if: contains(matrix.os, 'macos') && 0
+      if: contains(matrix.os, 'macos') && matrix.compiler == 'flang'
       run: |
         set -x
-
-    - name: Setup Compilers
-      run: |
-        set -x
-        if test "$FC" = "flang" ; then \
-          echo "FC=flang-new" >> "$GITHUB_ENV" ; \
-        else \
-          echo "FC=gfortran-${GCC_VERSION}" >> "$GITHUB_ENV" ; \
-        fi
-        if test "$CC" = "gcc" ; then echo "CC=gcc-${GCC_VERSION}" >> "$GITHUB_ENV" ; fi
-        if test "$CXX" = "g++" ; then echo "CXX=g++-${GCC_VERSION}" >> "$GITHUB_ENV" ; fi
+        brew update
+        brew install llvm@${COMPILER_VERSION} flang
+        # workaround issue #228: clang cannot find homebrew flang's C header
+        for p in /opt/homebrew /usr/local $(brew --prefix) ; do find $p/Cellar/flang -name ISO_Fortran_binding.h 2>/dev/null || true ; done
+        echo "CFLAGS=-I$(dirname $(find $(brew --prefix)/Cellar/flang -name ISO_Fortran_binding.h | head -1)) ${CFLAGS}" >> "$GITHUB_ENV"
+        # Prepend homebrew clang to PATH:
+        echo "PATH=$(brew --prefix)/opt/llvm/bin:${PATH}" >> "$GITHUB_ENV"
 
     - name: Setup FPM
       uses: fortran-lang/setup-fpm@main
-      if: ${{ matrix.os != 'macos-14' }}
+      if: ${{ !contains(matrix.os, 'macos') || matrix.os == 'macos-13' }}
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Build FPM
-      if: ${{ matrix.os == 'macos-14' }} # no arm64 fpm distro, build from source
+      # no macos-arm64 fpm distro, build from source
+      if: ${{ contains(matrix.os, 'macos') && matrix.os != 'macos-13' }} 
       run: |
         set -x
         curl --retry 5 -LOsS https://github.com/fortran-lang/fpm/releases/download/v0.11.0/fpm-0.11.0.F90
@@ -132,8 +150,11 @@ jobs:
 
     - name: Run unit tests
       run: |
-        echo GASNET_PSHM_NODES=${GASNET_PSHM_NODES}
         echo SUBJOB_PREFIX=${SUBJOB_PREFIX}
-        set -x
-        ./build/run-fpm.sh test --verbose -- -d
+        while (( GASNET_PSHM_NODES > 0 )); do \
+          echo GASNET_PSHM_NODES=${GASNET_PSHM_NODES} ; \
+          ( set -x ; ./build/run-fpm.sh test --verbose -- -d ) ; \
+          sleep 1 ; \
+          GASNET_PSHM_NODES=$(( GASNET_PSHM_NODES / 2 )) ; \
+        done
 
