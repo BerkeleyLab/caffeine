@@ -48,7 +48,7 @@ jobs:
       image: ${{ matrix.container }}
 
     env:
-      GCC_VERSION: ${{ matrix.version }}
+      COMPILER_VERSION: ${{ matrix.version }}
       FFLAGS: ${{ matrix.FFLAGS }}
       PREFIX: install
       GASNET_CONFIGURE_ARGS: --enable-rpath --enable-debug
@@ -60,9 +60,9 @@ jobs:
       if: matrix.compiler == 'gfortran'
       run: |
         set -x
-        echo "FC=gfortran-${GCC_VERSION}" >> "$GITHUB_ENV"
-        echo "CC=gcc-${GCC_VERSION}" >> "$GITHUB_ENV"
-        echo "CXX=g++-${GCC_VERSION}" >> "$GITHUB_ENV"
+        echo "FC=gfortran-${COMPILER_VERSION}" >> "$GITHUB_ENV"
+        echo "CC=gcc-${COMPILER_VERSION}" >> "$GITHUB_ENV"
+        echo "CXX=g++-${COMPILER_VERSION}" >> "$GITHUB_ENV"
 
     - name: Set flang variables
       if: matrix.compiler == 'flang'
@@ -80,7 +80,7 @@ jobs:
       run: |
         set -x
         sudo apt update
-        sudo apt install -y build-essential gfortran-${GCC_VERSION} g++-${GCC_VERSION} pkg-config make
+        sudo apt install -y build-essential gfortran-${COMPILER_VERSION} g++-${COMPILER_VERSION} pkg-config make
 
     - name: Install Ubuntu Container Dependencies
       if: ${{ contains(matrix.os, 'ubuntu') && contains(matrix.container, 'gmao') }}
@@ -94,7 +94,7 @@ jobs:
       run: |
         set -x
         brew update
-        brew install llvm@${GCC_VERSION} flang
+        brew install llvm@${COMPILER_VERSION} flang
         # workaround issue #228: clang cannot find homebrew flang's C header
         for p in /opt/homebrew /usr/local $(brew --prefix) ; do find $p/Cellar/flang -name ISO_Fortran_binding.h 2>/dev/null || true ; done
         echo "CFLAGS=-I$(dirname $(find $(brew --prefix)/Cellar/flang -name ISO_Fortran_binding.h | head -1)) ${CFLAGS}" >> "$GITHUB_ENV"
