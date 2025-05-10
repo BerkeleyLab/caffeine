@@ -96,17 +96,10 @@ jobs:
         brew update
         brew install llvm@${GCC_VERSION} flang
         # workaround issue #228: clang cannot find homebrew flang's C header
-        #for p in /opt/homebrew /usr/local ; do find $p/Cellar/flang -name ISO_Fortran_binding.h 2>/dev/null || true ; done
-        for p in /opt/homebrew /usr/local ; do \
-          if test -d $p ; then \
-            dir=$(find $p/Cellar/flang -name ISO_Fortran_binding.h | head -1) ; \
-          fi ; \
-          if test -n "$dir" ; then break ; fi ; \
-        done
-        dir=$(dirname ${dir} )
-        echo "CFLAGS=-I${dir} ${CFLAGS}" >> "$GITHUB_ENV"
+        for p in /opt/homebrew /usr/local $(brew --prefix) ; do find $p/Cellar/flang -name ISO_Fortran_binding.h 2>/dev/null || true ; done
+        echo "CFLAGS=-I$(dirname $(find $(brew --prefix)/Cellar/flang -name ISO_Fortran_binding.h | head -1)) ${CFLAGS}" >> "$GITHUB_ENV"
         # Prepend homebrew clang to PATH:
-        echo "PATH=/opt/homebrew/opt/llvm/bin:${PATH}" >> "$GITHUB_ENV"
+        echo "PATH=$(brew --prefix)/opt/llvm/bin:${PATH}" >> "$GITHUB_ENV"
 
     - name: Setup FPM
       uses: fortran-lang/setup-fpm@main
