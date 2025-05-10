@@ -19,7 +19,13 @@ contains
   end procedure
 
   module procedure prif_num_images_with_team_number
-    call unimplemented("prif_num_images_with_team_number")
+    if (team_number == -1) then
+      num_images = initial_team%num_images 
+    else if (team_number == current_team%info%team_number) then
+      num_images = current_team%info%num_images
+    else
+      call unimplemented("prif_num_images_with_team_number: no support for sibling teams")
+    end if
   end procedure
 
   module procedure prif_this_image_no_coarray
@@ -31,15 +37,56 @@ contains
   end procedure
 
   module procedure prif_this_image_with_coarray
+    integer(c_int) :: offset, doff, dsz
+    integer :: dim
+
     call_assert(coarray_handle_check(coarray_handle))
 
-    call unimplemented("prif_this_image_with_coarray")
+    if (present(team)) then
+      offset = team%info%this_image - 1
+    else
+      offset = current_team%info%this_image - 1
+    endif
+
+    associate (info => coarray_handle%info)
+      call_assert(size(cosubscripts) == info%corank)
+      do dim = 1, info%corank-1
+        dsz = INT(info%ucobounds(dim) - info%lcobounds(dim) + 1, c_int)
+        doff = mod(offset, dsz)
+        cosubscripts(dim) = doff + info%lcobounds(dim)
+        call_assert(cosubscripts(dim) <= info%ucobounds(dim))
+        offset = offset / dsz
+      end do
+      cosubscripts(info%corank) = offset + info%lcobounds(info%corank)
+      call_assert(cosubscripts(info%corank) <= info%ucobounds(info%corank))
+    end associate
+
+#   if ASSERTIONS
+      block ! sanity check
+        integer(c_int) :: image_index
+        if (present(team)) then
+          call prif_image_index_with_team(coarray_handle, cosubscripts, team, image_index)
+          call_assert(image_index == team%info%this_image)
+        else
+          call prif_image_index(coarray_handle, cosubscripts, image_index)
+          call_assert(image_index == current_team%info%this_image)
+        end if
+      end block
+#   endif
   end procedure
 
   module procedure prif_this_image_with_dim
     call_assert(coarray_handle_check(coarray_handle))
 
-    call unimplemented("prif_this_image_with_dim")
+    block
+      integer(c_int64_t) :: cosubscripts(coarray_handle%info%corank)
+
+      call_assert(dim >= 1 .and. dim <= coarray_handle%info%corank)
+
+      call prif_this_image_with_coarray(coarray_handle, team, cosubscripts)
+
+      cosubscript = cosubscripts(dim)
+    end block
   end procedure
 
   module procedure prif_failed_images

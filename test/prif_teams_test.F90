@@ -59,6 +59,11 @@ contains
           assert_equals(x, initial_num_imgs, "prif_num_images works with initial team")
 
         x = 0 ! clear outputs
+        call prif_num_images_with_team_number(team_number=-1_c_int64_t, num_images=x)
+        result_ = result_ .and. &
+          assert_equals(x, initial_num_imgs, "prif_num_images_with_team_number works with initial team")
+
+        x = 0 ! clear outputs
         call prif_this_image_no_coarray(team=initial_team, this_image=x)
         result_ = result_ .and. &
           assert_equals(x, me, "prif_this_image_no_coarray works with initial team")
@@ -100,6 +105,11 @@ contains
             call prif_num_images_with_team(team=team, num_images=x)
             result_ = result_ .and. &
               assert_equals(x, num_imgs, "prif_num_images works with team")
+
+            x = 0 ! clear outputs
+            call prif_num_images_with_team_number(team_number=which_team, num_images=x)
+            result_ = result_ .and. &
+              assert_equals(x, num_imgs, "prif_num_images_with_team_number works with current team")
 
             call prif_this_image_no_coarray(this_image=me_child)
             result_ = result_ .and. &
@@ -148,6 +158,11 @@ contains
             call prif_num_images_with_team(team=initial_team, num_images=x)
             result_ = result_ .and. &
               assert_equals(x, initial_num_imgs, "prif_num_images works with initial team")
+
+            x = 0 ! clear outputs
+            call prif_num_images_with_team_number(team_number=-1_c_int64_t, num_images=x)
+            result_ = result_ .and. &
+              assert_equals(x, initial_num_imgs, "prif_num_images_with_team_number works with initial team")
 
             x = 0 ! clear outputs
             call prif_this_image_no_coarray(team=initial_team, this_image=x)
