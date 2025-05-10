@@ -46,8 +46,8 @@ Prerequisites & Dependencies
 The `install.sh` script uses the following packages:
 * Fortran and C compilers
     * We regularly test with: gfortran v14 and LLVM Flang 20
-    * **Note:** Using the Homebrew-installed llvm and flang packages to build
-      Caffeine fails with an error related to not finding "ISO_Fortran_binding.h".
+    * On macOS the Homebrew-installed llvm and flang packages may require some
+      additional settings, see issue #228 for the latest information.
 * [Fortran package manager] `fpm`
 * [pkg-config]
 * [realpath]
