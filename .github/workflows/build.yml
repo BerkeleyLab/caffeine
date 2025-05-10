@@ -12,8 +12,6 @@ jobs:
         os: [macos-13, macos-14, macos-15, ubuntu-24.04]
         compiler: [ gfortran ]
         version: [ 13, 14 ]
-        CC: [ gcc ]
-        CXX: [ g++ ]
         exclude:
           - os: macos-15 # gcc-13 broken on macos-15
             version: 13
@@ -21,31 +19,21 @@ jobs:
           - os: macos-13
             compiler: flang
             version: 20
-            CC:  clang
-            CXX: clang++
           - os: macos-14
             compiler: flang
             version: 20
-            CC:  clang
-            CXX: clang++
           - os: macos-15
             compiler: flang
             version: 20
-            CC:  clang
-            CXX: clang++
           - os: ubuntu-24.04
             compiler: flang
             version: 20
-            CC: clang
-            CXX: clang++
             # https://hub.docker.com/r/phhargrove/llvm-flang/tags
             container: phhargrove/llvm-flang:20.1.0-1
             SUBJOB_PREFIX: GASNET_PSHM_NODES=2
           - os: ubuntu-24.04
             compiler: flang
             version: 19
-            CC: clang
-            CXX: clang++
             FFLAGS: -mmlir -allow-assumed-rank
             # https://hub.docker.com/r/phhargrove/llvm-flang/tags
             container: phhargrove/llvm-flang:19.1.1-1
@@ -53,8 +41,6 @@ jobs:
 #          - os: ubuntu-24.04
 #            compiler: flang
 #            version: new
-#            CC: clang
-#            CXX: clang++
 #            container: gmao/llvm-flang:latest
 #            SUBJOB_PREFIX: GASNET_PSHM_NODES=2
 
@@ -63,9 +49,6 @@ jobs:
 
     env:
       GCC_VERSION: ${{ matrix.version }}
-      FC: ${{ matrix.compiler }}
-      CC: ${{ matrix.CC }}
-      CXX: ${{ matrix.CXX }}
       FFLAGS: ${{ matrix.FFLAGS }}
       PREFIX: install
       GASNET_CONFIGURE_ARGS: --enable-rpath --enable-debug
@@ -73,6 +56,22 @@ jobs:
       SUBJOB_PREFIX: ${{ matrix.SUBJOB_PREFIX }}
 
     steps:
+    - name: Set gfortran variables
+      if: matrix.compiler == 'gfortran'
+      run: |
+        set -x
+        echo "FC=gfortran-${GCC_VERSION}" >> "$GITHUB_ENV"
+        echo "CC=gcc-${GCC_VERSION}" >> "$GITHUB_ENV"
+        echo "CXX=g++-${GCC_VERSION}" >> "$GITHUB_ENV"
+
+    - name: Set flang variables
+      if: matrix.compiler == 'flang'
+      run: |
+        set -x
+        echo "FC=flang-new" >> "$GITHUB_ENV" 
+        echo "CC=clang" >> "$GITHUB_ENV"
+        echo "CXX=clang++" >> "$GITHUB_ENV"
+
     - name: Checkout code
       uses: actions/checkout@v1
 
@@ -108,17 +107,6 @@ jobs:
         echo "CFLAGS=-I${dir} ${CFLAGS}" >> "$GITHUB_ENV"
         # Prepend homebrew clang to PATH:
         echo "PATH=/opt/homebrew/opt/llvm/bin:${PATH}" >> "$GITHUB_ENV"
-
-    - name: Setup Compilers
-      run: |
-        set -x
-        if test "$FC" = "flang" ; then \
-          echo "FC=flang-new" >> "$GITHUB_ENV" ; \
-        else \
-          echo "FC=gfortran-${GCC_VERSION}" >> "$GITHUB_ENV" ; \
-        fi
-        if test "$CC" = "gcc" ; then echo "CC=gcc-${GCC_VERSION}" >> "$GITHUB_ENV" ; fi
-        if test "$CXX" = "g++" ; then echo "CXX=g++-${GCC_VERSION}" >> "$GITHUB_ENV" ; fi
 
     - name: Setup FPM
       uses: fortran-lang/setup-fpm@main
