@@ -54,9 +54,9 @@ are accepted, but in some cases, the associated runtime behavior is not fully im
 |-----------|--------|-------|
 | `prif_num_images`                   | **YES** |  |
 | `prif_num_images_with_team`         | **YES** |  |
-| `prif_num_images_with_team_number`  | no |  |
+| `prif_num_images_with_team_number`  | *partial* | no support for sibling teams |
 | `prif_this_image_no_coarray`        | **YES** |  |
-| `prif_this_image_with_coarray`, `prif_this_image_with_dim`  | no |  |
+| `prif_this_image_with_coarray`, `prif_this_image_with_dim`  | **YES** |  |
 | `prif_failed_images`                | **YES** |  |
 | `prif_stopped_images`               | **YES** |  |
 | `prif_image_status`                 | **YES** |  |
@@ -87,8 +87,8 @@ are accepted, but in some cases, the associated runtime behavior is not fully im
 | `prif_coshape`                                   | **YES** |  |
 | `prif_local_data_pointer`                        | **YES** |  |
 | `prif_image_index`                               | **YES** |  |
-| `prif_image_index_with_team`                     | no |  |
-| `prif_image_index_with_team_number`              | no |  |
+| `prif_image_index_with_team`                     | **YES** |  |
+| `prif_image_index_with_team_number`              | *partial* | no support for sibling teams |
 
 ---
 

@@ -45,51 +45,61 @@ contains
     end associate
   end procedure
 
-  module procedure prif_image_index
-    integer :: dim, i
-    integer(c_int) :: prior_size, num_img
-    logical :: invalid_cosubscripts
+  subroutine image_index_helper(coarray_handle, sub, num_images, image_index)
+    implicit none
+    type(prif_coarray_handle), intent(in) :: coarray_handle
+    integer(c_int64_t), intent(in) :: sub(:)
+    integer(c_int), intent(in) :: num_images
+    integer(c_int), intent(out) :: image_index
+
+    integer :: dim
+    integer(c_int) :: prior_size
 
     call_assert(coarray_handle_check(coarray_handle))
 
-    invalid_cosubscripts = .false.
-
-    check_subscripts: do i = 1, size(sub)
-       if (sub(i) .lt. coarray_handle%info%lcobounds(i) .or. sub(i) .gt. coarray_handle%info%ucobounds(i)) then
-          invalid_cosubscripts = .true.
-          exit check_subscripts
-       end if
-    end do check_subscripts
-
-    if (.not. invalid_cosubscripts) then
-      image_index = 1 + INT(sub(1) - coarray_handle%info%lcobounds(1), c_int)
+    associate (info => coarray_handle%info) 
+      call_assert(size(sub) == info%corank)
+      if (sub(1) .lt. info%lcobounds(1) .or. sub(1) .gt. info%ucobounds(1)) then
+        image_index = 0
+        return
+      end if
+      image_index = 1 + INT(sub(1) - info%lcobounds(1), c_int)
       prior_size = 1
       ! Future work: values of prior_size are invariant across calls w/ the same coarray_handle
       !  We could store them in the coarray metadata at allocation rather than redundantly
       ! computing them here, which would accelerate calls with corank > 1 by removing
       ! corank multiply/add operations and the loop-carried dependence
       do dim = 2, size(sub)
-        prior_size = prior_size * INT(coarray_handle%info%ucobounds(dim-1) - coarray_handle%info%lcobounds(dim-1) + 1, c_int)
-        image_index = image_index + INT(sub(dim) - coarray_handle%info%lcobounds(dim), c_int) * prior_size
+        prior_size = prior_size * INT(info%ucobounds(dim-1) - info%lcobounds(dim-1) + 1, c_int)
+        if (sub(dim) .lt. info%lcobounds(dim) .or. sub(dim) .gt. info%ucobounds(dim)) then
+          image_index = 0
+          return
+        end if
+        image_index = image_index + INT(sub(dim) - info%lcobounds(dim), c_int) * prior_size
        end do
-    end if
+    end associate
 
-    call prif_num_images(num_images=num_img)
-    if (invalid_cosubscripts .or. image_index .gt. num_img) then
+    if (image_index .gt. num_images) then
        image_index = 0
     end if
+  end subroutine
+
+  module procedure prif_image_index
+    call image_index_helper(coarray_handle, sub, current_team%info%num_images, image_index)
   end procedure
 
   module procedure prif_image_index_with_team
-    call_assert(coarray_handle_check(coarray_handle))
-
-    call unimplemented("prif_image_index_with_team")
+    call image_index_helper(coarray_handle, sub, team%info%num_images, image_index)
   end procedure
 
   module procedure prif_image_index_with_team_number
-    call_assert(coarray_handle_check(coarray_handle))
-
-    call unimplemented("prif_image_index_with_team_number")
+    if (team_number == -1) then
+      call image_index_helper(coarray_handle, sub, initial_team%num_images, image_index)
+    else if (team_number == current_team%info%team_number) then
+      call image_index_helper(coarray_handle, sub, current_team%info%num_images, image_index)
+    else
+      call unimplemented("prif_image_index_with_team_number: no support for sibling teams")
+    end if 
   end procedure
 
   module procedure prif_local_data_pointer
