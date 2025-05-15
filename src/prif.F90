@@ -24,6 +24,7 @@ module prif
   public :: prif_alias_create, prif_alias_destroy
   public :: prif_lcobound_with_dim, prif_lcobound_no_dim, prif_ucobound_with_dim, prif_ucobound_no_dim, prif_coshape
   public :: prif_image_index, prif_image_index_with_team, prif_image_index_with_team_number
+  public :: prif_initial_team_index, prif_initial_team_index_with_team, prif_initial_team_index_with_team_number
   public :: prif_this_image_no_coarray, prif_this_image_with_coarray, prif_this_image_with_dim
   public :: prif_num_images, prif_num_images_with_team, prif_num_images_with_team_number
   public :: prif_failed_images, prif_stopped_images, prif_image_status
@@ -501,6 +502,32 @@ module prif
       integer(c_int64_t), intent(in) :: sub(:)
       integer(c_int64_t), intent(in) :: team_number
       integer(c_int), intent(out) :: image_index
+    end subroutine
+
+    module subroutine prif_initial_team_index(coarray_handle, sub, initial_team_index, stat)
+      implicit none
+      type(prif_coarray_handle), intent(in) :: coarray_handle
+      integer(c_int64_t), intent(in) :: sub(:)
+      integer(c_int), intent(out) :: initial_team_index
+      integer(c_int), intent(out), optional :: stat
+    end subroutine
+    
+    module subroutine prif_initial_team_index_with_team(coarray_handle, sub, team, initial_team_index, stat)
+      implicit none
+      type(prif_coarray_handle), intent(in) :: coarray_handle
+      integer(c_int64_t), intent(in) :: sub(:)
+      type(prif_team_type), intent(in) :: team
+      integer(c_int), intent(out) :: initial_team_index
+      integer(c_int), intent(out), optional :: stat
+    end subroutine
+    
+    module subroutine prif_initial_team_index_with_team_number(coarray_handle, sub, team_number, initial_team_index, stat)
+      implicit none
+      type(prif_coarray_handle), intent(in) :: coarray_handle
+      integer(c_int64_t), intent(in) :: sub(:)
+      integer(c_int64_t), intent(in) :: team_number
+      integer(c_int), intent(out) :: initial_team_index
+      integer(c_int), intent(out), optional :: stat
     end subroutine
 
     module subroutine prif_num_images(num_images)
