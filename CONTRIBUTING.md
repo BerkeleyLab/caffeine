@@ -10,11 +10,11 @@ If you encounter problems or limitations when installing or using Caffeine, plea
  2. Email the Caffeine [mailing list](mailto:fortran@lbl.gov) for advice.
  3. If steps 1 or 2 do not resolve the problem, please file a [new issue] including
     - [ ] The Fortran compiler and compiler version used with Caffeine,
-    - [ ] The complete output of the build command,
+    - [ ] The complete output of the install and build commands run with `--verbose` argument,
     - [ ] The Caffeine version number or commit hash,
     - [ ] Any conditions required to reproduce the problem such as
       - [ ] The output of `uname -a` showing the operating system (OS), OS version, and processor architecture,
-      - [ ] The number of images executed (e.g., the output of `echo $GASNET_PSHM_NODES`),
+      - [ ] The number of images executed (e.g., the output of `echo $CAF_IMAGES`),
       - [ ] The command used to run your program (e.g., `./build/run-fpm.sh run`), and
       - [ ] A minimal reproducer: if possible, fewer than 50 lines demonstrating an issue.
 

@@ -88,13 +88,24 @@ Caffeine leverages the following non-parallel features of Fortran to simplify th
 
 Download, build, and run an example
 -----------------------------------
+Here is an outline of the basic commands used to build Caffeine and run an example:
+
 ```
 git clone https://github.com/BerkeleyLab/caffeine.git
 cd caffeine
-./install.sh
-export GASNET_PSHM_NODES=8
-FC=<Fortran-compiler-path> CC=<C-compiler-path> CXX=<C++-compiler-path> ./build/run-fpm.sh run --example hello
+env FC=<Fortran-compiler> CC=<C-compiler> CXX=<C++-compiler> ./install.sh <options>
+env CAF_IMAGES=8 ./build/run-fpm.sh run --example hello
 ```
+
+The provided compilers MUST be "compatible": for the best experience you are
+HIGHLY recommended to specify the language frontends provided by a single version
+of a given compiler suite installation. The C++ compiler is optional for
+single-node deployments (and can be disabled using command-line option `--without-cxx`), 
+but C++ is required for some network backends.
+
+The `install.sh` recognizes a number of command-line options and environment variables to
+customize behavior for your system. See the output of `./install.sh --help` for full documentation.
+
 
 Example Usage
 -------------
@@ -114,6 +125,31 @@ Run tests
 ```
 ./build/run-fpm.sh test
 ```
+
+Recognized Environment Variables
+--------------------------------
+
+The following environment variables control the execution of the `fpm`-driven Caffeine unit test suite:
+
+* `CAF_IMAGES`: integer number of images to run
+* `SUBJOB_PREFIX`: command prefix to use for recursive `fpm` invocations in the test suite. 
+   Set `SUBJOB_PREFIX=skip` to disable such invocations (recommended for distributed-memory systems).
+
+The following environment variables control the behavior of the Caffeine library:
+
+* `CAF_HEAP_SIZE=128MB`: set the size of the shared-memory heap used for coarray storage, defaults to 128 MiB
+* `CAF_COMP_FRAC=0.10`: set the fraction of the shared-memory heap reserved for non-symmetric allocation, defaults to 10%
+
+Caffeine is built atop the [GASNet-EX] exascale networking middleware, which has its own
+set of environment variable knobs to control network-level behavior. 
+Here are *a few* of the most useful GASNet knobs:
+
+* `GASNET_VERBOSEENV=1`: enable console output of all the envvar settings affecting GASNet operation
+* `GASNET_SPAWN_VERBOSE=1`: enable verbose console output of parallel job-spawning steps
+* `GASNET_BACKTRACE=1`: enable automatic backtrace upon fatal errors
+* `GASNET_SSH_SERVERS="host1 host2"`: space-deliminted list of hostnames for distributed-memory job launch using the ssh-spawner
+
+See [GASNet documentation](https://gasnet.lbl.gov/dist-ex/README) for full details on all settings.
 
 Implementation Status
 --------------------
