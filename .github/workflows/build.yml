@@ -34,19 +34,19 @@ jobs:
             version: 20
             # https://hub.docker.com/r/phhargrove/llvm-flang/tags
             container: phhargrove/llvm-flang:20.1.0-1
-            SUBJOB_PREFIX: GASNET_PSHM_NODES=2
+            SUBJOB_PREFIX: CAF_IMAGES=2
           - os: ubuntu-24.04
             compiler: flang
             version: 19
             FFLAGS: -mmlir -allow-assumed-rank
             # https://hub.docker.com/r/phhargrove/llvm-flang/tags
             container: phhargrove/llvm-flang:19.1.1-1
-            SUBJOB_PREFIX: GASNET_PSHM_NODES=2
+            SUBJOB_PREFIX: CAF_IMAGES=2
 #          - os: ubuntu-24.04
 #            compiler: flang
 #            version: new
 #            container: gmao/llvm-flang:latest
-#            SUBJOB_PREFIX: GASNET_PSHM_NODES=2
+#            SUBJOB_PREFIX: CAF_IMAGES=2
 
     container:
       image: ${{ matrix.container }}
@@ -56,7 +56,7 @@ jobs:
       FFLAGS: ${{ matrix.FFLAGS }}
       PREFIX: install
       GASNET_CONFIGURE_ARGS: --enable-rpath --enable-debug
-      GASNET_PSHM_NODES: 8
+      CAF_IMAGES: 8
       SUBJOB_PREFIX: ${{ matrix.SUBJOB_PREFIX }}
 
     steps:
@@ -141,7 +141,7 @@ jobs:
 
     - name: Run examples
       run: |
-        echo GASNET_PSHM_NODES=${GASNET_PSHM_NODES}
+        echo CAF_IMAGES=${CAF_IMAGES}
         set -x
         ./build/run-fpm.sh run --verbose --example hello
         ./build/run-fpm.sh run --verbose --example stop_with_no_code
@@ -151,10 +151,10 @@ jobs:
     - name: Run unit tests
       run: |
         echo SUBJOB_PREFIX=${SUBJOB_PREFIX}
-        while (( GASNET_PSHM_NODES > 0 )); do \
-          echo GASNET_PSHM_NODES=${GASNET_PSHM_NODES} ; \
+        while (( CAF_IMAGES > 0 )); do \
+          echo CAF_IMAGES=${CAF_IMAGES} ; \
           ( set -x ; ./build/run-fpm.sh test --verbose -- -d ) ; \
           sleep 1 ; \
-          GASNET_PSHM_NODES=$(( GASNET_PSHM_NODES / 2 )) ; \
+          CAF_IMAGES=$(( CAF_IMAGES / 2 )) ; \
         done
 
