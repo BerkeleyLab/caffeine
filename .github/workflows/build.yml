@@ -154,9 +154,10 @@ jobs:
       if: ${{ contains(matrix.os, 'macos') && matrix.os != 'macos-13' }} 
       run: |
         set -x
-        curl --retry 5 -LOsS https://github.com/fortran-lang/fpm/releases/download/v0.11.0/fpm-0.11.0.F90
+        export FPM_VERSION=0.12.0
+        curl --retry 5 -LOsS https://github.com/fortran-lang/fpm/releases/download/v$FPM_VERSION/fpm-$FPM_VERSION.F90
         mkdir fpm-temp
-        gfortran-14 -o fpm-temp/fpm fpm-0.11.0.F90
+        gfortran-14 -o fpm-temp/fpm fpm-$FPM_VERSION.F90
         echo "PATH=${PWD}/fpm-temp:${PATH}" >> "$GITHUB_ENV"
 
     - name: Version info
