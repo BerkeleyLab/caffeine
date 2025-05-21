@@ -131,7 +131,7 @@ Recognized Environment Variables
 
 The following environment variables control the execution of the `fpm`-driven Caffeine unit test suite:
 
-* `CAF_IMAGES`: integer number of images to run
+* `CAF_IMAGES`: integer that indicates the number of images to run
 * `SUBJOB_PREFIX`: command prefix to use for recursive `fpm` invocations in the test suite. 
    Set `SUBJOB_PREFIX=skip` to disable such invocations (recommended for distributed-memory systems).
 
