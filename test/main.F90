@@ -17,6 +17,7 @@ program main
 contains
     function run() result(passed)
         use a00_caffeinate_test, only: &
+                check_caffeination, &
                 a00_caffeinate_caffeinate => &
                     test_caffeinate
         use caf_allocate_test, only: &
@@ -63,7 +64,7 @@ contains
                     test_prif_this_image_no_coarray
         use caf_stop_test, only: test_prif_stop
         use caf_error_stop_test, only: test_prif_error_stop
-        use veggies, only: test_item_t, test_that, run_tests
+        use veggies, only: test_item_t, test_that, run_tests, result_t
 
 
 
@@ -71,6 +72,10 @@ contains
 
         type(test_item_t) :: tests
         type(test_item_t), allocatable :: individual_tests(:)
+        type(result_t) :: dummy
+
+        ! ensure an early call to prif_init
+        dummy = check_caffeination()
 
         allocate(individual_tests(0))
 

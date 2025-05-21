@@ -12,6 +12,13 @@ USAGE:
 
  --help             Display this help text
  --prefix=PREFIX    Install library into 'PREFIX' directory
+ --network=<NET>    Build Caffeine to target given GASNet network conduit. 
+                    <NET> should be one of:
+                      smp: single-node shared-memory conduit (default)
+                      udp: portable UDP/IP (for Ethernet networks)
+                      ibv: InfiniBand IB Verbs
+                      ofi: OpenFabrics Interfaces
+                      ucx: Unified Communication X
  --prereqs          Display a list of prerequisite software.
                     Default prefix='\$HOME/.local/bin'
  --verbose          Show verbose build commands
@@ -43,6 +50,7 @@ EOF
 GCC_VERSION=${GCC_VERSION:=14}
 GASNET_VERSION="stable"
 VERBOSE=""
+GASNET_CONDUIT="${GASNET_CONDUIT:-smp}"
 
 list_prerequisites()
 {
@@ -81,6 +89,16 @@ while [ "$1" != "" ]; do
             ;;
         --prefix)
             PREFIX=$VALUE
+            ;;
+        --network)
+            GASNET_CONDUIT=$(tr '[:upper:]' '[:lower:]' <<< $VALUE)
+            case $GASNET_CONDUIT in
+              smp|udp|mpi|ibv|ofi|ucx) ;;
+              *) 
+                 echo "ERROR: Unrecognized --network=$GASNET_CONDUIT"
+                 print_usage_info
+                 exit 1
+            esac
             ;;
         --verbose)
             VERBOSE="--verbose"
@@ -304,8 +322,6 @@ EOF
   printf "Is it ok to download and install $1? [yes] "
 }
 
-# TODO: Expand this to other GASNet conduits (issue #66)
-GASNET_CONDUIT=smp
 pkg="gasnet-$GASNET_CONDUIT-seq"
 export PKG_CONFIG_PATH
 
@@ -337,8 +353,8 @@ if ! $PKG_CONFIG $pkg ; then
       cmd="$cmd --enable-$GASNET_CONDUIT"
       cmd="$cmd --enable-seq --disable-par --disable-parsync"
       cmd="$cmd --disable-segment-everything"
-      # TEMPORARY: disable MPI compatibility until Caffeine supports distributed conduits
-      cmd="$cmd --without-mpicc"
+      # TEMPORARY: disable MPI compatibility until we figure out how to support in fpm
+      cmd="$cmd --disable-mpi-compat"
       eval $cmd
       $MAKE -j 8 all
       $MAKE -j 8 install
@@ -366,6 +382,7 @@ GASNET_CPPFLAGS="`$PKG_CONFIG $pkg --variable=GASNET_CPPFLAGS`"
 #       in the directory path, and assumes that the first directory returned
 #       by pkg-config contains the GASNet lib directory
 GASNET_LIBDIR="$(echo $GASNET_LIBS | awk '{print $1};')"
+GASNET_LIBDIR=${GASNET_LIBDIR#-L}
 case "$GASNET_LIBDIR" in
   *spack* )
 	cat << EOF
@@ -378,7 +395,12 @@ EOF
     exit 1
     ;;
   * )
-    ;; # Do nothing otherwise 
+    GASNET_PREFIX=$(dirname $GASNET_LIBDIR)
+    if [ ! -r "$GASNET_PREFIX/include/gasnetex.h" ] ; then
+      echo "ERROR: Failed to detect GASNet install prefix from $GASNET_LIBS"
+      exit 1
+    fi
+    ;; 
 esac
 
 # Strip compiler flags
@@ -395,6 +417,9 @@ echo "# DO NOT EDIT OR COMMIT -- Created by caffeine/install.sh" > build/fpm.tom
 cp manifest/fpm.toml.template build/fpm.toml
 GASNET_LIB_LOCATIONS=`echo $GASNET_LIBS | awk '{locs=""; for(i = 1; i <= NF; i++) if ($i ~ /^-L/) {locs=(locs " " $i);}; print locs; }'`
 GASNET_LIB_NAMES=`echo $GASNET_LIBS | awk '{names=""; for(i = 1; i <= NF; i++) if ($i ~ /^-l/) {names=(names " " $i);}; print names; }' | sed 's/-l//g'`
+if [[ $GASNET_CONDUIT == "udp" ]] ; then
+  GASNET_LIB_NAMES+=" stdc++" # udp-conduit requires C++ libraries
+fi
 FPM_TOML_LINK_ENTRY="link = [\"$(echo ${GASNET_LIB_NAMES} | sed 's/ /", "/g')\"]"
 echo "${FPM_TOML_LINK_ENTRY}" >> build/fpm.toml
 ln -f -s build/fpm.toml
@@ -428,8 +453,29 @@ if ! [[ "$user_compiler_flags " =~ -[DU]ASSERTIONS[=\ ] ]] ; then
   compiler_flag+=" -DASSERTIONS"
 fi
 
+GASNET_CONDUIT_UPPER=$(tr '[:lower:]' '[:upper:]' <<<$GASNET_CONDUIT)
+compiler_flag+=" -DCAF_NETWORK_$GASNET_CONDUIT_UPPER"
+
 # Should come last to allow command-line overrides
 compiler_flag+=" $user_compiler_flags"
+
+case $GASNET_CONDUIT in
+  ibv|ofi|ucx) 
+    GASNET_RUNNER_ARG="${GASNET_RUNNER_ARG:-$GASNET_PREFIX/bin/gasnetrun_$GASNET_CONDUIT -n \${CAF_IMAGES:-2}}"
+  ;;
+  udp)
+    GASNET_RUNNER_ARG="${GASNET_RUNNER_ARG:-$GASNET_PREFIX/bin/amudprun -n \${CAF_IMAGES:-2}}"
+  ;;
+  mpi)
+    GASNET_RUNNER_ARG="${GASNET_RUNNER_ARG:-mpirun -n \${CAF_IMAGES:-2}}"
+  ;;
+  smp)
+    GASNET_RUNNER_ARG="${GASNET_RUNNER_ARG:-env GASNET_PSHM_NODES=\${CAF_IMAGES:-\${GASNET_PSHM_NODES:-}}}"
+  ;;
+  *)
+    GASNET_RUNNER_ARG="${GASNET_RUNNER_ARG:-}"
+  ;;
+esac
 
 RUN_FPM_SH="build/run-fpm.sh"
 cat << EOF > $RUN_FPM_SH
@@ -441,6 +487,10 @@ if echo "--help -help --version -version --list -list new update list clean publ
   set -x
   exec \$fpm "\$fpm_sub_cmd" "\$@"
 elif echo "build test run install" | grep -w -q -e "\$fpm_sub_cmd" ; then
+  sed -i.bak 's/^link = .*\$/$FPM_TOML_LINK_ENTRY/' build/fpm.toml
+  if test -n "$GASNET_RUNNER_ARG" && echo "test run" | grep -w -q -e "\$fpm_sub_cmd" ; then
+    set -- "--runner=$GASNET_RUNNER_ARG" "\$@"
+  fi
   set -x
   exec \$fpm "\$fpm_sub_cmd" \\
   --profile debug \\
