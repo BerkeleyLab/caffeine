@@ -243,6 +243,32 @@ submodule(prif) prif_private_s
       integer(c_int64_t), intent(out) :: count
     end subroutine
 
+    ! _______________________ Atomics  ____________________________
+
+    subroutine caf_atomic_int(opcode, image, addr, result, operand1, operand2) bind(c)
+      !! void caf_atomic_int(int opcode, int image, void* addr, int64_t *result, int64_t op1, int64_t op2)
+      import c_int, c_intptr_t, PRIF_ATOMIC_INT_KIND
+      implicit none
+      integer(c_int), intent(in), value :: opcode
+      integer(c_int), intent(in), value :: image
+      integer(c_intptr_t), intent(in), value :: addr
+      integer(PRIF_ATOMIC_INT_KIND), intent(out) :: result
+      integer(PRIF_ATOMIC_INT_KIND), intent(in), value :: operand1
+      integer(PRIF_ATOMIC_INT_KIND), intent(in), value :: operand2
+    end subroutine
+
+    subroutine caf_atomic_logical(opcode, image, addr, result, operand1, operand2) bind(c)
+      !! void caf_atomic_logical(int opcode, int image, void* addr, int64_t *result, int64_t op1, int64_t op2)
+      import c_int, c_intptr_t, PRIF_ATOMIC_LOGICAL_KIND
+      implicit none
+      integer(c_int), intent(in), value :: opcode
+      integer(c_int), intent(in), value :: image
+      integer(c_intptr_t), intent(in), value :: addr
+      logical(PRIF_ATOMIC_LOGICAL_KIND), intent(out) :: result
+      logical(PRIF_ATOMIC_LOGICAL_KIND), intent(in), value :: operand1
+      logical(PRIF_ATOMIC_LOGICAL_KIND), intent(in), value :: operand2
+    end subroutine
+
     ! ______________ Collective Subroutines __________________
 
      subroutine caf_co_broadcast(a, source_image, Nelem, team) bind(C)
