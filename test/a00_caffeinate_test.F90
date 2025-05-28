@@ -4,7 +4,7 @@ module a00_caffeinate_test
 
     implicit none
     private
-    public :: test_caffeinate
+    public :: test_caffeinate, check_caffeination
 
 contains
 
@@ -20,13 +20,25 @@ contains
     end function
 
     function check_caffeination() result(result_)
-        type(result_t) :: result_
+      ! this test needs to run very early at startup, so we memoize the result
+      type(result_t) :: result_
+      type(result_t), save :: myresult
+      logical, save :: once = .false.
 
+      if (once) then
+        result_ = myresult
+        return
+      endif 
+      once = .true.
+
+      block
         integer, parameter :: successful_initiation = 0
         integer :: init_exit_code
 
         call prif_init(init_exit_code)
-        result_ = assert_that(init_exit_code == successful_initiation)
+        myresult = assert_that(init_exit_code == successful_initiation)
+        result_ = myresult
+      end block
     end function
 
     function check_subsequent_prif_init_call() result(result_)

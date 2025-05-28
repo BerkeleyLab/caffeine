@@ -8,7 +8,7 @@ defaults:
 
 jobs:
   build:
-    name: ${{ matrix.compiler }}-${{ matrix.version }} (${{ matrix.os }})
+    name: ${{ matrix.compiler }}-${{ matrix.version }} ${{ matrix.network }} (${{ matrix.os }})
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -16,37 +16,62 @@ jobs:
         os: [macos-13, macos-14, macos-15, ubuntu-24.04]
         compiler: [ gfortran ]
         version: [ 13, 14 ]
+        network: [ smp ]
         exclude:
           - os: macos-15 # gcc-13 broken on macos-15
+            compiler: gfortran
             version: 13
+            network: smp
         include:
+        # --- flang coverage ---
           - os: macos-13
             compiler: flang
             version: 20
+            network: smp
           - os: macos-14
             compiler: flang
             version: 20
+            network: smp
           - os: macos-15
             compiler: flang
             version: 20
+            network: smp
           - os: ubuntu-24.04
             compiler: flang
             version: 20
+            network: smp
             # https://hub.docker.com/r/phhargrove/llvm-flang/tags
             container: phhargrove/llvm-flang:20.1.0-1
-            SUBJOB_PREFIX: GASNET_PSHM_NODES=2
           - os: ubuntu-24.04
             compiler: flang
             version: 19
+            network: smp
             FFLAGS: -mmlir -allow-assumed-rank
             # https://hub.docker.com/r/phhargrove/llvm-flang/tags
             container: phhargrove/llvm-flang:19.1.1-1
-            SUBJOB_PREFIX: GASNET_PSHM_NODES=2
 #          - os: ubuntu-24.04
 #            compiler: flang
 #            version: new
+#            network: smp
 #            container: gmao/llvm-flang:latest
-#            SUBJOB_PREFIX: GASNET_PSHM_NODES=2
+        # --- udp coverage for selected configs ---
+          - os: macos-15
+            compiler: gfortran
+            version: 14
+            network: udp
+          - os: ubuntu-24.04
+            compiler: gfortran
+            version: 14
+            network: udp
+          - os: macos-15
+            compiler: flang
+            version: 20
+            network: udp
+          - os: ubuntu-24.04
+            compiler: flang
+            version: 20
+            network: udp
+            container: phhargrove/llvm-flang:20.1.0-1
 
     container:
       image: ${{ matrix.container }}
@@ -56,8 +81,9 @@ jobs:
       FFLAGS: ${{ matrix.FFLAGS }}
       PREFIX: install
       GASNET_CONFIGURE_ARGS: --enable-rpath --enable-debug
-      GASNET_PSHM_NODES: 8
-      SUBJOB_PREFIX: ${{ matrix.SUBJOB_PREFIX }}
+      GASNET_SPAWN_VERBOSE: 1
+      GASNET_SPAWNFN: L
+      CAF_IMAGES: 8
 
     steps:
     - name: Set gfortran variables
@@ -75,6 +101,18 @@ jobs:
         echo "FC=flang-new" >> "$GITHUB_ENV" 
         echo "CC=clang" >> "$GITHUB_ENV"
         echo "CXX=clang++" >> "$GITHUB_ENV"
+
+    - name: Set Caffeine variables
+      run: |
+        set -x
+        # docker instances cannot handle high levels of subjob parallelism
+        if test -n "${{ matrix.container }}"; then \
+          echo "SUBJOB_PREFIX=CAF_IMAGES=2" >> "$GITHUB_ENV" ; \
+        fi
+        # disable shared-memory bypass with network=udp to simulate multi-node runs
+        if test "${{ matrix.network }}" = "udp"; then \
+          echo "GASNET_SUPERNODE_MAXSIZE=1" >> "$GITHUB_ENV" ; \
+        fi
 
     - name: Checkout code
       uses: actions/checkout@v1
@@ -116,9 +154,10 @@ jobs:
       if: ${{ contains(matrix.os, 'macos') && matrix.os != 'macos-13' }} 
       run: |
         set -x
-        curl --retry 5 -LOsS https://github.com/fortran-lang/fpm/releases/download/v0.11.0/fpm-0.11.0.F90
+        export FPM_VERSION=0.12.0
+        curl --retry 5 -LOsS https://github.com/fortran-lang/fpm/releases/download/v$FPM_VERSION/fpm-$FPM_VERSION.F90
         mkdir fpm-temp
-        gfortran-14 -o fpm-temp/fpm fpm-0.11.0.F90
+        gfortran-14 -o fpm-temp/fpm fpm-$FPM_VERSION.F90
         echo "PATH=${PWD}/fpm-temp:${PATH}" >> "$GITHUB_ENV"
 
     - name: Version info
@@ -137,11 +176,11 @@ jobs:
         for var in FC CC CXX FFLAGS CPPFLAGS CFLAGS LDFLAGS LIBS GASNET_CONFIGURE_ARGS ; do \
             eval echo "$var=\$$var"; done
         set -x
-        ./install.sh --prefix=${PREFIX} --verbose
+        ./install.sh --prefix=${PREFIX} --network=${{ matrix.network }} --verbose
 
     - name: Run examples
       run: |
-        echo GASNET_PSHM_NODES=${GASNET_PSHM_NODES}
+        echo CAF_IMAGES=${CAF_IMAGES}
         set -x
         ./build/run-fpm.sh run --verbose --example hello
         ./build/run-fpm.sh run --verbose --example stop_with_no_code
@@ -151,10 +190,10 @@ jobs:
     - name: Run unit tests
       run: |
         echo SUBJOB_PREFIX=${SUBJOB_PREFIX}
-        while (( GASNET_PSHM_NODES > 0 )); do \
-          echo GASNET_PSHM_NODES=${GASNET_PSHM_NODES} ; \
+        while (( CAF_IMAGES > 0 )); do \
+          echo CAF_IMAGES=${CAF_IMAGES} ; \
           ( set -x ; ./build/run-fpm.sh test --verbose -- -d ) ; \
           sleep 1 ; \
-          GASNET_PSHM_NODES=$(( GASNET_PSHM_NODES / 2 )) ; \
+          CAF_IMAGES=$(( CAF_IMAGES / 2 )) ; \
         done
 

@@ -38,7 +38,7 @@ contains
         
     call prif_sync_all()
     call prif_this_image_no_coarray(this_image=me)
-    result_ = (me == 1)
+    result_ = (me == 1) .and. (subjob_prefix /= "skip")
   end function 
 
 
