@@ -1,5 +1,5 @@
 name = "caffeine"
-version = "0.5.2"
+version = "0.5.3"
 license = "BSD-3-Clause-LBNL"
 author = ["Damian Rouson", "Brad Richardson", "Katherine Rasmussen", "Dan Bonachea"]
 maintainer = "fortran@lbl.gov"

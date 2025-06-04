@@ -5,7 +5,7 @@ Release Procedure for Caffeine
 -------------
 1. Nominate a Release Manager with primary responsibility for ensuring each step in this
    procedure is followed
-2. Ensure there are no open issues marked with `complete-before-release` label
+2. Ensure there are no open issues marked with `release-blocker` label
 3. Validate correctness testing has been performed across all supported systems and supported
    versions of external dependencies
 4. Complete release related chores in repository files
