@@ -104,7 +104,8 @@ single-node deployments (and can be disabled using command-line option `--withou
 but C++ is required for some network backends.
 
 The `install.sh` recognizes a number of command-line options and environment variables to
-customize behavior for your system. See the output of `./install.sh --help` for full documentation.
+customize behavior for your system. See the output of `./install.sh --help` for full documentation,
+including options for how to build for a distributed memory platform.
 
 
 Example Usage
