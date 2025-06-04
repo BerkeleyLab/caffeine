@@ -45,7 +45,7 @@ Prerequisites & Dependencies
 ### Build prerequisites
 The `install.sh` script uses the following packages:
 * Fortran and C compilers
-    * We regularly test with: gfortran v14 and LLVM Flang 20
+    * We regularly test with: gfortran v13, v14 and LLVM Flang 19, 20
     * On macOS the Homebrew-installed llvm and flang packages may require some
       additional settings, see issue #228 for the latest information.
 * [Fortran package manager] `fpm`
@@ -76,15 +76,12 @@ Caffeine leverages the following non-parallel features of Fortran to simplify th
 | The `iso_c_binding` module                | Fortran 2003  |
 | The `contiguous` attribute                | Fortran 2008  |
 | Submodule support [1]                     | Fortran 2008  |
-| `do concurrent` [2]                       | Fortran 2008  |
 | The `ISO_Fortran_binding.h` C header file | Fortran 2018  |
 | Assumed-type dummy arguments: `type(*)`   | Fortran 2018  |
 | Assumed-rank dummy arguments: `array(..)` | Fortran 2018  |
 
 
 [1] This feature simplifies development but is not essential to the package
-
-[2] This feature is used to support only `co_reduce` and might become optional in a future release.
 
 Download, build, and run an example
 -----------------------------------
@@ -104,7 +101,8 @@ single-node deployments (and can be disabled using command-line option `--withou
 but C++ is required for some network backends.
 
 The `install.sh` recognizes a number of command-line options and environment variables to
-customize behavior for your system. See the output of `./install.sh --help` for full documentation.
+customize behavior for your system. See the output of `./install.sh --help` for full documentation,
+including options for how to build for a distributed memory platform.
 
 
 Example Usage
