@@ -38,6 +38,12 @@ jobs:
             network: smp
           - os: ubuntu-24.04
             compiler: flang
+            version: latest
+            network: smp
+            # https://hub.docker.com/r/snowstep/llvm/tags
+            container: snowstep/llvm:noble
+          - os: ubuntu-24.04
+            compiler: flang
             version: 20
             network: smp
             # https://hub.docker.com/r/phhargrove/llvm-flang/tags
@@ -125,11 +131,11 @@ jobs:
         sudo apt install -y build-essential gfortran-${COMPILER_VERSION} g++-${COMPILER_VERSION} pkg-config make
 
     - name: Install Ubuntu Container Dependencies
-      if: ${{ contains(matrix.os, 'ubuntu') && contains(matrix.container, 'gmao') }}
+      if: ${{ contains(matrix.os, 'ubuntu') && matrix.container != '' && !contains(matrix.container, 'phhargrove') }}
       run: |
         set -x
         apt update
-        apt install -y build-essential pkg-config make
+        apt install -y build-essential pkg-config make git curl
 
     - name: Install macOS Dependencies
       if: contains(matrix.os, 'macos') && matrix.compiler == 'flang'
