@@ -89,6 +89,7 @@ jobs:
       GASNET_CONFIGURE_ARGS: --enable-rpath --enable-debug
       GASNET_SPAWN_VERBOSE: 1
       GASNET_SPAWNFN: L
+      GASNET_MASTERIP: 127.0.0.1
       CAF_IMAGES: 8
 
     steps:
