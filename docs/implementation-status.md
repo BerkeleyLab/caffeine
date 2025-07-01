@@ -198,39 +198,36 @@ are accepted, but in some cases, the associated runtime behavior is not fully im
 ---
 
 ## Atomic Memory Operations
-### Support = no
 
-<!---
 | Procedure | Status | Notes |
 |-----------|--------|-------|
-| `prif_atomic_add`          | no  |  |
-| `prif_atomic_add_indirect` | no  |  |
-| `prif_atomic_and`          | no  |  |
-| `prif_atomic_and_indirect` | no  |  |
-| `prif_atomic_or`           | no  |  |
-| `prif_atomic_or_indirect`  | no  |  |
-| `prif_atomic_xor`          | no  |  |
-| `prif_atomic_xor_indirect` | no  |  |
-| `prif_atomic_cas_int`                 | no  |  |
-| `prif_atomic_cas_int_indirect`        | no  |  |
-| `prif_atomic_cas_logical`             | no  |  |
-| `prif_atomic_cas_logical_indirect`    | no  |  |
-| `prif_atomic_fetch_add`               | no  |  |
-| `prif_atomic_fetch_add_indirect`      | no  |  |
-| `prif_atomic_fetch_and`               | no  |  |
-| `prif_atomic_fetch_and_indirect`      | no  |  |
-| `prif_atomic_fetch_or`                | no  |  |
-| `prif_atomic_fetch_or_indirect`       | no  |  |
-| `prif_atomic_fetch_xor`               | no  |  |
-| `prif_atomic_fetch_xor_indirect`      | no  |  |
-| `prif_atomic_define_int`              | no  |  |
-| `prif_atomic_define_int_indirect`     | no  |  |
-| `prif_atomic_define_logical`          | no  |  |
-| `prif_atomic_define_logical_indirect` | no  |  |
-| `prif_atomic_ref_int`                 | no  |  |
-| `prif_atomic_ref_int_indirect`        | no  |  |
-| `prif_atomic_ref_logical`             | no  |  |
-| `prif_atomic_ref_logical_indirect`    | no  |  |
--->
+| `prif_atomic_add`                     | **YES** |  |
+| `prif_atomic_add_indirect`            | **YES** |  |
+| `prif_atomic_and`                     | **YES** |  |
+| `prif_atomic_and_indirect`            | **YES** |  |
+| `prif_atomic_or`                      | **YES** |  |
+| `prif_atomic_or_indirect`             | **YES** |  |
+| `prif_atomic_xor`                     | **YES** |  |
+| `prif_atomic_xor_indirect`            | **YES** |  |
+| `prif_atomic_cas_int`                 | **YES** |  |
+| `prif_atomic_cas_int_indirect`        | **YES** |  |
+| `prif_atomic_cas_logical`             | **YES** |  |
+| `prif_atomic_cas_logical_indirect`    | **YES** |  |
+| `prif_atomic_fetch_add`               | **YES** |  |
+| `prif_atomic_fetch_add_indirect`      | **YES** |  |
+| `prif_atomic_fetch_and`               | **YES** |  |
+| `prif_atomic_fetch_and_indirect`      | **YES** |  |
+| `prif_atomic_fetch_or`                | **YES** |  |
+| `prif_atomic_fetch_or_indirect`       | **YES** |  |
+| `prif_atomic_fetch_xor`               | **YES** |  |
+| `prif_atomic_fetch_xor_indirect`      | **YES** |  |
+| `prif_atomic_define_int`              | **YES** |  |
+| `prif_atomic_define_int_indirect`     | **YES** |  |
+| `prif_atomic_define_logical`          | **YES** |  |
+| `prif_atomic_define_logical_indirect` | **YES** |  |
+| `prif_atomic_ref_int`                 | **YES** |  |
+| `prif_atomic_ref_int_indirect`        | **YES** |  |
+| `prif_atomic_ref_logical`             | **YES** |  |
+| `prif_atomic_ref_logical_indirect`    | **YES** |  |
 
 ---
