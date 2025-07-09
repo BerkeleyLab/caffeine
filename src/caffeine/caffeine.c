@@ -15,6 +15,7 @@
 #include <ISO_Fortran_binding.h>
 #include "../dlmalloc/dl_malloc_caf.h"
 #include "../dlmalloc/dl_malloc.h"
+#include "caffeine-internal.h"
 
 enum {
   UNRECOGNIZED_TYPE,
@@ -31,6 +32,7 @@ typedef void(*final_func_ptr)(void*, size_t) ;
 typedef uint8_t byte;
 
 static void event_init(void);
+static void atomic_init(void);
 
 // ---------------------------------------------------
 int caf_this_image(gex_TM_t tm) {
@@ -107,6 +109,8 @@ void caf_caffeinate(
   *non_symmetric_heap = create_mspace_with_base((void*)non_symmetric_heap_start, non_symmetric_heap_size, 0);
   mspace_set_footprint_limit(*non_symmetric_heap, non_symmetric_heap_size);
 
+  // init various subsystems:
+  atomic_init();
   event_init();
 }
 
@@ -306,6 +310,65 @@ void caf_event_wait(void *event_var_ptr, int64_t threshold, int segment_boundary
   assert(cnt >= threshold);
 }
 
+// _______________________ Atomics ____________________________
+
+#define OPMAP(name) [CAF_CONCAT2(CAF_OP_,name)] = CAF_CONCAT2(GEX_OP_,name)
+
+static gex_OP_t const op_map[] = {
+  OPMAP(GET),
+  OPMAP(SET),
+  OPMAP(ADD),
+  OPMAP(AND),
+  OPMAP(OR),
+  OPMAP(XOR),
+  OPMAP(FADD),
+  OPMAP(FAND),
+  OPMAP(FOR),
+  OPMAP(FXOR),
+  OPMAP(FCAS),
+};
+static gex_AD_t atomic_AD = GEX_AD_INVALID;
+
+static void atomic_init(void) {
+  assert(atomic_AD == GEX_AD_INVALID);
+
+  // create the atomic AD 
+  gex_AD_Create(&atomic_AD, myworldteam, GEX_DT_I64, 
+                GEX_OP_GET | GEX_OP_SET  | 
+                GEX_OP_ADD | GEX_OP_FADD |
+                GEX_OP_AND | GEX_OP_FAND |
+                GEX_OP_OR  | GEX_OP_FOR  |
+                GEX_OP_XOR | GEX_OP_FXOR |
+                GEX_OP_FCAS, 
+                0); // TODO: allow user control over GEX_FLAG_AD_FAVOR_* flags?
+
+  assert(atomic_AD != GEX_AD_INVALID);
+}
+
+void caf_atomic_int(int opcode, int image, void* addr, int64_t *result, int64_t op1, int64_t op2) {
+  assert(atomic_AD != GEX_AD_INVALID);
+  assert(addr);
+  assert(opcode >= 0 && opcode < sizeof(op_map)/sizeof(op_map[0]));
+
+  gex_OP_t op = op_map[opcode];
+  gex_Event_Wait(
+    gex_AD_OpNB_I64(atomic_AD, result, 
+                    image-1, addr,
+                    op, op1, op2,
+                    GEX_FLAG_RANK_IS_JOBRANK)
+  );
+  // DOB: We could very easily insert memory fencing into the AMO operation above 
+  // via GEX_FLAG_AD_ACQ | GEX_FLAG_AD_REL, incurring an associated performance penalty
+  // (most notably for same-node images communicating via shared-memory transport).
+  // However based on my reading of the informal hand-waving in F23 C.12.1 "Atomic memory consistency",
+  // such fencing is neither required nor guaranteed by the language.
+  // As such we leave the AMO unfenced and rely on the fences at surrounding
+  // memory segment boundaries to provide the required ordering semantics.
+}
+
+void caf_atomic_logical(int opcode, int image, void* addr, int64_t *result, int64_t op1, int64_t op2) {
+  caf_atomic_int(opcode, image, addr, result, op1, op2);
+}
 
 //-------------------------------------------------------------------
 
