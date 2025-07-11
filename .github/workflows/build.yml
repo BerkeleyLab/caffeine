@@ -155,6 +155,7 @@ jobs:
       if: ${{ !contains(matrix.os, 'macos') || matrix.os == 'macos-13' }}
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
+        fpm-version: latest
 
     - name: Build FPM
       # no macos-arm64 fpm distro, build from source
