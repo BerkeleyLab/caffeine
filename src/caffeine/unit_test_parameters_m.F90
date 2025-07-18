@@ -1,16 +1,15 @@
 ! Copyright (c), The Regents of the University
 ! Terms of use are as specified in LICENSE.txt
 module unit_test_parameters_m
+  use iso_c_binding, only: c_int
   use prif, only: prif_sync_all, prif_this_image_no_coarray
   !! Define values and utilities for consistent use throughout the test suite
   implicit none
 
   public
 
-  enum, bind(C)
-    enumerator :: expected_stop_code=99, expected_error_stop_code
+  integer(c_int), parameter :: expected_stop_code=99, expected_error_stop_code=100
       ! used in stop/error-stop unit tests and example/test-support supporting programs
-  end enum
 
   character(len=:), allocatable :: subjob_prefix
 
