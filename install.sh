@@ -441,10 +441,15 @@ exit_if_pkg_config_pc_file_missing "caffeine"
 user_compiler_flags="${CPPFLAGS:-} ${FFLAGS:-}"
 
 compiler_version=$($FPM_FC --version)
-if [[ $compiler_version == *flang* ]]; then
+if [[ $compiler_version =~ 'flang' ]]; then
   compiler_flag="-g -O3"
-else # assume gfortran
+elif [[ $compiler_version =~ 'GNU Fortran' ]]; then
   compiler_flag="-g -O3 -ffree-line-length-0 -Wno-unused-dummy-argument"
+elif [[ $compiler_version =~ 'LFortran' ]]; then
+  compiler_flag="-g -O3 --cpp"
+else # unknown compiler
+  compiler_flag="-g -O2"
+  echo "WARNING: Failed to detect a recognized Fortran compiler"
 fi
 compiler_flag+=" -DASSERT_MULTI_IMAGE -DASSERT_PARALLEL_CALLBACKS"
 
