@@ -14,6 +14,12 @@ submodule(prif:prif_private_s) program_termination_s
 
 contains
 
+  ! Do our best to portably flush anything that might be buffered in the Fortran I/O library
+  subroutine flush_all()
+    flush output_unit
+    flush error_unit
+  end subroutine
+
   module procedure prif_register_stop_callback
     type(callback_entry), pointer :: new_entry
     allocate(new_entry)
@@ -25,6 +31,9 @@ contains
   end procedure
 
   module procedure prif_stop
+
+    call flush_all()
+
     call prif_sync_all
     call run_callbacks(.false._c_bool, quiet, stop_code_int, stop_code_char)
 
@@ -35,7 +44,6 @@ contains
     end if
 
   contains
-
     subroutine prif_stop_integer(quiet, stop_code)
       !! synchronize, stop the executing image, and provide the stop_code, or 0 if not present, as the process exit status
       logical(c_bool), intent(in) :: quiet
@@ -45,16 +53,16 @@ contains
       if (present(stop_code)) then
         if (.not. quiet) then
           write(output_unit, *) "STOP ", stop_code
-          flush output_unit
         end if
         exit_code = stop_code
       else
         if (.not. quiet) then
           write(output_unit, *) "STOP"
-          flush output_unit
         end if
         exit_code = 0_c_int
       end if
+
+      call flush_all()
 
       call caf_decaffeinate(exit_code)
 
@@ -67,8 +75,9 @@ contains
 
       if (.not. quiet) then
         write(output_unit, *) "STOP '" // stop_code // "'"
-        flush output_unit
       end if
+
+      call flush_all()
 
       call caf_decaffeinate(exit_code=0_c_int) ! does not return
 
@@ -77,6 +86,9 @@ contains
   end procedure prif_stop
 
   module procedure prif_error_stop
+      
+    call flush_all()
+
     call run_callbacks(.true._c_bool, quiet, stop_code_int, stop_code_char)
     if (present(stop_code_char)) then
        call prif_error_stop_character(quiet, stop_code_char)
@@ -92,8 +104,9 @@ contains
 
     if (.not. quiet) then
       write(error_unit, *) "ERROR STOP '" // stop_code // "'"
-      flush error_unit
     end if
+
+    call flush_all()
 
     call caf_decaffeinate(1_c_int) ! does not return
   end subroutine
@@ -107,16 +120,16 @@ contains
     if (present(stop_code)) then
       if (.not.quiet) then
         write(error_unit,'(A, I0)') "ERROR STOP ", stop_code
-        flush error_unit
       end if
       exit_code = stop_code
     else
       if (.not.quiet) then
         write(error_unit,'(a)') "ERROR STOP"
-        flush error_unit
       end if
       exit_code = 1_c_int
     end if
+
+    call flush_all()
 
     call caf_decaffeinate(exit_code) ! does not return
   end subroutine
