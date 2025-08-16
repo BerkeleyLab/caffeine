@@ -190,6 +190,11 @@ contains
     end block
 
     block ! check aliasing creation
+#   if FORCE_PRIF_0_5
+#     define data_pointer_offset
+#   else
+#     define data_pointer_offset 0_c_size_t,
+#   endif
       integer i, j
       integer, parameter :: lim = 10
       type(prif_coarray_handle) :: a(lim)
@@ -198,13 +203,13 @@ contains
       do i=2, lim
         lco(1) = i
         uco(1) = i + num_imgs
-        call prif_alias_create(a(i-1), lco, uco, a(i))
+        call prif_alias_create(a(i-1), lco, uco, data_pointer_offset a(i))
         result_ = result_ .and. &
           assert_aliased(a(i-1), a(i)) 
         do j = i+1,lim
           lco(1) = j
           uco(1) = j + num_imgs
-          call prif_alias_create(a(i), lco, uco, a(j))
+          call prif_alias_create(a(i), lco, uco, data_pointer_offset a(j))
           result_ = result_ .and. &
             assert_aliased(a(i), a(j)) 
           result_ = result_ .and. &

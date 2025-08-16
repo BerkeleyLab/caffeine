@@ -20,6 +20,11 @@ contains
     ! start with a copy of the source descriptor
     alias_handle%info = source_handle%info
 
+#   if !FORCE_PRIF_0_5
+       alias_handle%info%coarray_data = &
+         as_c_ptr(as_int(alias_handle%info%coarray_data) + data_pointer_offset)
+#   endif
+
     ! apply provided cobounds
     alias_handle%info%corank = size(alias_lcobounds)
     alias_handle%info%lcobounds(1:size(alias_lcobounds)) = alias_lcobounds
