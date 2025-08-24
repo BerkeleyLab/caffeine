@@ -1,0 +1,86 @@
+#include "language-support.F90"
+
+module prif_init_test_m
+    use prif, only : prif_init, PRIF_STAT_ALREADY_INIT
+    use julienne_m, only: test_description_t, test_diagnosis_t, test_result_t, test_t, operator(.equalsExpected.)
+#if ! HAVE_PROCEDURE_ACTUAL_FOR_POINTER_DUMMY
+    use julienne_m, only: diagnosis_function_i
+#endif
+
+    implicit none
+    private
+    public :: prif_init_test_t
+
+    type, extends(test_t) :: prif_init_test_t
+    contains
+      procedure, nopass, non_overridable :: subject
+      procedure, nopass, non_overridable :: results
+    end type
+
+contains
+
+  pure function subject() result(test_subject)
+    character(len=:), allocatable :: test_subject
+    test_subject = "The prif_init subroutine"
+  end function
+
+#if HAVE_PROCEDURE_ACTUAL_FOR_POINTER_DUMMY
+
+  function results() result(test_results)
+    type(test_result_t), allocatable ::  test_results(:)
+    type(prif_init_test_t) prif_init_test
+
+    test_results = prif_init_test%run([ &
+        test_description_t("completing successfully", check_caffeination) &
+       ,test_description_t("returning PRIF_STAT_ALREADY_INIT on a subsequent call ", check_subsequent_prif_init_call) &
+    ])
+  end function
+
+#else
+
+  function results() result(test_results)
+    type(test_result_t), allocatable ::  test_results(:)
+    type(prif_init_test_t) prif_init_test
+    procedure(diagnosis_function_i), pointer :: &
+        check_caffeination_ptr => check_caffeination &
+       ,check_subsequent_prif_init_call_ptr => check_subsequent_prif_init_call
+
+    test_results = prif_init_test%run([ &
+        test_description_t("completing successfully", check_caffeination_ptr) &
+       ,test_description_t("returning PRIF_STAT_ALREADY_INIT on a subsequent call ", check_subsequent_prif_init_call_ptr) &
+    ])
+  end function
+
+#endif
+
+  function check_caffeination() result(test_diagnosis)
+    ! this test needs to run very early at startup, so we memoize the result
+    type(test_diagnosis_t) :: test_diagnosis
+    type(test_diagnosis_t), save :: memo
+    logical, save :: first_pass = .true.
+
+    if (first_pass) then
+      first_pass = .false.
+      write_memo: &
+      block
+        integer, parameter :: successful_initiation = 0
+        integer init_exit_code
+
+        call prif_init(init_exit_code)
+        memo = init_exit_code .equalsExpected. successful_initiation
+      end block write_memo
+    endif 
+
+    test_diagnosis = memo
+  end function
+
+  function check_subsequent_prif_init_call() result(test_diagnosis)
+    type(test_diagnosis_t) :: test_diagnosis
+    integer stat
+
+    call prif_init(stat)
+    call prif_init(stat)
+    test_diagnosis = stat .equalsExpected. PRIF_STAT_ALREADY_INIT
+  end function
+
+end module prif_init_test_m

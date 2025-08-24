@@ -1,61 +1,111 @@
-module caf_image_queries_test
+#include "language-support.F90"
+
+module prif_image_queries_test_m
     use iso_c_binding, only: c_int
     use prif, only : prif_image_status, prif_stopped_images, prif_failed_images, PRIF_STAT_FAILED_IMAGE, PRIF_STAT_STOPPED_IMAGE
     use prif, only : prif_num_images
-    use veggies, only: result_t, test_item_t, assert_that, describe, it, succeed
+    use julienne_m, only: &
+       operator(//) &
+      ,operator(.all.) &
+      ,operator(.also.) &
+      ,operator(.isAtLeast.) &
+      ,operator(.isAtMost.) &
+      ,operator(.lessThan.) &
+      ,operator(.expect.) &
+      ,test_description_t &
+      ,test_diagnosis_t &
+      ,test_result_t &
+      ,test_t
+#if ! HAVE_PROCEDURE_ACTUAL_FOR_POINTER_DUMMY
+    use julienne_m, only: diagnosis_function_i
+#endif
 
     implicit none
     private
-    public :: test_prif_image_queries
+    public :: prif_image_queries_test_t
+
+    type, extends(test_t) :: prif_image_queries_test_t 
+    contains
+      procedure, nopass, non_overridable :: subject
+      procedure, nopass, non_overridable :: results
+    end type
 
 contains
-    function test_prif_image_queries() result(tests)
-        type(test_item_t) :: tests
-    
-        tests = describe( &
-          "PRIF image queries", [ &
-           it("provide valid prif_image_status()", check_image_status), &
-           it("provide valid prif_stopped_images()", check_stopped_images), &
-           it("provide valid prif_failed_images()", check_failed_images) &
-        ])
-    end function
 
-    function check_image_status() result(result_)
-        type(result_t) :: result_
-        integer(c_int) :: image_status
-        
-        call prif_image_status(1, image_status=image_status)
-        result_ = assert_that(image_status == 0 .or. &
-                              image_status == PRIF_STAT_FAILED_IMAGE .or. &
-                              image_status == PRIF_STAT_STOPPED_IMAGE, "permitted image status")
-    end function
+  pure function subject() result(test_subject)
+    character(len=:), allocatable :: test_subject
+    test_subject = "PRIF image queries"
+  end function
 
-    function valid_image_list(nums) result(result_)
-        integer, allocatable, intent(in) :: nums(:)
-        type(result_t) :: result_
-        integer i, ni
+#if HAVE_PROCEDURE_ACTUAL_FOR_POINTER_DUMMY
 
-        call prif_num_images(num_images=ni)
-        result_ = assert_that( allocated(nums) .and. size(nums) <= ni .and. &
-                               all([(nums(i) >= 1 .and. nums(i) <= ni, i = 1, size(nums))]) .and. &
-                               all([(nums(i) < nums(i+1), i = 1, size(nums)-1)]), &
-                               "valid stopped images")
-    end function
+  function results() result(test_results)
+    type(test_result_t), allocatable :: test_results(:)
+    type(prif_image_queries_test_t) prif_image_queries_test
 
-    function check_stopped_images() result(result_)
-        type(result_t) :: result_
-        integer, allocatable :: nums(:)
+    test_results = prif_image_queries_test%run([ &
+       test_description_t("providing valid prif_image_status()", check_image_status) &
+      ,test_description_t("providing valid prif_stopped_images()", check_stopped_images) &
+      ,test_description_t("providing valid prif_failed_images()", check_failed_images) &
+    ])
+  end function
 
-        call prif_stopped_images(stopped_images=nums)
-        result_ = valid_image_list(nums)
-    end function
+#else
 
-    function check_failed_images() result(result_)
-        type(result_t) :: result_
-        integer, allocatable :: nums(:)
+  function results() result(test_results)
+    type(test_result_t), allocatable :: test_results(:)
+    type(prif_image_queries_test_t) prif_image_queries_test
+    procedure(diagnosis_function_i), pointer :: &
+       check_image_status_ptr => check_image_status &
+      ,check_stopped_images_ptr => check_stopped_images &
+      ,check_failed_images_ptr => check_failed_images
 
-        call prif_failed_images(failed_images=nums)
-        result_ = valid_image_list(nums)
-    end function
+    test_results = prif_image_queries_test%run([ &
+       test_description_t("providing valid prif_image_status()", check_image_status_ptr) &
+      ,test_description_t("providing valid prif_stopped_images()", check_stopped_images_ptr) &
+      ,test_description_t("providing valid prif_failed_images()", check_failed_images_ptr) &
+    ])
+  end function
 
-end module caf_image_queries_test
+#endif
+
+  function check_image_status() result(test_diagnosis)
+      type(test_diagnosis_t) :: test_diagnosis
+      integer(c_int) :: image_status
+      
+      call prif_image_status(1, image_status=image_status)
+      test_diagnosis = .expect. (any(image_status == [0, PRIF_STAT_FAILED_IMAGE, PRIF_STAT_STOPPED_IMAGE])) & ! TODO: replace with .any. once Juliennes supports it
+                        // "permitted image status"
+  end function
+
+  function valid_image_list(nums) result(test_diagnosis)
+      integer, allocatable, intent(in) :: nums(:)
+      type(test_diagnosis_t) test_diagnosis
+      integer ni
+
+      call prif_num_images(num_images=ni)
+      test_diagnosis = &
+         .expect. allocated(nums) &
+         .also. (size(nums) .isAtMost. ni) &
+         .also. (.all. (nums .isAtLeast. 1)) &
+         .also. (.all. (nums .isAtMost. ni)) &
+         .also. (.all. (nums(1:size(nums)-1) .lessThan. nums(2:size(nums)))) // "valid stopped image"
+  end function
+
+  function check_stopped_images() result(test_diagnosis)
+      type(test_diagnosis_t) :: test_diagnosis
+      integer, allocatable :: nums(:)
+
+      call prif_stopped_images(stopped_images=nums)
+      test_diagnosis = valid_image_list(nums)
+  end function
+
+  function check_failed_images() result(test_diagnosis)
+      type(test_diagnosis_t) :: test_diagnosis
+      integer, allocatable :: nums(:)
+
+      call prif_failed_images(failed_images=nums)
+      test_diagnosis = valid_image_list(nums)
+  end function
+
+end module prif_image_queries_test_m
