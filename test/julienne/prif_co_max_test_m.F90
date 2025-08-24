@@ -1,0 +1,226 @@
+#include "language-support.F90"
+
+module prif_co_max_test_m
+  use iso_c_binding, only: c_int8_t, c_int16_t, c_int32_t, c_int64_t, c_float, c_double
+  use prif, only : prif_co_max, prif_co_max_character, prif_this_image_no_coarray, prif_num_images
+  use julienne_m, only: &
+    operator(.all.) &
+   ,operator(.approximates.) &
+   ,operator(.within.) &
+   ,operator(.equalsExpected.) &
+   ,test_description_t &
+   ,test_diagnosis_t &
+   ,test_result_t &
+   ,test_t
+#if ! HAVE_PROCEDURE_ACTUAL_FOR_POINTER_DUMMY
+  use julienne_m, only : diagnosis_function_i
+#endif
+    implicit none
+
+
+    private
+    public :: prif_co_max_test_t
+
+    type, extends(test_t) :: prif_co_max_test_t
+    contains
+      procedure, nopass, non_overridable :: subject
+      procedure, nopass, non_overridable :: results
+    end type
+
+contains
+
+    pure function subject() result(test_subject)
+      character(len=:), allocatable :: test_subject
+      test_subject = "The prif_co_max subroutine"
+    end function
+
+#if HAVE_PROCEDURE_ACTUAL_FOR_POINTER_DUMMY
+
+    function results() result(test_results)
+      type(test_result_t), allocatable :: test_results(:)
+      type(prif_co_max_test_t) prif_co_max_test
+
+      test_results = prif_co_max_test%run([ &
+         test_description_t("computing element-wise maxima for integer(c_int32_t) scalars", check_32_bit_integer) &
+        ,test_description_t("computing element-wise maxima for a 1D default integer array", check_default_integer) &
+        ,test_description_t("computing element-wise maxima for a 1D integer(c_int8_t) array", check_8_bit_integer) &
+        ,test_description_t("computing element-wise maxima for a 1D integer(c_int16_t) array", check_16_bit_integer) &
+        ,test_description_t("computing element-wise maxima for a 1D integer(c_int64_t array", check_64_bit_integer) &
+        ,test_description_t("computing element-wise maxima for a 2D real(c_float) array", check_32_bit_real) &
+        ,test_description_t("computing element-wise maxima for a 1D real(c_double array", check_64_bit_real) &
+        ,test_description_t("computing element-wise maxima for character scalars", check_character) &
+      ])
+    end function
+
+#else
+
+    function results() result(test_results)
+      type(test_result_t), allocatable :: test_results(:)
+      type(prif_co_max_test_t) prif_co_max_test
+      procedure(diagnosis_function_i), pointer :: &
+         check_32_bit_integer_ptr => check_32_bit_integer &
+        ,check_default_integer_ptr => check_default_integer &
+        ,check_8_bit_integer_ptr => check_8_bit_integer &
+        ,check_16_bit_integer_ptr => check_16_bit_integer &
+        ,check_64_bit_integer_ptr => check_64_bit_integer &
+        ,check_32_bit_real_ptr => check_32_bit_real &
+        ,check_64_bit_real_ptr => check_64_bit_real &
+        ,check_character_ptr => check_character
+
+      test_results = prif_co_max_test%run([ &
+         test_description_t("computing element-wise maxima for integer(c_int32_t) scalars", check_32_bit_integer) &
+        ,test_description_t("computing element-wise maxima for a 1D default integer array", check_default_integer) &
+        ,test_description_t("computing element-wise maxima for a 1D integer(c_int8_t) array", check_8_bit_integer) &
+        ,test_description_t("computing element-wise maxima for a 1D integer(c_int16_t) array", check_16_bit_integer) &
+        ,test_description_t("computing element-wise maxima for a 1D integer(c_int64_t array", check_64_bit_integer) &
+        ,test_description_t("computing element-wise maxima for a 2D real(c_float) array", check_32_bit_real) &
+        ,test_description_t("computing element-wise maxima for a 1D real(c_double array", check_64_bit_real) &
+        ,test_description_t("computing element-wise maxima for character scalars", check_character) &
+      ])
+    end function
+
+#endif
+    function check_default_integer() result(test_diagnosis)
+        type(test_diagnosis_t) :: test_diagnosis
+
+        integer, parameter :: values(*,*) = reshape([1, -19, 5, 13, 11, 7, 17, 3], [2, 4])
+        integer :: me, ni, i
+        integer, dimension(size(values,1)) :: my_val, expected
+
+        call prif_this_image_no_coarray(this_image=me)
+        call prif_num_images(ni)
+
+        my_val = values(:, mod(me-1, size(values,2))+1)
+        call prif_co_max(my_val)
+
+        expected = maxval(reshape([(values(:, mod(i-1,size(values,2))+1), i = 1, ni)], [size(values,1),ni]), dim=2)
+        test_diagnosis = .all. (int(my_val) .equalsExpected. int(expected))
+    end function
+
+    function check_8_bit_integer() result(test_diagnosis)
+        type(test_diagnosis_t) :: test_diagnosis
+
+        integer(c_int8_t), parameter :: values(*,*) = reshape(int([1, -19, 5, 13, 11, 7, 17, 3],c_int8_t), [2, 4])
+        integer :: me, ni, i
+        integer(c_int8_t), dimension(size(values,1)) :: my_val, expected
+
+        call prif_this_image_no_coarray(this_image=me)
+        call prif_num_images(ni)
+
+        my_val = values(:, mod(me-1, size(values,2))+1)
+        call prif_co_max(my_val)
+
+        expected = maxval(reshape([(values(:, mod(i-1,size(values,2))+1), i = 1, ni)], [size(values,1),ni]), dim=2)
+        test_diagnosis = .all. (int(my_val) .equalsExpected. int(expected))
+    end function
+
+    function check_16_bit_integer() result(test_diagnosis)
+        type(test_diagnosis_t) :: test_diagnosis
+
+        integer(c_int16_t), parameter :: values(*,*) = reshape(int([1, -19, 5, 13, 11, 7, 17, 3],c_int16_t), [2, 4])
+        integer :: me, ni, i
+        integer(c_int16_t), dimension(size(values,1)) :: my_val, expected
+
+        call prif_this_image_no_coarray(this_image=me)
+        call prif_num_images(ni)
+
+        my_val = values(:, mod(me-1, size(values,2))+1)
+        call prif_co_max(my_val)
+
+        expected = maxval(reshape([(values(:, mod(i-1,size(values,2))+1), i = 1, ni)], [size(values,1),ni]), dim=2)
+        test_diagnosis = .all. (int(my_val) .equalsExpected. int(expected))
+    end function
+
+    function check_32_bit_integer() result(test_diagnosis)
+        type(test_diagnosis_t) :: test_diagnosis
+
+        integer(c_int32_t), parameter :: values(*) = [1, -19, 5, 13, 11, 7, 17, 3]
+        integer :: me, ni, i
+        integer(c_int32_t) :: my_val, expected
+
+        call prif_this_image_no_coarray(this_image=me)
+        call prif_num_images(ni)
+
+        my_val = values(mod(me-1, size(values))+1)
+        call prif_co_max(my_val)
+
+        expected = maxval([(values(mod(i-1,size(values))+1), i = 1, ni)])
+        test_diagnosis = my_val .equalsExpected. expected
+    end function
+
+    function check_64_bit_integer() result(test_diagnosis)
+        type(test_diagnosis_t) :: test_diagnosis
+
+        integer(c_int64_t), parameter :: values(*,*) = reshape([1, -19, 5, 13, 11, 7, 17, 3], [2, 4])
+        integer :: me, ni, i
+        integer(c_int64_t), dimension(size(values,1)) :: my_val, expected
+
+        call prif_this_image_no_coarray(this_image=me)
+        call prif_num_images(ni)
+
+        my_val = values(:, mod(me-1, size(values,2))+1)
+        call prif_co_max(my_val)
+
+        expected = maxval(reshape([(values(:, mod(i-1,size(values,2))+1), i = 1, ni)], [size(values,1),ni]), dim=2)
+        test_diagnosis = .all. (int(my_val) .equalsExpected. int(expected))
+    end function
+
+    function check_32_bit_real() result(test_diagnosis)
+        type(test_diagnosis_t) :: test_diagnosis
+
+        real(c_float), parameter :: values(*,*,*) = reshape([1, 19, 5, 13, 11, 7, 17, 3], [2,2,2])
+        real(c_float), parameter :: tolerance = 0_c_float
+        integer :: me, ni, i
+        real(c_float), dimension(size(values,1), size(values,2)) :: my_val, expected
+
+        call prif_this_image_no_coarray(this_image=me)
+        call prif_num_images(ni)
+
+        my_val = values(:, :, mod(me-1, size(values,3))+1)
+        call prif_co_max(my_val)
+
+        expected = maxval(reshape([(values(:,:,mod(i-1,size(values,3))+1), i = 1, ni)], [size(values,1), size(values,2), ni]), dim=3)
+        test_diagnosis = .all. (my_val .approximates. expected .within. tolerance)
+    end function
+
+    function check_64_bit_real() result(test_diagnosis)
+        type(test_diagnosis_t) :: test_diagnosis
+
+        real(c_double), parameter :: values(*,*) = reshape([1, 19, 5, 13, 11, 7, 17, 3], [2, 4])
+        real(c_double), parameter :: tolerance = 0_c_double
+        integer :: me, ni, i
+        real(c_double), dimension(size(values,1)) :: my_val, expected
+
+        call prif_this_image_no_coarray(this_image=me)
+        call prif_num_images(ni)
+
+        my_val = values(:, mod(me-1, size(values,2))+1)
+        call prif_co_max(my_val)
+
+        expected = maxval(reshape([(values(:, mod(i-1,size(values,2))+1), i = 1, ni)], [size(values,1),ni]), dim=2)
+        test_diagnosis = .all. (my_val .approximates. expected .within. tolerance)
+    end function
+
+    function check_character() result(test_diagnosis)
+        type(test_diagnosis_t) test_diagnosis
+        character(len=*), parameter :: values(*) = &
+            [ "To be   ","or not  " &
+            , "to      ","be.     " &
+            , "that    ","is      " &
+            , "the     ","question"]
+        integer :: me, ni, i
+        character(len=len(values)) :: my_val, expected
+
+        call prif_this_image_no_coarray(this_image=me)
+        call prif_num_images(ni)
+
+        my_val = values(mod(me-1, size(values))+1)
+        call prif_co_max_character(my_val)
+
+        ! issue #205: workaround flang optimizer bug with a temp
+        associate(tmp => [(values(mod(i-1,size(values))+1), i = 1, ni)])
+          test_diagnosis = my_val .equalsExpected. maxval(tmp)
+        end associate
+    end function
+
+end module prif_co_max_test_m

@@ -23,32 +23,9 @@ contains
         use caf_allocate_test, only: &
                 caf_allocate_prif_allocate => &
                     test_prif_allocate
-        use caf_co_broadcast_test, only: &
-                caf_co_broadcast_prif_co_broadcast => &
-                    test_prif_co_broadcast
-        use caf_co_max_test, only: &
-                caf_co_max_prif_co_max => &
-                    test_prif_co_max
-        use caf_co_min_test, only: &
-                caf_co_min_prif_co_min => &
-                    test_prif_co_min
-        use caf_co_reduce_test, only: &
-                caf_co_reduce_prif_co_reduce => &
-                    test_prif_co_reduce
-        use caf_co_sum_test, only: &
-                caf_co_sum_prif_co_sum => &
-                    test_prif_co_sum
-        use caf_coarray_inquiry_test, only: &
-                caf_coarray_inquiry_coarray_inquiry => &
-                    test_coarray_inquiry
         use caf_image_index_test, only: &
                 caf_image_index_prif_image_index => &
                     test_prif_image_index
-        use caf_num_images_test, only: &
-                caf_num_images_prif_num_images => &
-                    test_prif_num_images
-        use caf_image_queries_test, only: test_prif_image_queries
-        use caf_sync_images_test, only: test_prif_sync_images
         use caf_rma_test, only: &
                 caf_rma_prif_rma => &
                     test_prif_rma
@@ -61,9 +38,6 @@ contains
         use caf_teams_test, only: &
                 caf_teams_caf_teams => &
                     test_caf_teams
-        use caf_this_image_test, only: &
-                caf_this_image_prif_this_image_no_coarray => &
-                    test_prif_this_image_no_coarray
         use caf_stop_test, only: test_prif_stop
         use caf_error_stop_test, only: test_prif_error_stop
         use veggies, only: test_item_t, test_that, run_tests, result_t
@@ -100,22 +74,12 @@ contains
 #endif
         individual_tests = [a00_caffeinate_caffeinate()]
         individual_tests = [individual_tests, caf_allocate_prif_allocate()]
-        individual_tests = [individual_tests, caf_coarray_inquiry_coarray_inquiry()]
-        individual_tests = [individual_tests, caf_co_broadcast_prif_co_broadcast()]
-        individual_tests = [individual_tests, caf_co_max_prif_co_max()]
-        individual_tests = [individual_tests, caf_co_min_prif_co_min()]
-        individual_tests = [individual_tests, caf_co_reduce_prif_co_reduce()]
-        individual_tests = [individual_tests, caf_co_sum_prif_co_sum()]
         individual_tests = [individual_tests, caf_image_index_prif_image_index()]
-        individual_tests = [individual_tests, caf_num_images_prif_num_images()]
-        individual_tests = [individual_tests, test_prif_image_queries()]
         individual_tests = [individual_tests, caf_rma_prif_rma()]
         individual_tests = [individual_tests, test_prif_rma_strided()]
         individual_tests = [individual_tests, caf_teams_caf_teams()]
-        individual_tests = [individual_tests, caf_this_image_prif_this_image_no_coarray()]
         individual_tests = [individual_tests, test_prif_atomic()]
         individual_tests = [individual_tests, test_prif_event()]
-        individual_tests = [individual_tests, test_prif_sync_images()]
         individual_tests = [individual_tests, test_prif_stop()]
         individual_tests = [individual_tests, test_prif_error_stop()]
 
