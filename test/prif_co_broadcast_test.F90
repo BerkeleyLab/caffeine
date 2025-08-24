@@ -1,10 +1,28 @@
-module caf_co_broadcast_test
+#include "language-support.F90"
+
+module prif_co_broadcast_test_m
   use prif, only : prif_co_broadcast, prif_num_images, prif_this_image_no_coarray
-  use veggies, only : result_t, test_item_t, describe, it, assert_equals, assert_that
+  use julienne_m, only : &
+     test_description_t &
+    ,test_diagnosis_t &
+    ,test_result_t &
+    ,test_t &
+    ,operator(//) &
+    ,operator(.expect.) &
+    ,operator(.equalsExpected.)
+#if ! HAVE_PROCEDURE_ACTUAL_FOR_POINTER_DUMMY
+  use julienne_m, only : diagnosis_function_i
+#endif
 
   implicit none
   private
-  public :: test_prif_co_broadcast
+  public :: prif_co_broadcast_test_t
+
+  type, extends(test_t) :: prif_co_broadcast_test_t
+  contains
+    procedure, nopass, non_overridable  :: subject
+    procedure, nopass, non_overridable  :: results
+  end type
 
   type object_t
     integer i
@@ -19,15 +37,39 @@ module caf_co_broadcast_test
 
 contains
 
-  function test_prif_co_broadcast() result(tests)
-    type(test_item_t) tests
-  
-    tests = describe( &
-      "The prif_co_broadcast subroutine", &
-      [ it("broadcasts a default integer scalar with no optional arguments present", broadcast_default_integer_scalar) &
-       ,it("broadcasts a derived type scalar with no allocatable components", broadcast_derived_type) &
+  pure function subject() result(test_subject)
+    character(len=:), allocatable :: test_subject
+    test_subject = "The prif_co_broadcast subroutine"
+  end function
+
+#if HAVE_PROCEDURE_ACTUAL_FOR_POINTER_DUMMY
+
+  function results() result(test_results)
+    type(test_result_t), allocatable :: test_results(:)
+    type(prif_co_broadcast_test_t) prif_co_broadcast_test
+
+    test_results = prif_co_broadcast_test%run([ &
+       test_description_t("broadcasting a default integer scalar with no optional arguments present", broadcast_default_integer_scalar) &
+      ,test_description_t("broadcasting a derived type scalar with no allocatable components", broadcast_derived_type) &
     ])
   end function
+
+#else
+
+  function results() result(test_results)
+    type(test_result_t), allocatable :: test_results(:)
+    type(prif_co_broadcast_test_t) prif_co_broadcast_test
+    procedure(diagnosis_function_i), pointer :: &
+       broadcast_default_integer_scalar_ptr => broadcast_default_integer_scalar &
+      ,broadcast_derived_type_ptr => broadcast_derived_type
+
+    test_results = prif_co_broadcast_test%run([ &
+       test_description_t("broadcasting a default integer scalar with no optional arguments present", broadcast_default_integer_scalar_ptr) &
+      ,test_description_t("broadcasting a derived type scalar with no allocatable components", broadcast_derived_type_ptr) &
+    ])
+  end function
+
+#endif
 
   logical pure function equals(lhs, rhs) 
     type(object_t), intent(in) :: lhs, rhs 
@@ -39,30 +81,29 @@ contains
     ])
   end function
 
-  function broadcast_default_integer_scalar() result(result_)
-    type(result_t) result_
+  function broadcast_default_integer_scalar() result(test_diagnosis)
+    type(test_diagnosis_t) test_diagnosis
     integer iPhone, me
     integer, parameter :: source_value = 7779311, junk = -99
 
     call prif_this_image_no_coarray(this_image=me)
     iPhone = merge(source_value, junk, me==1)
     call prif_co_broadcast(iPhone, source_image=1)
-    result_ = assert_equals(source_value, iPhone)
+    test_diagnosis = iPhone .equalsExpected. source_value 
   end function
 
-  function broadcast_derived_type() result(result_)
-    type(result_t) result_
+  function broadcast_derived_type() result(test_diagnosis)
+    type(test_diagnosis_t) test_diagnosis
     type(object_t) object
-    integer :: me, ni
+    integer me, ni
 
     call prif_this_image_no_coarray(this_image=me)
     call prif_num_images(num_images=ni)
     object = object_t(me, .false., "gooey", me*(1.,0.))
     call prif_co_broadcast(object, source_image=ni)
     associate(expected_object => object_t(ni, .false., "gooey", ni*(1.,0.)))
-      result_ = assert_that(expected_object == object, "co_broadcast derived type")
+      test_diagnosis = .expect. (object == expected_object) // "co_broadcast derived type"
     end associate
-
   end function
 
-end module caf_co_broadcast_test
+end module prif_co_broadcast_test_m
