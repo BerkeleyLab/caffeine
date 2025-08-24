@@ -1,11 +1,32 @@
-module caf_co_reduce_test
+#include "language-support.F90"
+
+module prif_co_reduce_test_m
   use iso_c_binding, only: c_ptr, c_funptr, c_size_t, c_f_pointer, c_f_procpointer, c_funloc, c_loc, c_null_ptr
   use prif, only : prif_co_reduce, prif_num_images, prif_this_image_no_coarray, prif_operation_wrapper_interface
-  use veggies, only : result_t, test_item_t, assert_equals, assert_not, assert_that, describe, it, succeed
-
+  use julienne_m, only : &
+     operator(.all.) &
+    ,operator(.also.) &
+    ,operator(.approximates.) &
+    ,operator(.equalsExpected.) &
+    ,operator(.expect.) &
+    ,operator(.within.) &
+    ,test_description_t &
+    ,test_diagnosis_t &
+    ,test_result_t &
+    ,test_t
+#if ! HAVE_PROCEDURAL_ACTUAL_FOR_POINTER_DUMMY
+  use julienne_m, only : diagnosis_function_i
+#endif
   implicit none
+
   private
-  public :: test_prif_co_reduce
+  public :: prif_co_reduce_test_t
+
+  type, extends(test_t) :: prif_co_reduce_test_t
+  contains
+    procedure, nopass, non_overridable :: subject
+    procedure, nopass, non_overridable :: results
+  end type
 
   type :: pair
     integer :: fst
@@ -26,21 +47,53 @@ module caf_co_reduce_test
 
 contains
 
-  function test_prif_co_reduce() result(tests)
-    type(test_item_t) tests
+  pure function subject() result(test_subject)
+    character(len=:), allocatable :: test_subject
+    test_subject = "The prif_co_reduce subroutine"
+  end function
 
-    tests = describe( &
-      "The prif_co_reduce subroutine", &
-      [ it("can be used to implement logical and reduction", check_logical) &
-      , it("can be used for reduction on simple derived types", check_derived_type_reduction) &
+#if HAVE_PROCEDURAL_ACTUAL_FOR_POINTER_DUMMY
+
+  function results() result(test_results)
+    type(test_result_t), allocatable :: test_results(:)
+    type(prif_co_reduce_test_t) prif_co_reduce_test
+
+    test_results = prif_co_reduce_test%run([ &
+       test_description_t("performing a logical .and. reduction", check_logical) &
+      ,test_description_t("performing a derived type reduction", check_derived_type_reduction) &
 #if HAVE_PARAM_DERIVED
-      , it("can be used for reduction on derived types with length type parameters", check_type_parameter_reduction) &
+      ,test_description_t("performing a parameterized derived type reduction", check_type_parameter_reduction) &
 #endif
       ])
   end function
 
-  function check_logical() result(result_)
-    type(result_t) :: result_
+#else
+
+  function results() result(test_results)
+    type(test_result_t), allocatable :: test_results(:)
+    type(prif_co_reduce_test_t) prif_co_reduce_test
+    procedure(diagnosis_function_i), pointer :: &
+       check_logical_ptr => check_logical &
+      ,check_derived_type_reduction_ptr => check_derived_type_reduction
+#if HAVE_PARAM_DERIVED
+    procedure(diagnosis_function_i), pointer ::  check_type_parameter_reduction_ptr => check_type_parameter_reduction
+#endif
+
+    test_results = prif_co_reduce_test%run([ &
+       test_description_t("performing a logical .and. reduction", check_logical_ptr) &
+      ,test_description_t("performing a derived type reduction", check_derived_type_reduction_ptr) &
+#if HAVE_PARAM_DERIVED
+      ,test_description_t("performing a parameterized derived type reduction", check_type_parameter_reduction_ptr) &
+#endif
+      ])
+  end function
+
+
+#endif
+
+
+  function check_logical() result(test_diagnosis)
+    type(test_diagnosis_t) test_diagnosis
     logical :: val
     integer :: me
     procedure(prif_operation_wrapper_interface), pointer :: op
@@ -48,14 +101,14 @@ contains
 
     val = .true.
     call prif_co_reduce(val, op, c_null_ptr)
-    result_ = assert_that(val)
+    test_diagnosis = .expect. val
 
     call prif_this_image_no_coarray(this_image=me)
     if (me == 1) then
       val = .false.
     end if
     call prif_co_reduce(val, op, c_null_ptr)
-    result_ = result_.and.assert_not(val)
+    test_diagnosis = test_diagnosis .also. (.expect. (.not. val))
   end function
 
   subroutine and_wrapper(arg1, arg2_and_out, count, cdata) bind(C)
@@ -74,8 +127,8 @@ contains
     end do
   end subroutine
 
-  function check_derived_type_reduction() result(result_)
-    type(result_t) :: result_
+  function check_derived_type_reduction() result(test_diagnosis)
+    type(test_diagnosis_t) test_diagnosis
     type(pair), parameter :: values(*,*) = reshape( &
         [ pair(1, 53.), pair(3, 47.) &
         , pair(5, 43.), pair(7, 41.) &
@@ -87,6 +140,7 @@ contains
     type(pair), dimension(size(values,1)) :: my_val, expected
     type(pair), dimension(:,:), allocatable :: tmp
     procedure(prif_operation_wrapper_interface), pointer :: op
+    double precision, parameter :: tolerance = 0D0
 
     op => pair_adder
     call prif_this_image_no_coarray(this_image=me)
@@ -111,9 +165,8 @@ contains
 #else
     expected = reduce(tmp, add_pair, dim=2)
 #endif
-    result_ = &
-        assert_equals(expected%fst, my_val%fst) &
-        .and. assert_equals(real(expected%snd, kind=kind(0.d0)), real(my_val%snd, kind=kind(0.d0)))
+    test_diagnosis = .all. (my_val%fst .equalsExpected. expected%fst) &
+      .also. (.all. ( real(my_val%snd, kind=kind(0.d0)) .approximates. real(expected%snd, kind=kind(0.d0)) .within. tolerance))
   end function
 
   pure function add_pair(lhs, rhs) result(total)
@@ -148,8 +201,8 @@ contains
 ! Gfortran 14.2 also lacks the type support for this test:
 ! Error: Derived type 'pdtarray' at (1) is being used before it is defined
 
-  function check_type_parameter_reduction() result(result_)
-    type(result_t) :: result_
+  function check_type_parameter_reduction() result(test_diagnosis)
+    type(test_diagnosis_t) test_diagnosis
     type(array), parameter :: values(*,*) = reshape( &
         [ array(elements=[1, 53]), array(elements=[3, 47]) &
         , array(elements=[5, 43]), array(elements=[7, 41]) &
@@ -172,9 +225,7 @@ contains
     call prif_co_reduce(my_val, op, c_loc(context))
 
     expected = reduce(reshape([(values(:, mod(i-1,size(values,2))+1), i = 1, ni)], [size(values,1),ni]), add_array, dim=2)
-    do i = 1, size(expected)
-      result_ = result_.and.assert_equals(expected(i)%elements, my_val(i)%elements)
-    end do
+    test_diagnosis = .all. (my_val%elements .equalsExpected. expected%elements)
   end function
 
   pure function add_array(lhs, rhs) result(total)
@@ -216,4 +267,4 @@ contains
   end subroutine
 #endif /* HAVE_PARAM_DERIVED */
 
-end module caf_co_reduce_test
+end module prif_co_reduce_test_m
