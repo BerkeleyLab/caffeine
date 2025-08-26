@@ -40,6 +40,8 @@ jobs:
             compiler: flang
             version: latest
             network: smp
+            native_multi_image: 1
+            FFLAGS: -fcoarray -DHAVE_SYNC=0 -DHAVE_COLLECTIVES=0
             # https://hub.docker.com/r/snowstep/llvm/tags
             container: snowstep/llvm:focal
           - os: ubuntu-24.04
@@ -131,6 +133,10 @@ jobs:
         if test "${{ matrix.network }}" = "udp"; then \
           echo "GASNET_SUPERNODE_MAXSIZE=1" >> "$GITHUB_ENV" ; \
         fi
+        if (( ${{ matrix.native_multi_image }} )); then \
+          echo "FFLAGS=$FFLAGS -DHAVE_MULTI_IMAGE" >> "$GITHUB_ENV" ; \
+        fi
+
 
     - name: Checkout code
       uses: actions/checkout@v1
@@ -200,6 +206,11 @@ jobs:
         echo CAF_IMAGES=${CAF_IMAGES}
         set -x
         ./build/run-fpm.sh run --verbose --example hello
+
+    - name: Run native multi-image test
+      if: ${{ matrix.native_multi_image }}
+      run: |
+        set -x ; ./build/run-fpm.sh run --verbose
 
     - name: Run unit tests
       run: |
