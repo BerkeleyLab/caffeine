@@ -47,20 +47,20 @@ jobs:
             version: 21
             network: smp
             # https://hub.docker.com/r/phhargrove/llvm-flang/tags
-            container: phhargrove/llvm-flang:21.1.0-4
+            container: phhargrove/llvm-flang:21.1.0-latest
           - os: ubuntu-24.04
             compiler: flang
             version: 20
             network: smp
             # https://hub.docker.com/r/phhargrove/llvm-flang/tags
-            container: phhargrove/llvm-flang:20.1.0-1
+            container: phhargrove/llvm-flang:20.1.0-latest
           - os: ubuntu-24.04
             compiler: flang
             version: 19
             network: smp
             FFLAGS: -mmlir -allow-assumed-rank
             # https://hub.docker.com/r/phhargrove/llvm-flang/tags
-            container: phhargrove/llvm-flang:19.1.1-1
+            container: phhargrove/llvm-flang:19.1.1-latest
 #          - os: ubuntu-24.04
 #            compiler: flang
 #            version: new
@@ -83,12 +83,12 @@ jobs:
             compiler: flang
             version: 20
             network: udp
-            container: phhargrove/llvm-flang:20.1.0-1
+            container: phhargrove/llvm-flang:20.1.0-latest
           - os: ubuntu-24.04
             compiler: flang
             version: 21
             network: udp
-            container: phhargrove/llvm-flang:21.1.0-4
+            container: phhargrove/llvm-flang:21.1.0-latest
 
     container:
       image: ${{ matrix.container }}
