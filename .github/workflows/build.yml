@@ -26,15 +26,15 @@ jobs:
         # --- flang coverage ---
           - os: macos-13
             compiler: flang
-            version: 20
+            version: 21
             network: smp
           - os: macos-14
             compiler: flang
-            version: 20
+            version: 21
             network: smp
           - os: macos-15
             compiler: flang
-            version: 20
+            version: 21
             network: smp
           - os: ubuntu-24.04
             compiler: flang
