@@ -77,7 +77,7 @@ jobs:
             network: udp
           - os: macos-15
             compiler: flang
-            version: 20
+            version: 21
             network: udp
           - os: ubuntu-24.04
             compiler: flang
