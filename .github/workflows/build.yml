@@ -200,9 +200,6 @@ jobs:
         echo CAF_IMAGES=${CAF_IMAGES}
         set -x
         ./build/run-fpm.sh run --verbose --example hello
-        ./build/run-fpm.sh run --verbose --example stop_with_no_code
-        ( set +e ; ./build/run-fpm.sh run --verbose --example stop_with_integer_code ; test $? = 99 )
-        ( set +e ; ./build/run-fpm.sh run --verbose --example error_stop_with_integer_code ; test $? = 100 )
 
     - name: Run unit tests
       run: |
@@ -212,5 +209,22 @@ jobs:
           ( set -x ; ./build/run-fpm.sh test --verbose -- -d ) ; \
           sleep 1 ; \
           CAF_IMAGES=$(( CAF_IMAGES / 2 )) ; \
+        done
+
+    - name: Run exit tests
+      run: |
+        echo CAF_IMAGES=${CAF_IMAGES}
+        set -x
+        ./build/run-fpm.sh run --verbose --example stop_with_no_code
+        ( set +e ; ./build/run-fpm.sh run --verbose --example stop_with_integer_code ; test $? = 99 )
+        ( set +e ; ./build/run-fpm.sh run --verbose --example error_stop_with_integer_code ; test $? = 100 )
+        unset GASNET_SPAWN_VERBOSE
+        for ((i=1; i<=4; i++)); do \
+         (set +e ; \
+          ./build/run-fpm.sh run --verbose --example exit_case -- $i 2>&1 | tee output ; \
+          test ${PIPESTATUS[0]} = $((i + 100)) \
+            && grep -q "stdout from image $CAF_IMAGES" output \
+            && grep -q "stderr from image $CAF_IMAGES" output \
+         ) ; \
         done
 
