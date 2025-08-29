@@ -80,10 +80,10 @@ contains
 #endif
 
     test_results = prif_co_reduce_test%run([ &
-       test_description_t("performing a logical .and. reduction", check_logical) &
-      ,test_description_t("performing a derived type reduction", check_derived_type_reduction) &
+       test_description_t("performing a logical .and. reduction", check_logical_ptr) &
+      ,test_description_t("performing a derived type reduction", check_derived_type_reduction_ptr) &
 #if HAVE_PARAM_DERIVED
-      ,test_description_t("performing a parameterized derived type reduction", check_type_parameter_reduction) &
+      ,test_description_t("performing a parameterized derived type reduction", check_type_parameter_reduction_ptr) &
 #endif
       ])
   end function

@@ -12,8 +12,8 @@ program test_suite_driver
   use prif_co_sum_test_m, only : prif_co_sum_test_t
   use prif_image_queries_test_m, only : prif_image_queries_test_t
   use prif_num_images_test_m, only : prif_num_images_test_t
-  use prif_this_image_no_coarray_test_m, only : prif_this_image_no_coarray_test_t
   use prif_sync_images_test_m, only : prif_sync_images_test_t
+  use prif_this_image_no_coarray_test_m, only : prif_this_image_no_coarray_test_t
   implicit none
 
   associate(test_harness => test_harness_t([ &
@@ -26,8 +26,8 @@ program test_suite_driver
     ,test_fixture_t( prif_co_sum_test_t() ) &
     ,test_fixture_t( prif_image_queries_test_t() ) &
     ,test_fixture_t( prif_num_images_test_t() ) &
-    ,test_fixture_t( prif_this_image_no_coarray_test_t() ) &
     ,test_fixture_t( prif_sync_images_test_t() ) &
+    ,test_fixture_t( prif_this_image_no_coarray_test_t() ) &
   ]))
     call test_harness%report_results
   end associate

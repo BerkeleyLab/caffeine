@@ -68,14 +68,14 @@ contains
         ,check_character_ptr => check_character
 
       test_results = prif_co_max_test%run([ &
-         test_description_t("computing element-wise maxima for integer(c_int32_t) scalars", check_32_bit_integer) &
-        ,test_description_t("computing element-wise maxima for a 1D default integer array", check_default_integer) &
-        ,test_description_t("computing element-wise maxima for a 1D integer(c_int8_t) array", check_8_bit_integer) &
-        ,test_description_t("computing element-wise maxima for a 1D integer(c_int16_t) array", check_16_bit_integer) &
-        ,test_description_t("computing element-wise maxima for a 1D integer(c_int64_t array", check_64_bit_integer) &
-        ,test_description_t("computing element-wise maxima for a 2D real(c_float) array", check_32_bit_real) &
-        ,test_description_t("computing element-wise maxima for a 1D real(c_double array", check_64_bit_real) &
-        ,test_description_t("computing element-wise maxima for character scalars", check_character) &
+         test_description_t("computing element-wise maxima for integer(c_int32_t) scalars", check_32_bit_integer_ptr) &
+        ,test_description_t("computing element-wise maxima for a 1D default integer array", check_default_integer_ptr) &
+        ,test_description_t("computing element-wise maxima for a 1D integer(c_int8_t) array", check_8_bit_integer_ptr) &
+        ,test_description_t("computing element-wise maxima for a 1D integer(c_int16_t) array", check_16_bit_integer_ptr) &
+        ,test_description_t("computing element-wise maxima for a 1D integer(c_int64_t array", check_64_bit_integer_ptr) &
+        ,test_description_t("computing element-wise maxima for a 2D real(c_float) array", check_32_bit_real_ptr) &
+        ,test_description_t("computing element-wise maxima for a 1D real(c_double array", check_64_bit_real_ptr) &
+        ,test_description_t("computing element-wise maxima for character scalars", check_character_ptr) &
       ])
     end function
 
