@@ -446,7 +446,7 @@ module prif
       integer(c_int64_t), intent(in) :: alias_lcobounds(:)
       integer(c_int64_t), intent(in) :: alias_ucobounds(:)
 #   if !FORCE_PRIF_0_5
-      integer ( c_size_t ), intent (in) :: data_pointer_offset
+      integer(c_size_t), intent(in) :: data_pointer_offset
 #   endif
       type(prif_coarray_handle), intent(out) :: alias_handle
     end subroutine
