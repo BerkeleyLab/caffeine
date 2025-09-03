@@ -436,11 +436,18 @@ module prif
       character(len=:), intent(inout), allocatable, optional :: errmsg_alloc
     end subroutine
 
-    module subroutine prif_alias_create(source_handle, alias_lcobounds, alias_ucobounds, alias_handle)
+    module subroutine prif_alias_create(source_handle, alias_lcobounds, alias_ucobounds, &
+#   if !FORCE_PRIF_0_5
+                                        data_pointer_offset, &
+#   endif
+                                        alias_handle)
       implicit none
       type(prif_coarray_handle), intent(in) :: source_handle
       integer(c_int64_t), intent(in) :: alias_lcobounds(:)
       integer(c_int64_t), intent(in) :: alias_ucobounds(:)
+#   if !FORCE_PRIF_0_5
+      integer(c_size_t), intent(in) :: data_pointer_offset
+#   endif
       type(prif_coarray_handle), intent(out) :: alias_handle
     end subroutine
 

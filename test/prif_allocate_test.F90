@@ -8,7 +8,7 @@ module caf_allocate_test
   use veggies, only: result_t, test_item_t, assert_that, assert_equals, describe, it, succeed
   use iso_c_binding, only: &
       c_ptr, c_int, c_int64_t, c_size_t, c_funptr, c_null_funptr, &
-      c_f_pointer, c_null_ptr, c_loc, c_sizeof, c_associated
+      c_f_pointer, c_null_ptr, c_loc, c_sizeof, c_associated, c_intptr_t
 
   implicit none
   private
@@ -97,9 +97,23 @@ contains
     call prif_deallocate(c_loc(local_slice))
   end function
 
-  function assert_aliased(h1, h2) result(result_)
+  ! returns (p + off)
+  pure function c_ptr_add(p, off)
+    type(c_ptr), intent(in) :: p
+    integer(c_size_t), intent(in) :: off
+    type(c_ptr) :: c_ptr_add
+    integer(c_intptr_t) :: tmp
+      
+    tmp = transfer(p, tmp)
+    tmp = tmp + off
+    c_ptr_add = transfer(tmp, c_ptr_add)
+  end function
+
+  function assert_aliased(h1, h2, offset) result(result_)
     type(result_t) :: result_
     type(prif_coarray_handle) :: h1, h2
+    integer(c_size_t), optional :: offset
+    integer(c_size_t) :: offset_
     type(c_ptr) :: p1, p2
     integer(c_size_t) :: s1, s2
     type(c_ptr) :: c1, c2, cx
@@ -108,11 +122,19 @@ contains
 
     result_ = succeed("")
 
+    if (present(offset)) then
+      offset_ = offset
+    else
+      offset_ = 0
+    endif
+
     call prif_local_data_pointer(h1, p1)
     call prif_local_data_pointer(h2, p2)
     result_ = result_ .and. &
-      assert_that(c_associated(p1, p2))
+      assert_that(c_associated(c_ptr_add(p1, offset_), p2))
 
+    ! As of PRIF 0.6. prif_size_bytes is unspecified for aliases, 
+    ! so this particular check is specific to the current Caffeine implementation
     call prif_size_bytes(h1, s1)
     call prif_size_bytes(h2, s2)
     result_ = result_ .and. &
@@ -190,6 +212,11 @@ contains
     end block
 
     block ! check aliasing creation
+#   if FORCE_PRIF_0_5
+#     define data_pointer_offset
+#   else
+#     define data_pointer_offset 0_c_size_t,
+#   endif
       integer i, j
       integer, parameter :: lim = 10
       type(prif_coarray_handle) :: a(lim)
@@ -198,18 +225,30 @@ contains
       do i=2, lim
         lco(1) = i
         uco(1) = i + num_imgs
-        call prif_alias_create(a(i-1), lco, uco, a(i))
+        call prif_alias_create(a(i-1), lco, uco, data_pointer_offset a(i))
         result_ = result_ .and. &
           assert_aliased(a(i-1), a(i)) 
         do j = i+1,lim
           lco(1) = j
           uco(1) = j + num_imgs
-          call prif_alias_create(a(i), lco, uco, a(j))
+          call prif_alias_create(a(i), lco, uco, data_pointer_offset a(j))
           result_ = result_ .and. &
             assert_aliased(a(i), a(j)) 
           result_ = result_ .and. &
             assert_aliased(a(j), coarray_handle) 
         end do
+#       if !FORCE_PRIF_0_5
+          ! test PRIF 0.6 data_pointer_offset
+          block
+            type(prif_coarray_handle) :: b
+            integer(c_size_t) :: off
+            off = i
+            call prif_alias_create(a(i), lco, uco, off, b)
+            result_ = result_ .and. &
+              assert_aliased(a(i), b, off) 
+            call prif_alias_destroy(b)
+          end block
+#       endif
         do j = i+1,lim
           call prif_alias_destroy(a(j))
         end do
