@@ -62,7 +62,7 @@ module prif
     PRIF_CURRENT_TEAM               = 101, &
     PRIF_INITIAL_TEAM               = 102, &
     PRIF_PARENT_TEAM                = 103, &
-    PRIF_STAT_FAILED_IMAGE          = 201, &
+    PRIF_STAT_FAILED_IMAGE          =-201, &
     PRIF_STAT_LOCKED                = 202, &
     PRIF_STAT_LOCKED_OTHER_IMAGE    = 203, &
     PRIF_STAT_STOPPED_IMAGE         = 204, &
