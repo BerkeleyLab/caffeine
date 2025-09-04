@@ -71,7 +71,7 @@ are accepted, but in some cases, the associated runtime behavior is not fully im
 | `prif_allocate`            | **YES** |  |
 | `prif_deallocate_coarray`  | *partial* | no `final_func` arg support |
 | `prif_deallocate`          | **YES** |  |
-| `prif_alias_create`        | **YES** | includes `data_pointer_offset` argument expected in PRIF 0.6 |
+| `prif_alias_create`        | **YES** | includes `data_pointer_offset` argument added in PRIF 0.6 |
 | `prif_alias_destroy`       | **YES** |  |
 
 ---
@@ -89,9 +89,9 @@ are accepted, but in some cases, the associated runtime behavior is not fully im
 | `prif_image_index`                               | **YES** |  |
 | `prif_image_index_with_team`                     | **YES** |  |
 | `prif_image_index_with_team_number`              | *partial* | no support for sibling teams |
-| `prif_initial_team_index`                        | **YES** | expected in PRIF 0.6 |
-| `prif_initial_team_index_with_team`              | **YES** | expected in PRIF 0.6 |
-| `prif_initial_team_index_with_team_number`       | *partial* | expected in PRIF 0.6, no support for sibling teams |
+| `prif_initial_team_index`                        | **YES** | |
+| `prif_initial_team_index_with_team`              | **YES** | |
+| `prif_initial_team_index_with_team_number`       | *partial* | no support for sibling teams |
 
 ---
 
