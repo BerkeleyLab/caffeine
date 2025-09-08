@@ -179,10 +179,10 @@ Paper: <https://doi.org/10.25344/S4N017>
 
 ### PRIF Specification:
 
-Dan Bonachea, Katherine Rasmussen, Brad Richardson, Damian Rouson.    
-"[**Parallel Runtime Interface for Fortran (PRIF) Specification, Revision 0.5**](https://github.com/BerkeleyLab/caffeine/wiki/pubs/PRIF_0.5.pdf)",     
-Lawrence Berkeley National Laboratory Technical Report (LBNL-2001636), Dec 2024.    
-<https://doi.org/10.25344/S4CG6G>
+PRIF Committee.    
+"[**Parallel Runtime Interface for Fortran (PRIF) Specification, Revision 0.6**](https://github.com/BerkeleyLab/caffeine/wiki/pubs/PRIF_0.6.pdf)",     
+Lawrence Berkeley National Laboratory Technical Report (LBNL-2001698), Sept 2025.    
+<https://doi.org/10.25344/S4M01X>
 
 Funding
 -------
