@@ -41,7 +41,7 @@ jobs:
             version: latest
             network: smp
             # https://hub.docker.com/r/snowstep/llvm/tags
-            container: snowstep/llvm:noble
+            container: snowstep/llvm:focal
           - os: ubuntu-24.04
             compiler: flang
             version: 21
