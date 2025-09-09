@@ -32,7 +32,11 @@ contains
       once = .true.
 
       block
+#if HAVE_MULTI_IMAGE
+        integer, parameter :: successful_initiation = PRIF_STAT_ALREADY_INIT
+#else
         integer, parameter :: successful_initiation = 0
+#endif
         integer :: init_exit_code
 
         call prif_init(init_exit_code)
