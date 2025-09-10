@@ -1,30 +1,69 @@
-module caf_sync_images_test
+#include "language-support.F90"
+
+module prif_sync_images_test_m
     use iso_c_binding, only: c_int
     use prif, only : prif_sync_images, prif_this_image_no_coarray, prif_num_images, prif_sync_all
-    use veggies, only: result_t, test_item_t, assert_that, describe, it, succeed
+    use julienne_m, only: test_description_t, test_diagnosis_t, test_result_t, test_t, operator(.expect.)
+
+#if ! HAVE_PROCEDURE_ACTUAL_FOR_POINTER_DUMMY
+    use julienne_m, only: diagnosis_function_i
+#endif
 
     implicit none
     private
-    public :: test_prif_sync_images
+    public :: prif_sync_images_test_t
 
+    type, extends(test_t) :: prif_sync_images_test_t
+    contains
+      procedure, nopass, non_overridable :: subject
+      procedure, nopass, non_overridable :: results
+    end type
+ 
     integer, parameter :: lim = 10
 
 contains
-    function test_prif_sync_images() result(tests)
-        type(test_item_t) :: tests
-    
-        tests = describe( &
-          "PRIF sync images", [ &
-           it("pass serial prif_sync_images test", check_serial), &
-           it("pass prif_sync_images neighbor test", check_neighbor), &
-           it("pass prif_sync_images hot-spot test", check_hot) &
+
+    pure function subject() result(test_subject)
+      character(len=:), allocatable :: test_subject
+      test_subject = "The prif_sync_images subroutine"
+    end function
+
+#if HAVE_PROCEDURE_ACTUAL_FOR_POINTER_DUMMY
+
+    function results() result(test_results)
+        type(test_result_t), allocatable :: test_results(:)
+        type(prif_sync_images_test_t) prif_sync_images_test
+
+        test_results = prif_sync_images_test%run([ &
+           test_description_t("synchronizing an image with itself", check_serial), &
+           test_description_t("synchronizing with a neighbor", check_neighbor), &
+           test_description_t("synchronizing every image with one image", check_hot) &
         ])
     end function
 
-    function check_serial() result(result_)
-        type(result_t) :: result_
+#else
+
+    function results() result(test_results)
+        type(test_result_t), allocatable :: test_results(:)
+        type(prif_sync_images_test_t) prif_sync_images_test
+        procedure(diagnosis_function_i), pointer :: &
+           check_serial_ptr => check_serial &
+          ,check_neighbor_ptr => check_neighbor &
+          ,check_hot_ptr => check_hot
+
+        test_results = prif_sync_images_test%run([ &
+           test_description_t("synchronizing an image with itself", check_serial_ptr), &
+           test_description_t("synchronizing with a neighbor", check_neighbor_ptr), &
+           test_description_t("synchronizing every image with one image", check_hot_ptr) &
+        ])
+    end function
+
+#endif
+
+    function check_serial() result(test_diagnosis)
+        type(test_diagnosis_t) test_diagnosis
         integer(c_int) :: me
-        integer :: i
+        integer i
 
         call prif_this_image_no_coarray(this_image=me)
         call prif_sync_all
@@ -35,14 +74,14 @@ contains
         end do
 
         call prif_sync_all
-        result_ = succeed("")
+        test_diagnosis = .expect. .true.
     end function
 
 
-    function check_neighbor() result(result_)
-        type(result_t) :: result_
-        integer(c_int) :: me, num_imgs
-        integer :: i
+    function check_neighbor() result(test_diagnosis)
+        type(test_diagnosis_t) test_diagnosis
+        integer(c_int) me, num_imgs
+        integer i
 
         call prif_this_image_no_coarray(this_image=me)
         call prif_num_images(num_images=num_imgs)
@@ -55,11 +94,11 @@ contains
         end do
 
         call prif_sync_all
-        result_ = succeed("")
+        test_diagnosis = .expect. .true.
     end function
 
-    function check_hot() result(result_)
-        type(result_t) :: result_
+    function check_hot() result(test_diagnosis)
+        type(test_diagnosis_t) test_diagnosis
         integer(c_int) :: me, num_imgs
         integer :: i
 
@@ -87,8 +126,7 @@ contains
         endif
 
         call prif_sync_all
-        result_ = succeed("")
+        test_diagnosis = .expect. .true.
     end function
 
-
-end module 
+end module prif_sync_images_test_m
