@@ -41,9 +41,9 @@ jobs:
             version: latest
             network: smp
             native_multi_image: 1
-            FFLAGS: -fcoarray -DHAVE_SYNC=0 -DHAVE_COLLECTIVES=0
+            FFLAGS: -fcoarray -DHAVE_SYNC=0
             # https://hub.docker.com/r/snowstep/llvm/tags
-            container: snowstep/llvm:focal
+            container: snowstep/llvm:bookworm
           - os: ubuntu-24.04
             compiler: flang
             version: 21
