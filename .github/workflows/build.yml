@@ -91,6 +91,13 @@ jobs:
             version: 21
             network: udp
             container: phhargrove/llvm-flang:21.1.0-latest
+          - os: ubuntu-24.04
+            compiler: flang
+            version: latest
+            network: udp
+            native_multi_image: 1
+            FFLAGS: -fcoarray
+            container: snowstep/llvm:bookworm
 
     container:
       image: ${{ matrix.container }}
