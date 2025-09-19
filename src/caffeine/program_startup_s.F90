@@ -7,6 +7,7 @@ submodule(prif:prif_private_s) program_startup_s
 contains
 
   module procedure prif_init
+    use ieee_arithmetic, only: ieee_inexact, ieee_set_flag
     logical, save :: prif_init_called_previously = .false.
 
     if (prif_init_called_previously) then
@@ -26,6 +27,10 @@ contains
        initial_team%num_images = caf_num_images(initial_team%gex_team)
 
        call sync_init()
+
+       ! issue #259: Ensure we clear any IEEE FP exceptions potentially
+       ! signalled from within the C-based initialization code above
+       call ieee_set_flag(ieee_inexact, .false.)
 
        prif_init_called_previously = .true.
        stat = 0
