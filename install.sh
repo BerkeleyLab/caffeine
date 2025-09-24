@@ -48,7 +48,7 @@ EOF
 }
 
 GCC_VERSION=${GCC_VERSION:=14}
-GASNET_VERSION="stable"
+GASNET_VERSION="2025.8.0"
 VERBOSE=""
 GASNET_CONDUIT="${GASNET_CONDUIT:-smp}"
 
@@ -433,7 +433,7 @@ CAFFEINE_FPM_CFLAGS=$GASNET_CFLAGS $GASNET_CPPFLAGS
 Name: caffeine
 Description: Coarray Fortran parallel runtime library
 URL: https://gitlab.lbl.gov/berkeleylab/caffeine
-Version: 0.5.3
+Version: 0.6.0
 EOF
 
 exit_if_pkg_config_pc_file_missing "caffeine"
