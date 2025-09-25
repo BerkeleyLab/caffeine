@@ -21,22 +21,25 @@ parallelism beginning with Fortran 2008.  In Fortran, SPMD programming
 involves the creation of a fixed number of images (instances) of a
 program that execute asynchronously in shared or distributed memory, except
 where a program uses specific synchronization mechanisms.  Fortran's
-"coarray" distributed data structures offer a subscripted,
+coarray feature provides distributed data structures that offer a subscripted,
 multidimensional array notation defining a partitioned global address space
-(PGAS).  One image can use this notation for one-sided access to another
-image's slice of a coarray.
+(PGAS). One image can use the cosubscript notation to perform one-sided access
+of coarray data associated with another image.
 
 Fortran 2018 greatly expanded this feature set to include such concepts as
 teams (groupings) of images, events (counting semaphores), collective
 subroutines and failed-image detection (fault tolerance). Fortran 2023 provided
 additional, minor multi-image extensions, including notified remote data access.
 
-Several popular Fortran compilers, including LLVM `flang` and LFortran, currently
-lack support for multi-image parallel execution. These features are a mandatory
+Several popular Fortran compilers, including LLVM Flang and LFortran, currently
+lack complete support for multi-image parallel execution. These features are a mandatory
 part of Fortran, and thus are an important part of reaching full compliance with
-the 2008, 2018, or 2023 versions of the Fortran standard.
+the 2008, 2018, or 2023 versions of the Fortran standard. Thanks to PRIF and Caffeine,
+the forthcoming LLVM Flang 22 release is expected to support a meaningful subset of
+multi-image Fortran features. For more details, see
+[LLVM-HPC2025 paper](#Additional-Publications) below.
 
-Caffeine aims to provide a portable, high-performance and open-source parallel
+Caffeine provides a portable, high-performance and open-source parallel
 runtime library that such compilers can target in code generation as part of
 their solution to support Fortran's multi-image parallel features.
 
@@ -45,9 +48,9 @@ Prerequisites & Dependencies
 ### Build prerequisites
 The `install.sh` script uses the following packages:
 * Fortran and C compilers
-    * We regularly test with: gfortran v13, v14 and LLVM Flang 19, 20
-    * On macOS the Homebrew-installed llvm and flang packages may require some
-      additional settings, see issue #228 for the latest information.
+    * We regularly test with: GNU Fortran versions 13, 14 and LLVM Flang versions 19, 20, 21
+    * On macOS the Homebrew-installed `llvm` and `flang` packages may require some
+      additional settings, see [issue #228](https://github.com/BerkeleyLab/caffeine/issues/228) for the latest information.
 * [Fortran package manager] `fpm`
 * [pkg-config]
 * [realpath]
@@ -102,7 +105,7 @@ but C++ is required for some network backends.
 
 The `install.sh` recognizes a number of command-line options and environment variables to
 customize behavior for your system. See the output of `./install.sh --help` for full documentation,
-including options for how to build for a distributed memory platform.
+including options for how to build for a distributed-memory platform.
 
 
 Example Usage
@@ -183,6 +186,13 @@ PRIF Committee.
 "[**Parallel Runtime Interface for Fortran (PRIF) Specification, Revision 0.6**](https://github.com/BerkeleyLab/caffeine/wiki/pubs/PRIF_0.6.pdf)",     
 Lawrence Berkeley National Laboratory Technical Report (LBNL-2001698), Sept 2025.    
 <https://doi.org/10.25344/S4M01X>
+
+### Additional Publications:
+
+Dan Bonachea, Katherine Rasmussen, Damian Rouson, Jean-Didier Pailleux, Etienne Renault, Brad Richardson.    
+"[**Lowering and Runtime Support for Fortran’s Multi-Image Parallel Features using LLVM Flang, PRIF, and Caffeine**](https://doi.org/10.25344/S4G883)",    
+Proceedings of the [Eleventh Annual Workshop on the LLVM Compiler Infrastructure in HPC (LLVM-HPC2025)](https://llvm-in-hpc-workshop.github.io/LLVM-HPC-2025-Workshop.github.io/), November 2025.    
+Paper: <https://doi.org/10.25344/S4G883>
 
 Funding
 -------
