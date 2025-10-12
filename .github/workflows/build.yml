@@ -180,14 +180,12 @@ jobs:
 
     - name: Setup FPM
       uses: fortran-lang/setup-fpm@main
-      if: ${{ !contains(matrix.os, 'macos') || matrix.os == 'macos-13' || matrix.os == 'macos-15-intel'}}
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
         fpm-version: latest
 
     - name: Build FPM
-      # no macos-arm64 fpm distro, build from source
-      if: ${{ contains(matrix.os, 'macos') && matrix.os != 'macos-13' && matrix.os != 'macos-15-intel' }} 
+      if: false
       run: |
         set -x
         export FPM_VERSION=0.12.0
@@ -199,10 +197,14 @@ jobs:
     - name: Version info
       run: |
         echo == TOOL VERSIONS ==
-        (set -x ; uname -a )
-        if test -r /etc/os-release ; then (set -x ; cat /etc/os-release ) ; fi
+        echo Platform version info:
+        uname -a
+        if test -r /etc/os-release ; then grep -e NAME -e VERSION /etc/os-release  ; fi
+        if test -x /usr/bin/sw_vers ; then /usr/bin/sw_vers ; fi
+        echo
+        echo PATH="$PATH"
         for tool in ${FC} ${CC} ${CXX} fpm ; do
-          ( set -x ; w=$(which $tool) ; ls -al $w ; ls -alhL $w ; $tool --version )
+          ( echo ; set -x ; w=$(which $tool) ; ls -al $w ; ls -alhL $w ; $tool --version )
         done
 
     - name: Build Caffeine (install.sh)
