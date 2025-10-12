@@ -180,14 +180,12 @@ jobs:
 
     - name: Setup FPM
       uses: fortran-lang/setup-fpm@main
-      if: ${{ !contains(matrix.os, 'macos') || matrix.os == 'macos-13' || matrix.os == 'macos-15-intel'}}
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
         fpm-version: latest
 
     - name: Build FPM
-      # no macos-arm64 fpm distro, build from source
-      if: ${{ contains(matrix.os, 'macos') && matrix.os != 'macos-13' && matrix.os != 'macos-15-intel' }} 
+      if: false
       run: |
         set -x
         export FPM_VERSION=0.12.0
