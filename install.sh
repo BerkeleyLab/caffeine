@@ -515,9 +515,23 @@ chmod u+x $RUN_FPM_SH
 
 ./$RUN_FPM_SH build $VERBOSE
 
+LIBCAFFEINE_DST=libcaffeine-$GASNET_CONDUIT.a
+LIBCAFFEINE_SRC=$(./$RUN_FPM_SH install --list 2>/dev/null | grep libcaffeine | cut -d' ' -f2)
+
+if [ -z "$LIBCAFFEINE_SRC" ]; then
+  echo "ERROR: Failed to detect libcaffeine.a from fpm"
+  exit 1
+else
+  mkdir -p "$PREFIX/lib"
+  cp -af "$LIBCAFFEINE_SRC" "$PREFIX/lib/$LIBCAFFEINE_DST"
+  ln -sf "$LIBCAFFEINE_DST" "$PREFIX/lib/libcaffeine.a"
+fi
+
 cat << EOF
 
 ________________ Caffeine has been dispensed! ________________
+
+Caffeine is now installed in $PREFIX
 
 To rebuild or to run tests or examples via the Fortran Package
 Manager (fpm) with the required compiler/linker flags, pass a
