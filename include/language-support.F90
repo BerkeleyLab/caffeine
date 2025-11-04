@@ -24,11 +24,11 @@
 
 ! ISO_FORTRAN_ENV constant value control:
 ! The following knobs influence Caffeine's choice of value for the named constants 
-! specified by PRIF for ISO_FORTRAN_ENV. 
-! CAF_IMPORT_{ATOMIC,STAT,TEAM}_CONSTANTS: Import PRIF constant values 
-!     of the given category from compiler's ISO_FORTRAN_ENV
-! CAF_IMPORT_CONSTANTS: Provides a default value each category-specific knob above, 
-!     which take precedence
+! specified by PRIF for ISO_FORTRAN_ENV:
+! * CAF_IMPORT_{ATOMIC,STAT,TEAM}_CONSTANTS: Import PRIF constant values 
+!   of the given category from the compiler's ISO_FORTRAN_ENV
+! * CAF_IMPORT_CONSTANTS: Provides a default value for each category-specific knob above, 
+!   which take precedence
 ! NOTE: In all cases imported constant values are silently assumed to satisfy
 ! the requirements for the corresponding PRIF named constant.
 ! Additionally, the ATOMIC KIND constants are assumed to denote a 64-bit interoperable type
