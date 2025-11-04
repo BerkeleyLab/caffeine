@@ -64,16 +64,16 @@ module prif
   integer(c_int), parameter, public :: PRIF_VERSION_MINOR = 6
 
 #if CAF_IMPORT_ATOMIC_CONSTANTS
-  integer(c_int), parameter, public :: PRIF_ATOMIC_INT_KIND =     ATOMIC_INT_KIND
-  integer(c_int), parameter, public :: PRIF_ATOMIC_LOGICAL_KIND = ATOMIC_LOGICAL_KIND
+   integer(c_int), parameter, public :: PRIF_ATOMIC_INT_KIND =     ATOMIC_INT_KIND
+   integer(c_int), parameter, public :: PRIF_ATOMIC_LOGICAL_KIND = ATOMIC_LOGICAL_KIND
 #else
-  integer(c_int), parameter, public :: PRIF_ATOMIC_INT_KIND = c_int64_t
+   integer(c_int), parameter, public :: PRIF_ATOMIC_INT_KIND = c_int64_t
 
-# if HAVE_SELECTED_LOGICAL_KIND
-  integer(c_int), parameter, public :: PRIF_ATOMIC_LOGICAL_KIND = selected_logical_kind(64)
-# else
-  integer(c_int), parameter, public :: PRIF_ATOMIC_LOGICAL_KIND = PRIF_ATOMIC_INT_KIND
-# endif
+#  if HAVE_SELECTED_LOGICAL_KIND
+     integer(c_int), parameter, public :: PRIF_ATOMIC_LOGICAL_KIND = selected_logical_kind(64)
+#  else
+     integer(c_int), parameter, public :: PRIF_ATOMIC_LOGICAL_KIND = PRIF_ATOMIC_INT_KIND
+#  endif
 #endif
 
 #if CAF_IMPORT_TEAM_CONSTANTS
