@@ -21,3 +21,31 @@
 #define HAVE_PROCEDURE_ACTUAL_FOR_POINTER_DUMMY 0
 #endif  
 #endif
+
+! ISO_FORTRAN_ENV constant value control:
+! The following knobs influence Caffeine's choice of value for the named constants 
+! specified by PRIF for ISO_FORTRAN_ENV. 
+! CAF_IMPORT_{ATOMIC,STAT,TEAM}_CONSTANTS: Import PRIF constant values 
+!     of the given category from compiler's ISO_FORTRAN_ENV
+! CAF_IMPORT_CONSTANTS: Provides a default value each category-specific knob above, 
+!     which take precedence
+! NOTE: In all cases imported constant values are silently assumed to satisfy
+! the requirements for the corresponding PRIF named constant.
+! Additionally, the ATOMIC KIND constants are assumed to denote a 64-bit interoperable type
+#ifndef CAF_IMPORT_CONSTANTS
+#  if defined(__flang__)
+#    define CAF_IMPORT_CONSTANTS 1
+#  else
+#    define CAF_IMPORT_CONSTANTS 0
+#  endif
+#endif
+#ifndef CAF_IMPORT_ATOMIC_CONSTANTS
+#define CAF_IMPORT_ATOMIC_CONSTANTS CAF_IMPORT_CONSTANTS
+#endif
+#ifndef CAF_IMPORT_STAT_CONSTANTS
+#define CAF_IMPORT_STAT_CONSTANTS   CAF_IMPORT_CONSTANTS
+#endif
+#ifndef CAF_IMPORT_TEAM_CONSTANTS
+#define CAF_IMPORT_TEAM_CONSTANTS   CAF_IMPORT_CONSTANTS
+#endif
+
