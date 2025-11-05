@@ -1,6 +1,11 @@
 module caf_teams_test
     use iso_c_binding, only: c_size_t, c_ptr, c_null_funptr, c_int64_t, c_int
     use prif
+#if FORCE_PRIF_0_5 || FORCE_PRIF_0_6
+  use prif, only : prif_deallocate_coarray_ => prif_deallocate_coarray
+# define prif_deallocate_coarray(h)    prif_deallocate_coarray_([h])
+# define prif_deallocate_coarrays(arr) prif_deallocate_coarray_(arr)
+#endif
     use veggies, only: result_t, test_item_t, assert_equals, assert_that, describe, it, succeed, fail
 
     implicit none
@@ -179,8 +184,8 @@ contains
                     coarray_handle = coarrays(i), &
                     allocated_memory = allocated_memory)
             end do
-            call prif_deallocate_coarray(coarrays(4:4))
-            call prif_deallocate_coarray(coarrays(2:2))
+            call prif_deallocate_coarrays(coarrays(4:4))
+            call prif_deallocate_coarrays(coarrays(2:2))
 
         call prif_end_team()
 
