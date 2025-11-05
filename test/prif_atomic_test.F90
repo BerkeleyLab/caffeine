@@ -6,6 +6,9 @@ module caf_atomic_test
             c_ptr, c_int64_t, c_intptr_t, c_size_t, c_null_funptr, c_f_pointer, c_loc, c_sizeof
     use veggies, only: result_t, test_item_t, assert_equals, assert_that, describe, it, succeed
     use prif
+#if FORCE_PRIF_0_5 || FORCE_PRIF_0_6
+# define prif_deallocate_coarrays(arr) prif_deallocate_coarray(arr)
+#endif
 
     implicit none
     private
@@ -325,8 +328,8 @@ contains
 
         end block
 
-        call prif_deallocate_coarray([coarray_handle_int])
-        call prif_deallocate_coarray([coarray_handle_logical])
+        call prif_deallocate_coarrays([coarray_handle_int])
+        call prif_deallocate_coarrays([coarray_handle_logical])
     end function
 
     function check_atomic_contended() result(result_)
