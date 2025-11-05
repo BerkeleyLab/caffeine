@@ -22,10 +22,11 @@ module caf_event_test
             prif_sync_all, &
             prif_this_image_no_coarray
 #if FORCE_PRIF_0_5 || FORCE_PRIF_0_6
-  use prif, only : prif_deallocate_coarray
-# define prif_deallocate_coarrays(arr) prif_deallocate_coarray(arr)
+  use prif, only : prif_deallocate_coarray_ => prif_deallocate_coarray
+# define prif_deallocate_coarray(h)    prif_deallocate_coarray_([h])
+# define prif_deallocate_coarrays(arr) prif_deallocate_coarray_(arr)
 #else
-  use prif, only : prif_deallocate_coarrays
+  use prif, only : prif_deallocate_coarray, prif_deallocate_coarrays
 #endif
     use veggies, only: result_t, test_item_t, assert_equals, describe, it, succeed
 
@@ -138,7 +139,7 @@ contains
           end do
         end block 
 
-        call prif_deallocate_coarrays([coarray_handle])
+        call prif_deallocate_coarray(coarray_handle)
     end function
 
 
@@ -238,8 +239,7 @@ contains
           end do
         end block
 
-        call prif_deallocate_coarrays([coarray_handle_ctr])
-        call prif_deallocate_coarrays([coarray_handle_evt])
+        call prif_deallocate_coarrays(([coarray_handle_ctr, coarray_handle_evt]))
     end function
 
     function check_notify() result(result_)
@@ -339,8 +339,7 @@ contains
           end do
         end block
 
-        call prif_deallocate_coarrays([coarray_handle_ctr])
-        call prif_deallocate_coarrays([coarray_handle_evt])
+        call prif_deallocate_coarrays(([coarray_handle_ctr, coarray_handle_evt]))
     end function
 
 end module
