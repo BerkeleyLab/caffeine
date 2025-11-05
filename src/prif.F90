@@ -19,7 +19,7 @@ module prif
 #if FORCE_PRIF_0_5 || FORCE_PRIF_0_6
   public :: prif_deallocate_coarray
 #else
-  public :: prif_deallocate_coarrays
+  public :: prif_deallocate_coarray, prif_deallocate_coarrays
 #endif
   public :: prif_put, prif_put_indirect, prif_get, prif_get_indirect, prif_put_with_notify, prif_put_with_notify_indirect
   public :: prif_put_indirect_with_notify, prif_put_indirect_with_notify_indirect
@@ -189,6 +189,13 @@ module prif
       character(len=:), intent(inout), allocatable, optional :: errmsg_alloc
     end subroutine
 #else
+    module subroutine prif_deallocate_coarray(coarray_handle, stat, errmsg, errmsg_alloc)
+      implicit none
+      type(prif_coarray_handle), intent(in) :: coarray_handle
+      integer(c_int), intent(out), optional :: stat
+      character(len=*), intent(inout), optional :: errmsg
+      character(len=:), intent(inout), allocatable, optional :: errmsg_alloc
+    end subroutine
     module subroutine prif_deallocate_coarrays(coarray_handles, stat, errmsg, errmsg_alloc)
       implicit none
       type(prif_coarray_handle), intent(in) :: coarray_handles(:)
