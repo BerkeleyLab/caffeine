@@ -9,6 +9,19 @@ module prif
       c_char, c_int, c_bool, c_intptr_t, c_ptr, &
       c_funptr, c_size_t, c_ptrdiff_t, c_null_ptr, c_int64_t
 
+#if CAF_IMPORT_ATOMIC_CONSTANTS
+  use iso_fortran_env, only: ATOMIC_INT_KIND, ATOMIC_LOGICAL_KIND
+#endif
+#if CAF_IMPORT_STAT_CONSTANTS
+  use iso_fortran_env, only: &
+      STAT_FAILED_IMAGE, STAT_STOPPED_IMAGE, &
+      STAT_LOCKED, STAT_LOCKED_OTHER_IMAGE, &
+      STAT_UNLOCKED, STAT_UNLOCKED_FAILED_IMAGE
+#endif
+#if CAF_IMPORT_TEAM_CONSTANTS
+  use iso_fortran_env, only: CURRENT_TEAM, INITIAL_TEAM, PARENT_TEAM
+#endif
+
   implicit none
 
   private
@@ -50,24 +63,50 @@ module prif
   integer(c_int), parameter, public :: PRIF_VERSION_MAJOR = 0
   integer(c_int), parameter, public :: PRIF_VERSION_MINOR = 6
 
-  integer(c_int), parameter, public :: PRIF_ATOMIC_INT_KIND = c_int64_t
-
-#if HAVE_SELECTED_LOGICAL_KIND
-  integer(c_int), parameter, public :: PRIF_ATOMIC_LOGICAL_KIND = selected_logical_kind(64)
+#if CAF_IMPORT_ATOMIC_CONSTANTS
+   integer(c_int), parameter, public :: PRIF_ATOMIC_INT_KIND =     ATOMIC_INT_KIND
+   integer(c_int), parameter, public :: PRIF_ATOMIC_LOGICAL_KIND = ATOMIC_LOGICAL_KIND
 #else
-  integer(c_int), parameter, public :: PRIF_ATOMIC_LOGICAL_KIND = PRIF_ATOMIC_INT_KIND
+   integer(c_int), parameter, public :: PRIF_ATOMIC_INT_KIND = c_int64_t
+
+#  if HAVE_SELECTED_LOGICAL_KIND
+     integer(c_int), parameter, public :: PRIF_ATOMIC_LOGICAL_KIND = selected_logical_kind(64)
+#  else
+     integer(c_int), parameter, public :: PRIF_ATOMIC_LOGICAL_KIND = PRIF_ATOMIC_INT_KIND
+#  endif
 #endif
 
+#if CAF_IMPORT_TEAM_CONSTANTS
+  integer(c_int), parameter, public :: &
+    PRIF_CURRENT_TEAM               = CURRENT_TEAM, &
+    PRIF_INITIAL_TEAM               = INITIAL_TEAM, &
+    PRIF_PARENT_TEAM                = PARENT_TEAM
+#else
   integer(c_int), parameter, public :: &
     PRIF_CURRENT_TEAM               = 101, &
     PRIF_INITIAL_TEAM               = 102, &
-    PRIF_PARENT_TEAM                = 103, &
+    PRIF_PARENT_TEAM                = 103
+#endif
+
+#if CAF_IMPORT_STAT_CONSTANTS
+  integer(c_int), parameter, public :: &
+    PRIF_STAT_FAILED_IMAGE          = STAT_FAILED_IMAGE, &
+    PRIF_STAT_LOCKED                = STAT_LOCKED, &
+    PRIF_STAT_LOCKED_OTHER_IMAGE    = STAT_LOCKED_OTHER_IMAGE, &
+    PRIF_STAT_STOPPED_IMAGE         = STAT_STOPPED_IMAGE, &
+    PRIF_STAT_UNLOCKED              = STAT_UNLOCKED, &
+    PRIF_STAT_UNLOCKED_FAILED_IMAGE = STAT_UNLOCKED_FAILED_IMAGE
+#else
+  integer(c_int), parameter, public :: &
     PRIF_STAT_FAILED_IMAGE          =-201, &
     PRIF_STAT_LOCKED                = 202, &
     PRIF_STAT_LOCKED_OTHER_IMAGE    = 203, &
     PRIF_STAT_STOPPED_IMAGE         = 204, &
     PRIF_STAT_UNLOCKED              = 205, &
-    PRIF_STAT_UNLOCKED_FAILED_IMAGE = 206, &
+    PRIF_STAT_UNLOCKED_FAILED_IMAGE = 206
+#endif
+
+  integer(c_int), parameter, public :: &
     PRIF_STAT_OUT_OF_MEMORY         = 301, &
     PRIF_STAT_ALREADY_INIT          = 302
 
