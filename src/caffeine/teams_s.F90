@@ -43,7 +43,12 @@ contains
         teams_coarrays(i)%info => tmp_data
         call c_f_pointer(tmp_data%next_handle, tmp_data)
       end do
-      call prif_deallocate_coarray(teams_coarrays, stat, errmsg, errmsg_alloc)
+#if FORCE_PRIF_0_5 || FORCE_PRIF_0_6
+      call prif_deallocate_coarray &
+#else
+      call prif_deallocate_coarrays &
+#endif
+                (teams_coarrays, stat, errmsg, errmsg_alloc)
       nullify(current_team%info%coarrays)
     else
       ! child team sync required by F23 11.1.5.2,
