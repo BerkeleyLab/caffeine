@@ -12,13 +12,11 @@ module prif_image_queries_test_m
       ,operator(.isAtMost.) &
       ,operator(.lessThan.) &
       ,operator(.expect.) &
+      ,usher &
       ,test_description_t &
       ,test_diagnosis_t &
       ,test_result_t &
       ,test_t
-#if ! HAVE_PROCEDURE_ACTUAL_FOR_POINTER_DUMMY
-    use julienne_m, only: diagnosis_function_i
-#endif
 
     implicit none
     private
@@ -37,37 +35,16 @@ contains
     test_subject = "PRIF image queries"
   end function
 
-#if HAVE_PROCEDURE_ACTUAL_FOR_POINTER_DUMMY
-
   function results() result(test_results)
     type(test_result_t), allocatable :: test_results(:)
     type(prif_image_queries_test_t) prif_image_queries_test
 
     test_results = prif_image_queries_test%run([ &
-       test_description_t("providing valid prif_image_status()", check_image_status) &
-      ,test_description_t("providing valid prif_stopped_images()", check_stopped_images) &
-      ,test_description_t("providing valid prif_failed_images()", check_failed_images) &
+       test_description_t("providing valid prif_image_status()", usher(check_image_status)) &
+      ,test_description_t("providing valid prif_stopped_images()", usher(check_stopped_images)) &
+      ,test_description_t("providing valid prif_failed_images()", usher(check_failed_images)) &
     ])
   end function
-
-#else
-
-  function results() result(test_results)
-    type(test_result_t), allocatable :: test_results(:)
-    type(prif_image_queries_test_t) prif_image_queries_test
-    procedure(diagnosis_function_i), pointer :: &
-       check_image_status_ptr => check_image_status &
-      ,check_stopped_images_ptr => check_stopped_images &
-      ,check_failed_images_ptr => check_failed_images
-
-    test_results = prif_image_queries_test%run([ &
-       test_description_t("providing valid prif_image_status()", check_image_status_ptr) &
-      ,test_description_t("providing valid prif_stopped_images()", check_stopped_images_ptr) &
-      ,test_description_t("providing valid prif_failed_images()", check_failed_images_ptr) &
-    ])
-  end function
-
-#endif
 
   function check_image_status() result(test_diagnosis)
       type(test_diagnosis_t) :: test_diagnosis

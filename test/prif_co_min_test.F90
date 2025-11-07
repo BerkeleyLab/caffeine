@@ -8,13 +8,11 @@ module prif_co_min_test_m
    ,operator(.approximates.) &
    ,operator(.within.) &
    ,operator(.equalsExpected.) &
+   ,usher &
    ,test_description_t &
    ,test_diagnosis_t &
    ,test_result_t &
    ,test_t
-#if ! HAVE_PROCEDURE_ACTUAL_FOR_POINTER_DUMMY
-  use julienne_m, only : diagnosis_function_i
-#endif
   implicit none
 
   private
@@ -32,52 +30,21 @@ contains
     test_subject = "The prif_co_min subroutine"
   end function
 
-#if HAVE_PROCEDURE_ACTUAL_FOR_POINTER_DUMMY
-
   function results() result(test_results)
     type(test_result_t), allocatable :: test_results(:)
     type(prif_co_min_test_t) prif_co_min_test
 
     test_results = prif_co_min_test%run([ &
-       test_description_t("computing element-wise minima for integer(c_int32_t) scalars", check_32_bit_integer) &
-      ,test_description_t("computing element-wise minima for a 1D default integer array", check_default_integer) &
-      ,test_description_t("computing element-wise minima for a 1D integer(c_int8t) array", check_8_bit_integer) &
-      ,test_description_t("computing element-wise minima for a 1D integer(c_int16_t) array", check_16_bit_integer) &
-      ,test_description_t("computing element-wise minima for a 1D integer(c_int64_t) array", check_64_bit_integer) &
-      ,test_description_t("computing element-wise minima for a 2D real(c_float) array", check_32_bit_real) &
-      ,test_description_t("computing element-wise minima for a 1D real(c_double) array", check_64_bit_real) &
-      ,test_description_t("computing element-wise minima for a character scalar", check_character) &
+       test_description_t("computing element-wise minima for integer(c_int32_t) scalars", usher(check_32_bit_integer)) &
+      ,test_description_t("computing element-wise minima for a 1D default integer array", usher(check_default_integer)) &
+      ,test_description_t("computing element-wise minima for a 1D integer(c_int8t) array", usher(check_8_bit_integer)) &
+      ,test_description_t("computing element-wise minima for a 1D integer(c_int16_t) array", usher(check_16_bit_integer)) &
+      ,test_description_t("computing element-wise minima for a 1D integer(c_int64_t) array", usher(check_64_bit_integer)) &
+      ,test_description_t("computing element-wise minima for a 2D real(c_float) array", usher(check_32_bit_real)) &
+      ,test_description_t("computing element-wise minima for a 1D real(c_double) array", usher(check_64_bit_real)) &
+      ,test_description_t("computing element-wise minima for a character scalar", usher(check_character)) &
     ])
   end function
-
-#else
-
-  function results() result(test_results)
-    type(test_result_t), allocatable :: test_results(:)
-    type(prif_co_min_test_t) prif_co_min_test
-    procedure(diagnosis_function_i), pointer :: &
-       check_32_bit_integer_ptr => check_32_bit_integer &
-      ,check_default_integer_ptr => check_default_integer &
-      ,check_8_bit_integer_ptr => check_8_bit_integer &
-      ,check_16_bit_integer_ptr => check_16_bit_integer &
-      ,check_64_bit_integer_ptr => check_64_bit_integer &
-      ,check_32_bit_real_ptr => check_32_bit_real &
-      ,check_64_bit_real_ptr => check_64_bit_real &
-      ,check_character_ptr => check_character
-
-    test_results = prif_co_min_test%run([ &
-       test_description_t("computing element-wise minima for integer(c_int32_t) scalars", check_32_bit_integer_ptr) &
-      ,test_description_t("computing element-wise minima for a 1D default integer array", check_default_integer_ptr) &
-      ,test_description_t("computing element-wise minima for a 1D integer(c_int8t) array", check_8_bit_integer_ptr) &
-      ,test_description_t("computing element-wise minima for a 1D integer(c_int16_t) array", check_16_bit_integer_ptr) &
-      ,test_description_t("computing element-wise minima for a 1D integer(c_int64_t) array", check_64_bit_integer_ptr) &
-      ,test_description_t("computing element-wise minima for a 2D real(c_float) array", check_32_bit_real_ptr) &
-      ,test_description_t("computing element-wise minima for a 1D real(c_double) array", check_64_bit_real_ptr) &
-      ,test_description_t("computing element-wise minima for a character scalar", check_character_ptr) &
-    ])
-  end function
-
-#endif
 
   function check_default_integer() result(test_diagnosis)
       type(test_diagnosis_t) test_diagnosis
