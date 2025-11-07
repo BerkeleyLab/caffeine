@@ -14,13 +14,11 @@ module prif_coarray_inquiry_test_m
     ,operator(.also.) &
     ,operator(.equalsExpected.) &
     ,operator(.expect.) &
+    ,usher &
     ,test_description_t &
     ,test_diagnosis_t &
     ,test_result_t &
     ,test_t
-#if ! HAVE_PROCEDURE_ACTUAL_FOR_POINTER_DUMMY
-  use julienne_m, only : diagnosis_function_i
-#endif
   use iso_c_binding, only: &
       c_ptr, c_null_ptr, c_int64_t, c_int, c_size_t, c_null_funptr, c_associated
 
@@ -41,34 +39,15 @@ contains
      test_subject = "The PRIF coarray inquiry subroutines"
   end function
 
-#if HAVE_PROCEDURE_ACTUAL_FOR_POINTER_DUMMY
-
   function results() result(test_results)
     type(test_result_t), allocatable :: test_results(:)
     type(prif_coarray_inquiry_test_t) prif_coarray_inquiry_test
 
     test_results = prif_coarray_inquiry_test%run([ &
-       test_description_t("preserving the prif_local_data_pointer for an allocated coarray", check_prif_local_data_pointer) &
-      ,test_description_t("checking passed cobounds", check_cobounds) &
+       test_description_t("preserving the prif_local_data_pointer for an allocated coarray", usher(check_prif_local_data_pointer)) &
+      ,test_description_t("checking passed cobounds", usher(check_cobounds)) &
     ])
   end function
-
-#else
-
-  function results() result(test_results)
-    type(test_result_t), allocatable :: test_results(:)
-    type(prif_coarray_inquiry_test_t) prif_coarray_inquiry_test
-    procedure(diagnosis_function_i), pointer :: &
-       check_prif_local_data_pointer_ptr => check_prif_local_data_pointer &
-      ,check_cobounds_ptr => check_cobounds
-
-    test_results = prif_coarray_inquiry_test%run([ &
-       test_description_t("preserving the prif_local_data_pointer for an allocated coarray", check_prif_local_data_pointer_ptr) &
-      ,test_description_t("checking passed cobounds", check_cobounds_ptr) &
-    ])
-  end function
-
-#endif
 
   function check_prif_local_data_pointer() result(test_diagnosis)
       type(test_diagnosis_t) test_diagnosis

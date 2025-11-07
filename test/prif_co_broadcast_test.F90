@@ -3,16 +3,14 @@
 module prif_co_broadcast_test_m
   use prif, only : prif_co_broadcast, prif_num_images, prif_this_image_no_coarray
   use julienne_m, only : &
-     test_description_t &
+     usher &
+    ,test_description_t &
     ,test_diagnosis_t &
     ,test_result_t &
     ,test_t &
     ,operator(//) &
     ,operator(.expect.) &
     ,operator(.equalsExpected.)
-#if ! HAVE_PROCEDURE_ACTUAL_FOR_POINTER_DUMMY
-  use julienne_m, only : diagnosis_function_i
-#endif
 
   implicit none
   private
@@ -42,34 +40,15 @@ contains
     test_subject = "The prif_co_broadcast subroutine"
   end function
 
-#if HAVE_PROCEDURE_ACTUAL_FOR_POINTER_DUMMY
-
   function results() result(test_results)
     type(test_result_t), allocatable :: test_results(:)
     type(prif_co_broadcast_test_t) prif_co_broadcast_test
 
     test_results = prif_co_broadcast_test%run([ &
-       test_description_t("broadcasting a default integer scalar with no optional arguments present", broadcast_default_integer_scalar) &
-      ,test_description_t("broadcasting a derived type scalar with no allocatable components", broadcast_derived_type) &
+       test_description_t("broadcasting a default integer scalar with no optional arguments present", usher(broadcast_default_integer_scalar)) &
+      ,test_description_t("broadcasting a derived type scalar with no allocatable components", usher(broadcast_derived_type)) &
     ])
   end function
-
-#else
-
-  function results() result(test_results)
-    type(test_result_t), allocatable :: test_results(:)
-    type(prif_co_broadcast_test_t) prif_co_broadcast_test
-    procedure(diagnosis_function_i), pointer :: &
-       broadcast_default_integer_scalar_ptr => broadcast_default_integer_scalar &
-      ,broadcast_derived_type_ptr => broadcast_derived_type
-
-    test_results = prif_co_broadcast_test%run([ &
-       test_description_t("broadcasting a default integer scalar with no optional arguments present", broadcast_default_integer_scalar_ptr) &
-      ,test_description_t("broadcasting a derived type scalar with no allocatable components", broadcast_derived_type_ptr) &
-    ])
-  end function
-
-#endif
 
   logical pure function equals(lhs, rhs) 
     type(object_t), intent(in) :: lhs, rhs 
