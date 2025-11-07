@@ -10,13 +10,11 @@ module prif_co_reduce_test_m
     ,operator(.equalsExpected.) &
     ,operator(.expect.) &
     ,operator(.within.) &
+    ,usher &
     ,test_description_t &
     ,test_diagnosis_t &
     ,test_result_t &
     ,test_t
-#if ! HAVE_PROCEDURAL_ACTUAL_FOR_POINTER_DUMMY
-  use julienne_m, only : diagnosis_function_i
-#endif
   implicit none
 
   private
@@ -52,45 +50,18 @@ contains
     test_subject = "The prif_co_reduce subroutine"
   end function
 
-#if HAVE_PROCEDURAL_ACTUAL_FOR_POINTER_DUMMY
-
   function results() result(test_results)
     type(test_result_t), allocatable :: test_results(:)
     type(prif_co_reduce_test_t) prif_co_reduce_test
 
     test_results = prif_co_reduce_test%run([ &
-       test_description_t("performing a logical .and. reduction", check_logical) &
-      ,test_description_t("performing a derived type reduction", check_derived_type_reduction) &
+       test_description_t("performing a logical .and. reduction", usher(check_logical)) &
+      ,test_description_t("performing a derived type reduction", usher(check_derived_type_reduction)) &
 #if HAVE_PARAM_DERIVED
-      ,test_description_t("performing a parameterized derived type reduction", check_type_parameter_reduction) &
+      ,test_description_t("performing a parameterized derived type reduction", usher(check_type_parameter_reduction)) &
 #endif
       ])
   end function
-
-#else
-
-  function results() result(test_results)
-    type(test_result_t), allocatable :: test_results(:)
-    type(prif_co_reduce_test_t) prif_co_reduce_test
-    procedure(diagnosis_function_i), pointer :: &
-       check_logical_ptr => check_logical &
-      ,check_derived_type_reduction_ptr => check_derived_type_reduction
-#if HAVE_PARAM_DERIVED
-    procedure(diagnosis_function_i), pointer ::  check_type_parameter_reduction_ptr => check_type_parameter_reduction
-#endif
-
-    test_results = prif_co_reduce_test%run([ &
-       test_description_t("performing a logical .and. reduction", check_logical_ptr) &
-      ,test_description_t("performing a derived type reduction", check_derived_type_reduction_ptr) &
-#if HAVE_PARAM_DERIVED
-      ,test_description_t("performing a parameterized derived type reduction", check_type_parameter_reduction_ptr) &
-#endif
-      ])
-  end function
-
-
-#endif
-
 
   function check_logical() result(test_diagnosis)
     type(test_diagnosis_t) test_diagnosis

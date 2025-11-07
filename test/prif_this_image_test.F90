@@ -6,13 +6,11 @@ module prif_this_image_no_coarray_test_m
      operator(//) &
     ,operator(.all.) &
     ,operator(.equalsExpected.) &
+    ,usher &
     ,test_description_t &
     ,test_diagnosis_t &
     ,test_result_t &
     ,test_t
-#if ! HAVE_PROCEDURE_ACTUAL_FOR_POINTER_DUMMY
-  use julienne_m, only: diagnosis_function_i
-#endif
   implicit none
 
   private
@@ -30,31 +28,14 @@ contains
     test_subject = "The prif_this_image_no_coarray subroutine"
   end function
 
-#if HAVE_PROCEDURE_ACTUAL_FOR_POINTER_DUMMY
-
   function results() result(test_results)
     type(test_result_t), allocatable :: test_results(:)
     type(prif_this_image_no_coarray_test_t) prif_this_image_no_coarray_test
 
     test_results = prif_this_image_no_coarray_test%run([ &
-       test_description_t("returning a unique member of {1,...,num_images()} when called without arguments", check_this_image_set) &
+       test_description_t("returning a unique member of {1,...,num_images()} when called without arguments", usher(check_this_image_set)) &
     ])
   end function
-
-#else
-
-  function results() result(test_results)
-    type(test_result_t), allocatable :: test_results(:)
-    type(prif_this_image_no_coarray_test_t) prif_this_image_no_coarray_test
-    procedure(diagnosis_function_i), pointer :: &
-      check_this_image_set_ptr => check_this_image_set
-
-    test_results = prif_this_image_no_coarray_test%run([ &
-       test_description_t("returning a unique member of {1,...,num_images()} when called without arguments", check_this_image_set_ptr) &
-    ])
-  end function
-
-#endif
 
   function check_this_image_set() result(test_diagnosis)
     type(test_diagnosis_t) :: test_diagnosis
