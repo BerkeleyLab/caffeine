@@ -147,7 +147,7 @@ jobs:
           echo "GASNET_SUPERNODE_MAXSIZE=1" >> "$GITHUB_ENV" ; \
         fi
         if (( ${{ matrix.native_multi_image }} )); then \
-          echo "FFLAGS=$FFLAGS -DHAVE_MULTI_IMAGE" >> "$GITHUB_ENV" ; \
+          echo "FFLAGS=$FFLAGS -DHAVE_MULTI_IMAGE -DHAVE_MULTI_IMAGE_SUPPORT" >> "$GITHUB_ENV" ; \
         fi
 
 
