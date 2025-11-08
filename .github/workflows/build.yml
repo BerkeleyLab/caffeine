@@ -167,10 +167,17 @@ jobs:
         apt install -y build-essential pkg-config make git curl
 
     - name: Install macOS Dependencies
-      if: contains(matrix.os, 'macos') && matrix.compiler == 'flang'
+      if: contains(matrix.os, 'macos')
       run: |
         set -x
         brew update
+        # fpm binary distribution for macOS requires gfortran shared libraries from gcc@12
+        brew install gcc@12
+
+    - name: Install LLVM flang on macOS
+      if: contains(matrix.os, 'macos') && matrix.compiler == 'flang'
+      run: |
+        set -x
         brew install llvm@${COMPILER_VERSION} flang
         # workaround issue #228: clang cannot find homebrew flang's C header
         for p in /opt/homebrew /usr/local $(brew --prefix) ; do find $p/Cellar/flang -name ISO_Fortran_binding.h 2>/dev/null || true ; done
