@@ -15,13 +15,13 @@ jobs:
       matrix:
         os: [macos-13, macos-14, macos-15, macos-15-intel, ubuntu-24.04]
         compiler: [ gfortran ]
-        version: [ 13, 14 ]
+        version: [ 13, 14, 15 ]
         network: [ smp ]
         exclude:
           - os: macos-15 # gcc-13 broken on macos-15
-            compiler: gfortran
             version: 13
-            network: smp
+          - os: ubuntu-24.04 # no package available for gfortran 15 (yet?)
+            version: 15
         include:
         # --- flang coverage ---
           - os: macos-14
@@ -124,6 +124,10 @@ jobs:
         echo "FC=gfortran-${COMPILER_VERSION}" >> "$GITHUB_ENV"
         echo "CC=gcc-${COMPILER_VERSION}" >> "$GITHUB_ENV"
         echo "CXX=g++-${COMPILER_VERSION}" >> "$GITHUB_ENV"
+        # Veggies is incompatible with gfortran-15
+        if test "${{ matrix.version }}" = "15"; then \
+          echo "FPM_TEST_TARGET=--target julienne-driver" >> "$GITHUB_ENV" ; \
+        fi
 
     - name: Set flang variables
       if: matrix.compiler == 'flang'
@@ -237,7 +241,7 @@ jobs:
         echo SUBJOB_PREFIX=${SUBJOB_PREFIX}
         while (( CAF_IMAGES > 0 )); do \
           echo CAF_IMAGES=${CAF_IMAGES} ; \
-          ( set -x ; ./build/run-fpm.sh test --verbose -- -d ) ; \
+          ( set -x ; ./build/run-fpm.sh test $FPM_TEST_TARGET --verbose -- -d ) ; \
           sleep 1 ; \
           CAF_IMAGES=$(( CAF_IMAGES / 2 )) ; \
         done
