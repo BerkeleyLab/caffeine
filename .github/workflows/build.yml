@@ -13,15 +13,13 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [macos-13, macos-14, macos-15, macos-15-intel, ubuntu-24.04]
+        os: [ macos-13, macos-14, macos-15, macos-15-intel, ubuntu-24.04 ]
         compiler: [ gfortran ]
         version: [ 13, 14, 15 ]
         network: [ smp ]
         exclude:
           - os: macos-15 # gcc-13 broken on macos-15
             version: 13
-          - os: ubuntu-24.04 # no package available for gfortran 15 (yet?)
-            version: 15
         include:
         # --- flang coverage ---
           - os: macos-14
@@ -72,6 +70,10 @@ jobs:
           - os: macos-15
             compiler: gfortran
             version: 14
+            network: udp
+          - os: ubuntu-24.04
+            compiler: gfortran
+            version: 15
             network: udp
           - os: ubuntu-24.04
             compiler: gfortran
@@ -161,7 +163,24 @@ jobs:
       run: |
         set -x
         sudo apt update
-        sudo apt install -y build-essential gfortran-${COMPILER_VERSION} g++-${COMPILER_VERSION} pkg-config make
+        sudo apt install -y build-essential pkg-config make
+        if [[ ${COMPILER_VERSION} < 15 ]] ; then \
+          sudo apt install -y gfortran-${COMPILER_VERSION} g++-${COMPILER_VERSION} ; \
+        else \
+          curl -L https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh -o install-homebrew.sh ; \
+          chmod +x install-homebrew.sh ; \
+          env CI=1 ./install-homebrew.sh ; \
+          HOMEBREW_PREFIX="/home/linuxbrew/.linuxbrew" ; \
+          ${HOMEBREW_PREFIX}/bin/brew install -v gcc@${COMPILER_VERSION} binutils ; \
+          ls -al ${HOMEBREW_PREFIX}/bin ; \
+          echo "PATH=${HOMEBREW_PREFIX}/bin:${PATH}" >> "$GITHUB_ENV" ; \
+          : Homebrew GCC@15 needs binutils 2.44+ ; \
+          HOMEBREW_BINUTILS=$(ls -d ${HOMEBREW_PREFIX}/Cellar/binutils/2.*/bin ) ; \
+          ls -al ${HOMEBREW_BINUTILS} ; \
+          echo "FFLAGS=$FFLAGS -B ${HOMEBREW_BINUTILS}" >> "$GITHUB_ENV" ; \
+          echo "CFLAGS=$CFLAGS -B ${HOMEBREW_BINUTILS}" >> "$GITHUB_ENV" ; \
+          echo "CXXFLAGS=$CXXFLAGS -B ${HOMEBREW_BINUTILS}" >> "$GITHUB_ENV" ; \
+        fi
 
     - name: Install Ubuntu Container Dependencies
       if: ${{ contains(matrix.os, 'ubuntu') && matrix.container != '' && !contains(matrix.container, 'phhargrove') }}
