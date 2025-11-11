@@ -35,10 +35,14 @@ program native_multi_image
 #ifndef HAVE_CO_BROADCAST
 #define HAVE_CO_BROADCAST HAVE_COLLECTIVES
 #endif
+#ifndef HAVE_TEAM
+#define HAVE_TEAM 1
+#endif
 
   USE, INTRINSIC :: ISO_FORTRAN_ENV
-  integer :: me, ni, peer, tmp
+  integer :: me, ni, peer, tmp, team_id
   character(len=5) :: c
+  type(team_type) :: subteam, res
 
   me = THIS_IMAGE()
   ni = NUM_IMAGES()
@@ -90,6 +94,27 @@ program native_multi_image
     call CO_BROADCAST(tmp,1)
     call CO_BROADCAST(c,1)
 # endif
+
+#if HAVE_TEAM
+  call status("Testing TEAMS...")
+  res = get_team(CURRENT_TEAM)
+  res = get_team(INITIAL_TEAM)
+  res = get_team()
+  write(*,'(A,I3)') "Initial team number is ", team_number()
+
+  if (ni < 2) then
+    if (me == 1) write(*,'(A)') "Please run program again with at least 2 images to test more TEAM features."
+  else
+    team_id = merge(1, 2, me <= ni/2)
+    form team(team_id, subteam)
+    sync team(subteam)
+    change team(subteam)
+      write(*,'(A,I3,A,I3,A,I3)') 'Inside CHANGE TEAM construct: ', this_image(), ' of ', num_images(), ' in team number ', team_number()
+    end team
+    call sync_all
+    write(*,'(A,I3)') "After END TEAM statement, TEAM_NUMBER() is ", team_number()
+  end if
+#endif
 
   call sync_all
   write(*,'(A,I1,A,I1,A)') "Goodbye from image ", me, " of ", ni, " images"
