@@ -1,10 +1,17 @@
 module caf_allocate_test
   use prif, only : &
-      prif_allocate_coarray, prif_deallocate_coarray, &
+      prif_allocate_coarray, &
       prif_allocate, prif_deallocate, &
       prif_coarray_handle, prif_num_images, prif_size_bytes, &
       prif_set_context_data, prif_get_context_data, prif_local_data_pointer, &
       prif_alias_create, prif_alias_destroy
+#if FORCE_PRIF_0_5 || FORCE_PRIF_0_6
+  use prif, only : prif_deallocate_coarray_ => prif_deallocate_coarray
+# define prif_deallocate_coarray(h)    prif_deallocate_coarray_([h])
+# define prif_deallocate_coarrays(arr) prif_deallocate_coarray_(arr)
+#else
+  use prif, only : prif_deallocate_coarray, prif_deallocate_coarrays
+#endif
   use veggies, only: result_t, test_item_t, assert_that, assert_equals, describe, it, succeed
   use iso_c_binding, only: &
       c_ptr, c_int, c_int64_t, c_size_t, c_funptr, c_null_funptr, &
@@ -78,7 +85,7 @@ contains
       end do
     end block
 
-    call prif_deallocate_coarray([coarray_handle])
+    call prif_deallocate_coarray(coarray_handle)
 
   end function
 
@@ -258,7 +265,7 @@ contains
       end do
     end block
 
-    call prif_deallocate_coarray([coarray_handle])
+    call prif_deallocate_coarray(coarray_handle)
 
   end function
 end module caf_allocate_test

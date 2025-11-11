@@ -1,11 +1,18 @@
 module caf_coarray_inquiry_test
     use prif, only : &
-        prif_allocate_coarray, prif_deallocate_coarray, &
+        prif_allocate_coarray, &
         prif_coarray_handle, prif_num_images, &
         prif_local_data_pointer, prif_size_bytes, &
         prif_lcobound_no_dim, prif_lcobound_with_dim, & 
         prif_ucobound_no_dim, prif_ucobound_with_dim, & 
         prif_coshape
+#if FORCE_PRIF_0_5 || FORCE_PRIF_0_6
+  use prif, only : prif_deallocate_coarray_ => prif_deallocate_coarray
+# define prif_deallocate_coarray(h)    prif_deallocate_coarray_([h])
+# define prif_deallocate_coarrays(arr) prif_deallocate_coarray_(arr)
+#else
+  use prif, only : prif_deallocate_coarray, prif_deallocate_coarrays
+#endif
     use veggies, only: result_t, test_item_t, assert_that, describe, it, succeed
     use iso_c_binding, only: &
         c_ptr, c_null_ptr, c_int64_t, c_int, c_size_t, c_null_funptr, c_associated
@@ -53,7 +60,7 @@ contains
                 allocation_ptr)
         call prif_local_data_pointer(coarray_handle, local_ptr)
         result_ = assert_that(c_associated(local_ptr, allocation_ptr))
-        call prif_deallocate_coarray([coarray_handle])
+        call prif_deallocate_coarray(coarray_handle)
     end function
 
     function check_cobound(corank) result(result_)
@@ -117,7 +124,7 @@ contains
       result_ = result_ .and. &
         assert_that(all(sizes == (ucobounds - lcobounds + 1)), "prif_coshape is valid")
   
-      call prif_deallocate_coarray([coarray_handle])
+      call prif_deallocate_coarray(coarray_handle)
     end function
   
     function check_cobounds() result(result_)
