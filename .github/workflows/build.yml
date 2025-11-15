@@ -13,15 +13,13 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [macos-13, macos-14, macos-15, macos-15-intel, ubuntu-24.04]
+        os: [ macos-13, macos-14, macos-15, macos-15-intel, ubuntu-24.04 ]
         compiler: [ gfortran ]
-        version: [ 13, 14 ]
+        version: [ 13, 14, 15 ]
         network: [ smp ]
         exclude:
           - os: macos-15 # gcc-13 broken on macos-15
-            compiler: gfortran
             version: 13
-            network: smp
         include:
         # --- flang coverage ---
           - os: macos-14
@@ -75,6 +73,10 @@ jobs:
             network: udp
           - os: ubuntu-24.04
             compiler: gfortran
+            version: 15
+            network: udp
+          - os: ubuntu-24.04
+            compiler: gfortran
             version: 14
             network: udp
           - os: macos-15-intel
@@ -124,6 +126,10 @@ jobs:
         echo "FC=gfortran-${COMPILER_VERSION}" >> "$GITHUB_ENV"
         echo "CC=gcc-${COMPILER_VERSION}" >> "$GITHUB_ENV"
         echo "CXX=g++-${COMPILER_VERSION}" >> "$GITHUB_ENV"
+        # Veggies is incompatible with gfortran-15
+        if test "${{ matrix.version }}" = "15"; then \
+          echo "FPM_TEST_TARGET=--target julienne-driver" >> "$GITHUB_ENV" ; \
+        fi
 
     - name: Set flang variables
       if: matrix.compiler == 'flang'
@@ -145,7 +151,7 @@ jobs:
           echo "GASNET_SUPERNODE_MAXSIZE=1" >> "$GITHUB_ENV" ; \
         fi
         if (( ${{ matrix.native_multi_image }} )); then \
-          echo "FFLAGS=$FFLAGS -DHAVE_MULTI_IMAGE" >> "$GITHUB_ENV" ; \
+          echo "FFLAGS=$FFLAGS -DHAVE_MULTI_IMAGE -DHAVE_MULTI_IMAGE_SUPPORT" >> "$GITHUB_ENV" ; \
         fi
 
 
@@ -157,7 +163,24 @@ jobs:
       run: |
         set -x
         sudo apt update
-        sudo apt install -y build-essential gfortran-${COMPILER_VERSION} g++-${COMPILER_VERSION} pkg-config make
+        sudo apt install -y build-essential pkg-config make
+        if [[ ${COMPILER_VERSION} < 15 ]] ; then \
+          sudo apt install -y gfortran-${COMPILER_VERSION} g++-${COMPILER_VERSION} ; \
+        else \
+          curl -L https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh -o install-homebrew.sh ; \
+          chmod +x install-homebrew.sh ; \
+          env CI=1 ./install-homebrew.sh ; \
+          HOMEBREW_PREFIX="/home/linuxbrew/.linuxbrew" ; \
+          ${HOMEBREW_PREFIX}/bin/brew install -v gcc@${COMPILER_VERSION} binutils ; \
+          ls -al ${HOMEBREW_PREFIX}/bin ; \
+          echo "PATH=${HOMEBREW_PREFIX}/bin:${PATH}" >> "$GITHUB_ENV" ; \
+          : Homebrew GCC@15 needs binutils 2.44+ ; \
+          HOMEBREW_BINUTILS=$(ls -d ${HOMEBREW_PREFIX}/Cellar/binutils/2.*/bin ) ; \
+          ls -al ${HOMEBREW_BINUTILS} ; \
+          echo "FFLAGS=$FFLAGS -B ${HOMEBREW_BINUTILS}" >> "$GITHUB_ENV" ; \
+          echo "CFLAGS=$CFLAGS -B ${HOMEBREW_BINUTILS}" >> "$GITHUB_ENV" ; \
+          echo "CXXFLAGS=$CXXFLAGS -B ${HOMEBREW_BINUTILS}" >> "$GITHUB_ENV" ; \
+        fi
 
     - name: Install Ubuntu Container Dependencies
       if: ${{ contains(matrix.os, 'ubuntu') && matrix.container != '' && !contains(matrix.container, 'phhargrove') }}
@@ -237,7 +260,7 @@ jobs:
         echo SUBJOB_PREFIX=${SUBJOB_PREFIX}
         while (( CAF_IMAGES > 0 )); do \
           echo CAF_IMAGES=${CAF_IMAGES} ; \
-          ( set -x ; ./build/run-fpm.sh test --verbose -- -d ) ; \
+          ( set -x ; ./build/run-fpm.sh test $FPM_TEST_TARGET --verbose -- -d ) ; \
           sleep 1 ; \
           CAF_IMAGES=$(( CAF_IMAGES / 2 )) ; \
         done
