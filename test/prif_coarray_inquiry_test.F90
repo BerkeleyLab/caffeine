@@ -47,8 +47,8 @@ contains
     ])
   end function
 
-  function check_prif_local_data_pointer() result(test_diagnosis)
-      type(test_diagnosis_t) test_diagnosis
+  function check_prif_local_data_pointer() result(diag)
+      type(test_diagnosis_t) :: diag
 
       integer(kind=c_int64_t), dimension(1) :: lcobounds, ucobounds
       integer :: dummy_element, num_imgs
@@ -67,12 +67,12 @@ contains
               coarray_handle, &
               allocation_ptr)
       call prif_local_data_pointer(coarray_handle, local_ptr)
-      test_diagnosis = .expect. c_associated(local_ptr, allocation_ptr)
+      diag = .expect. c_associated(local_ptr, allocation_ptr)
       call prif_deallocate_coarray([coarray_handle])
   end function
 
-  impure elemental function check_cobound(corank) result(test_diagnosis)
-    type(test_diagnosis_t) test_diagnosis
+  impure elemental function check_cobound(corank) result(diag)
+    type(test_diagnosis_t) :: diag
     integer(c_int), intent(in) :: corank
 
     ! Allocate memory for an integer scalar coarray with given corank
@@ -85,6 +85,8 @@ contains
     type(prif_coarray_handle) :: coarray_handle
     type(c_ptr) :: allocated_memory
     integer(c_size_t) :: data_size, query_size
+
+    diag = .true.
 
     call prif_num_images(num_images=num_imgs)
     lcobounds(1) = 1
@@ -101,36 +103,43 @@ contains
       lcobounds, ucobounds, data_size, c_null_funptr, &
       coarray_handle, allocated_memory)
 
-    test_diagnosis = .expect. c_associated(allocated_memory)
+    diag = diag .also. &
+      .expect. c_associated(allocated_memory)
 
     call prif_size_bytes(coarray_handle, data_size=query_size)
-    test_diagnosis = test_diagnosis .also. (query_size .equalsExpected.  data_size) // "prif_size_bytes is valid"
+    diag = diag .also. &
+      (query_size .equalsExpected.  data_size) // "prif_size_bytes is valid"
 
     call prif_lcobound_no_dim(coarray_handle, tmp_bounds)
-    test_diagnosis = test_diagnosis .also. (.all. (tmp_bounds .equalsExpected. lcobounds)) // "prif_lcobound_no_dim is valid"
+    diag = diag .also. &
+      (.all. (tmp_bounds .equalsExpected. lcobounds)) // "prif_lcobound_no_dim is valid"
 
     call prif_ucobound_no_dim(coarray_handle, tmp_bounds)
-    test_diagnosis = test_diagnosis .also. (.all. (tmp_bounds .equalsExpected. ucobounds)) // "prif_ucobound_no_dim is valid"
+    diag = diag .also. &
+      (.all. (tmp_bounds .equalsExpected. ucobounds)) // "prif_ucobound_no_dim is valid"
 
     do i = 1, corank
       call prif_lcobound_with_dim(coarray_handle, i, tmp_bound)
-      test_diagnosis = test_diagnosis .also. (tmp_bound .equalsExpected. lcobounds(i)) // "prif_lcobound_with_dim is valid"
+      diag = diag .also. &
+        (tmp_bound .equalsExpected. lcobounds(i)) // "prif_lcobound_with_dim is valid"
 
       call prif_ucobound_with_dim(coarray_handle, i, tmp_bound)
-      test_diagnosis = test_diagnosis .also. (tmp_bound .equalsExpected. ucobounds(i)) // "prif_ucobound_with_dim is valid"
+      diag = diag .also. &
+        (tmp_bound .equalsExpected. ucobounds(i)) // "prif_ucobound_with_dim is valid"
     end do
 
     call prif_coshape(coarray_handle, sizes)
-    test_diagnosis = test_diagnosis .also. (.all. ((ucobounds - lcobounds + 1) .equalsExpected. sizes)) // "prif_coshape is valid"
+    diag = diag .also. &
+      (.all. ((ucobounds - lcobounds + 1) .equalsExpected. sizes)) // "prif_coshape is valid"
 
     call prif_deallocate_coarray([coarray_handle])
   end function
 
-  function check_cobounds() result(test_diagnosis)
-    type(test_diagnosis_t) test_diagnosis
+  function check_cobounds() result(diag)
+    type(test_diagnosis_t) :: diag
     integer(c_int) :: corank
 
-    test_diagnosis = .all. check_cobound([(corank, corank = 1_c_int, 15_c_int)])
+    diag = .all. check_cobound([(corank, corank = 1_c_int, 15_c_int)])
   end function
 
 end module prif_coarray_inquiry_test_m

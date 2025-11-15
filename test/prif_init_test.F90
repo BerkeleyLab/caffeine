@@ -30,9 +30,9 @@ contains
   end function
 
 
-  function check_caffeination() result(test_diagnosis)
+  function check_caffeination() result(diag)
     ! this test needs to run very early at startup, so we memoize the result
-    type(test_diagnosis_t) :: test_diagnosis
+    type(test_diagnosis_t) :: diag
     type(test_diagnosis_t), save :: memo
     logical, save :: first_pass = .true.
 
@@ -52,16 +52,16 @@ contains
       end block write_memo
     endif 
 
-    test_diagnosis = memo
+    diag = memo
   end function
 
-  function check_subsequent_prif_init_call() result(test_diagnosis)
-    type(test_diagnosis_t) :: test_diagnosis
+  function check_subsequent_prif_init_call() result(diag)
+    type(test_diagnosis_t) :: diag
     integer stat
 
     call prif_init(stat)
     call prif_init(stat)
-    test_diagnosis = stat .equalsExpected. PRIF_STAT_ALREADY_INIT
+    diag = stat .equalsExpected. PRIF_STAT_ALREADY_INIT
   end function
 
 end module prif_init_test_m

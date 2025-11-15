@@ -44,22 +44,22 @@ contains
     ])
   end function
 
-  function check_image_status() result(test_diagnosis)
-      type(test_diagnosis_t) :: test_diagnosis
+  function check_image_status() result(diag)
+      type(test_diagnosis_t) :: diag
       integer(c_int) :: image_status
       
       call prif_image_status(1, image_status=image_status)
-      test_diagnosis = .expect. (any(image_status == [0, PRIF_STAT_FAILED_IMAGE, PRIF_STAT_STOPPED_IMAGE])) & ! TODO: replace with .any. once Juliennes supports it
+      diag = .expect. (any(image_status == [0, PRIF_STAT_FAILED_IMAGE, PRIF_STAT_STOPPED_IMAGE])) & ! TODO: replace with .any. once Juliennes supports it
                         // "permitted image status"
   end function
 
-  function valid_image_list(nums) result(test_diagnosis)
+  function valid_image_list(nums) result(diag)
       integer, allocatable, intent(in) :: nums(:)
-      type(test_diagnosis_t) test_diagnosis
+      type(test_diagnosis_t) :: diag
       integer ni
 
       call prif_num_images(num_images=ni)
-      test_diagnosis = &
+      diag = &
          .expect. allocated(nums) &
          .also. (size(nums) .isAtMost. ni) &
          .also. (.all. (nums .isAtLeast. 1)) &
@@ -67,20 +67,20 @@ contains
          .also. (.all. (nums(1:size(nums)-1) .lessThan. nums(2:size(nums)))) // "valid stopped image"
   end function
 
-  function check_stopped_images() result(test_diagnosis)
-      type(test_diagnosis_t) :: test_diagnosis
+  function check_stopped_images() result(diag)
+      type(test_diagnosis_t) :: diag
       integer, allocatable :: nums(:)
 
       call prif_stopped_images(stopped_images=nums)
-      test_diagnosis = valid_image_list(nums)
+      diag = valid_image_list(nums)
   end function
 
-  function check_failed_images() result(test_diagnosis)
-      type(test_diagnosis_t) :: test_diagnosis
+  function check_failed_images() result(diag)
+      type(test_diagnosis_t) :: diag
       integer, allocatable :: nums(:)
 
       call prif_failed_images(failed_images=nums)
-      test_diagnosis = valid_image_list(nums)
+      diag = valid_image_list(nums)
   end function
 
 end module prif_image_queries_test_m

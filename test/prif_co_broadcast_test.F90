@@ -58,19 +58,19 @@ contains
     ])
   end function
 
-  function broadcast_default_integer_scalar() result(test_diagnosis)
-    type(test_diagnosis_t) test_diagnosis
+  function broadcast_default_integer_scalar() result(diag)
+    type(test_diagnosis_t) :: diag
     integer iPhone, me
     integer, parameter :: source_value = 7779311, junk = -99
 
     call prif_this_image_no_coarray(this_image=me)
     iPhone = merge(source_value, junk, me==1)
     call prif_co_broadcast(iPhone, source_image=1)
-    test_diagnosis = iPhone .equalsExpected. source_value 
+    diag = iPhone .equalsExpected. source_value 
   end function
 
-  function broadcast_derived_type() result(test_diagnosis)
-    type(test_diagnosis_t) test_diagnosis
+  function broadcast_derived_type() result(diag)
+    type(test_diagnosis_t) :: diag
     type(object_t) object
     integer me, ni
 
@@ -79,7 +79,7 @@ contains
     object = object_t(me, .false., "gooey", me*(1.,0.))
     call prif_co_broadcast(object, source_image=ni)
     associate(expected_object => object_t(ni, .false., "gooey", ni*(1.,0.)))
-      test_diagnosis = .expect. (object == expected_object) // "co_broadcast derived type"
+      diag = .expect. (object == expected_object) // "co_broadcast derived type"
     end associate
   end function
 

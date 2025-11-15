@@ -36,11 +36,11 @@ contains
   end function
 
 
-  function check_num_images_valid() result(test_diagnosis)
-    type(test_diagnosis_t) test_diagnosis
+  function check_num_images_valid() result(diag)
+    type(test_diagnosis_t) :: diag
     integer num_imgs
     call prif_num_images(num_images=num_imgs)
-    test_diagnosis = (num_imgs .isAtLeast. 1) // "positive number of images"
+    diag = (num_imgs .isAtLeast. 1) // "positive number of images"
   end function
 
 end module prif_num_images_test_m
