@@ -1,5 +1,3 @@
-#include "language-support.F90"
-
 module prif_this_image_no_coarray_test_m
   use prif, only : prif_this_image_no_coarray, prif_num_images, prif_co_sum
   use julienne_m, only: &

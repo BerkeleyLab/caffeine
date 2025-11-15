@@ -1,5 +1,3 @@
-#include "language-support.F90"
-
 module prif_sync_images_test_m
     use iso_c_binding, only: c_int
     use prif, only : prif_sync_images, prif_this_image_no_coarray, prif_num_images, prif_sync_all
