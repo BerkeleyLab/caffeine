@@ -23,7 +23,7 @@ module prif_this_image_no_coarray_test_m
 contains
   pure function subject() result(test_subject)
     character(len=:), allocatable :: test_subject
-    test_subject = "The prif_this_image_no_coarray subroutine"
+    test_subject = "prif_this_image_no_coarray"
   end function
 
   function results() result(test_results)
