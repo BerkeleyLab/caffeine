@@ -128,7 +128,7 @@ contains
         call prif_co_max(my_val)
 
         expected = maxval(reshape([(values(:, mod(i-1,size(values,2))+1), i = 1, ni)], [size(values,1),ni]), dim=2)
-        diag = .all. (int(my_val) .equalsExpected. int(expected))
+        diag = .all. (my_val .equalsExpected. expected)
     end function
 
     function check_32_bit_real() result(diag)

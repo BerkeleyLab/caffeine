@@ -112,7 +112,7 @@ contains
     type(pair), dimension(size(values,1)) :: my_val, expected
     type(pair), dimension(:,:), allocatable :: tmp
     procedure(prif_operation_wrapper_interface), pointer :: op
-    double precision, parameter :: tolerance = 0D0
+    real, parameter :: tolerance = 0D0
 
     op => pair_adder
     call prif_this_image_no_coarray(this_image=me)
@@ -138,7 +138,7 @@ contains
     expected = reduce(tmp, add_pair, dim=2)
 #endif
     diag = .all. (my_val%fst .equalsExpected. expected%fst) &
-      .also. (.all. ( real(my_val%snd, kind=kind(0.d0)) .approximates. real(expected%snd, kind=kind(0.d0)) .within. tolerance))
+      .also. (.all. ( my_val%snd .approximates. expected%snd .within. tolerance))
   end function
 
   pure function add_pair(lhs, rhs) result(total)
