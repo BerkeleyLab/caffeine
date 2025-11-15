@@ -33,8 +33,8 @@ contains
         ])
     end function
 
-    function check_serial() result(test_diagnosis)
-        type(test_diagnosis_t) test_diagnosis
+    function check_serial() result(diag)
+        type(test_diagnosis_t) :: diag
         integer(c_int) :: me
         integer i
 
@@ -47,12 +47,12 @@ contains
         end do
 
         call prif_sync_all
-        test_diagnosis = .expect. .true.
+        diag = .true.
     end function
 
 
-    function check_neighbor() result(test_diagnosis)
-        type(test_diagnosis_t) test_diagnosis
+    function check_neighbor() result(diag)
+        type(test_diagnosis_t) :: diag
         integer(c_int) me, num_imgs
         integer i
 
@@ -67,11 +67,11 @@ contains
         end do
 
         call prif_sync_all
-        test_diagnosis = .expect. .true.
+        diag = .true.
     end function
 
-    function check_hot() result(test_diagnosis)
-        type(test_diagnosis_t) test_diagnosis
+    function check_hot() result(diag)
+        type(test_diagnosis_t) :: diag
         integer(c_int) :: me, num_imgs
         integer :: i
 
@@ -99,7 +99,7 @@ contains
         endif
 
         call prif_sync_all
-        test_diagnosis = .expect. .true.
+        diag = .true.
     end function
 
 end module prif_sync_images_test_m
