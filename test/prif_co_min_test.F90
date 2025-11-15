@@ -25,7 +25,7 @@ module prif_co_min_test_m
 contains
   pure function subject() result(test_subject)
     character(len=:), allocatable :: test_subject
-    test_subject = "The prif_co_min subroutine"
+    test_subject = "prif_co_min"
   end function
 
   function results() result(test_results)

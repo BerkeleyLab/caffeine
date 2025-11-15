@@ -34,7 +34,7 @@ contains
 
   pure function subject() result(test_subject)
      character(len=:), allocatable :: test_subject
-     test_subject = "The PRIF coarray inquiry subroutines"
+     test_subject = "PRIF coarray inquiry procedures"
   end function
 
   function results() result(test_results)

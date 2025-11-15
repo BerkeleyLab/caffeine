@@ -23,7 +23,7 @@ contains
 
   pure function subject() result(test_subject)
     character(len=:), allocatable :: test_subject
-    test_subject = "The prif_num_images function"
+    test_subject = "prif_num_images"
   end function
 
   function results() result(test_results)
