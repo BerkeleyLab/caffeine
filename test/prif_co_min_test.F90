@@ -126,14 +126,14 @@ contains
       call prif_co_min(my_val)
 
       expected = minval(reshape([(values(:, mod(i-1,size(values,2))+1), i = 1, ni)], [size(values,1),ni]), dim=2)
-      diag = .all. (int(my_val) .equalsExpected. int(expected))
+      diag = .all. (my_val .equalsExpected. expected)
   end function
 
   function check_32_bit_real() result(diag)
       type(test_diagnosis_t) :: diag
 
       real(c_float), parameter :: values(*,*,*) = reshape([1, 19, 5, 13, 11, 7, 17, 3], [2,2,2])
-      real(c_double), parameter :: tolerance = 0_c_double
+      real(c_float), parameter :: tolerance = 0_c_double
       integer :: me, ni, i
       real(c_float), dimension(size(values,1), size(values,2)) :: my_val, expected
 
@@ -144,7 +144,7 @@ contains
       call prif_co_min(my_val)
 
       expected = minval(reshape([(values(:,:,mod(i-1,size(values,3))+1), i = 1, ni)], [size(values,1), size(values,2), ni]), dim=3)
-      diag = .all. (real(expected,kind=c_double) .approximates. real(my_val,kind=c_double) .within. tolerance)
+      diag = .all. (expected .approximates. my_val .within. tolerance)
   end function
 
   function check_64_bit_real() result(diag)
