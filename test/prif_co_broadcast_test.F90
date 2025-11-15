@@ -35,7 +35,7 @@ contains
 
   pure function subject() result(test_subject)
     character(len=:), allocatable :: test_subject
-    test_subject = "The prif_co_broadcast subroutine"
+    test_subject = "prif_co_broadcast"
   end function
 
   function results() result(test_results)

@@ -16,7 +16,7 @@ contains
 
   pure function subject() result(test_subject)
     character(len=:), allocatable :: test_subject
-    test_subject = "The prif_init subroutine"
+    test_subject = "prif_init"
   end function
 
   function results() result(test_results)

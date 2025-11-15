@@ -19,7 +19,7 @@ contains
 
     pure function subject() result(test_subject)
       character(len=:), allocatable :: test_subject
-      test_subject = "The prif_sync_images subroutine"
+      test_subject = "prif_sync_images"
     end function
 
     function results() result(test_results)
