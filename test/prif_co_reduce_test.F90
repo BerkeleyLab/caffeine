@@ -61,23 +61,26 @@ contains
       ])
   end function
 
-  function check_logical() result(test_diagnosis)
-    type(test_diagnosis_t) test_diagnosis
+  function check_logical() result(diag)
+    type(test_diagnosis_t) :: diag
     logical :: val
     integer :: me
     procedure(prif_operation_wrapper_interface), pointer :: op
+    diag = .true.
     op => and_wrapper
 
     val = .true.
     call prif_co_reduce(val, op, c_null_ptr)
-    test_diagnosis = .expect. val
+    diag = diag .also. &
+      .expect. val
 
     call prif_this_image_no_coarray(this_image=me)
     if (me == 1) then
       val = .false.
     end if
     call prif_co_reduce(val, op, c_null_ptr)
-    test_diagnosis = test_diagnosis .also. (.expect. (.not. val))
+    diag = diag .also. &
+      .expect. (.not. val)
   end function
 
   subroutine and_wrapper(arg1, arg2_and_out, count, cdata) bind(C)
@@ -96,8 +99,8 @@ contains
     end do
   end subroutine
 
-  function check_derived_type_reduction() result(test_diagnosis)
-    type(test_diagnosis_t) test_diagnosis
+  function check_derived_type_reduction() result(diag)
+    type(test_diagnosis_t) :: diag
     type(pair), parameter :: values(*,*) = reshape( &
         [ pair(1, 53.), pair(3, 47.) &
         , pair(5, 43.), pair(7, 41.) &
@@ -134,7 +137,7 @@ contains
 #else
     expected = reduce(tmp, add_pair, dim=2)
 #endif
-    test_diagnosis = .all. (my_val%fst .equalsExpected. expected%fst) &
+    diag = .all. (my_val%fst .equalsExpected. expected%fst) &
       .also. (.all. ( real(my_val%snd, kind=kind(0.d0)) .approximates. real(expected%snd, kind=kind(0.d0)) .within. tolerance))
   end function
 
@@ -170,8 +173,8 @@ contains
 ! Gfortran 14.2 also lacks the type support for this test:
 ! Error: Derived type 'pdtarray' at (1) is being used before it is defined
 
-  function check_type_parameter_reduction() result(test_diagnosis)
-    type(test_diagnosis_t) test_diagnosis
+  function check_type_parameter_reduction() result(diag)
+    type(test_diagnosis_t) :: diag
     type(array), parameter :: values(*,*) = reshape( &
         [ array(elements=[1, 53]), array(elements=[3, 47]) &
         , array(elements=[5, 43]), array(elements=[7, 41]) &
@@ -194,7 +197,7 @@ contains
     call prif_co_reduce(my_val, op, c_loc(context))
 
     expected = reduce(reshape([(values(:, mod(i-1,size(values,2))+1), i = 1, ni)], [size(values,1),ni]), add_array, dim=2)
-    test_diagnosis = .all. (my_val%elements .equalsExpected. expected%elements)
+    diag = .all. (my_val%elements .equalsExpected. expected%elements)
   end function
 
   pure function add_array(lhs, rhs) result(total)

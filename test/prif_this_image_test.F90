@@ -35,8 +35,8 @@ contains
     ])
   end function
 
-  function check_this_image_set() result(test_diagnosis)
-    type(test_diagnosis_t) :: test_diagnosis
+  function check_this_image_set() result(diag)
+    type(test_diagnosis_t) :: diag
     integer, allocatable :: image_numbers(:)
     integer i, me, ni
 
@@ -44,7 +44,7 @@ contains
     call prif_num_images(num_images=ni)
     image_numbers = [(merge(0, me, me/=i), i = 1, ni)]
     call prif_co_sum(image_numbers)
-    test_diagnosis = .all. (image_numbers .equalsExpected. [(i, i = 1, ni)]) // "correct image set"
+    diag = .all. (image_numbers .equalsExpected. [(i, i = 1, ni)]) // "correct image set"
   end function
 
 end module prif_this_image_no_coarray_test_m

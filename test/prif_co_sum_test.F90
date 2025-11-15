@@ -47,8 +47,8 @@ contains
       ])
   end function
 
-  function check_default_integer() result(test_diagnosis)
-      type(test_diagnosis_t) test_diagnosis
+  function check_default_integer() result(diag)
+      type(test_diagnosis_t) :: diag
 
       integer, parameter :: values(*,*) = reshape([1, -19, 5, 13, 11, 7, 17, 3], [2, 4])
       integer :: me, ni, i
@@ -61,11 +61,11 @@ contains
       call prif_co_sum(my_val)
 
       expected = sum(reshape([(values(:, mod(i-1,size(values,2))+1), i = 1, ni)], [size(values,1),ni]), dim=2)
-      test_diagnosis = .all. (int(my_val) .equalsExpected. int(expected))
+      diag = .all. (int(my_val) .equalsExpected. int(expected))
   end function
 
-  function check_8_bit_integer() result(test_diagnosis)
-      type(test_diagnosis_t) test_diagnosis
+  function check_8_bit_integer() result(diag)
+      type(test_diagnosis_t) :: diag
 
       integer(c_int8_t), parameter :: values(*,*) = reshape(int([1, -19, 5, 13, 11, 7, 17, 3],c_int8_t), [2, 4])
       integer :: me, ni, i
@@ -78,11 +78,11 @@ contains
       call prif_co_sum(my_val)
 
       expected = sum(reshape([(values(:, mod(i-1,size(values,2))+1), i = 1, ni)], [size(values,1),ni]), dim=2)
-      test_diagnosis = .all. (int(my_val) .equalsExpected. int(expected))
+      diag = .all. (int(my_val) .equalsExpected. int(expected))
   end function
 
-  function check_16_bit_integer() result(test_diagnosis)
-      type(test_diagnosis_t) test_diagnosis
+  function check_16_bit_integer() result(diag)
+      type(test_diagnosis_t) :: diag
 
       integer(c_int16_t), parameter :: values(*,*) = reshape(int([1, -19, 5, 13, 11, 7, 17, 3],c_int16_t), [2, 4])
       integer :: me, ni, i
@@ -95,11 +95,11 @@ contains
       call prif_co_sum(my_val)
 
       expected = sum(reshape([(values(:, mod(i-1,size(values,2))+1), i = 1, ni)], [size(values,1),ni]), dim=2)
-      test_diagnosis = .all. (int(my_val) .equalsExpected. int(expected))
+      diag = .all. (int(my_val) .equalsExpected. int(expected))
   end function
 
-  function check_32_bit_integer() result(test_diagnosis)
-      type(test_diagnosis_t) test_diagnosis
+  function check_32_bit_integer() result(diag)
+      type(test_diagnosis_t) :: diag
 
       integer(c_int32_t), parameter :: values(*) = [1, -19, 5, 13, 11, 7, 17, 3]
       integer :: me, ni, i
@@ -112,11 +112,11 @@ contains
       call prif_co_sum(my_val)
 
       expected = sum([(values(mod(i-1,size(values))+1), i = 1, ni)])
-      test_diagnosis = int(my_val) .equalsExpected. int(expected)
+      diag = int(my_val) .equalsExpected. int(expected)
   end function
 
-  function check_64_bit_integer() result(test_diagnosis)
-      type(test_diagnosis_t) test_diagnosis
+  function check_64_bit_integer() result(diag)
+      type(test_diagnosis_t) :: diag
 
       integer(c_int64_t), parameter :: values(*,*) = reshape([1, -19, 5, 13, 11, 7, 17, 3], [2, 4])
       integer :: me, ni, i
@@ -129,11 +129,11 @@ contains
       call prif_co_sum(my_val)
 
       expected = sum(reshape([(values(:, mod(i-1,size(values,2))+1), i = 1, ni)], [size(values,1),ni]), dim=2)
-      test_diagnosis = .all. (int(my_val) .equalsExpected. int(expected))
+      diag = .all. (int(my_val) .equalsExpected. int(expected))
   end function
 
-  function check_32_bit_real() result(test_diagnosis)
-      type(test_diagnosis_t) test_diagnosis
+  function check_32_bit_real() result(diag)
+      type(test_diagnosis_t) :: diag
 
       real(c_float), parameter :: values(*,*,*) = reshape([1, 19, 5, 13, 11, 7, 17, 3], [2,2,2])
       real(c_float), parameter :: tolerance = 0_c_float
@@ -147,11 +147,11 @@ contains
       call prif_co_sum(my_val)
 
       expected = sum(reshape([(values(:,:,mod(i-1,size(values,3))+1), i = 1, ni)], [size(values,1), size(values,2), ni]), dim=3)
-      test_diagnosis = .all. (my_val .approximates. expected .within. tolerance)
+      diag = .all. (my_val .approximates. expected .within. tolerance)
   end function
 
-  function check_64_bit_real() result(test_diagnosis)
-      type(test_diagnosis_t) test_diagnosis
+  function check_64_bit_real() result(diag)
+      type(test_diagnosis_t) :: diag
 
       real(c_double), parameter :: values(*,*) = reshape([1, 19, 5, 13, 11, 7, 17, 3], [2, 4])
       real(c_double), parameter :: tolerance = 0_c_double
@@ -165,11 +165,11 @@ contains
       call prif_co_sum(my_val)
 
       expected = sum(reshape([(values(:, mod(i-1,size(values,2))+1), i = 1, ni)], [size(values,1),ni]), dim=2)
-      test_diagnosis = .all. (my_val .approximates. expected .within. tolerance)
+      diag = .all. (my_val .approximates. expected .within. tolerance)
   end function
 
-  function check_32_bit_complex() result(test_diagnosis)
-      type(test_diagnosis_t) test_diagnosis
+  function check_32_bit_complex() result(diag)
+      type(test_diagnosis_t) :: diag
 
       complex(c_float), parameter :: values(*,*,*) = reshape( &
               [ cmplx(1., 53.), cmplx(3., 47.) &
@@ -190,13 +190,13 @@ contains
 
       expected = sum(reshape([(values(:,:,mod(i-1,size(values,3))+1), i = 1, ni)], [size(values,1), size(values,2), ni]), dim=3)
 
-      test_diagnosis = &
+      diag = &
         .all. (real(my_val) .approximates. real(expected) .within. tolerance) &
         .also. (.all. (aimag(my_val) .approximates. aimag(expected) .within. tolerance))
   end function
 
-  function check_64_bit_complex() result(test_diagnosis)
-      type(test_diagnosis_t) test_diagnosis
+  function check_64_bit_complex() result(diag)
+      type(test_diagnosis_t) :: diag
 
       complex(c_double), parameter :: values(*,*) = reshape( &
               [ cmplx(1., 53.), cmplx(3., 47.) &
@@ -217,7 +217,7 @@ contains
 
       expected = sum(reshape([(values(:,mod(i-1,size(values,2))+1), i = 1, ni)], [size(values,1), ni]), dim=2)
 
-      test_diagnosis = &
+      diag = &
         .all. (real(my_val, c_double) .approximates. real(expected, c_double) .within. tolerance) &
         .also. (.all. (real(aimag(my_val), c_double) .approximates. real(aimag(expected), c_double) .within. tolerance))
   end function
