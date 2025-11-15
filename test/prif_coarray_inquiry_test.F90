@@ -1,5 +1,3 @@
-#include "language-support.F90"
-
 module prif_coarray_inquiry_test_m
   use prif, only : &
       prif_allocate_coarray, prif_deallocate_coarray, &

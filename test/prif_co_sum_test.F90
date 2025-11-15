@@ -1,5 +1,3 @@
-#include "language-support.F90"
-
 module prif_co_sum_test_m
     use iso_c_binding, only: c_int8_t, c_int16_t, c_int32_t, c_int64_t, c_float, c_double
     use prif, only : prif_co_sum, prif_num_images, prif_this_image_no_coarray

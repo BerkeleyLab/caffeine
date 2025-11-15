@@ -1,5 +1,3 @@
-#include "language-support.F90"
-
 module prif_init_test_m
     use prif, only : prif_init, PRIF_STAT_ALREADY_INIT
     use julienne_m, only: test_description_t, test_diagnosis_t, test_result_t, test_t, operator(.equalsExpected.), usher

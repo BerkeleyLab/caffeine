@@ -1,5 +1,3 @@
-#include "language-support.F90"
-
 module prif_num_images_test_m
   use prif, only : prif_num_images
   use julienne_m, only:  &

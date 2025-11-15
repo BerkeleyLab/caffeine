@@ -1,5 +1,3 @@
-#include "language-support.F90"
-
 module prif_co_broadcast_test_m
   use prif, only : prif_co_broadcast, prif_num_images, prif_this_image_no_coarray
   use julienne_m, only : &
