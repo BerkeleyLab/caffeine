@@ -175,7 +175,7 @@ contains
             , "that    ","is      " &
             , "the     ","question"]
         integer :: me, ni, i
-        character(len=len(values)) :: my_val, expected
+        character(len=len(values)) :: my_val
 
         call prif_this_image_no_coarray(this_image=me)
         call prif_num_images(ni)
