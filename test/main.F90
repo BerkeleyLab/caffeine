@@ -26,6 +26,7 @@ contains
         use caf_image_index_test, only: &
                 caf_image_index_prif_image_index => &
                     test_prif_image_index
+        use prif_types_test, only: test_prif_types
         use caf_rma_test, only: &
                 caf_rma_prif_rma => &
                     test_prif_rma
@@ -73,6 +74,7 @@ contains
     end block
 #endif
         individual_tests = [a00_caffeinate_caffeinate()]
+        individual_tests = [individual_tests, test_prif_types()]
         individual_tests = [individual_tests, caf_allocate_prif_allocate()]
         individual_tests = [individual_tests, caf_image_index_prif_image_index()]
         individual_tests = [individual_tests, caf_rma_prif_rma()]
