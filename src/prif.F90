@@ -144,7 +144,7 @@ module prif
 
   type, public :: prif_team_type
     private
-    type(team_data), pointer :: info => null()
+    type(prif_team_descriptor), pointer :: info => null()
   end type
 
   abstract interface
@@ -1177,14 +1177,14 @@ module prif
     type(c_ptr) :: reserved
   end type
 
-  type, private :: team_data
+  type, private :: prif_team_descriptor
     type(c_ptr) :: gex_team
     type(c_ptr) :: heap_mspace
     integer(c_intptr_t) :: heap_start
     integer(c_size_t) :: heap_size
     integer(c_int64_t) :: team_number
     integer(c_int) :: this_image, num_images
-    type(team_data), pointer :: parent_team => null()
+    type(prif_team_descriptor), pointer :: parent_team => null()
     type(prif_coarray_descriptor), pointer :: coarrays => null()
     type(child_team_info), pointer :: child_heap_info => null()
   end type
