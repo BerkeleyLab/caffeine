@@ -190,9 +190,10 @@ Lawrence Berkeley National Laboratory Technical Report (LBNL-2001698), Sept 2025
 ### Additional Publications:
 
 Dan Bonachea, Katherine Rasmussen, Damian Rouson, Jean-Didier Pailleux, Etienne Renault, Brad Richardson.    
-"[**Lowering and Runtime Support for Fortran’s Multi-Image Parallel Features using LLVM Flang, PRIF, and Caffeine**](https://doi.org/10.25344/S4G883)",    
+"[**Lowering and Runtime Support for Fortran's Multi-Image Parallel Features using LLVM Flang, PRIF, and Caffeine**](https://github.com/BerkeleyLab/caffeine/wiki/pubs/LLVM-HPC25_FlangPRIFCaffeine.pdf)",    
 Proceedings of the [Eleventh Annual Workshop on the LLVM Compiler Infrastructure in HPC (LLVM-HPC2025)](https://llvm-in-hpc-workshop.github.io/LLVM-HPC-2025-Workshop.github.io/), November 2025.    
-Paper: <https://doi.org/10.25344/S4G883>
+Paper: <https://doi.org/10.25344/S4G883>    
+[Talk Slides](https://github.com/BerkeleyLab/caffeine/wiki/pubs/LLVM-HPC25_FlangPRIFCaffeine_Slides.pdf)
 
 Funding
 -------
