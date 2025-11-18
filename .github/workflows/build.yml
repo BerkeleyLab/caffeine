@@ -132,6 +132,9 @@ jobs:
         echo "FC=flang-new" >> "$GITHUB_ENV" 
         echo "CC=clang" >> "$GITHUB_ENV"
         echo "CXX=clang++" >> "$GITHUB_ENV"
+        if [[ "${{ matrix.container }}" =~ "snowstep/llvm" ]] ; then \
+          echo "LD_LIBRARY_PATH=/usr/lib/llvm-22/lib:$LD_LIBRARY_PATH" >> "$GITHUB_ENV" ; \
+        fi
 
     - name: Set Caffeine variables
       run: |
