@@ -7,7 +7,7 @@ copyright = "2021-2025 The Regents of the University of California, through Lawr
 
 [dev-dependencies]
 assert = {git = "https://github.com/berkeleylab/assert.git", tag = "3.0.0"}
-veggies = {git = "https://gitlab.com/everythingfunctional/veggies", tag = "v1.1.3"}
+veggies = {git = "https://gitlab.com/everythingfunctional/veggies", tag = "v1.2.1"}
 iso_varying_string = {git = "https://gitlab.com/everythingfunctional/iso_varying_string.git", tag = "v3.0.4"}
 
 [install]
