@@ -1,4 +1,4 @@
-module caf_image_index_test
+module prif_image_index_test_m
     use iso_c_binding, only: c_int, c_ptr, c_size_t, c_null_funptr, c_int64_t
     use prif, only: prif_coarray_handle, prif_allocate_coarray, &
                     prif_image_index, prif_num_images, &
@@ -17,31 +17,43 @@ module caf_image_index_test
 #else
   use prif, only : prif_deallocate_coarray, prif_deallocate_coarrays
 #endif
-    use veggies, only: result_t, test_item_t, assert_equals, assert_that, describe, it, succeed
+    use julienne_m, only: test_description_t, test_diagnosis_t, test_result_t, test_t, usher, passing_test &
+       ,operator(.also.), operator(.equalsExpected.), operator(.isAtLeast.), operator(.isAtMost.)
 
     implicit none
     private
-    public :: test_prif_image_index
-contains
-    function test_prif_image_index() result(tests)
-        type(test_item_t) :: tests
+    public :: prif_image_index_test_t
 
-        tests = describe( &
-          "prif_image_index and prif_initial_team_index", &
-          [ it("returns 1 for the simplest case", check_simple_case) &
-          , it("returns 1 when given the lower bounds", check_lower_bounds) &
-          , it("returns 0 with invalid subscripts", check_invalid_subscripts) &
-          , it("returns the expected answer for a more complicated case w/corank=2", check_complicated_2d) &
-          , it("returns the expected answer for a more complicated case w/corank=3", check_complicated_3d) &
-          , it("returns the expected answer with a child team and corank=2", check_complicated_2d_team) &
-          ])
+    type, extends(test_t) :: prif_image_index_test_t
+    contains
+      procedure, nopass, non_overridable :: subject
+      procedure, nopass, non_overridable :: results
+    end type
+contains
+    pure function subject()
+      character(len=:), allocatable :: subject
+      subject = "prif_image_index and prif_initial_team_index"
+    end function
+      
+    function results() result(test_results)
+      type(test_result_t), allocatable :: test_results(:)
+      type(prif_image_index_test_t) prif_image_index_test
+
+      test_results = prif_image_index_test%run([ &
+         test_description_t("returns 1 for the simplest case", usher(check_simple_case)) &
+        ,test_description_t("returns 1 when given the lower bounds", usher(check_lower_bounds)) &
+        ,test_description_t("returns 0 with invalid subscripts", usher(check_invalid_subscripts)) &
+        ,test_description_t("returns the expected answer for a more complicated case w/corank=2", usher(check_complicated_2d)) &
+        ,test_description_t("returns the expected answer for a more complicated case w/corank=3", usher(check_complicated_3d)) &
+        ,test_description_t("returns the expected answer with a child team and corank=2", usher(check_complicated_2d_team)) &
+        ])
     end function
 
-    function check_this_image_coarray(coarray_handle, corank, team) result(result_)
+    function check_this_image_coarray(coarray_handle, corank, team) result(diag)
         type(prif_coarray_handle) :: coarray_handle
         integer(c_int) :: corank
         type(prif_team_type), optional :: team
-        type(result_t) :: result_
+        type(test_diagnosis_t) :: diag
 
         integer(c_int64_t) :: co, cosubscripts(corank), colbound(corank), coubound(corank)
         integer(c_int) :: i, me, me_initial
@@ -49,7 +61,7 @@ contains
 
         call prif_get_team(PRIF_INITIAL_TEAM, team=initial_team)
 
-        result_ = succeed("")
+        diag = passing_test()
 
         call prif_lcobound_no_dim(coarray_handle, colbound)
         call prif_ucobound_no_dim(coarray_handle, coubound)
@@ -59,10 +71,10 @@ contains
         call prif_this_image_with_coarray(coarray_handle, team=team, cosubscripts=cosubscripts)
         do i=1,corank
           call prif_this_image_with_dim(coarray_handle, dim=i, team=team, cosubscript=co)
-          result_ = result_ .and. assert_equals(int(co), int(cosubscripts(i)))
+          diag = diag .also. (int(co) .equalsExpected. int(cosubscripts(i)))
 
-          result_ = result_ .and. assert_that(co >= colbound(i))
-          result_ = result_ .and. assert_that(co <= coubound(i))
+          diag = diag .also. (co .isAtLeast. colbound(i))
+          diag = diag .also. (co .isatMost. coubound(i))
         end do
 
         ! verify reverse mapping
@@ -71,7 +83,7 @@ contains
         else
           call prif_image_index(coarray_handle, cosubscripts, i)
         end if
-        result_ = result_ .and. assert_equals(i, me)
+        diag = diag .also. (i .equalsExpected. me)
 
         ! and prif_initial_team_index
         if (present(team)) then
@@ -79,12 +91,12 @@ contains
         else
           call prif_initial_team_index(coarray_handle, cosubscripts, i)
         end if
-        result_ = result_ .and. assert_equals(i, me_initial)
+        diag = diag .also. (i .equalsExpected. me_initial)
 
     end function
 
-    function check_simple_case() result(result_)
-        type(result_t) :: result_
+    function check_simple_case() result(diag)
+        type(test_diagnosis_t) :: diag
 
         type(prif_coarray_handle) :: coarray_handle
         type(c_ptr) :: allocated_memory
@@ -99,19 +111,19 @@ contains
                 coarray_handle = coarray_handle, &
                 allocated_memory = allocated_memory)
         call prif_image_index(coarray_handle, [1_c_int64_t], image_index=answer)
-        result_ = assert_equals(1_c_int, answer)
+        diag = (answer .equalsExpected. 1_c_int )
 
         call prif_initial_team_index(coarray_handle, [1_c_int64_t], initial_team_index=answer)
-        result_ =  result_ .and. assert_equals(1_c_int, answer)
+        diag =  diag .also. (answer .equalsExpected. 1_c_int)
 
-        result_ = result_ .and. &
+        diag = diag .also. &
           check_this_image_coarray(coarray_handle, 1)
 
         call prif_deallocate_coarray(coarray_handle)
     end function
 
-    function check_lower_bounds() result(result_)
-        type(result_t) :: result_
+    function check_lower_bounds() result(diag)
+        type(test_diagnosis_t) :: diag
 
         type(prif_coarray_handle) :: coarray_handle
         type(c_ptr) :: allocated_memory
@@ -126,19 +138,19 @@ contains
                 coarray_handle = coarray_handle, &
                 allocated_memory = allocated_memory)
         call prif_image_index(coarray_handle, [2_c_int64_t, 3_c_int64_t], image_index=answer)
-        result_ = assert_equals(1_c_int, answer)
+        diag = (answer .equalsExpected. 1_c_int)
 
         call prif_initial_team_index(coarray_handle, [2_c_int64_t, 3_c_int64_t], initial_team_index=answer)
-        result_ =  result_ .and. assert_equals(1_c_int, answer)
+        diag =  diag .also. (answer .equalsExpected. 1_c_int)
 
-        result_ = result_ .and. &
+        diag = diag .also. &
           check_this_image_coarray(coarray_handle, 2)
 
         call prif_deallocate_coarray(coarray_handle)
     end function
 
-    function check_invalid_subscripts() result(result_)
-        type(result_t) :: result_
+    function check_invalid_subscripts() result(diag)
+        type(test_diagnosis_t) diag
 
         type(prif_coarray_handle) :: coarray_handle
         type(c_ptr) :: allocated_memory
@@ -153,16 +165,16 @@ contains
                 coarray_handle = coarray_handle, &
                 allocated_memory = allocated_memory)
         call prif_image_index(coarray_handle, [-1_c_int64_t, 1_c_int64_t], image_index=answer)
-        result_ = assert_equals(0_c_int, answer)
+        diag = (answer .equalsExpected. 0_c_int)
 
-        result_ = result_ .and. &
+        diag = diag .also. &
           check_this_image_coarray(coarray_handle, 2)
 
         call prif_deallocate_coarray(coarray_handle)
     end function
 
-    function check_complicated_2d() result(result_)
-        type(result_t) :: result_
+    function check_complicated_2d() result(diag)
+        type(test_diagnosis_t) :: diag
 
         type(prif_coarray_handle) :: coarray_handle
         type(c_ptr) :: allocated_memory
@@ -178,21 +190,21 @@ contains
                 allocated_memory = allocated_memory)
         call prif_image_index(coarray_handle, [1_c_int64_t, 3_c_int64_t], image_index=answer)
         expected = merge(3_c_int,0_c_int,ni >= 3)
-        result_ = assert_equals(expected, answer)
+        diag = (answer .equalsExpected. expected)
 
         if (expected > 0) then
           call prif_initial_team_index(coarray_handle, [1_c_int64_t, 3_c_int64_t], initial_team_index=answer)
-          result_ =  result_ .and. assert_equals(expected, answer)
+          diag =  diag .also. (answer .equalsExpected. expected)
         end if
 
-        result_ = result_ .and. &
+        diag = diag .also. &
           check_this_image_coarray(coarray_handle, 2)
 
         call prif_deallocate_coarray(coarray_handle)
     end function
 
-    function check_complicated_3d() result(result_)
-        type(result_t) :: result_
+    function check_complicated_3d() result(diag)
+        type(test_diagnosis_t) diag
 
         type(prif_coarray_handle) :: coarray_handle
         type(c_ptr) :: allocated_memory
@@ -212,23 +224,23 @@ contains
                            [2_c_int64_t, 1_c_int64_t, 1_c_int64_t], &
                            team=initial_team, image_index=answer)
         expected = merge(8_c_int,0_c_int,ni >= 8)
-        result_ = assert_equals(expected, answer)
+        diag = (answer .equalsExpected. expected)
 
         if (expected > 0) then
           call prif_initial_team_index_with_team(coarray_handle, &
                            [2_c_int64_t, 1_c_int64_t, 1_c_int64_t], &
                            team=initial_team, initial_team_index=answer)
-          result_ =  result_ .and. assert_equals(expected, answer)
+          diag =  diag .also. (answer .equalsExpected. expected)
         endif
 
-        result_ = result_ .and. &
+        diag = diag .also. &
           check_this_image_coarray(coarray_handle, 3)
 
         call prif_deallocate_coarray(coarray_handle)
     end function
 
-    function check_complicated_2d_team() result(result_)
-        type(result_t) :: result_
+    function check_complicated_2d_team() result(diag)
+        type(test_diagnosis_t) diag
 
         type(prif_coarray_handle) :: coarray_handle
         type(c_ptr) :: allocated_memory
@@ -236,7 +248,7 @@ contains
         integer(c_int64_t) :: which_team
         type(prif_team_type) :: initial_team, child_team
 
-        result_ = succeed("")
+        diag = passing_test()
 
         call prif_get_team(team=initial_team)
         call prif_num_images_with_team(team=initial_team, num_images=ni)
@@ -261,140 +273,138 @@ contains
           call prif_image_index_with_team(coarray_handle, &
                               [0_c_int64_t, 2_c_int64_t], &
                               team=initial_team, image_index=answer)
-          result_ = result_ .and. &
-            assert_equals(1_c_int, answer)
+          diag = diag .also. &
+            (answer .equalsExpected. 1_c_int)
 
           call prif_image_index_with_team_number(coarray_handle, &
                               [0_c_int64_t, 2_c_int64_t], &
                               team_number=-1_c_int64_t, image_index=answer)
-          result_ = result_ .and. &
-            assert_equals(1_c_int, answer)
+          diag = diag .also. &
+            (answer .equalsExpected. 1_c_int)
 
           call prif_image_index_with_team(coarray_handle, &
                               [0_c_int64_t, 2_c_int64_t], &
                               team=child_team, image_index=answer)
-          result_ = result_ .and. &
-            assert_equals(1_c_int, answer)
+          diag = diag .also. &
+            (answer .equalsExpected. 1_c_int)
 
           call prif_image_index_with_team_number(coarray_handle, &
                               [0_c_int64_t, 2_c_int64_t], &
                               team_number=which_team, image_index=answer)
-          result_ = result_ .and. &
-            assert_equals(1_c_int, answer)
+          diag = diag .also. &
+            (answer .equalsExpected. 1_c_int)
 
           call prif_image_index(coarray_handle, &
                               [0_c_int64_t, 2_c_int64_t], &
                               image_index=answer)
-          result_ = result_ .and. &
-            assert_equals(1_c_int, answer)
+          diag = diag .also. &
+            (answer .equalsExpected. 1_c_int)
 
           ! initial_team_index lcobound
 
           call prif_initial_team_index_with_team(coarray_handle, &
                               [0_c_int64_t, 2_c_int64_t], &
                               initial_team, answer)
-          result_ = result_ .and. &
-            assert_equals(1_c_int, answer)
+          diag = diag .also. &
+            (answer .equalsExpected. 1_c_int)
 
           call prif_initial_team_index_with_team_number(coarray_handle, &
                               [0_c_int64_t, 2_c_int64_t], &
                               -1_c_int64_t, answer)
-          result_ = result_ .and. &
-            assert_equals(1_c_int, answer)
+          diag = diag .also. &
+            (answer .equalsExpected. 1_c_int)
 
           call prif_initial_team_index_with_team(coarray_handle, &
                               [0_c_int64_t, 2_c_int64_t], &
                               child_team, answer)
-          result_ = result_ .and. &
-            assert_equals(merge(1_c_int,2_c_int,which_team==1), answer)
+          diag = diag .also. &
+            (answer .equalsExpected. merge(1_c_int,2_c_int,which_team==1))
 
           call prif_initial_team_index_with_team_number(coarray_handle, &
                               [0_c_int64_t, 2_c_int64_t], &
                               which_team, answer)
-          result_ = result_ .and. &
-            assert_equals(merge(1_c_int,2_c_int,which_team==1), answer)
+          diag = diag .also. &
+            (answer .equalsExpected. merge(1_c_int,2_c_int,which_team==1))
 
           call prif_initial_team_index(coarray_handle, &
                               [0_c_int64_t, 2_c_int64_t], &
                               answer)
-          result_ = result_ .and. &
-            assert_equals(merge(1_c_int,2_c_int,which_team==1), answer)
+          diag = diag .also. &
+            (answer .equalsExpected. merge(1_c_int,2_c_int,which_team==1))
 
           ! image_index 3
 
           call prif_image_index_with_team(coarray_handle, &
                               [0_c_int64_t, 3_c_int64_t], &
                               team=initial_team, image_index=answer)
-          result_ = result_ .and. &
-            assert_equals(merge(3_c_int,0_c_int,ni >= 3), answer)
+          diag = diag .also. &
+            (answer .equalsExpected. merge(3_c_int,0_c_int,ni >= 3))
 
           call prif_image_index_with_team_number(coarray_handle, &
                               [0_c_int64_t, 3_c_int64_t], &
                               team_number=-1_c_int64_t, image_index=answer)
-          result_ = result_ .and. &
-            assert_equals(merge(3_c_int,0_c_int,ni >= 3), answer)
+          diag = diag .also. &
+            (answer .equalsExpected. merge(3_c_int,0_c_int,ni >= 3))
 
           call prif_image_index_with_team(coarray_handle, &
                               [0_c_int64_t, 3_c_int64_t], &
                               team=child_team, image_index=answer)
-          result_ = result_ .and. &
-            assert_equals(merge(3_c_int,0_c_int,cni >= 3), answer)
+          diag = diag .also. &
+            (answer .equalsExpected. merge(3_c_int,0_c_int,cni >= 3))
 
           call prif_image_index_with_team_number(coarray_handle, &
                               [0_c_int64_t, 3_c_int64_t], &
                               team_number=which_team, image_index=answer)
-          result_ = result_ .and. &
-            assert_equals(merge(3_c_int,0_c_int,cni >= 3), answer)
+          diag = diag .also. &
+            (answer .equalsExpected. merge(3_c_int,0_c_int,cni >= 3))
 
           call prif_image_index(coarray_handle, &
                               [0_c_int64_t, 3_c_int64_t], &
                               image_index=answer)
-          result_ = result_ .and. &
-            assert_equals(merge(3_c_int,0_c_int,cni >= 3), answer)
+          diag = diag .also. &
+            (answer .equalsExpected. merge(3_c_int,0_c_int,cni >= 3))
 
           ! initial_team_index 3
           if (ni >= 3) then
             call prif_initial_team_index_with_team(coarray_handle, &
                                 [0_c_int64_t, 3_c_int64_t], &
                                 team=initial_team, initial_team_index=answer)
-            result_ = result_ .and. &
-              assert_equals(3_c_int, answer)
+            diag = diag .also. &
+              (answer .equalsExpected. 3_c_int)
   
             call prif_initial_team_index_with_team_number(coarray_handle, &
                                 [0_c_int64_t, 3_c_int64_t], &
                                 team_number=-1_c_int64_t, initial_team_index=answer)
-            result_ = result_ .and. &
-              assert_equals(3_c_int, answer)
+            diag = diag .also. &
+              (answer .equalsExpected. 3_c_int)
           end if
           if (cni >= 3) then
             call prif_initial_team_index_with_team(coarray_handle, &
                                 [0_c_int64_t, 3_c_int64_t], &
                                 team=child_team, initial_team_index=answer)
-            result_ = result_ .and. &
-              assert_equals(merge(5_c_int,6_c_int,which_team==1), answer)
+            diag = diag .also. &
+              (answer .equalsExpected. merge(5_c_int,6_c_int,which_team==1))
   
             call prif_initial_team_index_with_team_number(coarray_handle, &
                                 [0_c_int64_t, 3_c_int64_t], &
                                 team_number=which_team, initial_team_index=answer)
-            result_ = result_ .and. &
-              assert_equals(merge(5_c_int,6_c_int,which_team==1), answer)
+            diag = diag .also. &
+              (answer .equalsExpected. merge(5_c_int,6_c_int,which_team==1))
   
             call prif_initial_team_index(coarray_handle, &
                                 [0_c_int64_t, 3_c_int64_t], &
                                 initial_team_index=answer)
-            result_ = result_ .and. &
-              assert_equals(merge(5_c_int,6_c_int,which_team==1), answer)
+            diag = diag .also. &
+              (answer .equalsExpected. merge(5_c_int,6_c_int,which_team==1))
           end if
 
-          result_ = result_ .and. &
+          diag = diag .also. &
             check_this_image_coarray(coarray_handle, 2, initial_team)
-          result_ = result_ .and. &
+          diag = diag .also. &
             check_this_image_coarray(coarray_handle, 2, child_team)
 
         call prif_end_team()
         call prif_deallocate_coarray(coarray_handle)
     end function
-
-
 
 end module

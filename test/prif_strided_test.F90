@@ -1,4 +1,4 @@
-module caf_strided_test
+module prif_strided_test_m
     use iso_c_binding, only: &
             c_ptr, c_int64_t, c_intptr_t, c_size_t, c_null_funptr, c_f_pointer, c_loc, c_sizeof
     use prif, only: &
@@ -21,52 +21,40 @@ module caf_strided_test
 #else
   use prif, only : prif_deallocate_coarray, prif_deallocate_coarrays
 #endif
-    use veggies, only: result_t, test_item_t, assert_equals, describe, it, succeed, fail
-
+    use julienne_m, only: test_description_t, test_diagnosis_t, test_result_t, test_t, usher &
+      ,operator(.all.), operator(.equalsExpected.)
+      
     implicit none
     private
-    public :: test_prif_rma_strided
+    public :: prif_strided_test_t
+
+    type, extends(test_t) :: prif_strided_test_t
+    contains
+      procedure, nopass, non_overridable :: subject
+      procedure, nopass, non_overridable :: results
+    end type
+
 contains
-    function test_prif_rma_strided() result(tests)
-        type(test_item_t) :: tests
 
-        tests = describe( &
-            "PRIF Strided RMA", &
-            [ it("can put strided data to another image", check_put) &
-            , it("can put strided data with indirect interface", check_put_indirect) &
-            , it("can get strided data from another image", check_get) &
-            , it("can get strided data with indirect interface", check_get_indirect) &
-            ])
+    pure function subject()
+      character(len=:), allocatable :: subject
+      subject = "PRIF Strided RMA"
     end function
 
-    function assert_equals_array2d(expected, actual) result(result_)
-        integer, intent(in) :: expected(:,:)
-        integer, intent(in) :: actual(:,:)
-        type(result_t) :: result_ 
-        integer :: i,j
-        
-        result_ = succeed("")
-        result_ = result_ .and. assert_equals(size(expected,1), size(actual,1))
-        result_ = result_ .and. assert_equals(size(expected,2), size(actual,2))
+    function results() result(test_results)
+        type(test_result_t), allocatable :: test_results(:)
+        type(prif_strided_test_t) prif_strided_test
 
-        do i = lbound(actual,1), ubound(actual,1) 
-          do j = lbound(actual,2), ubound(actual,2) 
-           block
-            character(len=100) :: result_string
-
-            write(result_string, '("At position (", I0, ",", I0, ") expected=", I0, " actual=", I0)') &
-                  i, j, expected(i,j), actual(i,j)
-
-            result_ = result_ .and. &
-              assert_equals(expected(i,j), actual(i,j), result_string)
-           end block
-          end do
-        end do
-        
+        test_results = prif_strided_test%run([ &
+             test_description_t("can put strided data to another image", usher(check_put)) &
+            ,test_description_t("can put strided data with indirect interface", usher(check_put_indirect)) &
+            ,test_description_t("can get strided data from another image", usher(check_get)) &
+            ,test_description_t("can get strided data with indirect interface", usher(check_get_indirect)) &
+        ])
     end function
 
-    function check_put() result(result_)
-        type(result_t) :: result_
+    function check_put() result(diag)
+        type(test_diagnosis_t) :: diag
 
         integer :: me, num_imgs, neighbor
         type(prif_coarray_handle) :: coarray_handle
@@ -116,13 +104,13 @@ contains
 
         call prif_sync_all
 
-        result_ = assert_equals_array2d(expected, local_slice)
+        diag = .all. (local_slice .equalsExpected. expected)
 
         call prif_deallocate_coarray(coarray_handle)
     end function
 
-    function check_put_indirect() result(result_)
-        type(result_t) :: result_
+    function check_put_indirect() result(diag)
+        type(test_diagnosis_t) :: diag
 
         type :: my_type
           type(c_ptr) :: my_component
@@ -190,14 +178,14 @@ contains
 
         call prif_sync_all
 
-        result_ = assert_equals_array2d(expected, component_access)
+        diag = .all. (component_access .equalsExpected. expected)
 
         call prif_deallocate(local_slice%my_component)
         call prif_deallocate_coarray(coarray_handle)
     end function
 
-    function check_get() result(result_)
-        type(result_t) :: result_
+    function check_get() result(diag)
+        type(test_diagnosis_t) :: diag
 
         integer :: me, num_imgs, neighbor
         type(prif_coarray_handle) :: coarray_handle
@@ -245,13 +233,13 @@ contains
 
         call prif_sync_all
 
-        result_ = assert_equals_array2d(expected, mydata)
+        diag = .all. (mydata .equalsExpected. expected)
 
         call prif_deallocate_coarray(coarray_handle)
     end function
 
-    function check_get_indirect() result(result_)
-        type(result_t) :: result_
+    function check_get_indirect() result(diag)
+        type(test_diagnosis_t) :: diag
 
         type :: my_type
           type(c_ptr) :: my_component
@@ -317,7 +305,7 @@ contains
 
         call prif_sync_all
 
-        result_ = assert_equals_array2d(expected, mydata)
+        diag = .all. (mydata .equalsExpected. expected)
 
         call prif_deallocate(local_slice%my_component)
         call prif_deallocate_coarray(coarray_handle)

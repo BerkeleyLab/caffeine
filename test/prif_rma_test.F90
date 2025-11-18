@@ -1,4 +1,4 @@
-module caf_rma_test
+module prif_rma_test_m
     use iso_c_binding, only: &
             c_ptr, c_int64_t, c_intptr_t, c_size_t, c_null_funptr, c_f_pointer, c_loc, c_sizeof
     use prif, only: &
@@ -21,26 +21,39 @@ module caf_rma_test
 #else
   use prif, only : prif_deallocate_coarray, prif_deallocate_coarrays
 #endif
-    use veggies, only: result_t, test_item_t, assert_equals, describe, it
+    use julienne_m, only: test_description_t, test_diagnosis_t, test_result_t, test_t, usher, operator(.equalsExpected.)
 
     implicit none
     private
-    public :: test_prif_rma
-contains
-    function test_prif_rma() result(tests)
-        type(test_item_t) :: tests
+    public :: prif_rma_test_t
 
-        tests = describe( &
-            "PRIF RMA", &
-            [ it("can send a value to another image", check_put) &
-            , it("can send a value with indirect interface", check_put_indirect) &
-            , it("can get a value from another image", check_get) &
-            , it("can get a value with indirect interface", check_get_indirect) &
-            ])
+    type, extends(test_t) :: prif_rma_test_t
+    contains
+      procedure, nopass, non_overridable :: subject
+      procedure, nopass, non_overridable :: results
+    end type
+
+contains
+
+    pure function subject()
+      character(len=:), allocatable :: subject
+      subject = "PRIF RMA"
     end function
 
-    function check_put() result(result_)
-        type(result_t) :: result_
+    function results() result(test_results)
+        type(test_result_t), allocatable :: test_results(:)
+        type(prif_rma_test_t) prif_rma_test
+
+        test_results = prif_rma_test%run([ &
+           test_description_t("can send a value to another image", usher(check_put)) &
+          ,test_description_t("can send a value with indirect interface", usher(check_put_indirect)) &
+          ,test_description_t("can get a value from another image", usher(check_get)) &
+          ,test_description_t("can get a value with indirect interface", usher(check_get_indirect)) &
+        ])
+    end function
+
+    function check_put() result(diag)
+        type(test_diagnosis_t) :: diag
 
         integer :: dummy_element, num_imgs, expected, neighbor
         integer, target :: me
@@ -76,13 +89,13 @@ contains
         ! superfluous, just to ensure prif_sync_memory is usable
         call prif_sync_memory
 
-        result_ = assert_equals(expected, local_slice)
+        diag = local_slice .equalsExpected. expected
 
         call prif_deallocate_coarray(coarray_handle)
     end function
 
-    function check_put_indirect() result(result_)
-        type(result_t) :: result_
+    function check_put_indirect() result(diag)
+        type(test_diagnosis_t) :: diag
 
         type :: my_type
           type(c_ptr) :: my_component
@@ -133,14 +146,14 @@ contains
         call prif_sync_all
 
         call c_f_pointer(local_slice%my_component, component_access)
-        result_ = assert_equals(expected, component_access)
+        diag = component_access .equalsExpected. expected
 
         call prif_deallocate(local_slice%my_component)
         call prif_deallocate_coarray(coarray_handle)
     end function
 
-    function check_get() result(result_)
-        type(result_t) :: result_
+    function check_get() result(diag)
+        type(test_diagnosis_t) :: diag
 
         integer :: dummy_element, num_imgs, me, neighbor, expected
         integer, target :: retrieved
@@ -174,13 +187,13 @@ contains
                 current_image_buffer = c_loc(retrieved), &
                 size_in_bytes = c_sizeof(retrieved))
 
-        result_ = assert_equals(expected, retrieved)
+        diag = retrieved .equalsExpected. expected
 
         call prif_deallocate_coarray(coarray_handle)
     end function
 
-    function check_get_indirect() result(result_)
-        type(result_t) :: result_
+    function check_get_indirect() result(diag)
+        type(test_diagnosis_t) :: diag
 
         type :: my_type
           type(c_ptr) :: my_component
@@ -231,7 +244,7 @@ contains
                 current_image_buffer = c_loc(retrieved), &
                 size_in_bytes = int(storage_size(retrieved)/8, c_size_t))
 
-        result_ = assert_equals(expected, retrieved)
+        diag = retrieved .equalsExpected. expected
 
         call prif_deallocate(local_slice%my_component)
         call prif_deallocate_coarray(coarray_handle)

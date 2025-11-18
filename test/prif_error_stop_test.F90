@@ -1,29 +1,41 @@
-module caf_error_stop_test
-    use prif, only: prif_this_image_no_coarray, prif_sync_all
-    use veggies, only: test_item_t, describe, result_t, it, assert_that, assert_equals, succeed
+module prif_error_stop_test_m
     use unit_test_parameters_m, only : expected_error_stop_code, &
         image_one => subjob_setup, cmd_prefix => subjob_prefix
+    use julienne_m, only: passing_test, test_description_t, test_diagnosis_t, test_result_t, test_t, usher &
+      ,operator(.expect.), operator(.equalsExpected.), operator(//)
 
     implicit none
     private
-    public :: test_prif_error_stop
+    public :: prif_error_stop_test_t
+
+    type, extends(test_t) :: prif_error_stop_test_t
+    contains
+      procedure, nopass, non_overridable :: subject
+      procedure, nopass, non_overridable :: results
+    end type
 
    integer, parameter :: max_message_len = 128
 
 contains
-    function test_prif_error_stop() result(tests)
-        type(test_item_t) :: tests
 
-        tests = describe( &
-                "A program that executes the prif_error_stop function", &
-                [ it("exits with a non-zero exitstat when the program omits the stop code", exit_with_no_stop_code) &
-                 ,it("prints a character stop code and exits with a non-zero exitstat", exit_with_character_stop_code) &
-                 ,it("prints an integer stop code and exits with exitstat equal to the stop code", exit_with_integer_stop_code) &
-                ])
+    pure function subject()
+      character(len=:), allocatable :: subject
+      subject = "A program that executes the prif_error_stop function"
     end function
 
-    function exit_with_no_stop_code() result(result_)
-        type(result_t) :: result_
+    function results() result(test_results)
+      type(test_result_t), allocatable :: test_results(:)
+      type(prif_error_stop_test_t) prif_error_stop_test
+
+      test_results = prif_error_stop_test%run([ &
+         test_description_t("exits with a non-zero exitstat when the program omits the stop code", usher(exit_with_no_stop_code)) &
+        ,test_description_t("prints a character stop code and exits with a non-zero exitstat", usher(exit_with_character_stop_code)) &
+        ,test_description_t("prints an integer stop code and exits with exitstat equal to the stop code", usher(exit_with_integer_stop_code)) &
+      ])
+    end function
+
+    function exit_with_no_stop_code() result(diag)
+        type(test_diagnosis_t) :: diag
         integer exit_status
         integer command_status
         character(len=max_message_len) command_message
@@ -38,15 +50,15 @@ contains
          ,cmdstat = command_status &
          ,cmdmsg = command_message &
         )   
-        result_ = assert_that(exit_status /= 0, command_message)
+        diag = .expect. (exit_status /= 0) // command_message
       else
-        result_ = succeed("skipped")
+        diag = passing_test()
       end if
 
     end function
 
-    function exit_with_integer_stop_code() result(result_)
-        type(result_t) :: result_
+    function exit_with_integer_stop_code() result(diag)
+        type(test_diagnosis_t) :: diag
         integer exit_status
         integer command_status
         character(len=max_message_len) command_message
@@ -61,16 +73,15 @@ contains
          ,cmdstat = command_status &
          ,cmdmsg = command_message &
         )
-        result_ = &
-         assert_equals(expected_error_stop_code, exit_status, command_message) 
+        diag = (exit_status .equalsExpected. expected_error_stop_code) // command_message
       else
-        result_ = succeed("skipped")
+        diag = passing_test()
       end if
 
     end function
 
-    function exit_with_character_stop_code() result(result_)
-        type(result_t) :: result_
+    function exit_with_character_stop_code() result(diag)
+        type(test_diagnosis_t) :: diag
         integer exit_status
         integer command_status
         character(len=max_message_len) command_message
@@ -85,11 +96,11 @@ contains
          ,cmdstat = command_status &
          ,cmdmsg = command_message &
         )   
-        result_ = assert_that(exit_status /= 0, command_message)
+        diag = .expect. (exit_status /= 0) // command_message
       else
-        result_ = succeed("skipped")
+        diag = passing_test()
       end if
 
     end function
 
-end module caf_error_stop_test
+end module prif_error_stop_test_m
