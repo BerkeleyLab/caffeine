@@ -43,7 +43,7 @@ jobs:
             native_multi_image: 1
             FFLAGS: -fcoarray
             # https://hub.docker.com/r/snowstep/llvm/tags
-            container: snowstep/llvm:bookworm
+            container: snowstep/llvm:noble
           - os: ubuntu-24.04
             compiler: flang
             version: 21
@@ -101,7 +101,7 @@ jobs:
             network: udp
             native_multi_image: 1
             FFLAGS: -fcoarray
-            container: snowstep/llvm:bookworm
+            container: snowstep/llvm:noble
 
     container:
       image: ${{ matrix.container }}
