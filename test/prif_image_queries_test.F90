@@ -60,11 +60,11 @@ contains
 
       call prif_num_images(num_images=ni)
       diag = &
-         .expect. allocated(nums) &
-         .also. (size(nums) .isAtMost. ni) &
-         .also. (.all. (nums .isAtLeast. 1)) &
-         .also. (.all. (nums .isAtMost. ni)) &
-         .also. (.all. (nums(1:size(nums)-1) .lessThan. nums(2:size(nums)))) // "valid stopped image"
+         .expect. allocated(nums) .also. &
+         (size(nums) .isAtMost. ni) .also. &
+         (.all. (nums .isAtLeast. 1)) .also. &
+         (.all. (nums .isAtMost. ni)) .also. &
+         (.all. (nums(1:size(nums)-1) .lessThan. nums(2:size(nums)))) // "valid stopped image"
   end function
 
   function check_stopped_images() result(diag)
