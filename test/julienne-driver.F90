@@ -17,7 +17,7 @@ program test_suite_driver
   implicit none
 
   associate(test_harness => test_harness_t([ &
-     test_fixture_t( prif_init_test_t() ) &
+     test_fixture_t( prif_init_test_t() ) &  ! must come first
     ,test_fixture_t( prif_num_images_test_t() ) &
     ,test_fixture_t( prif_this_image_no_coarray_test_t() ) &
     ,test_fixture_t( prif_image_queries_test_t() ) &

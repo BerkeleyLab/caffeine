@@ -31,28 +31,16 @@ contains
 
 
   function check_caffeination() result(diag)
-    ! this test needs to run very early at startup, so we memoize the result
     type(test_diagnosis_t) :: diag
-    type(test_diagnosis_t), save :: memo
-    logical, save :: first_pass = .true.
-
-    if (first_pass) then
-      first_pass = .false.
-      write_memo: &
-      block
 #if HAVE_MULTI_IMAGE
-        integer, parameter :: successful_initiation = PRIF_STAT_ALREADY_INIT
+    integer, parameter :: successful_initiation = PRIF_STAT_ALREADY_INIT
 #else
-        integer, parameter :: successful_initiation = 0
+    integer, parameter :: successful_initiation = 0
 #endif
-        integer init_exit_code
+    integer init_exit_code
 
-        call prif_init(init_exit_code)
-        memo = init_exit_code .equalsExpected. successful_initiation
-      end block write_memo
-    endif 
-
-    diag = memo
+    call prif_init(init_exit_code)
+    diag = init_exit_code .equalsExpected. successful_initiation
   end function
 
   function check_subsequent_prif_init_call() result(diag)
