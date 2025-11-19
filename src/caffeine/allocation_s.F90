@@ -72,7 +72,14 @@ contains
     allocated_memory = caf_allocate(non_symmetric_heap_mspace, size_in_bytes)
   end procedure
 
+#if FORCE_PRIF_0_5 || FORCE_PRIF_0_6
   module procedure prif_deallocate_coarray
+#else
+  module procedure prif_deallocate_coarray
+    call prif_deallocate_coarrays([coarray_handle], stat, errmsg, errmsg_alloc)
+  end procedure
+  module procedure prif_deallocate_coarrays
+#endif
     ! gfortran is yelling that this isn't valid for bind(C)
     ! https://gcc.gnu.org/bugzilla/show_bug.cgi?id=113338
     ! abstract interface

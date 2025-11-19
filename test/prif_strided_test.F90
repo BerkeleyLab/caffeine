@@ -4,7 +4,6 @@ module caf_strided_test
     use prif, only: &
             prif_coarray_handle, &
             prif_allocate_coarray, &
-            prif_deallocate_coarray, &
             prif_allocate, &
             prif_deallocate, &
             prif_num_images, &
@@ -15,6 +14,13 @@ module caf_strided_test
             prif_get_strided_indirect, &
             prif_sync_all, &
             prif_this_image_no_coarray
+#if FORCE_PRIF_0_5 || FORCE_PRIF_0_6
+  use prif, only : prif_deallocate_coarray_ => prif_deallocate_coarray
+# define prif_deallocate_coarray(h)    prif_deallocate_coarray_([h])
+# define prif_deallocate_coarrays(arr) prif_deallocate_coarray_(arr)
+#else
+  use prif, only : prif_deallocate_coarray, prif_deallocate_coarrays
+#endif
     use veggies, only: result_t, test_item_t, assert_equals, describe, it, succeed, fail
 
     implicit none
@@ -112,7 +118,7 @@ contains
 
         result_ = assert_equals_array2d(expected, local_slice)
 
-        call prif_deallocate_coarray([coarray_handle])
+        call prif_deallocate_coarray(coarray_handle)
     end function
 
     function check_put_indirect() result(result_)
@@ -187,7 +193,7 @@ contains
         result_ = assert_equals_array2d(expected, component_access)
 
         call prif_deallocate(local_slice%my_component)
-        call prif_deallocate_coarray([coarray_handle])
+        call prif_deallocate_coarray(coarray_handle)
     end function
 
     function check_get() result(result_)
@@ -241,7 +247,7 @@ contains
 
         result_ = assert_equals_array2d(expected, mydata)
 
-        call prif_deallocate_coarray([coarray_handle])
+        call prif_deallocate_coarray(coarray_handle)
     end function
 
     function check_get_indirect() result(result_)
@@ -314,7 +320,7 @@ contains
         result_ = assert_equals_array2d(expected, mydata)
 
         call prif_deallocate(local_slice%my_component)
-        call prif_deallocate_coarray([coarray_handle])
+        call prif_deallocate_coarray(coarray_handle)
     end function
 
 end module

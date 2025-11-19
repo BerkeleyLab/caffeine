@@ -23,7 +23,7 @@ submodule(prif) prif_private_s
 
   implicit none
 
-  type(team_data), target :: initial_team
+  type(prif_team_descriptor), target :: initial_team
   type(prif_team_type) :: current_team
   type(c_ptr) :: non_symmetric_heap_mspace
 
