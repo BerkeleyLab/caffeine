@@ -43,7 +43,7 @@ jobs:
             native_multi_image: 1
             FFLAGS: -fcoarray
             # https://hub.docker.com/r/snowstep/llvm/tags
-            container: snowstep/llvm:noble
+            container: snowstep/llvm:ubuntu-24.04-latest
           - os: ubuntu-24.04
             compiler: flang
             version: 21
@@ -105,7 +105,7 @@ jobs:
             network: udp
             native_multi_image: 1
             FFLAGS: -fcoarray
-            container: snowstep/llvm:noble
+            container: snowstep/llvm:ubuntu-24.04-latest
 
     container:
       image: ${{ matrix.container }}
@@ -136,9 +136,6 @@ jobs:
         echo "FC=flang-new" >> "$GITHUB_ENV" 
         echo "CC=clang" >> "$GITHUB_ENV"
         echo "CXX=clang++" >> "$GITHUB_ENV"
-        if [[ "${{ matrix.container }}" =~ "snowstep/llvm" ]] ; then \
-          echo "LD_LIBRARY_PATH=/usr/lib/llvm-22/lib:$LD_LIBRARY_PATH" >> "$GITHUB_ENV" ; \
-        fi
 
     - name: Set Caffeine variables
       run: |
