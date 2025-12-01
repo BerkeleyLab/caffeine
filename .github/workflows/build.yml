@@ -13,13 +13,11 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ macos-13, macos-14, macos-15, macos-15-intel, macos-26, ubuntu-24.04 ]
+        os: [ macos-14, macos-15, macos-15-intel, macos-26, ubuntu-24.04 ]
         compiler: [ gfortran ]
         version: [ 13, 14, 15 ]
         network: [ smp ]
         exclude:
-          - os: macos-13 # macos-13 brew is currently Gfortran 15.1.0 which Veggies does not support
-            version: 15
           - os: macos-15 # gcc-13 broken on macos-15
             version: 13
         include:
