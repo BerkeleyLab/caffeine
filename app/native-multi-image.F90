@@ -50,6 +50,16 @@ program native_multi_image
 
   write(*,'(A,I1,A,I1,A)') "Hello, world! From image ", me, " of ", ni, " images"
 
+# if SET_EXCEPTIONS
+    block 
+       ! deliberately trigger IEEE arithmetic exceptions: INEXACT and UNDERFLOW
+       real :: r
+       r = 1e-30
+       r = r + r * r
+      write (*,*) r
+    end block
+# endif
+
 # if HAVE_SYNC_ALL
     call status("Testing SYNC ALL...")
     call sync_all
