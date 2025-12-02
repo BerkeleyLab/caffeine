@@ -250,7 +250,9 @@ jobs:
     - name: Run native multi-image test
       if: ${{ matrix.native_multi_image }}
       run: |
-        set -x ; ./build/run-fpm.sh run --verbose
+        set -x ; ./build/run-fpm.sh run --verbose 2>&1 | tee output ; \
+          test ${PIPESTATUS[0]} = 0 && \
+               ! grep -q "IEEE arithmetic exceptions signaled" output
 
     - name: Run unit tests
       run: |
