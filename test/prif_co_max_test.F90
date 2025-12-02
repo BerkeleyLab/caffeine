@@ -41,7 +41,7 @@ contains
         ,test_description_t("computing element-wise maxima for a 1D integer(c_int16_t) array", usher(check_16_bit_integer)) &
         ,test_description_t("computing element-wise maxima for a 1D integer(c_int64_t array", usher(check_64_bit_integer)) &
         ,test_description_t("computing element-wise maxima for a 2D real(c_float) array", usher(check_32_bit_real)) &
-        ,test_description_t("computing element-wise maxima for a 1D real(c_double array", usher(check_64_bit_real)) &
+        ,test_description_t("computing element-wise maxima for a 1D real(c_double) array", usher(check_64_bit_real)) &
         ,test_description_t("computing element-wise maxima for character scalars", usher(check_character)) &
       ])
     end function
