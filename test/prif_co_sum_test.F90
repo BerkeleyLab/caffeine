@@ -61,7 +61,7 @@ contains
       call prif_co_sum(my_val)
 
       expected = sum(reshape([(values(:, mod(i-1,size(values,2))+1), i = 1, ni)], [size(values,1),ni]), dim=2)
-      diag = .all. (int(my_val) .equalsExpected. int(expected))
+      diag = .all. (my_val .equalsExpected. expected)
   end function
 
   function check_8_bit_integer() result(diag)
