@@ -1,197 +1,226 @@
-module caf_co_sum_test
+module prif_co_sum_test_m
     use iso_c_binding, only: c_int8_t, c_int16_t, c_int32_t, c_int64_t, c_float, c_double
     use prif, only : prif_co_sum, prif_num_images, prif_this_image_no_coarray
-    use veggies, only: result_t, test_item_t, assert_equals, describe, it, succeed
+    use julienne_m, only: &
+       operator(.all.) &
+      ,operator(.also.) &
+      ,operator(.approximates.) &
+      ,operator(.equalsExpected.) &
+      ,operator(.within.) &
+      ,usher &
+      ,test_description_t &
+      ,test_diagnosis_t &
+      ,test_result_t &
+      ,test_t
 
     implicit none
     private
-    public :: test_prif_co_sum
+    public :: prif_co_sum_test_t
+
+    type, extends(test_t) :: prif_co_sum_test_t
+    contains
+      procedure, nopass, non_overridable :: subject
+      procedure, nopass, non_overridable :: results
+    end type
 
 contains
-    function test_prif_co_sum() result(tests)
-        type(test_item_t) tests
 
-        tests = describe( &
-          "The prif_co_sum subroutine computes the sum across images for corresponding elements for", &
-          [ it("a 1D default integer array", check_default_integer) &
-          , it("a 1D 8-bit integer array", check_8_bit_integer) &
-          , it("a 1D 16-bit integer array", check_16_bit_integer) &
-          , it("32-bit integer scalars", check_32_bit_integer) &
-          , it("a 1D 64-bit integer array", check_64_bit_integer) &
-          , it("a 2D 32-bit real array", check_32_bit_real) &
-          , it("a 1D 64-bit real array", check_64_bit_real) &
-          , it("a 2D complex array with 32-bit components", check_32_bit_complex) &
-          , it("a 1D complex array with 64-bit components", check_64_bit_complex) &
-          ])
-    end function
+  pure function subject() result(test_subject)
+    character(len=:), allocatable :: test_subject
+    test_subject = "prif_co_sum"
+  end function
 
-    function check_default_integer() result(result_)
-        type(result_t) :: result_
+  function results() result(test_results)
+    type(test_result_t), allocatable :: test_results(:)
+    type(prif_co_sum_test_t) prif_co_sum_test
 
-        integer, parameter :: values(*,*) = reshape([1, -19, 5, 13, 11, 7, 17, 3], [2, 4])
-        integer :: me, ni, i
-        integer, dimension(size(values,1)) :: my_val, expected
+      test_results = prif_co_sum_test%run([ &
+         test_description_t("computing the element-wise sum of a 1D default integer array", usher(check_default_integer)) &
+        ,test_description_t("computing the element-wise sum of a 1D 8-bit integer(c_int8_t) array", usher(check_8_bit_integer)) &
+        ,test_description_t("computing the element-wise sum of a 1D 16-bit integer(c_int16_t) array", usher(check_16_bit_integer)) &
+        ,test_description_t("computing the element-wise sum of integer(c_int32_t) scalars", usher(check_32_bit_integer)) &
+        ,test_description_t("computing the element-wise sum of a 1D 64-bit integer(c_int64_t) array", usher(check_64_bit_integer)) &
+        ,test_description_t("computing the element-wise sum of a 2D 32-bit real(c_float) array", usher(check_32_bit_real)) &
+        ,test_description_t("computing the element-wise sum of a 1D 64-bit real(c_double) array", usher(check_64_bit_real)) &
+        ,test_description_t("computing the element-wise sum of a 2D complex(c_float) array", usher(check_32_bit_complex)) &
+        ,test_description_t("computing the element-wise sum of a 1D complex(c_double) array", usher(check_64_bit_complex)) &
+      ])
+  end function
 
-        call prif_this_image_no_coarray(this_image=me)
-        call prif_num_images(ni)
+  function check_default_integer() result(diag)
+      type(test_diagnosis_t) :: diag
 
-        my_val = values(:, mod(me-1, size(values,2))+1)
-        call prif_co_sum(my_val)
+      integer, parameter :: values(*,*) = reshape([1, -19, 5, 13, 11, 7, 17, 3], [2, 4])
+      integer :: me, ni, i
+      integer, dimension(size(values,1)) :: my_val, expected
 
-        expected = sum(reshape([(values(:, mod(i-1,size(values,2))+1), i = 1, ni)], [size(values,1),ni]), dim=2)
-        result_ = assert_equals(int(expected), int(my_val))
-    end function
+      call prif_this_image_no_coarray(this_image=me)
+      call prif_num_images(ni)
 
-    function check_8_bit_integer() result(result_)
-        type(result_t) :: result_
+      my_val = values(:, mod(me-1, size(values,2))+1)
+      call prif_co_sum(my_val)
 
-        integer(c_int8_t), parameter :: values(*,*) = reshape(int([1, -19, 5, 13, 11, 7, 17, 3],c_int8_t), [2, 4])
-        integer :: me, ni, i
-        integer(c_int8_t), dimension(size(values,1)) :: my_val, expected
+      expected = sum(reshape([(values(:, mod(i-1,size(values,2))+1), i = 1, ni)], [size(values,1),ni]), dim=2)
+      diag = .all. (my_val .equalsExpected. expected)
+  end function
 
-        call prif_this_image_no_coarray(this_image=me)
-        call prif_num_images(ni)
+  function check_8_bit_integer() result(diag)
+      type(test_diagnosis_t) :: diag
 
-        my_val = values(:, mod(me-1, size(values,2))+1)
-        call prif_co_sum(my_val)
+      integer(c_int8_t), parameter :: values(*,*) = reshape(int([1, -19, 5, 13, 11, 7, 17, 3],c_int8_t), [2, 4])
+      integer :: me, ni, i
+      integer(c_int8_t), dimension(size(values,1)) :: my_val, expected
 
-        expected = sum(reshape([(values(:, mod(i-1,size(values,2))+1), i = 1, ni)], [size(values,1),ni]), dim=2)
-        result_ = assert_equals(int(expected), int(my_val))
-    end function
+      call prif_this_image_no_coarray(this_image=me)
+      call prif_num_images(ni)
 
-    function check_16_bit_integer() result(result_)
-        type(result_t) :: result_
+      my_val = values(:, mod(me-1, size(values,2))+1)
+      call prif_co_sum(my_val)
 
-        integer(c_int16_t), parameter :: values(*,*) = reshape(int([1, -19, 5, 13, 11, 7, 17, 3],c_int16_t), [2, 4])
-        integer :: me, ni, i
-        integer(c_int16_t), dimension(size(values,1)) :: my_val, expected
+      expected = sum(reshape([(values(:, mod(i-1,size(values,2))+1), i = 1, ni)], [size(values,1),ni]), dim=2)
+      diag = .all. (int(my_val) .equalsExpected. int(expected))
+  end function
 
-        call prif_this_image_no_coarray(this_image=me)
-        call prif_num_images(ni)
+  function check_16_bit_integer() result(diag)
+      type(test_diagnosis_t) :: diag
 
-        my_val = values(:, mod(me-1, size(values,2))+1)
-        call prif_co_sum(my_val)
+      integer(c_int16_t), parameter :: values(*,*) = reshape(int([1, -19, 5, 13, 11, 7, 17, 3],c_int16_t), [2, 4])
+      integer :: me, ni, i
+      integer(c_int16_t), dimension(size(values,1)) :: my_val, expected
 
-        expected = sum(reshape([(values(:, mod(i-1,size(values,2))+1), i = 1, ni)], [size(values,1),ni]), dim=2)
-        result_ = assert_equals(int(expected), int(my_val))
-    end function
+      call prif_this_image_no_coarray(this_image=me)
+      call prif_num_images(ni)
 
-    function check_32_bit_integer() result(result_)
-        type(result_t) :: result_
+      my_val = values(:, mod(me-1, size(values,2))+1)
+      call prif_co_sum(my_val)
 
-        integer(c_int32_t), parameter :: values(*) = [1, -19, 5, 13, 11, 7, 17, 3]
-        integer :: me, ni, i
-        integer(c_int32_t) :: my_val, expected
+      expected = sum(reshape([(values(:, mod(i-1,size(values,2))+1), i = 1, ni)], [size(values,1),ni]), dim=2)
+      diag = .all. (int(my_val) .equalsExpected. int(expected))
+  end function
 
-        call prif_this_image_no_coarray(this_image=me)
-        call prif_num_images(ni)
+  function check_32_bit_integer() result(diag)
+      type(test_diagnosis_t) :: diag
 
-        my_val = values(mod(me-1, size(values))+1)
-        call prif_co_sum(my_val)
+      integer(c_int32_t), parameter :: values(*) = [1, -19, 5, 13, 11, 7, 17, 3]
+      integer :: me, ni, i
+      integer(c_int32_t) :: my_val, expected
 
-        expected = sum([(values(mod(i-1,size(values))+1), i = 1, ni)])
-        result_ = assert_equals(expected, my_val)
-    end function
+      call prif_this_image_no_coarray(this_image=me)
+      call prif_num_images(ni)
 
-    function check_64_bit_integer() result(result_)
-        type(result_t) :: result_
+      my_val = values(mod(me-1, size(values))+1)
+      call prif_co_sum(my_val)
 
-        integer(c_int64_t), parameter :: values(*,*) = reshape([1, -19, 5, 13, 11, 7, 17, 3], [2, 4])
-        integer :: me, ni, i
-        integer(c_int64_t), dimension(size(values,1)) :: my_val, expected
+      expected = sum([(values(mod(i-1,size(values))+1), i = 1, ni)])
+      diag = int(my_val) .equalsExpected. int(expected)
+  end function
 
-        call prif_this_image_no_coarray(this_image=me)
-        call prif_num_images(ni)
+  function check_64_bit_integer() result(diag)
+      type(test_diagnosis_t) :: diag
 
-        my_val = values(:, mod(me-1, size(values,2))+1)
-        call prif_co_sum(my_val)
+      integer(c_int64_t), parameter :: values(*,*) = reshape([1, -19, 5, 13, 11, 7, 17, 3], [2, 4])
+      integer :: me, ni, i
+      integer(c_int64_t), dimension(size(values,1)) :: my_val, expected
 
-        expected = sum(reshape([(values(:, mod(i-1,size(values,2))+1), i = 1, ni)], [size(values,1),ni]), dim=2)
-        result_ = assert_equals(int(expected), int(my_val))
-    end function
+      call prif_this_image_no_coarray(this_image=me)
+      call prif_num_images(ni)
 
-    function check_32_bit_real() result(result_)
-        type(result_t) :: result_
+      my_val = values(:, mod(me-1, size(values,2))+1)
+      call prif_co_sum(my_val)
 
-        real(c_float), parameter :: values(*,*,*) = reshape([1, 19, 5, 13, 11, 7, 17, 3], [2,2,2])
-        integer :: me, ni, i
-        real(c_float), dimension(size(values,1), size(values,2)) :: my_val, expected
+      expected = sum(reshape([(values(:, mod(i-1,size(values,2))+1), i = 1, ni)], [size(values,1),ni]), dim=2)
+      diag = .all. (my_val .equalsExpected. expected)
+  end function
 
-        call prif_this_image_no_coarray(this_image=me)
-        call prif_num_images(ni)
+  function check_32_bit_real() result(diag)
+      type(test_diagnosis_t) :: diag
 
-        my_val = values(:, :, mod(me-1, size(values,3))+1)
-        call prif_co_sum(my_val)
+      real(c_float), parameter :: values(*,*,*) = reshape([1, 19, 5, 13, 11, 7, 17, 3], [2,2,2])
+      real(c_float), parameter :: tolerance = 0_c_float
+      integer :: me, ni, i
+      real(c_float), dimension(size(values,1), size(values,2)) :: my_val, expected
 
-        expected = sum(reshape([(values(:,:,mod(i-1,size(values,3))+1), i = 1, ni)], [size(values,1), size(values,2), ni]), dim=3)
-        result_ = assert_equals(real(expected,kind=c_double), real(my_val,kind=c_double))
-    end function
+      call prif_this_image_no_coarray(this_image=me)
+      call prif_num_images(ni)
 
-    function check_64_bit_real() result(result_)
-        type(result_t) :: result_
+      my_val = values(:, :, mod(me-1, size(values,3))+1)
+      call prif_co_sum(my_val)
 
-        real(c_double), parameter :: values(*,*) = reshape([1, 19, 5, 13, 11, 7, 17, 3], [2, 4])
-        integer :: me, ni, i
-        real(c_double), dimension(size(values,1)) :: my_val, expected
+      expected = sum(reshape([(values(:,:,mod(i-1,size(values,3))+1), i = 1, ni)], [size(values,1), size(values,2), ni]), dim=3)
+      diag = .all. (my_val .approximates. expected .within. tolerance)
+  end function
 
-        call prif_this_image_no_coarray(this_image=me)
-        call prif_num_images(ni)
+  function check_64_bit_real() result(diag)
+      type(test_diagnosis_t) :: diag
 
-        my_val = values(:, mod(me-1, size(values,2))+1)
-        call prif_co_sum(my_val)
+      real(c_double), parameter :: values(*,*) = reshape([1, 19, 5, 13, 11, 7, 17, 3], [2, 4])
+      real(c_double), parameter :: tolerance = 0_c_double
+      integer :: me, ni, i
+      real(c_double), dimension(size(values,1)) :: my_val, expected
 
-        expected = sum(reshape([(values(:, mod(i-1,size(values,2))+1), i = 1, ni)], [size(values,1),ni]), dim=2)
-        result_ = assert_equals(expected, my_val)
-    end function
+      call prif_this_image_no_coarray(this_image=me)
+      call prif_num_images(ni)
 
-    function check_32_bit_complex() result(result_)
-        type(result_t) :: result_
+      my_val = values(:, mod(me-1, size(values,2))+1)
+      call prif_co_sum(my_val)
 
-        complex(c_float), parameter :: values(*,*,*) = reshape( &
-                [ cmplx(1., 53.), cmplx(3., 47.) &
-                , cmplx(5., 43.), cmplx(7., 41.) &
-                , cmplx(11., 37.), cmplx(13., 31.) &
-                , cmplx(17., 29.), cmplx(19., 23.) &
-                ], &
-                [2,2,2])
-        integer :: me, ni, i
-        complex(c_float), dimension(size(values,1),size(values,2)) :: my_val, expected
+      expected = sum(reshape([(values(:, mod(i-1,size(values,2))+1), i = 1, ni)], [size(values,1),ni]), dim=2)
+      diag = .all. (my_val .approximates. expected .within. tolerance)
+  end function
 
-        call prif_this_image_no_coarray(this_image=me)
-        call prif_num_images(ni)
+  function check_32_bit_complex() result(diag)
+      type(test_diagnosis_t) :: diag
 
-        my_val = values(:, :, mod(me-1, size(values,3))+1)
-        call prif_co_sum(my_val)
+      complex(c_float), parameter :: values(*,*,*) = reshape( &
+              [ cmplx(1., 53.), cmplx(3., 47.) &
+              , cmplx(5., 43.), cmplx(7., 41.) &
+              , cmplx(11., 37.), cmplx(13., 31.) &
+              , cmplx(17., 29.), cmplx(19., 23.) &
+              ], &
+              [2,2,2])
+      real(c_float), parameter :: tolerance = 0_c_float
+      integer :: me, ni, i
+      complex(c_float), dimension(size(values,1),size(values,2)) :: my_val, expected
 
-        expected = sum(reshape([(values(:,:,mod(i-1,size(values,3))+1), i = 1, ni)], [size(values,1), size(values,2), ni]), dim=3)
-        result_ = &
-                assert_equals(real(expected, kind=c_double), real(my_val, kind=c_double)) &
-                .and.assert_equals(real(aimag(expected), kind=c_double), real(aimag(my_val), kind=c_double))
-    end function
+      call prif_this_image_no_coarray(this_image=me)
+      call prif_num_images(ni)
 
-    function check_64_bit_complex() result(result_)
-        type(result_t) :: result_
+      my_val = values(:, :, mod(me-1, size(values,3))+1)
+      call prif_co_sum(my_val)
 
-        complex(c_double), parameter :: values(*,*) = reshape( &
-                [ cmplx(1., 53.), cmplx(3., 47.) &
-                , cmplx(5., 43.), cmplx(7., 41.) &
-                , cmplx(11., 37.), cmplx(13., 31.) &
-                , cmplx(17., 29.), cmplx(19., 23.) &
-                ], &
-                [2,4])
-        integer :: me, ni, i
-        complex(c_double), dimension(size(values,1)) :: my_val, expected
+      expected = sum(reshape([(values(:,:,mod(i-1,size(values,3))+1), i = 1, ni)], [size(values,1), size(values,2), ni]), dim=3)
 
-        call prif_this_image_no_coarray(this_image=me)
-        call prif_num_images(ni)
+      diag = &
+        .all. (real(my_val) .approximates. real(expected) .within. tolerance) &
+        .also. (.all. (aimag(my_val) .approximates. aimag(expected) .within. tolerance))
+  end function
 
-        my_val = values(:, mod(me-1, size(values,2))+1)
-        call prif_co_sum(my_val)
+  function check_64_bit_complex() result(diag)
+      type(test_diagnosis_t) :: diag
 
-        expected = sum(reshape([(values(:,mod(i-1,size(values,2))+1), i = 1, ni)], [size(values,1), ni]), dim=2)
-        result_ = &
-                assert_equals(real(expected), real(my_val)) &
-                .and.assert_equals(aimag(expected), aimag(my_val))
-    end function
+      complex(c_double), parameter :: values(*,*) = reshape( &
+              [ cmplx(1., 53.), cmplx(3., 47.) &
+              , cmplx(5., 43.), cmplx(7., 41.) &
+              , cmplx(11., 37.), cmplx(13., 31.) &
+              , cmplx(17., 29.), cmplx(19., 23.) &
+              ], &
+              [2,4])
+      real(c_double), parameter :: tolerance = 0_c_double
+      integer me, ni, i
+      complex(c_double), dimension(size(values,1)) :: my_val, expected
 
-end module caf_co_sum_test
+      call prif_this_image_no_coarray(this_image=me)
+      call prif_num_images(ni)
+
+      my_val = values(:, mod(me-1, size(values,2))+1)
+      call prif_co_sum(my_val)
+
+      expected = sum(reshape([(values(:,mod(i-1,size(values,2))+1), i = 1, ni)], [size(values,1), ni]), dim=2)
+
+      ! TODO: simplify once Julienne issue #137 is implemented
+      diag = &
+        .all. (real(my_val, c_double) .approximates. real(expected, c_double) .within. tolerance) &
+        .also. (.all. (real(aimag(my_val), c_double) .approximates. real(aimag(expected), c_double) .within. tolerance))
+  end function
+
+end module prif_co_sum_test_m

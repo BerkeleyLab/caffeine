@@ -1,169 +1,190 @@
-module caf_co_min_test
-    use iso_c_binding, only: c_int8_t, c_int16_t, c_int32_t, c_int64_t, c_float, c_double
-    use prif, only : prif_co_min, prif_co_min_character, prif_this_image_no_coarray, prif_num_images
-    use veggies, only: result_t, test_item_t, assert_equals, describe, it, succeed
+module prif_co_min_test_m
+  use iso_c_binding, only: c_int8_t, c_int16_t, c_int32_t, c_int64_t, c_float, c_double
+  use prif, only : prif_co_min, prif_co_min_character, prif_this_image_no_coarray, prif_num_images
+  use julienne_m, only: &
+    operator(.all.) &
+   ,operator(.approximates.) &
+   ,operator(.within.) &
+   ,operator(.equalsExpected.) &
+   ,usher &
+   ,test_description_t &
+   ,test_diagnosis_t &
+   ,test_result_t &
+   ,test_t
+  implicit none
 
-    implicit none
-    private
-    public :: test_prif_co_min
+  private
+  public :: prif_co_min_test_t
+
+  type, extends(test_t) :: prif_co_min_test_t
+  contains
+    procedure, nopass, non_overridable :: subject
+    procedure, nopass, non_overridable :: results
+  end type
 
 contains
-    function test_prif_co_min() result(tests)
-        type(test_item_t) tests
+  pure function subject() result(test_subject)
+    character(len=:), allocatable :: test_subject
+    test_subject = "prif_co_min"
+  end function
 
-        tests = describe( &
-          "The prif_co_min subroutine computes the minimum value across images for corresponding elements for", &
-          [ it("a 1D default integer array", check_default_integer) &
-          , it("a 1D 8-bit integer array", check_8_bit_integer) &
-          , it("a 1D 16-bit integer array", check_16_bit_integer) &
-          , it("32-bit integer scalars", check_32_bit_integer) &
-          , it("a 1D 64-bit integer array", check_64_bit_integer) &
-          , it("a 2D 32-bit real array", check_32_bit_real) &
-          , it("a 1D 64-bit real array", check_64_bit_real) &
-          , it("a character scalar", check_character) &
-          ])
-    end function
+  function results() result(test_results)
+    type(test_result_t), allocatable :: test_results(:)
+    type(prif_co_min_test_t) prif_co_min_test
 
-    function check_default_integer() result(result_)
-        type(result_t) :: result_
+    test_results = prif_co_min_test%run([ &
+       test_description_t("computing element-wise minima for integer(c_int32_t) scalars", usher(check_32_bit_integer)) &
+      ,test_description_t("computing element-wise minima for a 1D default integer array", usher(check_default_integer)) &
+      ,test_description_t("computing element-wise minima for a 1D integer(c_int8t) array", usher(check_8_bit_integer)) &
+      ,test_description_t("computing element-wise minima for a 1D integer(c_int16_t) array", usher(check_16_bit_integer)) &
+      ,test_description_t("computing element-wise minima for a 1D integer(c_int64_t) array", usher(check_64_bit_integer)) &
+      ,test_description_t("computing element-wise minima for a 2D real(c_float) array", usher(check_32_bit_real)) &
+      ,test_description_t("computing element-wise minima for a 1D real(c_double) array", usher(check_64_bit_real)) &
+      ,test_description_t("computing element-wise minima for a character scalar", usher(check_character)) &
+    ])
+  end function
 
-        integer, parameter :: values(*,*) = reshape([1, -19, 5, 13, 11, 7, 17, 3], [2, 4])
-        integer :: me, ni, i
-        integer, dimension(size(values,1)) :: my_val, expected
+  function check_default_integer() result(diag)
+      type(test_diagnosis_t) :: diag
 
-        call prif_this_image_no_coarray(this_image=me)
-        call prif_num_images(ni)
+      integer, parameter :: values(*,*) = reshape([1, -19, 5, 13, 11, 7, 17, 3], [2, 4])
+      integer, dimension(size(values,1)) :: my_val, expected
+      integer me, ni, i
 
-        my_val = values(:, mod(me-1, size(values,2))+1)
-        call prif_co_min(my_val)
+      call prif_this_image_no_coarray(this_image=me)
+      call prif_num_images(ni)
 
-        expected = minval(reshape([(values(:, mod(i-1,size(values,2))+1), i = 1, ni)], [size(values,1),ni]), dim=2)
-        result_ = assert_equals(int(expected), int(my_val))
-    end function
+      my_val = values(:, mod(me-1, size(values,2))+1)
+      call prif_co_min(my_val)
 
-    function check_8_bit_integer() result(result_)
-        type(result_t) :: result_
+      expected = minval(reshape([(values(:, mod(i-1,size(values,2))+1), i = 1, ni)], [size(values,1),ni]), dim=2)
+      diag = .all. (my_val .equalsExpected. expected)
+  end function
 
-        integer(c_int8_t), parameter :: values(*,*) = reshape(int([1, -19, 5, 13, 11, 7, 17, 3],c_int8_t), [2, 4])
-        integer :: me, ni, i
-        integer(c_int8_t), dimension(size(values,1)) :: my_val, expected
+  function check_8_bit_integer() result(diag)
+      type(test_diagnosis_t) :: diag
 
-        call prif_this_image_no_coarray(this_image=me)
-        call prif_num_images(ni)
+      integer(c_int8_t), parameter :: values(*,*) = reshape(int([1, -19, 5, 13, 11, 7, 17, 3],c_int8_t), [2, 4])
+      integer :: me, ni, i
+      integer(c_int8_t), dimension(size(values,1)) :: my_val, expected
 
-        my_val = values(:, mod(me-1, size(values,2))+1)
-        call prif_co_min(my_val)
+      call prif_this_image_no_coarray(this_image=me)
+      call prif_num_images(ni)
 
-        expected = minval(reshape([(values(:, mod(i-1,size(values,2))+1), i = 1, ni)], [size(values,1),ni]), dim=2)
-        result_ = assert_equals(int(expected), int(my_val))
-    end function
+      my_val = values(:, mod(me-1, size(values,2))+1)
+      call prif_co_min(my_val)
 
-    function check_16_bit_integer() result(result_)
-        type(result_t) :: result_
+      expected = minval(reshape([(values(:, mod(i-1,size(values,2))+1), i = 1, ni)], [size(values,1),ni]), dim=2)
+      diag = .all. (int(my_val) .equalsExpected. int(expected))
+  end function
 
-        integer(c_int16_t), parameter :: values(*,*) = reshape(int([1, -19, 5, 13, 11, 7, 17, 3],c_int16_t), [2, 4])
-        integer :: me, ni, i
-        integer(c_int16_t), dimension(size(values,1)) :: my_val, expected
+  function check_16_bit_integer() result(diag)
+      type(test_diagnosis_t) :: diag
 
-        call prif_this_image_no_coarray(this_image=me)
-        call prif_num_images(ni)
+      integer(c_int16_t), parameter :: values(*,*) = reshape(int([1, -19, 5, 13, 11, 7, 17, 3],c_int16_t), [2, 4])
+      integer :: me, ni, i
+      integer(c_int16_t), dimension(size(values,1)) :: my_val, expected
 
-        my_val = values(:, mod(me-1, size(values,2))+1)
-        call prif_co_min(my_val)
+      call prif_this_image_no_coarray(this_image=me)
+      call prif_num_images(ni)
 
-        expected = minval(reshape([(values(:, mod(i-1,size(values,2))+1), i = 1, ni)], [size(values,1),ni]), dim=2)
-        result_ = assert_equals(int(expected), int(my_val))
-    end function
+      my_val = values(:, mod(me-1, size(values,2))+1)
+      call prif_co_min(my_val)
 
-    function check_32_bit_integer() result(result_)
-        type(result_t) :: result_
+      expected = minval(reshape([(values(:, mod(i-1,size(values,2))+1), i = 1, ni)], [size(values,1),ni]), dim=2)
+      diag = .all. (int(my_val) .equalsExpected. int(expected))
+  end function
 
-        integer(c_int32_t), parameter :: values(*) = [1, -19, 5, 13, 11, 7, 17, 3]
-        integer :: me, ni, i
-        integer(c_int32_t) :: my_val, expected
+  function check_32_bit_integer() result(diag)
+      type(test_diagnosis_t) :: diag
 
-        call prif_this_image_no_coarray(this_image=me)
-        call prif_num_images(ni)
+      integer(c_int32_t), parameter :: values(*) = [1, -19, 5, 13, 11, 7, 17, 3]
+      integer :: me, ni, i
+      integer(c_int32_t) :: my_val, expected
 
-        my_val = values(mod(me-1, size(values))+1)
-        call prif_co_min(my_val)
+      call prif_this_image_no_coarray(this_image=me)
+      call prif_num_images(ni)
 
-        expected = minval([(values(mod(i-1,size(values))+1), i = 1, ni)])
-        result_ = assert_equals(expected, my_val)
-    end function
+      my_val = values(mod(me-1, size(values))+1)
+      call prif_co_min(my_val)
 
-    function check_64_bit_integer() result(result_)
-        type(result_t) :: result_
+      expected = minval([(values(mod(i-1,size(values))+1), i = 1, ni)])
+      diag = int(my_val) .equalsExpected. int(expected)
+  end function
 
-        integer(c_int64_t), parameter :: values(*,*) = reshape([1, -19, 5, 13, 11, 7, 17, 3], [2, 4])
-        integer :: me, ni, i
-        integer(c_int64_t), dimension(size(values,1)) :: my_val, expected
+  function check_64_bit_integer() result(diag)
+      type(test_diagnosis_t) :: diag
 
-        call prif_this_image_no_coarray(this_image=me)
-        call prif_num_images(ni)
+      integer(c_int64_t), parameter :: values(*,*) = reshape([1, -19, 5, 13, 11, 7, 17, 3], [2, 4])
+      integer :: me, ni, i
+      integer(c_int64_t), dimension(size(values,1)) :: my_val, expected
 
-        my_val = values(:, mod(me-1, size(values,2))+1)
-        call prif_co_min(my_val)
+      call prif_this_image_no_coarray(this_image=me)
+      call prif_num_images(ni)
 
-        expected = minval(reshape([(values(:, mod(i-1,size(values,2))+1), i = 1, ni)], [size(values,1),ni]), dim=2)
-        result_ = assert_equals(int(expected), int(my_val))
-    end function
+      my_val = values(:, mod(me-1, size(values,2))+1)
+      call prif_co_min(my_val)
 
-    function check_32_bit_real() result(result_)
-        type(result_t) :: result_
+      expected = minval(reshape([(values(:, mod(i-1,size(values,2))+1), i = 1, ni)], [size(values,1),ni]), dim=2)
+      diag = .all. (my_val .equalsExpected. expected)
+  end function
 
-        real(c_float), parameter :: values(*,*,*) = reshape([1, 19, 5, 13, 11, 7, 17, 3], [2,2,2])
-        integer :: me, ni, i
-        real(c_float), dimension(size(values,1), size(values,2)) :: my_val, expected
+  function check_32_bit_real() result(diag)
+      type(test_diagnosis_t) :: diag
 
-        call prif_this_image_no_coarray(this_image=me)
-        call prif_num_images(ni)
+      real(c_float), parameter :: values(*,*,*) = reshape([1, 19, 5, 13, 11, 7, 17, 3], [2,2,2])
+      real(c_float), parameter :: tolerance = 0_c_double
+      integer :: me, ni, i
+      real(c_float), dimension(size(values,1), size(values,2)) :: my_val, expected
 
-        my_val = values(:, :, mod(me-1, size(values,3))+1)
-        call prif_co_min(my_val)
+      call prif_this_image_no_coarray(this_image=me)
+      call prif_num_images(ni)
 
-        expected = minval(reshape([(values(:,:,mod(i-1,size(values,3))+1), i = 1, ni)], [size(values,1), size(values,2), ni]), dim=3)
-        result_ = assert_equals(real(expected,kind=c_double), real(my_val,kind=c_double))
-    end function
+      my_val = values(:, :, mod(me-1, size(values,3))+1)
+      call prif_co_min(my_val)
 
-    function check_64_bit_real() result(result_)
-        type(result_t) :: result_
+      expected = minval(reshape([(values(:,:,mod(i-1,size(values,3))+1), i = 1, ni)], [size(values,1), size(values,2), ni]), dim=3)
+      diag = .all. (expected .approximates. my_val .within. tolerance)
+  end function
 
-        real(c_double), parameter :: values(*,*) = reshape([1, 19, 5, 13, 11, 7, 17, 3], [2, 4])
-        integer :: me, ni, i
-        real(c_double), dimension(size(values,1)) :: my_val, expected
+  function check_64_bit_real() result(diag)
+      type(test_diagnosis_t) :: diag
 
-        call prif_this_image_no_coarray(this_image=me)
-        call prif_num_images(ni)
+      real(c_double), parameter :: values(*,*) = reshape([1, 19, 5, 13, 11, 7, 17, 3], [2, 4])
+      real(c_double), parameter :: tolerance = 0_c_double
+      integer :: me, ni, i
+      real(c_double), dimension(size(values,1)) :: my_val, expected
 
-        my_val = values(:, mod(me-1, size(values,2))+1)
-        call prif_co_min(my_val)
+      call prif_this_image_no_coarray(this_image=me)
+      call prif_num_images(ni)
 
-        expected = minval(reshape([(values(:, mod(i-1,size(values,2))+1), i = 1, ni)], [size(values,1),ni]), dim=2)
-        result_ = assert_equals(expected, my_val)
-    end function
+      my_val = values(:, mod(me-1, size(values,2))+1)
+      call prif_co_min(my_val)
 
-    function check_character() result(result_)
-        type(result_t) result_
-        character(len=*), parameter :: values(*) = &
-            [ "To be   ","or not  " &
-            , "to      ","be.     " &
-            , "that    ","is      " &
-            , "the     ","question"]
-        integer :: me, ni, i
-        character(len=len(values)) :: my_val, expected
+      expected = minval(reshape([(values(:, mod(i-1,size(values,2))+1), i = 1, ni)], [size(values,1),ni]), dim=2)
+      diag = .all. (my_val .approximates. expected .within. tolerance)
+  end function
 
-        call prif_this_image_no_coarray(this_image=me)
-        call prif_num_images(ni)
+  function check_character() result(diag)
+      type(test_diagnosis_t) :: diag
+      character(len=*), parameter :: values(*) = &
+          [ "To be   ","or not  " &
+          , "to      ","be.     " &
+          , "that    ","is      " &
+          , "the     ","question"]
+      character(len=len(values)) my_val
+      integer me, ni, i
 
-        my_val = values(mod(me-1, size(values))+1)
-        call prif_co_min_character(my_val)
+      call prif_this_image_no_coarray(this_image=me)
+      call prif_num_images(ni)
 
-        ! issue #205: workaround flang optimizer bug with a temp
-        associate(tmp => [(values(mod(i-1,size(values))+1), i = 1, ni)])
-          expected = minval(tmp)
-        end associate
-        result_ = assert_equals(expected, my_val)
-    end function
+      my_val = values(mod(me-1, size(values))+1)
+      call prif_co_min_character(my_val)
 
-end module caf_co_min_test
+      ! issue #205: workaround flang optimizer bug with a temp
+      associate(tmp => [(values(mod(i-1,size(values))+1), i = 1, ni)])
+        diag = .all. (my_val .equalsExpected. minval(tmp))
+      end associate
+  end function
+
+end module prif_co_min_test_m

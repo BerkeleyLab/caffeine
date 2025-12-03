@@ -146,8 +146,11 @@ jobs:
         if test "${{ matrix.network }}" = "udp"; then \
           echo "GASNET_SUPERNODE_MAXSIZE=1" >> "$GITHUB_ENV" ; \
         fi
+        # Turn some knobs for a compiler that natively uses PRIF for multi-image features:
+        # HAVE_MULTI_IMAGE : controls app/native-multi-image and prif_init testing
+        # HAVE_MULTI_IMAGE_SUPPORT : force-enable Julienne's multi-image support
         if (( ${{ matrix.native_multi_image }} )); then \
-          echo "FFLAGS=$FFLAGS -DHAVE_MULTI_IMAGE" >> "$GITHUB_ENV" ; \
+          echo "FFLAGS=$FFLAGS -DHAVE_MULTI_IMAGE -DHAVE_MULTI_IMAGE_SUPPORT" >> "$GITHUB_ENV" ; \
         fi
 
 
