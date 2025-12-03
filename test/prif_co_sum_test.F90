@@ -217,6 +217,7 @@ contains
 
       expected = sum(reshape([(values(:,mod(i-1,size(values,2))+1), i = 1, ni)], [size(values,1), ni]), dim=2)
 
+      ! TODO: simplify once Julienne issue #137 is implemented
       diag = &
         .all. (real(my_val, c_double) .approximates. real(expected, c_double) .within. tolerance) &
         .also. (.all. (real(aimag(my_val), c_double) .approximates. real(aimag(expected), c_double) .within. tolerance))

@@ -49,7 +49,8 @@ contains
       integer(c_int) :: image_status
       
       call prif_image_status(1, image_status=image_status)
-      diag = .expect. (any(image_status == [0, PRIF_STAT_FAILED_IMAGE, PRIF_STAT_STOPPED_IMAGE])) & ! TODO: replace with .any. once Juliennes supports it
+      ! TODO: replace with .any. once Julienne issue #138 is implemented
+      diag = .expect. (any(image_status == [0, PRIF_STAT_FAILED_IMAGE, PRIF_STAT_STOPPED_IMAGE])) &
                         // "permitted image status"
   end function
 
