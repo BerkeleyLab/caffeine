@@ -7,6 +7,7 @@ program test_suite_driver
   use prif_num_images_test_m, only : prif_num_images_test_t
   use prif_this_image_no_coarray_test_m, only : prif_this_image_no_coarray_test_t
   use prif_image_queries_test_m, only : prif_image_queries_test_t
+  use prif_types_test_m, only : prif_types_test_t
   use prif_co_broadcast_test_m, only : prif_co_broadcast_test_t
   use prif_co_sum_test_m, only : prif_co_sum_test_t
   use prif_co_max_test_m, only : prif_co_max_test_t
@@ -31,6 +32,7 @@ program test_suite_driver
     ,test_fixture_t( prif_num_images_test_t() ) &
     ,test_fixture_t( prif_this_image_no_coarray_test_t() ) &
     ,test_fixture_t( prif_image_queries_test_t() ) &
+    ,test_fixture_t( prif_types_test_t() ) &
     ,test_fixture_t( prif_co_broadcast_test_t() ) &
     ,test_fixture_t( prif_co_sum_test_t() ) &
     ,test_fixture_t( prif_co_max_test_t() ) &
