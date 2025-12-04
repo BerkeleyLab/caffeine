@@ -24,7 +24,7 @@ module prif_atomic_test_m
 contains
     pure function subject()
         character(len=:), allocatable :: subject
-        subject = "PRIF atomics"
+        subject = "PRIF Atomics"
     end function
 
     function results() result(test_results)
@@ -32,8 +32,8 @@ contains
         type(prif_atomic_test_t) prif_atomic_test
 
         test_results = prif_atomic_test%run([ &
-              test_description_t("pass uncontended atomic test", usher(check_atomic_uncontended)) &
-            , test_description_t("pass contended hot-spot atomic test", usher(check_atomic_contended)) &
+              test_description_t("an uncontended atomic test", usher(check_atomic_uncontended)) &
+            , test_description_t("a contended hot-spot atomic test", usher(check_atomic_contended)) &
             ])
     end function
 

@@ -30,7 +30,7 @@ contains
 
   pure function subject() result(test_subject)
     character(len=:), allocatable :: test_subject
-    test_subject = "PRIF image query procedures"
+    test_subject = "PRIF Image Queries"
   end function
 
   function results() result(test_results)

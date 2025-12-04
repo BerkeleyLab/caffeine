@@ -29,7 +29,7 @@ module prif_types_test_m
 contains
     pure function subject()
       character(len=:), allocatable :: subject
-      subject = "PRIF types"
+      subject = "PRIF Types"
     end function
 
     function results() result(test_results)

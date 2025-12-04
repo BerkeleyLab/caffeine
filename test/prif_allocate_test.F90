@@ -32,7 +32,7 @@ contains
 
   pure function subject()
     character(len=:), allocatable :: subject
-    subject = "PRIF allocation"
+    subject = "PRIF Allocation"
   end function
 
   function results() result(test_results)

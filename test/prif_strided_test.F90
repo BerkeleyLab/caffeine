@@ -46,10 +46,10 @@ contains
         type(prif_strided_test_t) prif_strided_test
 
         test_results = prif_strided_test%run([ &
-             test_description_t("can put strided data to another image", usher(check_put)) &
-            ,test_description_t("can put strided data with indirect interface", usher(check_put_indirect)) &
-            ,test_description_t("can get strided data from another image", usher(check_get)) &
-            ,test_description_t("can get strided data with indirect interface", usher(check_get_indirect)) &
+             test_description_t("putting strided data to another image", usher(check_put)) &
+            ,test_description_t("putting strided data with indirect interface", usher(check_put_indirect)) &
+            ,test_description_t("getting strided data from another image", usher(check_get)) &
+            ,test_description_t("getting strided data with indirect interface", usher(check_get_indirect)) &
         ])
     end function
 

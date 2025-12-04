@@ -20,7 +20,7 @@ module prif_stop_test_m
 contains
     pure function subject()
       character(len=:), allocatable :: subject
-      subject = "A program that executes the prif_stop function"
+      subject = "prif_stop"
     end function
 
     function results() result(test_results)
@@ -28,10 +28,10 @@ contains
       type(prif_stop_test_t) prif_stop_test
 
       test_results = prif_stop_test%run([ &
-         test_description_t("exits with a zero exitstat when the program omits the stop code", usher(exit_with_no_stop_code)) &
-        ,test_description_t("prints an integer stop code and exits with exitstat equal to the stop code", usher(exit_with_integer_stop_code)) &
-        ,test_description_t("prints a character stop code and exits with a non-zero exitstat", usher(exit_with_character_stop_code)) &
-        ,test_description_t("invokes a registered callback", usher(check_callback_invocation)) &
+         test_description_t("delivering a zero exitstat when the stop code is omitted", usher(exit_with_no_stop_code)) &
+        ,test_description_t("printing an integer stop code and delivering the non-zero exitstat", usher(exit_with_integer_stop_code)) &
+        ,test_description_t("printing a character stop code and delivering a zero exitstat", usher(exit_with_character_stop_code)) &
+        ,test_description_t("invoking a registered callback", usher(check_callback_invocation)) &
       ])
     end function
 

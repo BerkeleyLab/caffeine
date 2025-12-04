@@ -45,10 +45,10 @@ contains
         type(prif_rma_test_t) prif_rma_test
 
         test_results = prif_rma_test%run([ &
-           test_description_t("can send a value to another image", usher(check_put)) &
-          ,test_description_t("can send a value with indirect interface", usher(check_put_indirect)) &
-          ,test_description_t("can get a value from another image", usher(check_get)) &
-          ,test_description_t("can get a value with indirect interface", usher(check_get_indirect)) &
+           test_description_t("sending a value to another image", usher(check_put)) &
+          ,test_description_t("sending a value with indirect interface", usher(check_put_indirect)) &
+          ,test_description_t("getting a value from another image", usher(check_get)) &
+          ,test_description_t("getting a value with indirect interface", usher(check_get_indirect)) &
         ])
     end function
 

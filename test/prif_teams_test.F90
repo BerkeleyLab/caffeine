@@ -22,7 +22,7 @@ module prif_teams_test_m
 contains
     pure function subject()
       character(len=:), allocatable :: subject
-      subject = "Teams"
+      subject = "PRIF Teams"
     end function
 
     function results() result(test_results)
