@@ -3,7 +3,7 @@ module prif_stop_test_m
     use julienne_m, only: passing_test, test_description_t, test_diagnosis_t, test_result_t, test_t, usher &
       ,operator(.equalsExpected.), operator(//)
     use unit_test_parameters_m, only : expected_stop_code, &
-        image_one => subjob_setup, cmd_prefix => subjob_prefix
+        image_one => subjob_setup, cmd_prefix => subjob_prefix, fpm_driver
 
     implicit none
     private
@@ -44,7 +44,7 @@ contains
         command_message = "exit_with_no_stop_code"
 
         call execute_command_line( &
-          command = cmd_prefix//"./build/run-fpm.sh run --example stop_with_no_code > /dev/null 2>&1", &
+          command = cmd_prefix//fpm_driver//" run --example stop_with_no_code > /dev/null 2>&1", &
           wait = .true., &
           exitstat = exit_status, &
           cmdstat = cmd_stat, &
@@ -66,7 +66,7 @@ contains
         command_message = "exit_with_integer_stop_code"
 
         call execute_command_line( &
-          command = cmd_prefix//"./build/run-fpm.sh run --example stop_with_integer_code > /dev/null 2>&1", &
+          command = cmd_prefix//fpm_driver//" run --example stop_with_integer_code > /dev/null 2>&1", &
           wait = .true., &
           exitstat = exit_status, &
           cmdstat = cmd_stat, &
@@ -88,7 +88,7 @@ contains
         command_message = "exit_with_character_stop_code"
 
         call execute_command_line( &
-          command = cmd_prefix//"./build/run-fpm.sh run --example stop_with_character_code > /dev/null 2>&1", &
+          command = cmd_prefix//fpm_driver//" run --example stop_with_character_code > /dev/null 2>&1", &
           wait = .true., &
           exitstat = exit_status, &
           cmdstat = cmd_stat, &
@@ -109,7 +109,7 @@ contains
 
       if (image_one()) then
         call execute_command_line( &
-          command = cmd_prefix//"./build/run-fpm.sh run --example register_stop_callback > /dev/null 2>&1", &
+          command = cmd_prefix//fpm_driver//" run --example register_stop_callback > /dev/null 2>&1", &
           wait = .true., &
           exitstat = exit_status, &
           cmdstat = cmd_stat, &
