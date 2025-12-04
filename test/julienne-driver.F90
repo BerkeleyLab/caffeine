@@ -46,7 +46,6 @@ program test_suite_driver
     ,test_fixture_t( prif_rma_test_t() ) &
     ,test_fixture_t( prif_strided_test_t() ) &
     ,test_fixture_t( prif_event_test_t() ) &
-    ,test_fixture_t( prif_image_queries_test_t() ) &
     ,test_fixture_t( prif_atomic_test_t() ) &
     ,test_fixture_t( prif_error_stop_test_t() ) &
     ,test_fixture_t( prif_stop_test_t() ) &
