@@ -29,24 +29,36 @@ program test_suite_driver
 
   associate(test_harness => test_harness_t([ &
      test_fixture_t( prif_init_test_t() ) &  ! must come first
+
+    ! tests for basic functionality that are mostly self-contained
     ,test_fixture_t( prif_num_images_test_t() ) &
     ,test_fixture_t( prif_this_image_no_coarray_test_t() ) &
     ,test_fixture_t( prif_image_queries_test_t() ) &
     ,test_fixture_t( prif_types_test_t() ) &
+
+    ! collectives tests
     ,test_fixture_t( prif_co_broadcast_test_t() ) &
     ,test_fixture_t( prif_co_sum_test_t() ) &
     ,test_fixture_t( prif_co_max_test_t() ) &
     ,test_fixture_t( prif_co_min_test_t() ) &
     ,test_fixture_t( prif_co_reduce_test_t() ) &
-    ,test_fixture_t( prif_sync_images_test_t() ) &
-    ,test_fixture_t( prif_image_index_test_t() ) &
-    ,test_fixture_t( prif_allocate_test_t() ) &
+
+    ! tests that rely primarily upon coarrays
+    ,test_fixture_t( prif_allocate_test_t() ) & ! should be first coarray test
     ,test_fixture_t( prif_coarray_inquiry_test_t() ) &
-    ,test_fixture_t( prif_teams_test_t() ) &
+    ,test_fixture_t( prif_image_index_test_t() ) &
     ,test_fixture_t( prif_rma_test_t() ) &
     ,test_fixture_t( prif_strided_test_t() ) &
+
+    ! synchronization and data race tests
     ,test_fixture_t( prif_event_test_t() ) &
     ,test_fixture_t( prif_atomic_test_t() ) &
+    ,test_fixture_t( prif_sync_images_test_t() ) & ! internally uses coarrays and events
+
+    ! complicated multi-feature tests
+    ,test_fixture_t( prif_teams_test_t() ) &
+
+    ! exit tests
     ,test_fixture_t( prif_error_stop_test_t() ) &
     ,test_fixture_t( prif_stop_test_t() ) &
   ]))
