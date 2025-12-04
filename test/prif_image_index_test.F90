@@ -1,6 +1,6 @@
 module caf_image_index_test
     use iso_c_binding, only: c_int, c_ptr, c_size_t, c_null_funptr, c_int64_t
-    use prif, only: prif_coarray_handle, prif_allocate_coarray, prif_deallocate_coarray, &
+    use prif, only: prif_coarray_handle, prif_allocate_coarray, &
                     prif_image_index, prif_num_images, &
                     prif_team_type, prif_get_team, &
                     prif_this_image_no_coarray, &
@@ -10,6 +10,13 @@ module caf_image_index_test
                     prif_this_image_with_coarray, prif_this_image_with_dim, &
                     prif_lcobound_no_dim, prif_ucobound_no_dim, &
                     prif_num_images_with_team, PRIF_INITIAL_TEAM
+#if FORCE_PRIF_0_5 || FORCE_PRIF_0_6
+  use prif, only : prif_deallocate_coarray_ => prif_deallocate_coarray
+# define prif_deallocate_coarray(h)    prif_deallocate_coarray_([h])
+# define prif_deallocate_coarrays(arr) prif_deallocate_coarray_(arr)
+#else
+  use prif, only : prif_deallocate_coarray, prif_deallocate_coarrays
+#endif
     use veggies, only: result_t, test_item_t, assert_equals, assert_that, describe, it, succeed
 
     implicit none
@@ -100,7 +107,7 @@ contains
         result_ = result_ .and. &
           check_this_image_coarray(coarray_handle, 1)
 
-        call prif_deallocate_coarray([coarray_handle])
+        call prif_deallocate_coarray(coarray_handle)
     end function
 
     function check_lower_bounds() result(result_)
@@ -127,7 +134,7 @@ contains
         result_ = result_ .and. &
           check_this_image_coarray(coarray_handle, 2)
 
-        call prif_deallocate_coarray([coarray_handle])
+        call prif_deallocate_coarray(coarray_handle)
     end function
 
     function check_invalid_subscripts() result(result_)
@@ -151,7 +158,7 @@ contains
         result_ = result_ .and. &
           check_this_image_coarray(coarray_handle, 2)
 
-        call prif_deallocate_coarray([coarray_handle])
+        call prif_deallocate_coarray(coarray_handle)
     end function
 
     function check_complicated_2d() result(result_)
@@ -181,7 +188,7 @@ contains
         result_ = result_ .and. &
           check_this_image_coarray(coarray_handle, 2)
 
-        call prif_deallocate_coarray([coarray_handle])
+        call prif_deallocate_coarray(coarray_handle)
     end function
 
     function check_complicated_3d() result(result_)
@@ -217,7 +224,7 @@ contains
         result_ = result_ .and. &
           check_this_image_coarray(coarray_handle, 3)
 
-        call prif_deallocate_coarray([coarray_handle])
+        call prif_deallocate_coarray(coarray_handle)
     end function
 
     function check_complicated_2d_team() result(result_)
@@ -385,7 +392,7 @@ contains
             check_this_image_coarray(coarray_handle, 2, child_team)
 
         call prif_end_team()
-        call prif_deallocate_coarray([coarray_handle])
+        call prif_deallocate_coarray(coarray_handle)
     end function
 
 

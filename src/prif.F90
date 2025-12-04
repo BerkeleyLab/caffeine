@@ -28,7 +28,12 @@ module prif
   public :: prif_init
   public :: prif_register_stop_callback, prif_stop_callback_interface
   public :: prif_stop, prif_error_stop, prif_fail_image
-  public :: prif_allocate_coarray, prif_allocate, prif_deallocate_coarray, prif_deallocate
+  public :: prif_allocate_coarray, prif_allocate, prif_deallocate
+#if FORCE_PRIF_0_5 || FORCE_PRIF_0_6
+  public :: prif_deallocate_coarray
+#else
+  public :: prif_deallocate_coarray, prif_deallocate_coarrays
+#endif
   public :: prif_put, prif_put_indirect, prif_get, prif_get_indirect, prif_put_with_notify, prif_put_with_notify_indirect
   public :: prif_put_indirect_with_notify, prif_put_indirect_with_notify_indirect
   public :: prif_get_strided, prif_get_strided_indirect, prif_put_strided, prif_put_strided_indirect
@@ -139,7 +144,7 @@ module prif
 
   type, public :: prif_team_type
     private
-    type(team_data), pointer :: info => null()
+    type(prif_team_descriptor), pointer :: info => null()
   end type
 
   abstract interface
@@ -214,6 +219,7 @@ module prif
       character(len=:), intent(inout), allocatable, optional :: errmsg_alloc
     end subroutine
 
+#if FORCE_PRIF_0_5 || FORCE_PRIF_0_6
     module subroutine prif_deallocate_coarray(coarray_handles, stat, errmsg, errmsg_alloc)
       implicit none
       type(prif_coarray_handle), intent(in) :: coarray_handles(:)
@@ -221,6 +227,22 @@ module prif
       character(len=*), intent(inout), optional :: errmsg
       character(len=:), intent(inout), allocatable, optional :: errmsg_alloc
     end subroutine
+#else
+    module subroutine prif_deallocate_coarray(coarray_handle, stat, errmsg, errmsg_alloc)
+      implicit none
+      type(prif_coarray_handle), intent(in) :: coarray_handle
+      integer(c_int), intent(out), optional :: stat
+      character(len=*), intent(inout), optional :: errmsg
+      character(len=:), intent(inout), allocatable, optional :: errmsg_alloc
+    end subroutine
+    module subroutine prif_deallocate_coarrays(coarray_handles, stat, errmsg, errmsg_alloc)
+      implicit none
+      type(prif_coarray_handle), intent(in) :: coarray_handles(:)
+      integer(c_int), intent(out), optional :: stat
+      character(len=*), intent(inout), optional :: errmsg
+      character(len=:), intent(inout), allocatable, optional :: errmsg_alloc
+    end subroutine
+#endif
 
     module subroutine prif_deallocate(mem, stat, errmsg, errmsg_alloc)
       implicit none
@@ -1155,14 +1177,14 @@ module prif
     type(c_ptr) :: reserved
   end type
 
-  type, private :: team_data
+  type, private :: prif_team_descriptor
     type(c_ptr) :: gex_team
     type(c_ptr) :: heap_mspace
     integer(c_intptr_t) :: heap_start
     integer(c_size_t) :: heap_size
     integer(c_int64_t) :: team_number
     integer(c_int) :: this_image, num_images
-    type(team_data), pointer :: parent_team => null()
+    type(prif_team_descriptor), pointer :: parent_team => null()
     type(prif_coarray_descriptor), pointer :: coarrays => null()
     type(child_team_info), pointer :: child_heap_info => null()
   end type

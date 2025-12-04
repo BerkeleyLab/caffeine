@@ -6,6 +6,13 @@ module prif_coarray_inquiry_test_m
       prif_lcobound_no_dim, prif_lcobound_with_dim, &
       prif_ucobound_no_dim, prif_ucobound_with_dim, &
       prif_coshape
+#if FORCE_PRIF_0_5 || FORCE_PRIF_0_6
+  use prif, only : prif_deallocate_coarray_ => prif_deallocate_coarray
+# define prif_deallocate_coarray(h)    prif_deallocate_coarray_([h])
+# define prif_deallocate_coarrays(arr) prif_deallocate_coarray_(arr)
+#else
+  use prif, only : prif_deallocate_coarray, prif_deallocate_coarrays
+#endif
   use julienne_m, only: &
      operator(//) &
     ,operator(.all.) &
@@ -68,7 +75,7 @@ contains
               allocation_ptr)
       call prif_local_data_pointer(coarray_handle, local_ptr)
       diag = .expect. c_associated(local_ptr, allocation_ptr)
-      call prif_deallocate_coarray([coarray_handle])
+      call prif_deallocate_coarray(coarray_handle)
   end function
 
   impure elemental function check_cobound(corank) result(diag)
@@ -132,7 +139,7 @@ contains
     diag = diag .also. &
       (.all. ((ucobounds - lcobounds + 1) .equalsExpected. sizes)) // "prif_coshape is valid"
 
-    call prif_deallocate_coarray([coarray_handle])
+    call prif_deallocate_coarray(coarray_handle)
   end function
 
   function check_cobounds() result(diag)
