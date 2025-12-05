@@ -36,13 +36,13 @@ contains
       type(test_result_t), allocatable :: test_results(:)
       type(prif_types_test_t) prif_types_test
 
-      test_results = prif_types_test%run([ &
+      allocate(test_results, source = prif_types_test%run([ &
             test_description_t("having a compliant prif_team_type representation", usher(check_team_type)) &
           , test_description_t("having a compliant prif_event_type representation", usher(check_event_type)) &
           , test_description_t("having a compliant prif_lock_type representation", usher(check_lock_type)) &
           , test_description_t("having a compliant prif_notify_type representation", usher(check_notify_type)) &
           , test_description_t("having a compliant prif_critical_type representation", usher(check_critical_type)) &
-        ])
+      ]))
     end function
 
     function check_team_type() result(diag)

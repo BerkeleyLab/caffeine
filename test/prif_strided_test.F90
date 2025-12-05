@@ -45,12 +45,12 @@ contains
         type(test_result_t), allocatable :: test_results(:)
         type(prif_strided_test_t) prif_strided_test
 
-        test_results = prif_strided_test%run([ &
+        allocate(test_results, source = prif_strided_test%run([ &
              test_description_t("putting strided data to another image", usher(check_put)) &
             ,test_description_t("putting strided data with indirect interface", usher(check_put_indirect)) &
             ,test_description_t("getting strided data from another image", usher(check_get)) &
             ,test_description_t("getting strided data with indirect interface", usher(check_get_indirect)) &
-        ])
+        ]))
     end function
 
     function check_put() result(diag)

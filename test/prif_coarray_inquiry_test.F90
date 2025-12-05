@@ -48,10 +48,10 @@ contains
     type(test_result_t), allocatable :: test_results(:)
     type(prif_coarray_inquiry_test_t) prif_coarray_inquiry_test
 
-    test_results = prif_coarray_inquiry_test%run([ &
+    allocate(test_results, source = prif_coarray_inquiry_test%run([ &
        test_description_t("preserving the prif_local_data_pointer for an allocated coarray", usher(check_prif_local_data_pointer)) &
       ,test_description_t("checking passed cobounds", usher(check_cobounds)) &
-    ])
+    ]))
   end function
 
   function check_prif_local_data_pointer() result(diag)

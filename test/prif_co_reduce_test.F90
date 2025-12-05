@@ -52,13 +52,13 @@ contains
     type(test_result_t), allocatable :: test_results(:)
     type(prif_co_reduce_test_t) prif_co_reduce_test
 
-    test_results = prif_co_reduce_test%run([ &
+    allocate(test_results, source = prif_co_reduce_test%run([ &
        test_description_t("performing a logical .and. reduction", usher(check_logical)) &
       ,test_description_t("performing a derived type reduction", usher(check_derived_type_reduction)) &
 #if HAVE_PARAM_DERIVED
       ,test_description_t("performing a parameterized derived type reduction", usher(check_type_parameter_reduction)) &
 #endif
-      ])
+    ]))
   end function
 
   function check_logical() result(diag)

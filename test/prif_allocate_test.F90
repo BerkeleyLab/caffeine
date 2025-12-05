@@ -39,14 +39,14 @@ contains
     type(test_result_t), allocatable :: test_results(:)
     type(prif_allocate_test_t) prif_allocate_test
 
-    test_results = prif_allocate_test%run([ &
+    allocate(test_results, source = prif_allocate_test%run([ &
        test_description_t("allocating, using and deallocating an integer scalar coarray with a corank of 1", &
          usher(check_allocate_integer_scalar_coarray_with_corank1)) &
       ,test_description_t("allocating, using and deallocating an integer array coarray with a corank of 2", &
          usher(check_allocate_integer_array_coarray_with_corank2)) &
       ,test_description_t("allocating, using and deallocating memory non-symmetrically", &
          usher(check_allocate_non_symmetric)) &
-    ])
+    ]))
   end function
 
   function check_allocate_integer_scalar_coarray_with_corank1() result(diag)

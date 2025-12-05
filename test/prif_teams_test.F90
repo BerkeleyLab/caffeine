@@ -29,9 +29,9 @@ contains
         type(test_result_t), allocatable :: test_results(:)
         type(prif_teams_test_t) prif_teams_test
 
-        test_results = prif_teams_test%run([ &
+        allocate(test_results, source = prif_teams_test%run([ &
             test_description_t("creating, changing to, and allocating coarrays", usher(check_teams)) &
-        ])
+        ]))
     end function
 
     function check_teams() result(diag)

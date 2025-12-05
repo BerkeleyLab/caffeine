@@ -31,10 +31,10 @@ contains
         type(test_result_t), allocatable :: test_results(:)
         type(prif_atomic_test_t) prif_atomic_test
 
-        test_results = prif_atomic_test%run([ &
+        allocate(test_results, source = prif_atomic_test%run([ &
               test_description_t("an uncontended atomic test", usher(check_atomic_uncontended)) &
             , test_description_t("a contended hot-spot atomic test", usher(check_atomic_contended)) &
-            ])
+        ]))
     end function
 
     subroutine test_srand(seed)

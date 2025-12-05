@@ -26,11 +26,11 @@ contains
         type(test_result_t), allocatable :: test_results(:)
         type(prif_sync_images_test_t) prif_sync_images_test
 
-        test_results = prif_sync_images_test%run([ &
+        allocate(test_results, source = prif_sync_images_test%run([ &
            test_description_t("synchronizing an image with itself", usher(check_serial)), &
            test_description_t("synchronizing with a neighbor", usher(check_neighbor)), &
            test_description_t("synchronizing every image with one image", usher(check_hot)) &
-        ])
+        ]))
     end function
 
     function check_serial() result(diag)

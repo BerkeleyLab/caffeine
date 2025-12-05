@@ -34,7 +34,7 @@ contains
     type(test_result_t), allocatable :: test_results(:)
     type(prif_co_sum_test_t) prif_co_sum_test
 
-      test_results = prif_co_sum_test%run([ &
+      allocate(test_results, source = prif_co_sum_test%run([ &
          test_description_t("computing the element-wise sum of a 1D default integer array", usher(check_default_integer)) &
         ,test_description_t("computing the element-wise sum of a 1D 8-bit integer(c_int8_t) array", usher(check_8_bit_integer)) &
         ,test_description_t("computing the element-wise sum of a 1D 16-bit integer(c_int16_t) array", usher(check_16_bit_integer)) &
@@ -44,7 +44,7 @@ contains
         ,test_description_t("computing the element-wise sum of a 1D 64-bit real(c_double) array", usher(check_64_bit_real)) &
         ,test_description_t("computing the element-wise sum of a 2D complex(c_float) array", usher(check_32_bit_complex)) &
         ,test_description_t("computing the element-wise sum of a 1D complex(c_double) array", usher(check_64_bit_complex)) &
-      ])
+      ]))
   end function
 
   function check_default_integer() result(diag)

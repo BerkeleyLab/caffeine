@@ -30,9 +30,9 @@ contains
     type(test_result_t), allocatable :: test_results(:)
     type(prif_this_image_no_coarray_test_t) prif_this_image_no_coarray_test
 
-    test_results = prif_this_image_no_coarray_test%run([ &
+    allocate(test_results, source = prif_this_image_no_coarray_test%run([ &
        test_description_t("returning a unique member of {1,...,num_images()} when called without arguments", usher(check_this_image_set)) &
-    ])
+    ]))
   end function
 
   function check_this_image_set() result(diag)
@@ -42,7 +42,7 @@ contains
 
     call prif_this_image_no_coarray(this_image=me)
     call prif_num_images(num_images=ni)
-    image_numbers = [(merge(0, me, me/=i), i = 1, ni)]
+    allocate(image_numbers, source = [(merge(0, me, me/=i), i = 1, ni)])
     call prif_co_sum(image_numbers)
     diag = .all. (image_numbers .equalsExpected. [(i, i = 1, ni)]) // "correct image set"
   end function

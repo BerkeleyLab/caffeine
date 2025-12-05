@@ -51,11 +51,11 @@ contains
         type(test_result_t), allocatable :: test_results(:)
         type(prif_event_test_t) prif_event_test
 
-        test_results = prif_event_test%run([ &
+        allocate(test_results, source = prif_event_test%run([ &
            test_description_t("a serial event test", usher(check_event_serial)) &
           ,test_description_t("a parallel hot-spot event test", usher(check_event_parallel)) &
           ,test_description_t("a parallel hot-spot notify test", usher(check_notify)) &
-        ])
+        ]))
     end function
 
     function test_rand(lo, hi) result(result_)

@@ -37,11 +37,11 @@ contains
     type(test_result_t), allocatable :: test_results(:)
     type(prif_image_queries_test_t) prif_image_queries_test
 
-    test_results = prif_image_queries_test%run([ &
+    allocate(test_results, source = prif_image_queries_test%run([ &
        test_description_t("providing valid prif_image_status()", usher(check_image_status)) &
       ,test_description_t("providing valid prif_stopped_images()", usher(check_stopped_images)) &
       ,test_description_t("providing valid prif_failed_images()", usher(check_failed_images)) &
-    ])
+    ]))
   end function
 
   function check_image_status() result(diag)

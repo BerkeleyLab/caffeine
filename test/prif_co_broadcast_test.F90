@@ -42,10 +42,10 @@ contains
     type(test_result_t), allocatable :: test_results(:)
     type(prif_co_broadcast_test_t) prif_co_broadcast_test
 
-    test_results = prif_co_broadcast_test%run([ &
+    allocate(test_results, source = prif_co_broadcast_test%run([ &
        test_description_t("broadcasting a default integer scalar with no optional arguments present", usher(broadcast_default_integer_scalar)) &
       ,test_description_t("broadcasting a derived type scalar with no allocatable components", usher(broadcast_derived_type)) &
-    ])
+    ]))
   end function
 
   logical pure function equals(lhs, rhs) 

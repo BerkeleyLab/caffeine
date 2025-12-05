@@ -39,14 +39,14 @@ contains
       type(test_result_t), allocatable :: test_results(:)
       type(prif_image_index_test_t) prif_image_index_test
 
-      test_results = prif_image_index_test%run([ &
+      allocate(test_results, source = prif_image_index_test%run([ &
          test_description_t("returning 1 for the simplest case", usher(check_simple_case)) &
         ,test_description_t("returning 1 when given the lower bounds", usher(check_lower_bounds)) &
         ,test_description_t("returning 0 with invalid subscripts", usher(check_invalid_subscripts)) &
         ,test_description_t("returning the expected answer for a more complicated case w/corank=2", usher(check_complicated_2d)) &
         ,test_description_t("returning the expected answer for a more complicated case w/corank=3", usher(check_complicated_3d)) &
         ,test_description_t("returning the expected answer with a child team and corank=2", usher(check_complicated_2d_team)) &
-        ])
+      ]))
     end function
 
     function check_this_image_coarray(coarray_handle, corank, team) result(diag)

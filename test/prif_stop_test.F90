@@ -27,12 +27,12 @@ contains
       type(test_result_t), allocatable :: test_results(:)
       type(prif_stop_test_t) prif_stop_test
 
-      test_results = prif_stop_test%run([ &
+      allocate(test_results, source = prif_stop_test%run([ &
          test_description_t("delivering a zero exitstat when the stop code is omitted", usher(exit_with_no_stop_code)) &
         ,test_description_t("printing an integer stop code and delivering the non-zero exitstat", usher(exit_with_integer_stop_code)) &
         ,test_description_t("printing a character stop code and delivering a zero exitstat", usher(exit_with_character_stop_code)) &
         ,test_description_t("invoking a registered callback", usher(check_callback_invocation)) &
-      ])
+      ]))
     end function
 
     function exit_with_no_stop_code() result(diag)

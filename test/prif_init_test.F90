@@ -23,10 +23,10 @@ contains
     type(test_result_t), allocatable ::  test_results(:)
     type(prif_init_test_t) prif_init_test
 
-    test_results = prif_init_test%run([ &
+    allocate(test_results, source = prif_init_test%run([ &
         test_description_t("completing successfully", usher(check_caffeination)) &
        ,test_description_t("returning PRIF_STAT_ALREADY_INIT on a subsequent call ", usher(check_subsequent_prif_init_call)) &
-    ])
+    ]))
   end function
 
 

@@ -44,12 +44,12 @@ contains
         type(test_result_t), allocatable :: test_results(:)
         type(prif_rma_test_t) prif_rma_test
 
-        test_results = prif_rma_test%run([ &
+        allocate(test_results, source = prif_rma_test%run([ &
            test_description_t("sending a value to another image", usher(check_put)) &
           ,test_description_t("sending a value with indirect interface", usher(check_put_indirect)) &
           ,test_description_t("getting a value from another image", usher(check_get)) &
           ,test_description_t("getting a value with indirect interface", usher(check_get_indirect)) &
-        ])
+        ]))
     end function
 
     function check_put() result(diag)
