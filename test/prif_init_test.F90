@@ -4,7 +4,7 @@ module prif_init_test_m
 
     implicit none
     private
-    public :: prif_init_test_t
+    public :: prif_init_test_t, check_caffeination
 
     type, extends(test_t) :: prif_init_test_t
     contains
@@ -31,16 +31,27 @@ contains
 
 
   function check_caffeination() result(diag)
+    ! this test needs to run very early at startup, so we memoize the result
     type(test_diagnosis_t) :: diag
-#if HAVE_MULTI_IMAGE
-    integer, parameter :: successful_initiation = PRIF_STAT_ALREADY_INIT
-#else
-    integer, parameter :: successful_initiation = 0
-#endif
-    integer init_exit_code
+    type(test_diagnosis_t), save :: memo
+    logical, save :: first_pass = .true.
 
-    call prif_init(init_exit_code)
-    diag = init_exit_code .equalsExpected. successful_initiation
+    if (first_pass) then
+      first_pass = .false.
+      block
+#if HAVE_MULTI_IMAGE
+        integer, parameter :: successful_initiation = PRIF_STAT_ALREADY_INIT
+#else
+        integer, parameter :: successful_initiation = 0
+#endif
+        integer init_exit_code
+
+        call prif_init(init_exit_code)
+        memo = init_exit_code .equalsExpected. successful_initiation
+      end block
+    endif 
+
+    diag = memo
   end function
 
   function check_subsequent_prif_init_call() result(diag)

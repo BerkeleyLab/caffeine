@@ -2,8 +2,8 @@
 ! Terms of use are as specified in LICENSE.txt
 
 program test_suite_driver
-  use julienne_m, only : test_fixture_t, test_harness_t
-  use prif_init_test_m, only : prif_init_test_t
+  use julienne_m, only : test_fixture_t, test_harness_t, test_diagnosis_t
+  use prif_init_test_m, only : prif_init_test_t, check_caffeination
   use prif_num_images_test_m, only : prif_num_images_test_t
   use prif_this_image_no_coarray_test_m, only : prif_this_image_no_coarray_test_t
   use prif_image_queries_test_m, only : prif_image_queries_test_t
@@ -27,10 +27,12 @@ program test_suite_driver
   use prif_stop_test_m, only : prif_stop_test_t  
   implicit none
 
-  associate(test_harness => test_harness_t([ &
-     test_fixture_t( prif_init_test_t() ) &  ! must come first
+  type(test_diagnosis_t) :: dummy
+  dummy = check_caffeination() ! ensure an early call to prif_init
 
+  associate(test_harness => test_harness_t([ &
     ! tests for basic functionality that are mostly self-contained
+     test_fixture_t( prif_init_test_t() ) &
     ,test_fixture_t( prif_num_images_test_t() ) &
     ,test_fixture_t( prif_this_image_no_coarray_test_t() ) &
     ,test_fixture_t( prif_image_queries_test_t() ) &
