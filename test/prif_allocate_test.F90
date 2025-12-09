@@ -163,7 +163,6 @@ contains
 
     call prif_get_context_data(h2, c2)
     diag = diag .also. (cx .equalsExpected. c2) // "expected cx = c2"
-      
 
     call prif_set_context_data(h2, c_null_ptr)
     call prif_get_context_data(h1, c1)
@@ -192,7 +191,6 @@ contains
 
     allocated_memory = c_null_ptr
     local_slice => null()
-
     diag = .expect. (.not.associated(local_slice)) // "expected .not. associated(local_slice)"
 
     data_size = 10*storage_size(dummy_element)/8
@@ -233,13 +231,13 @@ contains
       type(prif_coarray_handle) :: a(lim)
       integer(c_int64_t) :: lco(1), uco(1)
       a(1) = coarray_handle
-      do i=2, lim 
-        lco(1) = i 
+      do i=2, lim
+        lco(1) = i
         uco(1) = i + num_imgs
         call prif_alias_create(a(i-1), lco, uco, data_pointer_offset a(i))
         diag = diag .also. assert_aliased(a(i-1), a(i))
         do j = i+1,lim
-          lco(1) = j 
+          lco(1) = j
           uco(1) = j + num_imgs
           call prif_alias_create(a(i), lco, uco, data_pointer_offset a(j))
           diag = diag .also. assert_aliased(a(i), a(j))
@@ -249,8 +247,8 @@ contains
           ! test PRIF 0.6 data_pointer_offset
           block
             type(prif_coarray_handle) :: b
-            integer(c_size_t) :: off 
-            off = i 
+            integer(c_size_t) :: off
+            off = i
             call prif_alias_create(a(i), lco, uco, off, b)
             diag = diag .also. assert_aliased(a(i), b, off) 
             call prif_alias_destroy(b)
@@ -260,7 +258,7 @@ contains
           call prif_alias_destroy(a(j))
         end do
       end do
-      do i=2, lim 
+      do i=2, lim
         call prif_alias_destroy(a(i))
       end do
     end block
