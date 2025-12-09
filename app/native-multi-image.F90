@@ -107,10 +107,10 @@ program native_multi_image
 
 #if HAVE_TEAM
   call status("Testing TEAMS...")
-  res = get_team(CURRENT_TEAM)
-  res = get_team(INITIAL_TEAM)
-  res = get_team()
-  write(*,'(A,I3)') "Initial team number is ", team_number()
+  res = GET_TEAM(CURRENT_TEAM)
+  res = GET_TEAM(INITIAL_TEAM)
+  res = GET_TEAM()
+  write(*,'(A,I3)') "Initial team number is ", TEAM_NUMBER()
 
   if (ni < 2) then
     if (me == 1) write(*,'(A)') "Please run program again with at least 2 images to test more TEAM features."
