@@ -40,9 +40,14 @@ program native_multi_image
 #endif
 
   USE, INTRINSIC :: ISO_FORTRAN_ENV
-  integer :: me, ni, peer, tmp, team_id
+  integer :: me, ni, peer, tmp
+# if HAVE_TEAM
+  integer :: team_id
+# endif
   character(len=5) :: c
+# if HAVE_TEAM
   type(team_type) :: subteam, res
+# endif
 
   me = THIS_IMAGE()
   ni = NUM_IMAGES()
@@ -105,7 +110,7 @@ program native_multi_image
     call CO_BROADCAST(c,1)
 # endif
 
-#if HAVE_TEAM
+# if HAVE_TEAM
   call status("Testing TEAMS...")
   res = GET_TEAM(CURRENT_TEAM)
   res = GET_TEAM(INITIAL_TEAM)
@@ -126,7 +131,7 @@ program native_multi_image
   call sync_all
   write(*,'(A,I3)') "After END TEAM statement, TEAM_NUMBER() is ", team_number()
 
-#endif
+# endif
 
   call sync_all
   write(*,'(A,I1,A,I1,A)') "Goodbye from image ", me, " of ", ni, " images"
