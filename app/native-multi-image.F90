@@ -112,18 +112,20 @@ program native_multi_image
   res = GET_TEAM()
   write(*,'(A,I3)') "Initial team number is ", TEAM_NUMBER()
 
-  if (ni < 2) then
-    if (me == 1) write(*,'(A)') "Please run program again with at least 2 images to test more TEAM features."
+  if (ni == 1) then
+    team_id = ni
   else
     team_id = merge(1, 2, me <= ni/2)
-    form team(team_id, subteam)
-    sync team(subteam)
-    change team(subteam)
-      write(*,'(A,I3,A,I3,A,I3)') 'Inside CHANGE TEAM construct: ', this_image(), ' of ', num_images(), ' in team number ', team_number()
-    end team
-    call sync_all
-    write(*,'(A,I3)') "After END TEAM statement, TEAM_NUMBER() is ", team_number()
   end if
+
+  form team(team_id, subteam)
+  sync team(subteam)
+  change team(subteam)
+    write(*,'(A,I3,A,I3,A,I3)') 'Inside CHANGE TEAM construct: ', this_image(), ' of ', num_images(), ' in team number ', team_number()
+  end team
+  call sync_all
+  write(*,'(A,I3)') "After END TEAM statement, TEAM_NUMBER() is ", team_number()
+
 #endif
 
   call sync_all
