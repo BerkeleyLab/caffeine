@@ -123,14 +123,13 @@ program native_multi_image
     team_id = merge(1, 2, me <= ni/2)
   end if
 
-  form team(team_id, subteam)
-  sync team(subteam)
-  change team(subteam)
-    write(*,'(A,I3,A,I3,A,I3)') 'Inside CHANGE TEAM construct: ', this_image(), ' of ', num_images(), ' in team number ', team_number()
-  end team
+  FORM TEAM(team_id, subteam)
+  SYNC TEAM(subteam)
+  CHANGE TEAM(subteam)
+    write(*,'(A,I3,A,I3,A,I3)') 'Inside CHANGE TEAM construct: ', THIS_IMAGE(), ' of ', NUM_IMAGES(), ' in team number ', TEAM_NUMBER()
+  END TEAM
   call sync_all
-  write(*,'(A,I3)') "After END TEAM statement, TEAM_NUMBER() is ", team_number()
-
+  write(*,'(A,I3)') "After END TEAM statement, TEAM_NUMBER() is ", TEAM_NUMBER()
 # endif
 
   call sync_all
