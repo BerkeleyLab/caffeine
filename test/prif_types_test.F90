@@ -1,7 +1,9 @@
+#include "test-utils.F90"
+
 module prif_types_test_m
     use iso_fortran_env, only: int8
     use prif, only: prif_team_type, prif_event_type, prif_notify_type, prif_lock_type, prif_critical_type
-    use julienne_m, only: test_description_t, test_diagnosis_t, test_result_t, test_t, passing_test, usher &
+    use julienne_m, only: test_description_t, test_diagnosis_t, test_result_t, test_t, string_t, usher &
        ,operator(.all.), operator(.also.), operator(.expect.), operator(.equalsExpected.), operator(.greaterThan.), operator(.isAtMost.), operator(//)
 
     implicit none
@@ -51,17 +53,15 @@ contains
         type(pointer_wrapper_t) :: pointer_wrap
         type(dummy_t), target :: tgt
 
-        diag = passing_test()
+        diag = .true.
 
         ! size check
-        diag = diag .also. &
-          (storage_size(team) .equalsExpected. storage_size(pointer_wrap))
+        ALSO(storage_size(team) .equalsExpected. storage_size(pointer_wrap))
 
         ! default initialization check
         pointer_wrap%info => tgt
         pointer_wrap = transfer(team, pointer_wrap)
-        diag = diag .also. &
-          (.expect.(.not. associated(pointer_wrap%info)) // "default initialization to null")
+        ALSO2(.expect.(.not. associated(pointer_wrap%info)), "default initialization to null")
     end function
 
     function check_event_type() result(diag)
@@ -70,19 +70,17 @@ contains
         integer :: ssz
         integer(int8), allocatable :: bytes(:)
 
-        diag = passing_test()
+        diag = .true.
 
         ! size check
         ssz = storage_size(event)
-        diag = diag .also. &
-          (ssz .greaterThan. 0) .also. &
-          (ssz .isAtMost. 64*8) 
+        ALSO(ssz .greaterThan. 0)
+        ALSO(ssz .isAtMost. 64*8) 
 
         ! default initialization check
         allocate(bytes(64))
         bytes = transfer(event, bytes)
-        diag = diag .also. &
-          .all.(int(bytes) .equalsExpected. 0) // "default initialization to zero"
+        ALSO2(.all.(int(bytes) .equalsExpected. 0), "default initialization to zero")
     end function
 
     function check_lock_type() result(diag)
@@ -91,19 +89,17 @@ contains
         integer :: ssz
         integer(int8), allocatable :: bytes(:)
 
-        diag = passing_test()
+        diag = .true.
 
         ! size check
         ssz = storage_size(lock)
-        diag = diag .also. &
-          (ssz .greaterThan. 0) .also. &
-          (ssz .isAtMost. 64*8) 
+        ALSO(ssz .greaterThan. 0)
+        ALSO(ssz .isAtMost. 64*8) 
 
         ! default initialization check
         allocate(bytes(64))
         bytes = transfer(lock, bytes)
-        diag = diag .also. &
-          .all.(int(bytes) .equalsExpected. 0) // "default initialization to zero"
+        ALSO2(.all.(int(bytes) .equalsExpected. 0), "default initialization to zero")
     end function
 
     function check_notify_type() result(diag)
@@ -112,19 +108,17 @@ contains
         integer :: ssz
         integer(int8), allocatable :: bytes(:)
 
-        diag = passing_test()
+        diag = .true.
 
         ! size check
         ssz = storage_size(notify)
-        diag = diag .also. &
-          (ssz .greaterThan. 0) .also. &
-          (ssz .isAtMost. 64*8) 
+        ALSO(ssz .greaterThan. 0)
+        ALSO(ssz .isAtMost. 64*8) 
 
         ! default initialization check
         allocate(bytes(64))
         bytes = transfer(notify, bytes)
-        diag = diag .also. &
-          .all.(int(bytes) .equalsExpected. 0) // "default initialization to zero"
+        ALSO2(.all.(int(bytes) .equalsExpected. 0), "default initialization to zero")
     end function
 
     function check_critical_type() result(diag)
@@ -133,19 +127,17 @@ contains
         integer :: ssz
         integer(int8), allocatable :: bytes(:)
 
-        diag = passing_test()
+        diag = .true.
 
         ! size check
         ssz = storage_size(critical)
-        diag = diag .also. &
-          (ssz .greaterThan. 0) .also. &
-          (ssz .isAtMost. 64*8) 
+        ALSO(ssz .greaterThan. 0)
+        ALSO(ssz .isAtMost. 64*8) 
 
         ! default initialization check
         allocate(bytes(64))
         bytes = transfer(critical, bytes)
-        diag = diag .also. &
-          .all.(int(bytes) .equalsExpected. 0) // "default initialization to zero"
+        ALSO2(.all.(int(bytes) .equalsExpected. 0), "default initialization to zero")
     end function
 
 end module prif_types_test_m

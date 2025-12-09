@@ -1,3 +1,5 @@
+#include "test-utils.F90"
+
 module prif_coarray_inquiry_test_m
   use prif, only : &
       prif_allocate_coarray, prif_deallocate_coarray, &
@@ -20,6 +22,7 @@ module prif_coarray_inquiry_test_m
     ,operator(.equalsExpected.) &
     ,operator(.expect.) &
     ,usher &
+    ,string_t &
     ,test_description_t &
     ,test_diagnosis_t &
     ,test_result_t &
@@ -110,34 +113,27 @@ contains
       lcobounds, ucobounds, data_size, c_null_funptr, &
       coarray_handle, allocated_memory)
 
-    diag = diag .also. &
-      .expect. c_associated(allocated_memory)
+    ALSO(.expect. c_associated(allocated_memory))
 
     call prif_size_bytes(coarray_handle, data_size=query_size)
-    diag = diag .also. &
-      (query_size .equalsExpected.  data_size) // "prif_size_bytes is valid"
+    ALSO2(query_size .equalsExpected. data_size, "prif_size_bytes is valid")
 
     call prif_lcobound_no_dim(coarray_handle, tmp_bounds)
-    diag = diag .also. &
-      (.all. (tmp_bounds .equalsExpected. lcobounds)) // "prif_lcobound_no_dim is valid"
+    ALSO2(.all. (tmp_bounds .equalsExpected. lcobounds), "prif_lcobound_no_dim is valid")
 
     call prif_ucobound_no_dim(coarray_handle, tmp_bounds)
-    diag = diag .also. &
-      (.all. (tmp_bounds .equalsExpected. ucobounds)) // "prif_ucobound_no_dim is valid"
+    ALSO2(.all. (tmp_bounds .equalsExpected. ucobounds), "prif_ucobound_no_dim is valid")
 
     do i = 1, corank
       call prif_lcobound_with_dim(coarray_handle, i, tmp_bound)
-      diag = diag .also. &
-        (tmp_bound .equalsExpected. lcobounds(i)) // "prif_lcobound_with_dim is valid"
+      ALSO2(tmp_bound .equalsExpected. lcobounds(i), "prif_lcobound_with_dim is valid")
 
       call prif_ucobound_with_dim(coarray_handle, i, tmp_bound)
-      diag = diag .also. &
-        (tmp_bound .equalsExpected. ucobounds(i)) // "prif_ucobound_with_dim is valid"
+      ALSO2(tmp_bound .equalsExpected. ucobounds(i), "prif_ucobound_with_dim is valid")
     end do
 
     call prif_coshape(coarray_handle, sizes)
-    diag = diag .also. &
-      (.all. ((ucobounds - lcobounds + 1) .equalsExpected. sizes)) // "prif_coshape is valid"
+    ALSO2(.all. ((ucobounds - lcobounds + 1) .equalsExpected. sizes), "prif_coshape is valid")
 
     call prif_deallocate_coarray(coarray_handle)
   end function

@@ -1,3 +1,4 @@
+#include "test-utils.F90"
 #include "assert_macros.h"
 
 ! TEST_ASSERT activates immediate assertions in test code
@@ -28,7 +29,7 @@ module prif_event_test_m
 #else
   use prif, only : prif_deallocate_coarray, prif_deallocate_coarrays
 #endif
-    use julienne_m, only: test_description_t, test_diagnosis_t, test_result_t, test_t, usher, passing_test &
+    use julienne_m, only: test_description_t, test_diagnosis_t, test_result_t, test_t, string_t, usher &
       ,operator(.all.), operator(.also.), operator(.equalsExpected.), operator(//)
 
     implicit none
@@ -77,7 +78,7 @@ contains
         type(prif_event_type), pointer :: local_event
         integer(c_intptr_t) :: base_addr
 
-        diag = passing_test()
+        diag = .true.
         call RANDOM_INIT(REPEATABLE=.true., IMAGE_DISTINCT=.true.)
 
         sizeof_event = int(storage_size(dummy_event)/8, c_size_t)
@@ -105,7 +106,7 @@ contains
           expect = 0
           do i=1, lim
             call prif_event_query(c_loc(local_event), count)
-            diag = diag .also. (int(count) .equalsExpected. expect) // "event count at top of loop"
+            ALSO2(int(count) .equalsExpected. expect, "event count at top of loop")
             call_assert(expect == int(count))
 
             do j=1,i
@@ -113,14 +114,14 @@ contains
               expect = expect + 1
 
               call prif_event_query(c_loc(local_event), count)
-              diag = diag .also. (int(count) .equalsExpected. expect) // "after event_post"
+              ALSO2(int(count) .equalsExpected. expect, "after event_post")
               call_assert(expect == int(count))
 
               call prif_event_post_indirect(me, base_addr)
               expect = expect + 1
 
               call prif_event_query(c_loc(local_event), count)
-              diag = diag .also. (int(count) .equalsExpected. expect) // "event count after event_post_indirect"
+              ALSO2(int(count) .equalsExpected. expect, "event count after event_post_indirect")
               call_assert(expect == int(count))
 
               if (expect >= 1) then
@@ -145,7 +146,7 @@ contains
                 expect = expect - c
 
                 call prif_event_query(c_loc(local_event), count)
-                diag = diag .also. (int(count) .equalsExpected. expect) // context
+                ALSO2(int(count) .equalsExpected. expect, context)
                 call_assert_describe(expect == int(count), context)
               end if
             end do
@@ -168,7 +169,7 @@ contains
         type(prif_event_type), pointer :: local_evt
         integer, pointer :: local_ctr(:)
 
-        diag = passing_test()
+        diag = .true.
         sizeof_event = int(storage_size(dummy_event)/8, c_size_t)
         sizeof_int = c_sizeof(me)
         call prif_num_images(num_images=num_imgs)
@@ -223,7 +224,7 @@ contains
               call prif_event_wait(c_loc(local_evt), int(num_imgs,c_int64_t))
 
               ! validate ctr(:)[1] == i
-              diag = diag .also. (.all. (local_ctr(1:num_imgs) .equalsExpected. i)) // "gather result"
+              ALSO2(.all. (local_ctr(1:num_imgs) .equalsExpected. i), "gather result")
 
               ! image 1 writes back a coarray value to each image, then posts an event
               do j=1,num_imgs
@@ -245,7 +246,7 @@ contains
             call prif_event_wait(c_loc(local_evt))
 
             ! validate ctr(1)[me] == i
-            diag = diag .also. (local_ctr(1) .equalsExpected. i) // "scatter result"
+            ALSO2(local_ctr(1) .equalsExpected. i, "scatter result")
 
           end do
         end block
@@ -265,7 +266,7 @@ contains
         type(prif_notify_type), pointer :: local_evt
         integer, pointer :: local_ctr(:)
 
-        diag = passing_test()
+        diag = .true.
         sizeof_notify = int(storage_size(dummy_notify)/8, c_size_t)
         sizeof_int = c_sizeof(me)
         call prif_num_images(num_images=num_imgs)
@@ -319,7 +320,7 @@ contains
               call prif_notify_wait(c_loc(local_evt), int(num_imgs,c_int64_t))
 
               ! validate ctr(:)[1] == i
-              diag = diag .also. (.all. (local_ctr(1:num_imgs) .equalsExpected. i)) // "gather result"
+              ALSO2(.all. (local_ctr(1:num_imgs) .equalsExpected. i), "gather result")
 
               ! image 1 writes back a coarray value to each image with notify
               do j=1,num_imgs
@@ -343,7 +344,7 @@ contains
             call prif_notify_wait(c_loc(local_evt))
 
             ! validate ctr(1)[me] == i
-            diag = diag .also. (local_ctr(1) .equalsExpected. i) // "scatter result"
+            ALSO2(local_ctr(1) .equalsExpected. i, "scatter result")
 
           end do
         end block

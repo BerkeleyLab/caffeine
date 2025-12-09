@@ -1,7 +1,7 @@
 module prif_error_stop_test_m
     use unit_test_parameters_m, only : expected_error_stop_code, &
         image_one => subjob_setup, cmd_prefix => subjob_prefix, fpm_driver
-    use julienne_m, only: passing_test, test_description_t, test_diagnosis_t, test_result_t, test_t, usher &
+    use julienne_m, only: test_description_t, test_diagnosis_t, test_result_t, test_t, usher &
       ,operator(.expect.), operator(.equalsExpected.), operator(//)
 
     implicit none
@@ -52,7 +52,7 @@ contains
         )   
         diag = .expect. (exit_status /= 0) // command_message
       else
-        diag = passing_test()
+        diag = .true.
       end if
 
     end function
@@ -75,7 +75,7 @@ contains
         )
         diag = (exit_status .equalsExpected. expected_error_stop_code) // command_message
       else
-        diag = passing_test()
+        diag = .true.
       end if
 
     end function
@@ -98,7 +98,7 @@ contains
         )   
         diag = .expect. (exit_status /= 0) // command_message
       else
-        diag = passing_test()
+        diag = .true.
       end if
 
     end function

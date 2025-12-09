@@ -1,6 +1,6 @@
 module prif_stop_test_m
     use prif, only: prif_this_image_no_coarray, prif_sync_all
-    use julienne_m, only: passing_test, test_description_t, test_diagnosis_t, test_result_t, test_t, usher &
+    use julienne_m, only: test_description_t, test_diagnosis_t, test_result_t, test_t, usher &
       ,operator(.equalsExpected.), operator(//)
     use unit_test_parameters_m, only : expected_stop_code, &
         image_one => subjob_setup, cmd_prefix => subjob_prefix, fpm_driver
@@ -52,7 +52,7 @@ contains
         )
         diag = (exit_status .equalsExpected. 0) // command_message
       else
-        diag = passing_test()
+        diag = .true.
       end if
 
     end function
@@ -74,7 +74,7 @@ contains
         )
         diag = (exit_status .equalsExpected. expected_stop_code) // command_message
       else
-        diag = passing_test()
+        diag = .true.
       end if
 
     end function
@@ -97,7 +97,7 @@ contains
         ! the standard recommends zero exit status for character stop codes
         diag = (exit_status .equalsExpected. 0) // command_message
       else
-        diag = passing_test()
+        diag = .true.
       end if
 
     end function
@@ -117,7 +117,7 @@ contains
         )
         diag = (exit_status .equalsExpected. 0) // command_message
       else
-        diag = passing_test()
+        diag = .true.
       end if
     end function
 

@@ -1,3 +1,5 @@
+#include "test-utils.F90"
+
 module prif_allocate_test_m
   use prif, only : &
       prif_allocate_coarray, &
@@ -12,7 +14,7 @@ module prif_allocate_test_m
 #else
   use prif, only : prif_deallocate_coarray, prif_deallocate_coarrays
 #endif
-  use julienne_m, only: test_description_t, test_diagnosis_t, test_result_t, test_t, passing_test, usher &
+  use julienne_m, only: test_description_t, test_diagnosis_t, test_result_t, test_t, string_t, usher &
     ,operator(.all.), operator(.also.), operator(.equalsExpected.), operator(.expect.), operator(//)
   use iso_c_binding, only: &
       c_ptr, c_int, c_int64_t, c_size_t, c_null_funptr, &
@@ -62,13 +64,15 @@ contains
     integer, pointer :: local_slice
     integer(c_size_t) :: data_size, query_size
 
+    diag = .true.
+
     call prif_num_images(num_images=num_imgs)
     lcobounds(1) = 1
     ucobounds(1) = num_imgs
 
     allocated_memory = c_null_ptr
     local_slice => null()
-    diag = (.expect. (.not. associated(local_slice))) // ".expect. (.not.associated(local_slice))"
+    ALSO(.expect. (.not. associated(local_slice)))
 
     data_size = storage_size(dummy_element)/8
     call prif_allocate_coarray( &
@@ -76,13 +80,13 @@ contains
       coarray_handle, allocated_memory)
 
     call c_f_pointer(allocated_memory, local_slice)
-    diag = diag .also. (.expect. associated(local_slice)) // ".expect. associated(local_slice)"
+    ALSO(.expect. associated(local_slice))
 
     local_slice = 42
-    diag = diag .also. (local_slice .equalsExpected. 42)
+    ALSO(local_slice .equalsExpected. 42)
 
     call prif_size_bytes(coarray_handle, data_size=query_size)
-    diag = diag .also. (query_size .equalsExpected. data_size) // "invalid prif_size_bytes"
+    ALSO2(query_size .equalsExpected. data_size, "invalid prif_size_bytes")
 
     block ! Check prif_{set,get}_context_data
       integer, target :: dummy(10), i
@@ -92,7 +96,7 @@ contains
         actual = c_null_ptr
         call prif_set_context_data(coarray_handle, expect)
         call prif_get_context_data(coarray_handle, actual)
-        diag = diag .also. (actual .equalsExpected. expect ) // "prif_{set,get}_context_data are not working"
+        ALSO2(actual .equalsExpected. expect, "prif_{set,get}_context_data are not working")
       end do
     end block
 
@@ -138,6 +142,8 @@ contains
     integer, save, target :: dummy(10)
     integer, save :: di = 1
 
+    diag = .true.
+
     if (present(offset)) then
       offset_ = offset
     else
@@ -146,27 +152,27 @@ contains
 
     call prif_local_data_pointer(h1, p1)
     call prif_local_data_pointer(h2, p2)
-    diag = (p2 .equalsExpected. c_ptr_add(p1, offset_)) // "expected p2 == (c_ptr_add(p1, offset_)"
+    ALSO(p2 .equalsExpected. c_ptr_add(p1, offset_))
 
     ! As of PRIF 0.6. prif_size_bytes is unspecified for aliases, 
     ! so this particular check is specific to the current Caffeine implementation
     call prif_size_bytes(h1, s1)
     call prif_size_bytes(h2, s2)
-    diag = diag .also. (int(s2) .equalsExpected. int(s1)) // "expected int(s2) == int(s1))"
+    ALSO(int(s2) .equalsExpected. int(s1))
       
     cx = c_loc(dummy(di))
     di = mod(di,size(dummy)) + 1
 
     call prif_set_context_data(h1, cx)
     call prif_get_context_data(h1, c1)
-    diag = diag .also. (cx .equalsExpected. c1) // "expected cx == c1"
+    ALSO(cx .equalsExpected. c1)
 
     call prif_get_context_data(h2, c2)
-    diag = diag .also. (cx .equalsExpected. c2) // "expected cx = c2"
-
+    ALSO(cx .equalsExpected. c2)
+      
     call prif_set_context_data(h2, c_null_ptr)
     call prif_get_context_data(h1, c1)
-    diag = diag .also. (.expect. (.not. c_associated(c1))) // "expected .not. c_associated(c1)"
+    ALSO(.expect. (.not. c_associated(c1)))
 
   end function
 
@@ -183,15 +189,17 @@ contains
     integer, pointer :: local_slice(:)
     integer(c_size_t) :: data_size, query_size
 
+    diag = .true.
+
     call prif_num_images(num_images=num_imgs)
-    lcobounds(1) = 1 
-    ucobounds(1) = 4 
-    lcobounds(2) = 1 
+    lcobounds(1) = 1
+    ucobounds(1) = 4
+    lcobounds(2) = 1
     ucobounds(2) = num_imgs
 
     allocated_memory = c_null_ptr
     local_slice => null()
-    diag = .expect. (.not.associated(local_slice)) // "expected .not. associated(local_slice)"
+    ALSO(.expect. (.not.associated(local_slice)))
 
     data_size = 10*storage_size(dummy_element)/8
     call prif_allocate_coarray( &
@@ -199,13 +207,13 @@ contains
       coarray_handle, allocated_memory)
 
     call prif_size_bytes(coarray_handle, data_size=query_size)
-    diag = diag .also. (query_size .equalsExpected. data_size) // "invalid prif_size_bytes"
+    ALSO2(query_size .equalsExpected. data_size, "invalid prif_size_bytes")
 
     call c_f_pointer(allocated_memory, local_slice, [10])
-    diag = diag .also. (.expect. associated(local_slice)) // "expected associated(local_slice)"
+    ALSO(.expect. associated(local_slice))
 
     local_slice = [(i*i, i = 1, 10)]
-    diag = diag .also. (.all. (local_slice .equalsExpected. [(i*i, i = 1, 10)])) // "local_slice(i) /= i*i"
+    ALSO(.all. (local_slice .equalsExpected. [(i*i, i = 1, 10)]))
 
 
     block ! Check prif_{set,get}_context_data
@@ -216,7 +224,7 @@ contains
         actual = c_null_ptr
         call prif_set_context_data(coarray_handle, expect)
         call prif_get_context_data(coarray_handle, actual)
-        diag = diag .also. (actual .equalsExpected. expect) // "prif_{set,get}_context_data not working"
+        ALSO2(actual .equalsExpected. expect, "prif_{set,get}_context_data not working")
       end do
     end block
 
@@ -235,13 +243,13 @@ contains
         lco(1) = i
         uco(1) = i + num_imgs
         call prif_alias_create(a(i-1), lco, uco, data_pointer_offset a(i))
-        diag = diag .also. assert_aliased(a(i-1), a(i))
+        ALSO(assert_aliased(a(i-1), a(i)))
         do j = i+1,lim
           lco(1) = j
           uco(1) = j + num_imgs
           call prif_alias_create(a(i), lco, uco, data_pointer_offset a(j))
-          diag = diag .also. assert_aliased(a(i), a(j))
-          diag = diag .also. assert_aliased(a(j), coarray_handle) 
+          ALSO(assert_aliased(a(i), a(j)))
+          ALSO(assert_aliased(a(j), coarray_handle))
         end do
 #       if !FORCE_PRIF_0_5
           ! test PRIF 0.6 data_pointer_offset
@@ -250,7 +258,7 @@ contains
             integer(c_size_t) :: off
             off = i
             call prif_alias_create(a(i), lco, uco, off, b)
-            diag = diag .also. assert_aliased(a(i), b, off) 
+            ALSO(assert_aliased(a(i), b, off))
             call prif_alias_destroy(b)
           end block
 #       endif

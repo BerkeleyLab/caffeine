@@ -1,9 +1,10 @@
 #include "julienne-assert-macros.h"
+#include "test-utils.F90"
 
 module prif_atomic_test_m
     use iso_c_binding, only: &
             c_ptr, c_int64_t, c_intptr_t, c_size_t, c_null_funptr, c_f_pointer, c_loc, c_sizeof
-    use julienne_m, only: call_julienne_assert_, passing_test, test_description_t, test_diagnosis_t, test_result_t, test_t, usher &
+    use julienne_m, only: call_julienne_assert_, test_description_t, test_diagnosis_t, test_result_t, test_t, string_t, usher &
       ,operator(.also.), operator(.equalsExpected.), operator(.isAtLeast.), operator(.isAtMost.), operator(.lessThan.), operator(//)
     use prif
 #if FORCE_PRIF_0_5 || FORCE_PRIF_0_6
@@ -56,15 +57,14 @@ contains
         call_julienne_assert((result_ .isAtLeast. lo) .also. (result_ .isAtMost. hi))
     end function
 
-    function assert_equals_logical(expect, actual, desc) result(diag)
+    function assert_equals_logical(expect, actual) result(diag)
         logical(PRIF_ATOMIC_LOGICAL_KIND), intent(in) :: expect, actual
-        character(len=*), intent(in) :: desc
         type(test_diagnosis_t) :: diag
         character(len=:), allocatable :: expect_str, actual_str
         expect_str = merge(".true. ",".false.",expect)
         actual_str = merge(".true. ",".false.",actual)
 
-        diag = (expect_str .equalsExpected. actual_str) // desc
+        diag = (expect_str .equalsExpected. actual_str)
     end function
 
     function check_atomic_uncontended() result(diag)
@@ -80,7 +80,7 @@ contains
 
         integer(c_intptr_t) :: base_addr_int, base_addr_logical
 
-        diag = passing_test()
+        diag = .true.
 
         sizeof_atomic_int = int(storage_size(dummy_atomic_int)/8, c_size_t)
         sizeof_atomic_logical = int(storage_size(dummy_atomic_logical)/8, c_size_t)
@@ -127,39 +127,32 @@ contains
             expect_int = me
             call prif_atomic_define_int(me, coarray_handle_int, 0_c_size_t, value=expect_int)
             call prif_atomic_ref_int(me, coarray_handle_int, 0_c_size_t, value=value_int)
-            diag = diag .also. &
-              (value_int .equalsExpected. expect_int) // "local define direct / ref direct"
+            ALSO2(value_int .equalsExpected. expect_int, "local define direct / ref direct")
             call prif_atomic_ref_int_indirect(me, base_addr_int, value=value_int)
-            diag = diag .also. &
-              (value_int .equalsExpected. expect_int) // "local define direct / ref indirect"
+            ALSO2(value_int .equalsExpected. expect_int, "local define direct / ref indirect")
 
             expect_int = me * 100 
             call prif_atomic_define_int_indirect(me, base_addr_int, value=expect_int)
             call prif_atomic_ref_int_indirect(me, base_addr_int, value=value_int)
-            diag = diag .also. &
-              (value_int .equalsExpected. expect_int) // "local define indirect / ref indirect"
+            ALSO2(value_int .equalsExpected. expect_int, "local define indirect / ref indirect")
 
             call prif_atomic_cas_int(me, coarray_handle_int, 0_c_size_t, &
                                      old=value_int, compare=expect_int, new=(expect_int*10))
-            diag = diag .also. &
-              (value_int .equalsExpected. expect_int) // "local cas direct"
+            ALSO2(value_int .equalsExpected. expect_int, "local cas direct")
             expect_int = expect_int * 10
 
             call prif_atomic_cas_int_indirect(me, base_addr_int, &
                                               old=value_int, compare=expect_int, new=(expect_int*10))
-            diag = diag .also. &
-              (value_int .equalsExpected. expect_int) // "local cas indirect"
+            ALSO2(value_int .equalsExpected. expect_int, "local cas indirect")
             expect_int = expect_int * 10
 
             call prif_atomic_ref_int(me, coarray_handle_int, 0_c_size_t, value=value_int)
-            diag = diag .also. &
-              (value_int .equalsExpected. expect_int) // "local cas / ref direct"
+            ALSO2(value_int .equalsExpected. expect_int, "local cas / ref direct")
 
             expect_int = 0
             call prif_atomic_define_int(me, coarray_handle_int, 0_c_size_t, value=expect_int)
             call prif_atomic_ref_int(me, coarray_handle_int, 0_c_size_t, value=value_int)
-            diag = diag .also. &
-              (value_int .equalsExpected. expect_int) // "local define direct / ref direct (final)"
+            ALSO2(value_int .equalsExpected. expect_int, "local define direct / ref direct (final)")
 
             call prif_sync_all() ! only here for subtest isolation
 
@@ -168,39 +161,32 @@ contains
             expect_logical = (IOR(me,1) == 1)
             call prif_atomic_define_logical(me, coarray_handle_logical, 0_c_size_t, value=expect_logical)
             call prif_atomic_ref_logical(me, coarray_handle_logical, 0_c_size_t, value=value_logical)
-            diag = diag .also. &
-              assert_equals_logical(expect_logical, value_logical, "local define direct / ref direct)")
+            ALSO2(assert_equals_logical(expect_logical, value_logical), "local define direct / ref direct)")
             call prif_atomic_ref_logical_indirect(me, base_addr_logical, value=value_logical)
-            diag = diag .also. &
-              assert_equals_logical(expect_logical, value_logical, "local define direct / ref indirect")
+            ALSO2(assert_equals_logical(expect_logical, value_logical), "local define direct / ref indirect")
 
             expect_logical = .not. expect_logical
             call prif_atomic_define_logical_indirect(me, base_addr_logical, value=expect_logical)
             call prif_atomic_ref_logical_indirect(me, base_addr_logical, value=value_logical)
-            diag = diag .also. &
-              assert_equals_logical(expect_logical, value_logical, "local define indirect / ref indirect")
+            ALSO2(assert_equals_logical(expect_logical, value_logical), "local define indirect / ref indirect")
 
             call prif_atomic_cas_logical(me, coarray_handle_logical, 0_c_size_t, &
                                          old=value_logical, compare=expect_logical, new=(.not. expect_logical))
-            diag = diag .also. &
-              assert_equals_logical(expect_logical, value_logical, "local cas direct")
+            ALSO2(assert_equals_logical(expect_logical, value_logical), "local cas direct")
             expect_logical = .not. expect_logical
 
             call prif_atomic_cas_logical_indirect(me, base_addr_logical, &
                                                   old=value_logical, compare=expect_logical, new=(.not. expect_logical))
-            diag = diag .also. &
-              assert_equals_logical(expect_logical, value_logical, "local cas indirect")
+            ALSO2(assert_equals_logical(expect_logical, value_logical), "local cas indirect")
             expect_logical = .not. expect_logical
 
             call prif_atomic_ref_logical(me, coarray_handle_logical, 0_c_size_t, value=value_logical)
-            diag = diag .also. &
-              assert_equals_logical(expect_logical, value_logical, "local cas / ref direct")
+            ALSO2(assert_equals_logical(expect_logical, value_logical), "local cas / ref direct")
 
             expect_logical = .false.
             call prif_atomic_define_logical(me, coarray_handle_logical, 0_c_size_t, value=expect_logical)
             call prif_atomic_ref_logical(me, coarray_handle_logical, 0_c_size_t, value=value_logical)
-            diag = diag .also. &
-              assert_equals_logical(expect_logical, value_logical, "local define direct / ref direct (final)")
+            ALSO2(assert_equals_logical(expect_logical, value_logical), "local define direct / ref direct (final)")
 
           end do
 
@@ -229,21 +215,18 @@ contains
               case (2) ; test_desc = "cas succeed"
                 call prif_atomic_cas_logical(peer, coarray_handle_logical, 0_c_size_t, &
                                          old=value_logical, compare=expect_logical, new=tmp)
-                diag = diag .also. &
-                  assert_equals_logical(expect_logical, value_logical, "int cas direct succeed")
+                ALSO2(assert_equals_logical(expect_logical, value_logical), "int cas direct succeed")
                 expect_logical = tmp
 
               case (3) ; test_desc = "cas fail"
                 call prif_atomic_cas_logical(peer, coarray_handle_logical, 0_c_size_t, &
                                          old=value_logical, compare=(.not. expect_logical), new=tmp)
-                diag = diag .also. &
-                  assert_equals_logical(expect_logical, value_logical, "int cas direct fail")
+                ALSO2(assert_equals_logical(expect_logical, value_logical), "int cas direct fail")
 
             end select
 
             call prif_atomic_ref_logical(peer, coarray_handle_logical, 0_c_size_t, value=value_logical)
-            diag = diag .also. &
-              assert_equals_logical(expect_logical, value_logical, "result check for peer int "//test_desc)
+            ALSO2(assert_equals_logical(expect_logical, value_logical), "result check for peer int "//test_desc)
           end block
           end do
 
@@ -265,15 +248,13 @@ contains
               case (2) ; test_desc = "cas succeed"
                 call prif_atomic_cas_int(peer, coarray_handle_int, 0_c_size_t, &
                                          old=value_int, compare=expect_int, new=tmp)
-                diag = diag .also. &
-                  (value_int .equalsExpected. expect_int) // "int cas direct succeed"
+                ALSO2(value_int .equalsExpected. expect_int, "int cas direct succeed")
                 expect_int = tmp
 
               case (3) ; test_desc = "cas fail"
                 call prif_atomic_cas_int(peer, coarray_handle_int, 0_c_size_t, &
                                          old=value_int, compare=expect_int+1, new=tmp)
-                diag = diag .also. &
-                  (value_int .equalsExpected. expect_int) // "int cas direct fail"
+                ALSO2(value_int .equalsExpected. expect_int, "int cas direct fail")
 
               case (4) ; test_desc = "add"
                 call prif_atomic_add(peer, coarray_handle_int, 0_c_size_t, value=tmp)
@@ -281,8 +262,7 @@ contains
 
               case (5) ; test_desc = "fetch_add"
                 call prif_atomic_fetch_add(peer, coarray_handle_int, 0_c_size_t, value=tmp, old=value_int)
-                diag = diag .also. &
-                  (value_int .equalsExpected. expect_int) // "fetch_add fetch check"
+                ALSO2(value_int .equalsExpected. expect_int, "fetch_add fetch check")
                 expect_int = expect_int + tmp
 
               case (6) ; test_desc = "and"
@@ -291,8 +271,7 @@ contains
 
               case (7) ; test_desc = "fetch_and"
                 call prif_atomic_fetch_and(peer, coarray_handle_int, 0_c_size_t, value=tmp, old=value_int)
-                diag = diag .also. &
-                  (value_int .equalsExpected. expect_int) // "fetch_and fetch check"
+                ALSO2(value_int .equalsExpected. expect_int, "fetch_and fetch check")
                 expect_int = IAND(expect_int, tmp)
 
               case (8) ; test_desc = "or"
@@ -301,8 +280,7 @@ contains
 
               case (9) ; test_desc = "fetch_or"
                 call prif_atomic_fetch_or(peer, coarray_handle_int, 0_c_size_t, value=tmp, old=value_int)
-                diag = diag .also. &
-                  (value_int .equalsExpected. expect_int) // "fetch_or fetch check"
+                ALSO2(value_int .equalsExpected. expect_int, "fetch_or fetch check")
                 expect_int = IOR(expect_int, tmp)
 
               case (10) ; test_desc = "xor"
@@ -311,16 +289,14 @@ contains
 
               case (11) ; test_desc = "fetch_xor"
                 call prif_atomic_fetch_xor(peer, coarray_handle_int, 0_c_size_t, value=tmp, old=value_int)
-                diag = diag .also. &
-                  (value_int .equalsExpected. expect_int) // "fetch_xor fetch check"
+                ALSO2(value_int .equalsExpected. expect_int, "fetch_xor fetch check")
                 expect_int = IEOR(expect_int, tmp)
 
 
             end select
 
             call prif_atomic_ref_int(peer, coarray_handle_int, 0_c_size_t, value=value_int)
-            diag = diag .also. &
-              (value_int .equalsExpected. expect_int) // "result check for peer int "//test_desc
+            ALSO2(value_int .equalsExpected. expect_int, "result check for peer int "//test_desc)
           end block
           end do
 
@@ -345,7 +321,7 @@ contains
         logical(PRIF_ATOMIC_LOGICAL_KIND) :: value_logical, expect_logical, tmp_logical
         character(len=:),allocatable :: desc
 
-        diag = passing_test()
+        diag = .true.
 
         sizeof_atomic_int = int(storage_size(dummy_atomic_int)/8, c_size_t)
         sizeof_atomic_logical = int(storage_size(dummy_atomic_logical)/8, c_size_t)
@@ -377,17 +353,14 @@ contains
           call prif_atomic_add_indirect(root, base_addr_int, value=plus_one)
           call prif_atomic_add_indirect(root, base_addr_int, value=minus_one)
           call prif_atomic_fetch_add_indirect(root, base_addr_int, value=plus_one, old=value_int)
-          diag = diag .also. &
-            (value_int .isAtLeast.  expect_int) // (desc//"mid-increment lower bound")
-          diag = diag .also. &
-            (value_int .lessThan. (expect_int + num_imgs)) // (desc//"mid-increment upper bound")
+          ALSO2(value_int .isAtLeast.  expect_int, desc//"mid-increment lower bound")
+          ALSO2(value_int .lessThan. (expect_int + num_imgs), desc//"mid-increment upper bound")
 
           call prif_sync_all()
 
           expect_int = expect_int + num_imgs
           call prif_atomic_ref_int_indirect(root, base_addr_int, value=value_int)
-          diag = diag .also. &
-            (value_int .equalsExpected. expect_int) // (desc//"loop-bottom check")
+          ALSO2(value_int .equalsExpected. expect_int, desc//"loop-bottom check")
         end do
 
 
@@ -400,10 +373,8 @@ contains
           do
             call prif_atomic_cas_int_indirect(root, base_addr_int, &
                                               old=value_int, compare=tmp_int, new=(tmp_int+1))
-            diag = diag .also. &
-              (value_int .isAtLeast. expect_int) // desc//"mid-increment lower bound"
-            diag = diag .also. &
-              (value_int .lessThan. (expect_int + num_imgs)) // desc//"mid-increment upper bound"
+            ALSO2(value_int .isAtLeast. expect_int, desc//"mid-increment lower bound")
+            ALSO2(value_int .lessThan. (expect_int + num_imgs), desc//"mid-increment upper bound")
             if (value_int == tmp_int) exit ! success 
             tmp_int = value_int ! collision => retry
           end do
@@ -412,8 +383,7 @@ contains
 
           expect_int = expect_int + num_imgs
           call prif_atomic_ref_int_indirect(root, base_addr_int, value=value_int)
-          diag = diag .also. &
-            (value_int .equalsExpected. expect_int) // desc//"loop-bottom check"
+          ALSO2(value_int .equalsExpected. expect_int, desc//"loop-bottom check")
         end do
 
 
@@ -428,8 +398,7 @@ contains
             call prif_atomic_cas_logical_indirect(root, base_addr_logical, &
                                               old=value_logical, compare=tmp_logical, new=(.not. tmp_logical))
             if (value_logical .eqv. tmp_logical) exit ! success 
-            diag = diag .also. &
-              assert_equals_logical(value_logical, .not. tmp_logical, desc//"mid-swap sanity check")
+            ALSO2(assert_equals_logical(value_logical, .not. tmp_logical), desc//"mid-swap sanity check")
             tmp_logical = value_logical ! collision => retry
           end do
 
@@ -437,8 +406,7 @@ contains
 
           expect_logical = merge(expect_logical, .not. expect_logical, mod(num_imgs,2) == 0)
           call prif_atomic_ref_logical_indirect(root, base_addr_logical, value=value_logical)
-          diag = diag .also. &
-            assert_equals_logical(expect_logical, value_logical, desc//"loop-bottom check")
+          ALSO2(assert_equals_logical(expect_logical, value_logical), desc//"loop-bottom check")
         end do
 
         call prif_sync_all()
@@ -465,8 +433,7 @@ contains
 
             case (2) ; test_desc = "fetch_and"
               call prif_atomic_fetch_and_indirect(root, base_addr_int, value=NOT(my_bit), old=value_int)
-              diag = diag .also. &
-                (IAND(value_int,my_bit) .equalsExpected. expect_int) // desc//"fetch_and fetch check"
+              ALSO2(IAND(value_int,my_bit) .equalsExpected. expect_int, desc//"fetch_and fetch check")
               expect_int = IAND(expect_int, NOT(my_bit))
 
             case (3) ; test_desc = "or"
@@ -475,8 +442,7 @@ contains
 
             case (4) ; test_desc = "fetch_or"
               call prif_atomic_fetch_or_indirect(root, base_addr_int, value=my_bit, old=value_int)
-              diag = diag .also. &
-                (IAND(value_int,my_bit) .equalsExpected. expect_int) // desc//"fetch_or fetch check"
+              ALSO2(IAND(value_int,my_bit) .equalsExpected. expect_int, desc//"fetch_or fetch check")
               expect_int = IOR(expect_int, my_bit)
 
             case (5) ; test_desc = "xor"
@@ -485,16 +451,14 @@ contains
 
             case (6) ; test_desc = "fetch_xor"
               call prif_atomic_fetch_xor_indirect(root, base_addr_int, value=my_bit, old=value_int)
-              diag = diag .also. &
-                (IAND(value_int,my_bit) .equalsExpected. expect_int) // desc//"fetch_xor fetch check"
+              ALSO2(IAND(value_int,my_bit) .equalsExpected. expect_int, desc//"fetch_xor fetch check")
               expect_int = IEOR(expect_int, my_bit)
 
 
           end select
 
           call prif_atomic_ref_int_indirect(root, base_addr_int, value=value_int)
-          diag = diag .also. &
-            (IAND(value_int,my_bit) .equalsExpected. expect_int) // desc//"result check for int "//test_desc
+          ALSO2(IAND(value_int,my_bit) .equalsExpected. expect_int, desc//"result check for int "//test_desc)
 
         end block
         end do
