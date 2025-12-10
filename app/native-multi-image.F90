@@ -115,11 +115,7 @@ program native_multi_image
   res = GET_TEAM()
   write(*,'(A,I3)') "Initial team number is ", TEAM_NUMBER()
 
-  if (ni == 1) then
-    team_id = ni
-  else
-    team_id = merge(1, 2, me <= ni/2)
-  end if
+    team_id = merge(1, 2, me <= (ni+1)/2)
 
   FORM TEAM(team_id, subteam)
   SYNC TEAM(subteam)
