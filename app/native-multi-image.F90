@@ -41,12 +41,10 @@ program native_multi_image
 
   USE, INTRINSIC :: ISO_FORTRAN_ENV
   integer :: me, ni, peer, tmp
-# if HAVE_TEAM
-  integer :: team_id
-# endif
   character(len=5) :: c
 # if HAVE_TEAM
-  type(team_type) :: subteam, res
+  integer :: team_id
+  type(TEAM_TYPE) :: subteam, res
 # endif
 
   me = THIS_IMAGE()
