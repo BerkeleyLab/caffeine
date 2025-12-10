@@ -24,7 +24,7 @@ observe the following workflow:
 Additional git policies for the primary Caffeine repository:
 
 * Never force push to `main`
-* All code changes and non-trivial documentation changes use a pull request
+* All code changes and non-trivial documentation changes require a pull request
 * No stray branches, except for rare cases of long-lived parallel development
 
 Conventions for code and commits in Caffeine
@@ -55,7 +55,7 @@ Conventions for code and commits in Caffeine
 
 Conventions for test code
 -------------------------
-* All significant features should have non-trivial correctness tests in test/
+* All significant features should have non-trivial correctness tests in `test/`
 * Every PRIF procedure must be invoked by at least one test
 * Correctness tests should aim to achieve complete code coverage of internal paths,
   and exercise any important corner-cases.
