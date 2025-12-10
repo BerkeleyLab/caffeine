@@ -5,6 +5,8 @@
 #include <stdio.h>
 #include <stdbool.h>
 #include <assert.h>
+#include <math.h>
+#include <fenv.h>
 #include <gasnetex.h>
 #include <gasnet_coll.h>
 #include <gasnet_vis.h>
@@ -33,6 +35,22 @@ typedef uint8_t byte;
 
 static void event_init(void);
 static void atomic_init(void);
+
+// ---------------------------------------------------
+// Floating-point exception support
+
+#ifndef IEEE_FE_MASK
+#define IEEE_FE_MASK   FE_INEXACT
+#endif
+static fexcept_t fe_flag_save;
+void caf_fe_save(void) {
+  fegetexceptflag(&fe_flag_save, IEEE_FE_MASK);
+}
+void caf_fe_restore(void) {
+  fesetexceptflag(&fe_flag_save, IEEE_FE_MASK);
+}
+#define CHECK_INEXACT() \
+  printf("%3i: inexact flag = %s\n",__LINE__,fetestexcept(FE_INEXACT) & FE_INEXACT ? "YES" : "no")
 
 // ---------------------------------------------------
 int caf_this_image(gex_TM_t tm) {
@@ -142,7 +160,14 @@ void caf_allocate_remaining(mspace heap, void** allocated_space, size_t* allocat
   // nor necessarily the largest open space, but in practice is likely
   // to work out that way
   struct mallinfo heap_info = mspace_mallinfo(heap);
-  *allocated_size = heap_info.keepcost * 0.9f;
+
+  // clang's implementation of nearbyint() raises FE_INEXACT,
+  // in direct contradiction to its specified purpose.
+  // Workaround this defect by saving and restoring the FE flags
+  caf_fe_save();
+  *allocated_size = (size_t)nearbyint(heap_info.keepcost * 0.9f);
+  caf_fe_restore();
+
   *allocated_space = mspace_memalign(heap, 8, *allocated_size);
   if (!*allocated_space) // uh-oh, something went wrong..
     gasnett_fatalerror("caf_allocate_remaining failed to mspace_memalign(%"PRIuSZ")", 

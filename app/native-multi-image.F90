@@ -35,16 +35,33 @@ program native_multi_image
 #ifndef HAVE_CO_BROADCAST
 #define HAVE_CO_BROADCAST HAVE_COLLECTIVES
 #endif
+#ifndef HAVE_TEAM
+#define HAVE_TEAM 1
+#endif
 
   USE, INTRINSIC :: ISO_FORTRAN_ENV
   integer :: me, ni, peer, tmp
   character(len=5) :: c
+# if HAVE_TEAM
+  integer :: team_id
+  type(TEAM_TYPE) :: subteam, res
+# endif
 
   me = THIS_IMAGE()
   ni = NUM_IMAGES()
   peer = MIN(IEOR(me-1,1)+1, ni)
 
   write(*,'(A,I1,A,I1,A)') "Hello, world! From image ", me, " of ", ni, " images"
+
+# if SET_EXCEPTIONS
+    block 
+       ! deliberately trigger IEEE arithmetic exceptions: INEXACT and UNDERFLOW
+       real :: r
+       r = 1e-30
+       r = r + r * r
+      write (*,*) r
+    end block
+# endif
 
 # if HAVE_SYNC_ALL
     call status("Testing SYNC ALL...")
@@ -89,6 +106,24 @@ program native_multi_image
     call status("Testing CO_BROADCAST...")
     call CO_BROADCAST(tmp,1)
     call CO_BROADCAST(c,1)
+# endif
+
+# if HAVE_TEAM
+  call status("Testing TEAMS...")
+  res = GET_TEAM(CURRENT_TEAM)
+  res = GET_TEAM(INITIAL_TEAM)
+  res = GET_TEAM()
+  write(*,'(A,I3)') "Initial team number is ", TEAM_NUMBER()
+
+    team_id = merge(1, 2, me <= (ni+1)/2)
+
+  FORM TEAM(team_id, subteam)
+  SYNC TEAM(subteam)
+  CHANGE TEAM(subteam)
+    write(*,'(A,I3,A,I3,A,I3)') 'Inside CHANGE TEAM construct: ', THIS_IMAGE(), ' of ', NUM_IMAGES(), ' in team number ', TEAM_NUMBER()
+  END TEAM
+  call sync_all
+  write(*,'(A,I3)') "After END TEAM statement, TEAM_NUMBER() is ", TEAM_NUMBER()
 # endif
 
   call sync_all
