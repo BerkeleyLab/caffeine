@@ -109,7 +109,7 @@ contains
       call prif_co_min(my_val)
 
       expected = minval([(values(mod(i-1,size(values))+1), i = 1, ni)])
-      diag = int(my_val) .equalsExpected. int(expected)
+      diag = my_val .equalsExpected. expected
   end function
 
   function check_64_bit_integer() result(diag)

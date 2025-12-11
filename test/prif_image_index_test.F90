@@ -73,7 +73,7 @@ contains
         call prif_this_image_with_coarray(coarray_handle, team=team, cosubscripts=cosubscripts)
         do i=1,corank
           call prif_this_image_with_dim(coarray_handle, dim=i, team=team, cosubscript=co)
-          ALSO(int(co) .equalsExpected. int(cosubscripts(i)))
+          ALSO(co .equalsExpected. cosubscripts(i))
 
           ALSO(co .isAtLeast. colbound(i))
           ALSO(co .isatMost. coubound(i))

@@ -158,17 +158,17 @@ contains
     ! so this particular check is specific to the current Caffeine implementation
     call prif_size_bytes(h1, s1)
     call prif_size_bytes(h2, s2)
-    ALSO(int(s2) .equalsExpected. int(s1))
+    ALSO(s2 .equalsExpected. s1)
       
     cx = c_loc(dummy(di))
     di = mod(di,size(dummy)) + 1
 
     call prif_set_context_data(h1, cx)
     call prif_get_context_data(h1, c1)
-    ALSO(cx .equalsExpected. c1)
+    ALSO(c1 .equalsExpected. cx)
 
     call prif_get_context_data(h2, c2)
-    ALSO(cx .equalsExpected. c2)
+    ALSO(c2 .equalsExpected. cx)
       
     call prif_set_context_data(h2, c_null_ptr)
     call prif_get_context_data(h1, c1)
