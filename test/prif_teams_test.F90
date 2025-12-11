@@ -60,42 +60,42 @@ contains
 
         n = 0 ! clear outputs
         call prif_team_number(team_number=n)
-        ALSO2(int(n) .equalsExpected. -1, "Initial team number is -1")
+        ALSO2(n .equalsExpected. -1_c_int64_t, "Initial team number is -1")
 
         n = 0 ! clear outputs
         call prif_get_team(team=initial_team)
         call prif_team_number(team=initial_team, team_number=n)
-        ALSO2(-1 .equalsExpected. int(n), "prif_get_team retrieval of current initial team")
+        ALSO2(n .equalsExpected. -1_c_int64_t, "prif_get_team retrieval of current initial team")
           
         ! ensure prif_sync_team is usable
         call prif_sync_team(team=initial_team)
 
         x = 0 ! clear outputs
         call prif_num_images_with_team(team=initial_team, num_images=x)
-        ALSO2(initial_num_imgs .equalsExpected. x, "prif_num_images in initial team")
+        ALSO2(x .equalsExpected. initial_num_imgs, "prif_num_images in initial team")
           
         x = 0 ! clear outputs
         call prif_num_images_with_team_number(team_number=-1_c_int64_t, num_images=x)
-        ALSO2(initial_num_imgs .equalsExpected. x, "prif_num_images_with_team_number in initial team")
+        ALSO2(x .equalsExpected. initial_num_imgs, "prif_num_images_with_team_number in initial team")
 
         x = 0 ! clear outputs
         call prif_this_image_no_coarray(team=initial_team, this_image=x)
-        ALSO2(me .equalsExpected. x, "prif_this_image_no_coarray in initial team")
+        ALSO2(x .equalsExpected. me, "prif_this_image_no_coarray in initial team")
           
         t = prif_team_type() ; n = 0 ! clear outputs
         call prif_get_team(level=PRIF_INITIAL_TEAM, team=t)
         call prif_team_number(team=t, team_number=n)
-        ALSO2(int(n) .equalsExpected. -1, "prif_get_team(PRIF_INITIAL_TEAM) retrieves initial team")
+        ALSO2(n .equalsExpected. -1_c_int64_t, "prif_get_team(PRIF_INITIAL_TEAM) retrieves initial team")
           
         t = prif_team_type() ; n = 0 ! clear outputs
         call prif_get_team(level=PRIF_CURRENT_TEAM, team=t)
         call prif_team_number(team=t, team_number=n)
-        ALSO2(int(n) .equalsExpected. -1, "prif_get_team(PRIF_CURRENT_TEAM) retrieval of initial team when current team is initial team")
+        ALSO2(n .equalsExpected. -1_c_int64_t, "prif_get_team(PRIF_CURRENT_TEAM) retrieval of initial team when current team is initial team")
 
         t = prif_team_type() ; n = 0 ! clear outputs
         call prif_get_team(level=PRIF_PARENT_TEAM, team=t)
         call prif_team_number(team=t, team_number=n)
-        ALSO2(-1 .equalsExpected. int(n), "prif_get_team(PRIF_PARENT_TEAM) retrieves initial team when parent team is initial team")
+        ALSO2(n .equalsExpected. -1_c_int64_t, "prif_get_team(PRIF_PARENT_TEAM) retrieves initial team when parent team is initial team")
           
         which_team = merge(1_c_int64_t, 2_c_int64_t, mod(me, 2) == 0)
         element_size = int(storage_size(dummy_element)/8, c_size_t)
@@ -110,59 +110,59 @@ contains
 
             x = 0 ! clear outputs
             call prif_num_images_with_team(team=team, num_images=x)
-            ALSO2(num_imgs .equalsExpected. x, "prif_num_images works with team")
+            ALSO2(x .equalsExpected. num_imgs, "prif_num_images works with team")
 
             x = 0 ! clear outputs
             call prif_num_images_with_team_number(team_number=which_team, num_images=x)
-            ALSO2 (num_imgs .equalsExpected. x, "prif_num_images_with_team_number works with current team")
+            ALSO2 (x .equalsExpected. num_imgs, "prif_num_images_with_team_number works with current team")
 
             call prif_this_image_no_coarray(this_image=me_child)
-            ALSO2((me - 1)/2 + 1 .equalsExpected. me_child, "prif_this_image is valid")
+            ALSO2(me_child .equalsExpected. (me - 1)/2 + 1, "prif_this_image is valid")
               
 
             x = 0 ! clear outputs
             call prif_this_image_no_coarray(team=team, this_image=x)
-            ALSO2 (me_child .equalsExpected. x, "prif_this_image is valid")
+            ALSO2(x .equalsExpected. me_child, "prif_this_image is valid")
 
             n = 0 ! clear outputs
             call prif_team_number(team_number=n)
-            ALSO2(int(which_team) .equalsExpected. int(n), "Correct current team number")
+            ALSO2(n .equalsExpected. which_team, "Correct current team number")
     
             n = 0 ! clear outputs
             call prif_team_number(team=team, team_number=n)
-            ALSO2(int(which_team) .equalsExpected. int(n), "Correct current team number")
+            ALSO2(n .equalsExpected. which_team, "Correct current team number")
     
             t = prif_team_type() ; n = 0 ! clear outputs
             call prif_get_team(team=t)
             call prif_team_number(team=t, team_number=n)
-            ALSO2(int(which_team) .equalsExpected. int(n), "prif_get_team retrieves current team")
+            ALSO2(n .equalsExpected. which_team, "prif_get_team retrieves current team")
     
             t = prif_team_type() ; n = 0 ! clear outputs
             call prif_get_team(level=PRIF_INITIAL_TEAM, team=t)
             call prif_team_number(team=t, team_number=n)
-            ALSO2(-1 .equalsExpected. int(n), "prif_get_team(PRIF_INITIAL_TEAM) retrieves initial team")
+            ALSO2(n .equalsExpected. -1_c_int64_t, "prif_get_team(PRIF_INITIAL_TEAM) retrieves initial team")
     
             t = prif_team_type() ; n = 0 ! clear outputs
             call prif_get_team(level=PRIF_CURRENT_TEAM, team=t)
             call prif_team_number(team=t, team_number=n)
-            ALSO2(int(which_team) .equalsExpected. int(n), "prif_get_team(PRIF_CURRENT_TEAM) retrieves current team")
+            ALSO2(n .equalsExpected. which_team, "prif_get_team(PRIF_CURRENT_TEAM) retrieves current team")
     
             t = prif_team_type() ; n = 0 ! clear outputs
             call prif_get_team(level=PRIF_PARENT_TEAM, team=t)
             call prif_team_number(team=t, team_number=n)
-            ALSO2(-1 .equalsExpected. int(n), "prif_get_team(PRIF_PARENT_TEAM) retrieves initial team when parent team is initial team")
+            ALSO2(n .equalsExpected. -1_c_int64_t, "prif_get_team(PRIF_PARENT_TEAM) retrieves initial team when parent team is initial team")
 
             x = 0 ! clear outputs
             call prif_num_images_with_team(team=initial_team, num_images=x)
-            ALSO2(initial_num_imgs .equalsExpected. x, "prif_num_images works with initial team")
+            ALSO2(x .equalsExpected. initial_num_imgs, "prif_num_images works with initial team")
 
             x = 0 ! clear outputs
             call prif_num_images_with_team_number(team_number=-1_c_int64_t, num_images=x)
-            ALSO2(initial_num_imgs .equalsExpected. x, "prif_num_images_with_team_number works with initial team")
+            ALSO2(x .equalsExpected. initial_num_imgs, "prif_num_images_with_team_number works with initial team")
 
             x = 0 ! clear outputs
             call prif_this_image_no_coarray(team=initial_team, this_image=x)
-            ALSO2(me .equalsExpected. x, "prif_this_image_no_coarray works with initial team")
+            ALSO2(x .equalsExpected. me, "prif_this_image_no_coarray works with initial team")
 
             do i = 1, num_coarrays
                 call prif_allocate_coarray( &
@@ -185,7 +185,7 @@ contains
         t = prif_team_type() ; n = 0 ! clear outputs
         call prif_get_team(team=t)
         call prif_team_number(team=t, team_number=n)
-        ALSO2(-1 .equalsExpected. int(n), "prif_end_team restores initial team")
+        ALSO2(n .equalsExpected. -1_c_int64_t, "prif_end_team restores initial team")
 
     end function
 end module prif_teams_test_m
