@@ -5,7 +5,7 @@ module prif_atomic_test_m
     use iso_c_binding, only: &
             c_ptr, c_int64_t, c_intptr_t, c_size_t, c_null_funptr, c_f_pointer, c_loc, c_sizeof
     use julienne_m, only: call_julienne_assert_, test_description_t, test_diagnosis_t, test_result_t, test_t, string_t, usher &
-      ,operator(.also.), operator(.equalsExpected.), operator(.isAtLeast.), operator(.isAtMost.), operator(.lessThan.), operator(//)
+      ,operator(.also.), operator(.expect.), operator(.equalsExpected.), operator(.isAtLeast.), operator(.isAtMost.), operator(.lessThan.), operator(//)
     use prif
 #if FORCE_PRIF_0_5 || FORCE_PRIF_0_6
   use prif, only : prif_deallocate_coarray_ => prif_deallocate_coarray
@@ -22,7 +22,20 @@ module prif_atomic_test_m
       procedure, nopass, non_overridable :: subject
       procedure, nopass, non_overridable :: results
     end type
+
+    ! define an .equalsExpected. for logical(PRIF_ATOMIC_LOGICAL_KIND)
+    interface operator(.equalsExpected.)
+      module procedure prif_logical_equals
+    end interface operator(.equalsExpected.)
 contains
+    pure function prif_logical_equals(lhs, rhs) result(diag)
+        logical(PRIF_ATOMIC_LOGICAL_KIND), intent(in) :: lhs, rhs
+        type(test_diagnosis_t) :: diag
+
+        diag = test_diagnosis_t(logical(lhs .eqv. rhs), &
+             string_t("expected ") // merge('T','F',rhs) // "; actual value is " // merge('T','F',lhs))
+    end function prif_logical_equals
+
     pure function subject()
         character(len=:), allocatable :: subject
         subject = "PRIF Atomics"
@@ -55,16 +68,6 @@ contains
         call random_number(r) ! Generate a uniform random number in [0, 1)
         result_ = int(r * (hi - lo + 1)) + lo
         call_julienne_assert((result_ .isAtLeast. lo) .also. (result_ .isAtMost. hi))
-    end function
-
-    function assert_equals_logical(expect, actual) result(diag)
-        logical(PRIF_ATOMIC_LOGICAL_KIND), intent(in) :: expect, actual
-        type(test_diagnosis_t) :: diag
-        character(len=:), allocatable :: expect_str, actual_str
-        expect_str = merge(".true. ",".false.",expect)
-        actual_str = merge(".true. ",".false.",actual)
-
-        diag = (expect_str .equalsExpected. actual_str)
     end function
 
     function check_atomic_uncontended() result(diag)
@@ -161,32 +164,32 @@ contains
             expect_logical = (IOR(me,1) == 1)
             call prif_atomic_define_logical(me, coarray_handle_logical, 0_c_size_t, value=expect_logical)
             call prif_atomic_ref_logical(me, coarray_handle_logical, 0_c_size_t, value=value_logical)
-            ALSO2(assert_equals_logical(expect_logical, value_logical), "local define direct / ref direct)")
+            ALSO2(value_logical .equalsExpected. expect_logical, "local define direct / ref direct)")
             call prif_atomic_ref_logical_indirect(me, base_addr_logical, value=value_logical)
-            ALSO2(assert_equals_logical(expect_logical, value_logical), "local define direct / ref indirect")
+            ALSO2(value_logical .equalsExpected. expect_logical, "local define direct / ref indirect")
 
             expect_logical = .not. expect_logical
             call prif_atomic_define_logical_indirect(me, base_addr_logical, value=expect_logical)
             call prif_atomic_ref_logical_indirect(me, base_addr_logical, value=value_logical)
-            ALSO2(assert_equals_logical(expect_logical, value_logical), "local define indirect / ref indirect")
+            ALSO2(value_logical .equalsExpected. expect_logical, "local define indirect / ref indirect")
 
             call prif_atomic_cas_logical(me, coarray_handle_logical, 0_c_size_t, &
                                          old=value_logical, compare=expect_logical, new=(.not. expect_logical))
-            ALSO2(assert_equals_logical(expect_logical, value_logical), "local cas direct")
+            ALSO2(value_logical .equalsExpected. expect_logical, "local cas direct")
             expect_logical = .not. expect_logical
 
             call prif_atomic_cas_logical_indirect(me, base_addr_logical, &
                                                   old=value_logical, compare=expect_logical, new=(.not. expect_logical))
-            ALSO2(assert_equals_logical(expect_logical, value_logical), "local cas indirect")
+            ALSO2(value_logical .equalsExpected. expect_logical, "local cas indirect")
             expect_logical = .not. expect_logical
 
             call prif_atomic_ref_logical(me, coarray_handle_logical, 0_c_size_t, value=value_logical)
-            ALSO2(assert_equals_logical(expect_logical, value_logical), "local cas / ref direct")
+            ALSO2(value_logical .equalsExpected. expect_logical, "local cas / ref direct")
 
             expect_logical = .false.
             call prif_atomic_define_logical(me, coarray_handle_logical, 0_c_size_t, value=expect_logical)
             call prif_atomic_ref_logical(me, coarray_handle_logical, 0_c_size_t, value=value_logical)
-            ALSO2(assert_equals_logical(expect_logical, value_logical), "local define direct / ref direct (final)")
+            ALSO2(value_logical .equalsExpected. expect_logical, "local define direct / ref direct (final)")
 
           end do
 
@@ -215,18 +218,18 @@ contains
               case (2) ; test_desc = "cas succeed"
                 call prif_atomic_cas_logical(peer, coarray_handle_logical, 0_c_size_t, &
                                          old=value_logical, compare=expect_logical, new=tmp)
-                ALSO2(assert_equals_logical(expect_logical, value_logical), "int cas direct succeed")
+                ALSO2(value_logical .equalsExpected. expect_logical, "int cas direct succeed")
                 expect_logical = tmp
 
               case (3) ; test_desc = "cas fail"
                 call prif_atomic_cas_logical(peer, coarray_handle_logical, 0_c_size_t, &
                                          old=value_logical, compare=(.not. expect_logical), new=tmp)
-                ALSO2(assert_equals_logical(expect_logical, value_logical), "int cas direct fail")
+                ALSO2(value_logical .equalsExpected. expect_logical, "int cas direct fail")
 
             end select
 
             call prif_atomic_ref_logical(peer, coarray_handle_logical, 0_c_size_t, value=value_logical)
-            ALSO2(assert_equals_logical(expect_logical, value_logical), "result check for peer int "//test_desc)
+            ALSO2(value_logical .equalsExpected. expect_logical, "result check for peer int "//test_desc)
           end block
           end do
 
@@ -398,7 +401,7 @@ contains
             call prif_atomic_cas_logical_indirect(root, base_addr_logical, &
                                               old=value_logical, compare=tmp_logical, new=(.not. tmp_logical))
             if (value_logical .eqv. tmp_logical) exit ! success 
-            ALSO2(assert_equals_logical(value_logical, .not. tmp_logical), desc//"mid-swap sanity check")
+            ALSO2(.expect. logical(value_logical .eqv. .not. tmp_logical), desc//"mid-swap sanity check")
             tmp_logical = value_logical ! collision => retry
           end do
 
@@ -406,7 +409,7 @@ contains
 
           expect_logical = merge(expect_logical, .not. expect_logical, mod(num_imgs,2) == 0)
           call prif_atomic_ref_logical_indirect(root, base_addr_logical, value=value_logical)
-          ALSO2(assert_equals_logical(expect_logical, value_logical), desc//"loop-bottom check")
+          ALSO2(value_logical .equalsExpected. expect_logical, desc//"loop-bottom check")
         end do
 
         call prif_sync_all()
