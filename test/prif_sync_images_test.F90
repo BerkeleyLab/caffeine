@@ -1,7 +1,7 @@
 module prif_sync_images_test_m
     use iso_c_binding, only: c_int
     use prif, only : prif_sync_images, prif_this_image_no_coarray, prif_num_images, prif_sync_all
-    use julienne_m, only: test_description_t, test_diagnosis_t, test_result_t, test_t, operator(.expect.), usher
+    use julienne_m, only: test_description_t, test_diagnosis_t, test_result_t, test_t, usher
 
     implicit none
     private

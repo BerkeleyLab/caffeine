@@ -15,7 +15,7 @@ module prif_allocate_test_m
   use prif, only : prif_deallocate_coarray, prif_deallocate_coarrays
 #endif
   use julienne_m, only: test_description_t, test_diagnosis_t, test_result_t, test_t, string_t, usher &
-    ,operator(.all.), operator(.also.), operator(.equalsExpected.), operator(.expect.), operator(//)
+    ,operator(.all.), operator(.also.), operator(.equalsExpected.), operator(//)
   use iso_c_binding, only: &
       c_ptr, c_int, c_int64_t, c_size_t, c_null_funptr, &
       c_f_pointer, c_null_ptr, c_loc, c_associated, c_intptr_t
@@ -72,7 +72,7 @@ contains
 
     allocated_memory = c_null_ptr
     local_slice => null()
-    ALSO(.expect. (.not. associated(local_slice)))
+    ALSO(.not. associated(local_slice))
 
     data_size = storage_size(dummy_element)/8
     call prif_allocate_coarray( &
@@ -80,7 +80,7 @@ contains
       coarray_handle, allocated_memory)
 
     call c_f_pointer(allocated_memory, local_slice)
-    ALSO(.expect. associated(local_slice))
+    ALSO(associated(local_slice))
 
     local_slice = 42
     ALSO(local_slice .equalsExpected. 42)
@@ -172,7 +172,7 @@ contains
       
     call prif_set_context_data(h2, c_null_ptr)
     call prif_get_context_data(h1, c1)
-    ALSO(.expect. (.not. c_associated(c1)))
+    ALSO(.not. c_associated(c1))
 
   end function
 
@@ -199,7 +199,7 @@ contains
 
     allocated_memory = c_null_ptr
     local_slice => null()
-    ALSO(.expect. (.not.associated(local_slice)))
+    ALSO(.not.associated(local_slice))
 
     data_size = 10*storage_size(dummy_element)/8
     call prif_allocate_coarray( &
@@ -210,7 +210,7 @@ contains
     ALSO2(query_size .equalsExpected. data_size, "invalid prif_size_bytes")
 
     call c_f_pointer(allocated_memory, local_slice, [10])
-    ALSO(.expect. associated(local_slice))
+    ALSO(associated(local_slice))
 
     local_slice = [(i*i, i = 1, 10)]
     ALSO(.all. (local_slice .equalsExpected. [(i*i, i = 1, 10)]))

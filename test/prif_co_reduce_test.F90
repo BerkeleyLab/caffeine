@@ -8,7 +8,6 @@ module prif_co_reduce_test_m
     ,operator(.also.) &
     ,operator(.approximates.) &
     ,operator(.equalsExpected.) &
-    ,operator(.expect.) &
     ,operator(.within.) &
     ,operator(//) &
     ,usher &
@@ -75,14 +74,14 @@ contains
 
     val = .true.
     call prif_co_reduce(val, op, c_null_ptr)
-    ALSO(.expect. val)
+    ALSO(val)
 
     call prif_this_image_no_coarray(this_image=me)
     if (me == 1) then
       val = .false.
     end if
     call prif_co_reduce(val, op, c_null_ptr)
-    ALSO(.expect. (.not. val))
+    ALSO(.not. val)
   end function
 
   subroutine and_wrapper(arg1, arg2_and_out, count, cdata) bind(C)

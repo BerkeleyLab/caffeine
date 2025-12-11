@@ -17,6 +17,7 @@
 #endif
 
 #define ALSO(exp) ALSO2(exp, "expression: (" // CPP_STRINGIFY_SOURCE(exp) // ")")
-#define ALSO2(exp,desc) diag = diag .also. (exp) // NEW_LINE(' ') // \
-                        __FILE__ // ":" // CPP_LINE_STRING // ": FAILED: " // desc
+#define ALSO2(exp,desc) diag = diag .also. \
+                      ( test_diagnosis_t(exp, NEW_LINE('')) // \
+                        __FILE__ // ":" // CPP_LINE_STRING // ": FAILED: " // desc )
 

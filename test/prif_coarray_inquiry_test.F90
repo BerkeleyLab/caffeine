@@ -20,7 +20,6 @@ module prif_coarray_inquiry_test_m
     ,operator(.all.) &
     ,operator(.also.) &
     ,operator(.equalsExpected.) &
-    ,operator(.expect.) &
     ,usher &
     ,string_t &
     ,test_description_t &
@@ -77,7 +76,7 @@ contains
               coarray_handle, &
               allocation_ptr)
       call prif_local_data_pointer(coarray_handle, local_ptr)
-      diag = .expect. c_associated(local_ptr, allocation_ptr)
+      diag = c_associated(local_ptr, allocation_ptr)
       call prif_deallocate_coarray(coarray_handle)
   end function
 
@@ -113,7 +112,7 @@ contains
       lcobounds, ucobounds, data_size, c_null_funptr, &
       coarray_handle, allocated_memory)
 
-    ALSO(.expect. c_associated(allocated_memory))
+    ALSO(c_associated(allocated_memory))
 
     call prif_size_bytes(coarray_handle, data_size=query_size)
     ALSO2(query_size .equalsExpected. data_size, "prif_size_bytes is valid")

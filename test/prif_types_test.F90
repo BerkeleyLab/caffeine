@@ -4,7 +4,7 @@ module prif_types_test_m
     use iso_fortran_env, only: int8
     use prif, only: prif_team_type, prif_event_type, prif_notify_type, prif_lock_type, prif_critical_type
     use julienne_m, only: test_description_t, test_diagnosis_t, test_result_t, test_t, string_t, usher &
-       ,operator(.all.), operator(.also.), operator(.expect.), operator(.equalsExpected.), operator(.greaterThan.), operator(.isAtMost.), operator(//)
+       ,operator(.all.), operator(.also.), operator(.equalsExpected.), operator(.greaterThan.), operator(.isAtMost.), operator(//)
 
     implicit none
     private
@@ -61,7 +61,7 @@ contains
         ! default initialization check
         pointer_wrap%info => tgt
         pointer_wrap = transfer(team, pointer_wrap)
-        ALSO2(.expect.(.not. associated(pointer_wrap%info)), "default initialization to null")
+        ALSO2(.not. associated(pointer_wrap%info), "default initialization to null")
     end function
 
     function check_event_type() result(diag)

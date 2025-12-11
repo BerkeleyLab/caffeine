@@ -61,7 +61,7 @@ contains
 
       call prif_num_images(num_images=ni)
       diag = &
-         .expect. allocated(nums) .also. &
+          allocated(nums) .also. &
          (size(nums) .isAtMost. ni) .also. &
          (.all. (nums .isAtLeast. 1)) .also. &
          (.all. (nums .isAtMost. ni)) .also. &
