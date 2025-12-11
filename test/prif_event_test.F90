@@ -99,33 +99,33 @@ contains
 
         block
           integer, parameter :: lim = 10
-          integer i, j, expect, c, r
-          integer(c_int64_t) :: count
+          integer i, j, c, r
+          integer(c_int64_t) :: count, expect
           character(len=50) :: context
 
           expect = 0
           do i=1, lim
             call prif_event_query(c_loc(local_event), count)
-            ALSO2(int(count) .equalsExpected. expect, "event count at top of loop")
-            call_assert(expect == int(count))
+            ALSO2(count .equalsExpected. expect, "event count at top of loop")
+            call_assert(expect == count)
 
             do j=1,i
               call prif_event_post(me, coarray_handle, 0_c_size_t)
               expect = expect + 1
 
               call prif_event_query(c_loc(local_event), count)
-              ALSO2(int(count) .equalsExpected. expect, "after event_post")
-              call_assert(expect == int(count))
+              ALSO2(count .equalsExpected. expect, "after event_post")
+              call_assert(expect == count)
 
               call prif_event_post_indirect(me, base_addr)
               expect = expect + 1
 
               call prif_event_query(c_loc(local_event), count)
-              ALSO2(int(count) .equalsExpected. expect, "event count after event_post_indirect")
-              call_assert(expect == int(count))
+              ALSO2(count .equalsExpected. expect, "event count after event_post_indirect")
+              call_assert(expect == count)
 
               if (expect >= 1) then
-                c = test_rand(1, expect)
+                c = test_rand(1, int(expect))
                 if (c > 1) then
                   context = "after event_wait(c)"
                   call prif_event_wait(c_loc(local_event), int(c,c_int64_t))
@@ -146,8 +146,8 @@ contains
                 expect = expect - c
 
                 call prif_event_query(c_loc(local_event), count)
-                ALSO2(int(count) .equalsExpected. expect, context)
-                call_assert_describe(expect == int(count), context)
+                ALSO2(count .equalsExpected. expect, context)
+                call_assert_describe(expect == count, context)
               end if
             end do
           end do
