@@ -34,7 +34,7 @@ contains
       type(test_result_t), allocatable :: test_results(:)
       type(prif_co_max_test_t) prif_co_max_test
 
-      test_results = prif_co_max_test%run([ &
+      allocate(test_results, source = prif_co_max_test%run([ &
          test_description_t("computing element-wise maxima for integer(c_int32_t) scalars", usher(check_32_bit_integer)) &
         ,test_description_t("computing element-wise maxima for a 1D default integer array", usher(check_default_integer)) &
         ,test_description_t("computing element-wise maxima for a 1D integer(c_int8_t) array", usher(check_8_bit_integer)) &
@@ -43,7 +43,7 @@ contains
         ,test_description_t("computing element-wise maxima for a 2D real(c_float) array", usher(check_32_bit_real)) &
         ,test_description_t("computing element-wise maxima for a 1D real(c_double) array", usher(check_64_bit_real)) &
         ,test_description_t("computing element-wise maxima for character scalars", usher(check_character)) &
-      ])
+      ]))
     end function
 
     function check_default_integer() result(diag)
@@ -60,7 +60,7 @@ contains
         call prif_co_max(my_val)
 
         expected = maxval(reshape([(values(:, mod(i-1,size(values,2))+1), i = 1, ni)], [size(values,1),ni]), dim=2)
-        diag = .all. (int(my_val) .equalsExpected. int(expected))
+        diag = .all. (my_val .equalsExpected. expected)
     end function
 
     function check_8_bit_integer() result(diag)

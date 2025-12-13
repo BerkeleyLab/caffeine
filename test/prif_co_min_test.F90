@@ -32,7 +32,7 @@ contains
     type(test_result_t), allocatable :: test_results(:)
     type(prif_co_min_test_t) prif_co_min_test
 
-    test_results = prif_co_min_test%run([ &
+    allocate(test_results, source = prif_co_min_test%run([ &
        test_description_t("computing element-wise minima for integer(c_int32_t) scalars", usher(check_32_bit_integer)) &
       ,test_description_t("computing element-wise minima for a 1D default integer array", usher(check_default_integer)) &
       ,test_description_t("computing element-wise minima for a 1D integer(c_int8t) array", usher(check_8_bit_integer)) &
@@ -41,7 +41,7 @@ contains
       ,test_description_t("computing element-wise minima for a 2D real(c_float) array", usher(check_32_bit_real)) &
       ,test_description_t("computing element-wise minima for a 1D real(c_double) array", usher(check_64_bit_real)) &
       ,test_description_t("computing element-wise minima for a character scalar", usher(check_character)) &
-    ])
+    ]))
   end function
 
   function check_default_integer() result(diag)
@@ -109,7 +109,7 @@ contains
       call prif_co_min(my_val)
 
       expected = minval([(values(mod(i-1,size(values))+1), i = 1, ni)])
-      diag = int(my_val) .equalsExpected. int(expected)
+      diag = my_val .equalsExpected. expected
   end function
 
   function check_64_bit_integer() result(diag)

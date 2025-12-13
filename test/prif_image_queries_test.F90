@@ -30,18 +30,18 @@ contains
 
   pure function subject() result(test_subject)
     character(len=:), allocatable :: test_subject
-    test_subject = "PRIF image query procedures"
+    test_subject = "PRIF Image Queries"
   end function
 
   function results() result(test_results)
     type(test_result_t), allocatable :: test_results(:)
     type(prif_image_queries_test_t) prif_image_queries_test
 
-    test_results = prif_image_queries_test%run([ &
+    allocate(test_results, source = prif_image_queries_test%run([ &
        test_description_t("providing valid prif_image_status()", usher(check_image_status)) &
       ,test_description_t("providing valid prif_stopped_images()", usher(check_stopped_images)) &
       ,test_description_t("providing valid prif_failed_images()", usher(check_failed_images)) &
-    ])
+    ]))
   end function
 
   function check_image_status() result(diag)
@@ -61,7 +61,7 @@ contains
 
       call prif_num_images(num_images=ni)
       diag = &
-         .expect. allocated(nums) .also. &
+          allocated(nums) .also. &
          (size(nums) .isAtMost. ni) .also. &
          (.all. (nums .isAtLeast. 1)) .also. &
          (.all. (nums .isAtMost. ni)) .also. &

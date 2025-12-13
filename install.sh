@@ -487,6 +487,8 @@ cat << EOF > $RUN_FPM_SH
 #!/bin/sh
 #-- DO NOT EDIT -- created by caffeine/install.sh
 fpm="${FPM}"
+FPM_DRIVER=\${FPM_DRIVER:-\`realpath \$0\`}
+export FPM_DRIVER
 fpm_sub_cmd=\$1; shift
 if echo "--help -help --version -version --list -list new update list clean publish" | grep -w -q -e "\$fpm_sub_cmd" ; then
   set -x

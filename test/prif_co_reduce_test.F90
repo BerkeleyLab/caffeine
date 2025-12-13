@@ -1,3 +1,5 @@
+#include "test-utils.F90"
+
 module prif_co_reduce_test_m
   use iso_c_binding, only: c_ptr, c_funptr, c_size_t, c_f_pointer, c_f_procpointer, c_funloc, c_loc, c_null_ptr
   use prif, only : prif_co_reduce, prif_num_images, prif_this_image_no_coarray, prif_operation_wrapper_interface
@@ -6,9 +8,10 @@ module prif_co_reduce_test_m
     ,operator(.also.) &
     ,operator(.approximates.) &
     ,operator(.equalsExpected.) &
-    ,operator(.expect.) &
     ,operator(.within.) &
+    ,operator(//) &
     ,usher &
+    ,string_t &
     ,test_description_t &
     ,test_diagnosis_t &
     ,test_result_t &
@@ -52,13 +55,13 @@ contains
     type(test_result_t), allocatable :: test_results(:)
     type(prif_co_reduce_test_t) prif_co_reduce_test
 
-    test_results = prif_co_reduce_test%run([ &
+    allocate(test_results, source = prif_co_reduce_test%run([ &
        test_description_t("performing a logical .and. reduction", usher(check_logical)) &
       ,test_description_t("performing a derived type reduction", usher(check_derived_type_reduction)) &
 #if HAVE_PARAM_DERIVED
       ,test_description_t("performing a parameterized derived type reduction", usher(check_type_parameter_reduction)) &
 #endif
-      ])
+    ]))
   end function
 
   function check_logical() result(diag)
@@ -71,16 +74,14 @@ contains
 
     val = .true.
     call prif_co_reduce(val, op, c_null_ptr)
-    diag = diag .also. &
-      .expect. val
+    ALSO(val)
 
     call prif_this_image_no_coarray(this_image=me)
     if (me == 1) then
       val = .false.
     end if
     call prif_co_reduce(val, op, c_null_ptr)
-    diag = diag .also. &
-      .expect. (.not. val)
+    ALSO(.not. val)
   end function
 
   subroutine and_wrapper(arg1, arg2_and_out, count, cdata) bind(C)
