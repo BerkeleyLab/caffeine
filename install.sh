@@ -451,7 +451,10 @@ else # unknown compiler
   compiler_flag="-g -O2"
   echo "WARNING: Failed to detect a recognized Fortran compiler"
 fi
+# enable Assert's multi-image support with PRIF callbacks provided by libcaffeine
 compiler_flag+=" -DASSERT_MULTI_IMAGE -DASSERT_PARALLEL_CALLBACKS"
+# enable Julienne's multi-image support with PRIF callbacks provided by julienne-driver
+compiler_flag+=" -DHAVE_MULTI_IMAGE_SUPPORT -DJULIENNE_PARALLEL_CALLBACKS"
 
 if ! [[ "$user_compiler_flags " =~ -[DU]ASSERTIONS[=\ ] ]] ; then 
   # default to enabling assertions, unless the command line sets a relevant flag
