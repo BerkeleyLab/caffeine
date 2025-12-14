@@ -17,10 +17,8 @@ jobs:
         compiler: [ gfortran ]
         version: [ 13, 14, 15 ]
         network: [ smp ]
-        exclude:
-          - os: macos-15 # gcc-13 broken on macos-15
-            version: 13
         include:
+
         # --- flang coverage ---
           - os: macos-14
             compiler: flang
@@ -34,6 +32,11 @@ jobs:
             compiler: flang
             version: 21
             network: smp
+          - os: macos-26
+            compiler: flang
+            version: 21
+            network: smp
+
           - os: ubuntu-24.04
             compiler: flang
             version: latest
@@ -61,6 +64,7 @@ jobs:
             FFLAGS: -mmlir -allow-assumed-rank
             # https://hub.docker.com/r/phhargrove/llvm-flang/tags
             container: phhargrove/llvm-flang:19.1.1-latest
+
         # --- PRIF-old coverage ---
           - os: ubuntu-24.04
             compiler: flang
@@ -76,11 +80,13 @@ jobs:
             label: PRIF-0.6
             FFLAGS: -DFORCE_PRIF_0_6
             container: phhargrove/llvm-flang:21.1.0-latest
+
         # --- udp coverage for selected configs ---
           - os: macos-15
             compiler: gfortran
             version: 14
             network: udp
+
           - os: ubuntu-24.04
             compiler: gfortran
             version: 15
@@ -89,6 +95,7 @@ jobs:
             compiler: gfortran
             version: 14
             network: udp
+
           - os: macos-15-intel
             compiler: flang
             version: 21
@@ -97,6 +104,11 @@ jobs:
             compiler: flang
             version: 21
             network: udp
+          - os: macos-26
+            compiler: flang
+            version: 21
+            network: udp
+
           - os: ubuntu-24.04
             compiler: flang
             version: 20
