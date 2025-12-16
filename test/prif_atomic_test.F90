@@ -226,6 +226,7 @@ contains
                                          old=value_logical, compare=(.not. expect_logical), new=tmp)
                 ALSO2(value_logical .equalsExpected. expect_logical, "int cas direct fail")
 
+              case default ; test_desc = "internal error"; call_julienne_assert(.false.)
             end select
 
             call prif_atomic_ref_logical(peer, coarray_handle_logical, 0_c_size_t, value=value_logical)
@@ -295,6 +296,7 @@ contains
                 ALSO2(value_int .equalsExpected. expect_int, "fetch_xor fetch check")
                 expect_int = IEOR(expect_int, tmp)
 
+              case default ; test_desc = "internal error"; call_julienne_assert(.false.)
 
             end select
 
@@ -457,6 +459,7 @@ contains
               ALSO2(IAND(value_int,my_bit) .equalsExpected. expect_int, desc//"fetch_xor fetch check")
               expect_int = IEOR(expect_int, my_bit)
 
+            case default ; test_desc = "internal error"; call_julienne_assert(.false.)
 
           end select
 
