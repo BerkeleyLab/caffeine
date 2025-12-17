@@ -32,7 +32,8 @@ teams (groupings) of images, events (counting semaphores), collective
 subroutines and failed-image detection (fault tolerance). Fortran 2023 provided
 additional, minor multi-image extensions, including notified remote data access.
 
-Several popular Fortran compilers, including LLVM Flang and LFortran, currently
+Several popular Fortran compilers, including [LLVM Flang](https://flang.llvm.org/docs/FortranStandardsSupport.html)
+and LFortran, currently
 lack complete support for multi-image parallel execution. These features are a mandatory
 part of Fortran, and thus are an important part of reaching full compliance with
 the 2008, 2018, or 2023 versions of the Fortran standard. Thanks to PRIF and Caffeine,
