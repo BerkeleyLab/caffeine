@@ -6,9 +6,10 @@ Caffeine
 Caffeine is a parallel runtime library that aims to support Fortran compilers
 with a programming-model-agnostic application interface to various
 communication libraries.  Current work is on supporting the Parallel Runtime
-Interface for Fortran (PRIF) with the [GASNet-EX] exascale-ready networking
-middleware.  Future plans include support for an alternative Message Passing
-Interface ([MPI]) back end.
+Interface for Fortran ([PRIF](#citing-prif-please-use-the-following-publication)) with the [GASNet-EX] exascale-ready networking
+middleware.  The Caffeine team anticipates collaborating on separate alternative
+PRIF implementations using other communication substrates such as the Message
+Passing Interface ([MPI]).
 
 ![Caffeine system stack diagram](https://github.com/BerkeleyLab/caffeine/wiki/img/caffeine-stack.gif)
 
@@ -218,4 +219,3 @@ See [LICENSE.txt](LICENSE.txt) for usage terms and conditions.
 [make]: https://www.gnu.org/software/make/
 [git]: https://git-scm.com
 [curl]: https://curl.se
-
