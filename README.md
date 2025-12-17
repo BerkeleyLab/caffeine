@@ -48,7 +48,7 @@ Prerequisites & Dependencies
 ### Build prerequisites
 The `install.sh` script uses the following packages:
 * Fortran and C compilers
-    * We regularly test with: GNU Fortran versions 13, 14 and LLVM Flang versions 19, 20, 21
+    * We regularly test with: GNU Fortran versions 13, 14, 15 and LLVM Flang versions 19, 20, 21
     * On macOS the Homebrew-installed `llvm` and `flang` packages may require some
       additional settings, see [issue #228](https://github.com/BerkeleyLab/caffeine/issues/228) for the latest information.
 * [Fortran package manager] `fpm`
@@ -68,9 +68,8 @@ Caffeine also depends on the following packages that will be automatically insta
 of the build process.
 
 * [GASNet-EX] exascale networking middleware
-* [assert](https://github.com/BerkeleyLab/assert)
-* [veggies](https://github.com/everythingfunctional/veggies)
-* [iso_varying_string](https://github.com/everythingfunctional/iso_varying_string)
+* [assert](https://go.lbl.gov/assert)
+* [julienne](https://go.lbl.gov/julienne)
 
 Caffeine leverages the following non-parallel features of Fortran to simplify the writing of a portable, compact runtime-library that supports Fortran's parallel features:
 
