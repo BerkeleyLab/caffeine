@@ -6,9 +6,10 @@ Caffeine
 Caffeine is a parallel runtime library that aims to support Fortran compilers
 with a programming-model-agnostic application interface to various
 communication libraries.  Current work is on supporting the Parallel Runtime
-Interface for Fortran (PRIF) with the [GASNet-EX] exascale-ready networking
-middleware.  Future plans include support for an alternative Message Passing
-Interface ([MPI]) back end.
+Interface for Fortran ([PRIF](#citing-prif-please-use-the-following-publication)) with the [GASNet-EX] exascale-ready networking
+middleware.  The Caffeine team anticipates collaborating on separate alternative
+PRIF implementations using other communication substrates such as the Message
+Passing Interface ([MPI]).
 
 ![Caffeine system stack diagram](https://github.com/BerkeleyLab/caffeine/wiki/img/caffeine-stack.gif)
 
@@ -31,7 +32,8 @@ teams (groupings) of images, events (counting semaphores), collective
 subroutines and failed-image detection (fault tolerance). Fortran 2023 provided
 additional, minor multi-image extensions, including notified remote data access.
 
-Several popular Fortran compilers, including LLVM Flang and LFortran, currently
+Several popular Fortran compilers, including [LLVM Flang](https://flang.llvm.org/docs/FortranStandardsSupport.html)
+and LFortran, currently
 lack complete support for multi-image parallel execution. These features are a mandatory
 part of Fortran, and thus are an important part of reaching full compliance with
 the 2008, 2018, or 2023 versions of the Fortran standard. Thanks to PRIF and Caffeine,
@@ -48,7 +50,7 @@ Prerequisites & Dependencies
 ### Build prerequisites
 The `install.sh` script uses the following packages:
 * Fortran and C compilers
-    * We regularly test with: GNU Fortran versions 13, 14 and LLVM Flang versions 19, 20, 21
+    * We regularly test with: GNU Fortran versions 13, 14, 15 and LLVM Flang versions 19, 20, 21
     * On macOS the Homebrew-installed `llvm` and `flang` packages may require some
       additional settings, see [issue #228](https://github.com/BerkeleyLab/caffeine/issues/228) for the latest information.
 * [Fortran package manager] `fpm`
@@ -68,9 +70,8 @@ Caffeine also depends on the following packages that will be automatically insta
 of the build process.
 
 * [GASNet-EX] exascale networking middleware
-* [assert](https://github.com/BerkeleyLab/assert)
-* [veggies](https://github.com/everythingfunctional/veggies)
-* [iso_varying_string](https://github.com/everythingfunctional/iso_varying_string)
+* [assert](https://go.lbl.gov/assert)
+* [julienne](https://go.lbl.gov/julienne)
 
 Caffeine leverages the following non-parallel features of Fortran to simplify the writing of a portable, compact runtime-library that supports Fortran's parallel features:
 
@@ -199,7 +200,7 @@ Funding
 -------
 The Computer Languages and Systems Software ([CLaSS]) Group at [Berkeley Lab] has developed Caffeine 
 on funding from the Exascale Computing Project ([ECP](https://www.exascaleproject.org)) 
-and the Stewardship for Programming Systems and Tools ([S4PST](https://ornl.github.io/events/s4pst2023/)) project,
+and the Stewardship for Programming Systems and Tools ([S4PST](https://s4pst.org)) project,
 part of the Consortium for the Advancement of Scientific Software ([CASS](https://cass.community/)).
 
 Support and Licensing
@@ -219,4 +220,3 @@ See [LICENSE.txt](LICENSE.txt) for usage terms and conditions.
 [make]: https://www.gnu.org/software/make/
 [git]: https://git-scm.com
 [curl]: https://curl.se
-
