@@ -95,7 +95,7 @@ Here is an outline of the basic commands used to build Caffeine and run an examp
 git clone https://github.com/BerkeleyLab/caffeine.git
 cd caffeine
 env FC=<Fortran-compiler> CC=<C-compiler> CXX=<C++-compiler> ./install.sh <options>
-env CAF_IMAGES=8 ./build/run-fpm.sh run --example hello
+env CAF_IMAGES=8 ./run-fpm.sh run --example hello
 ```
 
 The provided compilers MUST be "compatible": for the best experience you are
@@ -125,7 +125,7 @@ using Fortran's multi-image features to print a message from each image.
 Run tests
 ---------
 ```
-./build/run-fpm.sh test
+./run-fpm.sh test
 ```
 
 Recognized Environment Variables
