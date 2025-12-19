@@ -413,16 +413,17 @@ if [ "$GASNET_CC_REAL" != "$FPM_CC" ]; then
   exit 1;
 fi
 
-echo "# DO NOT EDIT OR COMMIT -- Created by caffeine/install.sh" > build/fpm.toml
-cp manifest/fpm.toml.template build/fpm.toml
+FPM_TOML="fpm.toml"
+rm -f $FPM_TOML
+echo "# DO NOT EDIT OR COMMIT -- Created by caffeine/install.sh" > $FPM_TOML
+cat manifest/fpm.toml.template >> $FPM_TOML
 GASNET_LIB_LOCATIONS=`echo $GASNET_LIBS | awk '{locs=""; for(i = 1; i <= NF; i++) if ($i ~ /^-L/) {locs=(locs " " $i);}; print locs; }'`
 GASNET_LIB_NAMES=`echo $GASNET_LIBS | awk '{names=""; for(i = 1; i <= NF; i++) if ($i ~ /^-l/) {names=(names " " $i);}; print names; }' | sed 's/-l//g'`
 if [[ $GASNET_CONDUIT == "udp" ]] ; then
   GASNET_LIB_NAMES+=" stdc++" # udp-conduit requires C++ libraries
 fi
 FPM_TOML_LINK_ENTRY="link = [\"$(echo ${GASNET_LIB_NAMES} | sed 's/ /", "/g')\"]"
-echo "${FPM_TOML_LINK_ENTRY}" >> build/fpm.toml
-ln -f -s build/fpm.toml
+echo "${FPM_TOML_LINK_ENTRY}" >> $FPM_TOML
 
 CAFFEINE_PC="$PREFIX/lib/pkgconfig/caffeine.pc"
 cat << EOF > $CAFFEINE_PC
@@ -485,7 +486,7 @@ case $GASNET_CONDUIT in
   ;;
 esac
 
-RUN_FPM_SH="build/run-fpm.sh"
+RUN_FPM_SH="run-fpm.sh"
 cat << EOF > $RUN_FPM_SH
 #!/bin/sh
 #-- DO NOT EDIT -- created by caffeine/install.sh
@@ -497,7 +498,7 @@ if echo "--help -help --version -version --list -list new update list clean publ
   set -x
   exec \$fpm "\$fpm_sub_cmd" "\$@"
 elif echo "build test run install" | grep -w -q -e "\$fpm_sub_cmd" ; then
-  sed -i.bak 's/^link = .*\$/$FPM_TOML_LINK_ENTRY/' build/fpm.toml
+  sed -i 's/^link = .*\$/$FPM_TOML_LINK_ENTRY/' $FPM_TOML
   if test -n "$GASNET_RUNNER_ARG" && echo "test run" | grep -w -q -e "\$fpm_sub_cmd" ; then
     set -- "--runner=$GASNET_RUNNER_ARG" "\$@"
   fi
@@ -517,6 +518,8 @@ else
 fi
 EOF
 chmod u+x $RUN_FPM_SH
+# for backwards-compatibility of instructions/scripting:
+( cd build && ln -f -s ../$RUN_FPM_SH run-fpm.sh )
 
 ./$RUN_FPM_SH build $VERBOSE
 
@@ -540,7 +543,7 @@ Caffeine is now installed in $PREFIX
 
 To rebuild or to run tests or examples via the Fortran Package
 Manager (fpm) with the required compiler/linker flags, pass a
-fpm command to the build/run-fpm.sh script. For example, run
+fpm command to the run-fpm.sh script. For example, run
 the program example/hello.f90 as follows:
 
 ./$RUN_FPM_SH run --example hello
