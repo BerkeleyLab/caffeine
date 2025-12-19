@@ -31,6 +31,11 @@ Release Procedure for Caffeine
 6. Tag a release candidate. For example `git tag #.#.#-rc1`, then `git push origin #.#.#-rc1`
 7. Compel several people to manually validate the release candidate on systems of interest
    and with compilers and compiler versions listed in README
+    1. When possible, test both on shared and distributed memory systems.
+    2. When testing on Perlmutter, use the following steps:
+        1. Build source and tests on the login node using the desired compiler
+        2. Get a dedicated node: `salloc -t 10 -N 2 -n 8 -q interactive -A PROJECT_ID -C cpu`
+        3. Launch the parallel job to run the tests: `env SUBJOB_PREFIX=skip GASNET_SUPERNODE_MAXSIZE=2 CAF_IMAGES=8 build/run-fpm.sh test --verbose`
 8. Create annotated tag (only after release candidate has been checked by team members)
     For example `git tag -a #.#.# -m "release version #.#.#"`, then `git push origin #.#.#`
 9. Publish the release
