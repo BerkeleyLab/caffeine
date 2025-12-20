@@ -270,12 +270,12 @@ jobs:
       run: |
         echo CAF_IMAGES=${CAF_IMAGES}
         set -x
-        ./build/run-fpm.sh run --verbose --example hello
+        ./run-fpm.sh run --verbose --example hello
 
     - name: Run native multi-image test
       if: ${{ matrix.native_multi_image }}
       run: |
-        set -x ; ./build/run-fpm.sh run --verbose 2>&1 | tee output ; \
+        set -x ; ./run-fpm.sh run --verbose 2>&1 | tee output ; \
           test ${PIPESTATUS[0]} = 0 && \
                ! grep -q "IEEE arithmetic exceptions signaled" output
 
@@ -284,7 +284,7 @@ jobs:
         echo SUBJOB_PREFIX=${SUBJOB_PREFIX}
         while (( CAF_IMAGES > 0 )); do \
           echo CAF_IMAGES=${CAF_IMAGES} ; \
-          ( set -x ; ./build/run-fpm.sh test --verbose -- -d ) ; \
+          ( set -x ; ./run-fpm.sh test --verbose -- -d ) ; \
           sleep 1 ; \
           CAF_IMAGES=$(( CAF_IMAGES / 2 )) ; \
         done
@@ -293,13 +293,13 @@ jobs:
       run: |
         echo CAF_IMAGES=${CAF_IMAGES}
         set -x
-        ./build/run-fpm.sh run --verbose --example stop_with_no_code
-        ( set +e ; ./build/run-fpm.sh run --verbose --example stop_with_integer_code ; test $? = 99 )
-        ( set +e ; ./build/run-fpm.sh run --verbose --example error_stop_with_integer_code ; test $? = 100 )
+        ./run-fpm.sh run --verbose --example stop_with_no_code
+        ( set +e ; ./run-fpm.sh run --verbose --example stop_with_integer_code ; test $? = 99 )
+        ( set +e ; ./run-fpm.sh run --verbose --example error_stop_with_integer_code ; test $? = 100 )
         unset GASNET_SPAWN_VERBOSE
         for ((i=1; i<=4; i++)); do \
          (set +e ; \
-          ./build/run-fpm.sh run --verbose --example exit_case -- $i 2>&1 | tee output ; \
+          ./run-fpm.sh run --verbose --example exit_case -- $i 2>&1 | tee output ; \
           test ${PIPESTATUS[0]} = $((i + 100)) \
             && grep -q "stdout from image $CAF_IMAGES" output \
             && grep -q "stderr from image $CAF_IMAGES" output \

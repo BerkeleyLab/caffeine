@@ -15,7 +15,7 @@ If you encounter problems or limitations when installing or using Caffeine, plea
     - [ ] Any conditions required to reproduce the problem such as
       - [ ] The output of `uname -a` showing the operating system (OS), OS version, and processor architecture,
       - [ ] The number of images executed (e.g., the output of `echo $CAF_IMAGES`),
-      - [ ] The command used to run your program (e.g., `./build/run-fpm.sh run`), and
+      - [ ] The command used to run your program (e.g., `./run-fpm.sh run`), and
       - [ ] A minimal reproducer: if possible, fewer than 50 lines demonstrating an issue.
 
 ## Contributing Code or Documentation
@@ -31,7 +31,7 @@ To contribute, please follow these steps:
 - [ ] Follow the coding conventions in [docs/README-maintainers.md](./docs/README-maintainers.md).
 - [ ] Make your commits logically atomic, self-consistent, and cohesive.
 - [ ] Add one or more unit tests in the `test` subdirectory to verify your fix or feature.
-- [ ] Ensure that your branch passes all tests (via `./build/run-fpm.sh test` with appropriate flags).
+- [ ] Ensure that your branch passes all tests (via `./run-fpm.sh test` with appropriate flags).
 - [ ] Update the [README.md](./README.md) if your branch affects anything described there.
 - [ ] Push your branch to your fork.
 - [ ] Open a [Pull Request](https://github.com/berkeleylab/caffeine/pulls) (PR) against an existing branch of the Berkeley Lab [Caffeine repository](https://github.com/berkeleylab/caffeine). 

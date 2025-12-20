@@ -57,7 +57,7 @@ contains
       if (len(subjob_prefix) > 0) subjob_prefix = subjob_prefix//" "
     end if
     if (.not. allocated(fpm_driver)) then
-      call getenv_withdefault("FPM_DRIVER", "./build/run-fpm.sh", fpm_driver)
+      call getenv_withdefault("FPM_DRIVER", "./run-fpm.sh", fpm_driver)
     end if
         
     call prif_sync_all()

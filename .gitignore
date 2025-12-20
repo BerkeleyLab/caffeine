@@ -1,8 +1,9 @@
 # fpm-generated build tree
 build
 
-# install.sh-generated fpm manifest 
+# install.sh-generated fpm files
 fpm.toml
+run-fpm.sh
 
 # ford-generated documentation
 doc/html
