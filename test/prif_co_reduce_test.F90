@@ -196,9 +196,11 @@ contains
     procedure(prif_operation_wrapper_interface), pointer :: op
     type(reduction_context_data), target :: context
 
+    diag = .true.
+
     op => array_wrapper
     context%user_op = c_funloc(add_array)
-    context%length = values%length
+    context%length = values(1,1)%length
     call prif_this_image_no_coarray(this_image=me)
     call prif_num_images(ni)
 
@@ -206,7 +208,9 @@ contains
     call prif_co_reduce(my_val, op, c_loc(context))
 
     expected = reduce(reshape([(values(:, mod(i-1,size(values,2))+1), i = 1, ni)], [size(values,1),ni]), add_array, dim=2)
-    diag = .all. (my_val%elements .equalsExpected. expected%elements)
+    do i = 1, size(my_val)
+      ALSO(.all. (my_val(i)%elements .equalsExpected. expected(i)%elements))
+    end do
   end function
 
   pure function add_array(lhs, rhs) result(total)
