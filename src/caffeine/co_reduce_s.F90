@@ -36,6 +36,7 @@ contains
 
     if (present(stat)) stat=0
 
+    call_assert(associated(operation_wrapper))
 #   if __GFORTRAN__
       ! Gfortran 13..15 bug workaround
       funptr = caf_c_funloc_deref(c_funloc(operation_wrapper))
@@ -53,5 +54,39 @@ contains
         cdata, &
         current_team%info%gex_team)
   end subroutine
+
+  module subroutine prif_co_reduce_cptr(a_ptr, element_size, element_count, operation_wrapper, cdata, result_image, stat, errmsg, errmsg_alloc)
+    type(c_ptr), intent(in) :: a_ptr
+    integer(c_size_t), intent(in) :: element_size
+    integer(c_size_t), intent(in) :: element_count
+    procedure(prif_operation_wrapper_interface), pointer, intent(in) :: operation_wrapper
+    type(c_ptr), intent(in), value :: cdata
+    integer(c_int), intent(in), optional :: result_image
+    integer(c_int), intent(out), optional :: stat
+    character(len=*), intent(inout), optional :: errmsg
+    character(len=:), intent(inout), allocatable, optional :: errmsg_alloc
+    type(c_funptr) :: funptr 
+
+    if (present(stat)) stat=0
+
+    call_assert(associated(operation_wrapper))
+#   if __GFORTRAN__
+      ! Gfortran 13..15 bug workaround
+      funptr = caf_c_funloc_deref(c_funloc(operation_wrapper))
+#   else
+      funptr = c_funloc(operation_wrapper)
+#   endif
+    call_assert(c_associated(funptr))
+
+    call caf_co_reduce_cptr( &
+        a_ptr, &
+        optional_value(result_image), &
+        element_count, element_size, &
+        funptr, &
+        cdata, &
+        current_team%info%gex_team)
+  end subroutine
+
+
 
 end submodule co_reduce_s
