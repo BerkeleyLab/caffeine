@@ -428,11 +428,11 @@ void caf_atomic_logical(int opcode, int image, void* addr, int64_t *result, int6
 }
 
 //-------------------------------------------------------------------
+// Type-erased collective subroutines
+//-------------------------------------------------------------------
 
-void caf_co_reduce(
-  CFI_cdesc_t* a_desc, int result_image, size_t num_elements, gex_Coll_ReduceFn_t user_op, void* client_data, gex_TM_t team
-) {
-  assert(a_desc);
+void caf_co_reduce_cptr( void *a_ptr, int result_image, size_t num_elements, size_t element_size,
+                         gex_Coll_ReduceFn_t user_op, void* client_data, gex_TM_t team) {
   assert(result_image >= 0);
   assert(num_elements > 0);
   assert(user_op);
@@ -442,20 +442,27 @@ void caf_co_reduce(
   // Here we undo that incorrect extra level of indirection
   user_op = *(gex_Coll_ReduceFn_t *)user_op; 
 #endif
-  char* a_address = (char*) a_desc->base_addr;
-  size_t c_sizeof_a = a_desc->elem_len;
   gex_Event_t ev;
 
   if (result_image) {
-    ev = gex_Coll_ReduceToOneNB(
-      team, result_image-1, a_address, a_address, GEX_DT_USER, c_sizeof_a, num_elements, GEX_OP_USER, user_op, client_data, 0
-    );
+    ev = gex_Coll_ReduceToOneNB( team, result_image-1, a_ptr, a_ptr, 
+                                 GEX_DT_USER, element_size, num_elements, 
+                                 GEX_OP_USER, user_op, client_data, 0 );
   } else {
-    ev = gex_Coll_ReduceToAllNB(
-      team,                 a_address, a_address, GEX_DT_USER, c_sizeof_a, num_elements, GEX_OP_USER, user_op, client_data, 0
-    );
+    ev = gex_Coll_ReduceToAllNB( team,                 a_ptr, a_ptr, 
+                                 GEX_DT_USER, element_size, num_elements, 
+                                 GEX_OP_USER, user_op, client_data, 0);
   }
   gex_Event_Wait(ev);
+}
+
+void caf_co_reduce( CFI_cdesc_t* a_desc, int result_image, size_t num_elements, 
+                    gex_Coll_ReduceFn_t user_op, void* client_data, gex_TM_t team) {
+  assert(a_desc);
+  char* a_ptr = (char*) a_desc->base_addr;
+  size_t element_size = a_desc->elem_len;
+  caf_co_reduce_cptr(a_ptr, result_image, num_elements, element_size,
+                     user_op, client_data, team);
 }
 
 void caf_co_broadcast(CFI_cdesc_t * a_desc, int source_image, int num_elements, gex_TM_t team)
