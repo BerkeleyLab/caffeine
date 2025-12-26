@@ -1,10 +1,12 @@
 #include "test-utils.F90"
+#include "julienne-assert-macros.h"
 
 module prif_co_reduce_test_m
-  use iso_c_binding, only: c_ptr, c_funptr, c_size_t, c_f_pointer, c_f_procpointer, c_funloc, c_loc, c_null_ptr
+  use iso_c_binding, only: c_ptr, c_funptr, c_size_t, c_f_pointer, c_f_procpointer, c_funloc, c_loc, c_null_ptr, c_associated
   use prif, only : prif_co_reduce, prif_num_images, prif_this_image_no_coarray, prif_operation_wrapper_interface
   use julienne_m, only : &
-     operator(.all.) &
+     call_julienne_assert_ &
+    ,operator(.all.) &
     ,operator(.also.) &
     ,operator(.approximates.) &
     ,operator(.equalsExpected.) &
@@ -43,6 +45,8 @@ module prif_co_reduce_test_m
     integer :: length
   end type
 #endif
+
+  integer, target :: dummy
 
 contains
 
@@ -93,6 +97,9 @@ contains
     integer(c_size_t) :: i
 
     if (count == 0) return
+    ! this expression is buggy as of Julienne 3.6.0 (julienne#166)
+    !call_julienne_assert(cdata .equalsExpected. c_null_ptr)
+    call_julienne_assert(.not. c_associated(cdata))
     call c_f_pointer(arg1, lhs, [count])
     call c_f_pointer(arg2_and_out, rhs_and_result, [count])
     do i = 1, count
@@ -120,7 +127,7 @@ contains
     call prif_num_images(ni)
 
     my_val = values(:, mod(me-1, size(values,2))+1)
-    call prif_co_reduce(my_val, op, c_null_ptr)
+    call prif_co_reduce(my_val, op, c_loc(dummy))
 
     allocate(tmp(size(values,1),ni))
     tmp = reshape([(values(:, mod(i-1,size(values,2))+1), i = 1, ni)], [size(values,1),ni])
@@ -159,6 +166,7 @@ contains
     integer(c_size_t) :: i
 
     if (count == 0) return
+    call_julienne_assert(cdata .equalsExpected. c_loc(dummy))
     call c_f_pointer(arg1, lhs, [count])
     call c_f_pointer(arg2_and_out, rhs_and_result, [count])
     do i = 1, count
