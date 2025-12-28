@@ -192,11 +192,10 @@ contains
   end subroutine
 
 #if HAVE_PARAM_DERIVED
-! As of LLVM20, flang does not implement the types used by this test:
+! As of LLVM21, flang does not implement the types used by this test:
 ! flang/lib/Lower/ConvertType.cpp:482: not yet implemented: parameterized derived types
-! error: Actual argument associated with TYPE(*) dummy argument 'a=' may not have a parameterized derived type
 
-! Gfortran 14.2 also lacks the type support for this test:
+! Gfortran 14.2..15.2 also lack the type support for this test:
 ! Error: Derived type 'pdtarray' at (1) is being used before it is defined
 
   function check_type_parameter_reduction() result(diag)
@@ -222,7 +221,28 @@ contains
     call prif_num_images(ni)
 
     my_val = values(:, mod(me-1, size(values,2))+1)
-    call prif_co_reduce(my_val, op, c_loc(context))
+
+#  if ALLOW_ASSUMED_TYPE_PDT
+    ! Ideally here we'd directly pass the user data `my_val` to prif_co_reduce as follows:
+      call prif_co_reduce(my_val, op, c_loc(context))
+    ! Unfortunately the code above is not strictly standards-conformant, because Fortran forbids
+    ! passing an actual argument of derived type with type parameters to a procedure where the
+    ! corresponding dummy argument has assumed type (the first argument to `prif_co_reduce`).
+    ! Example errors from gfortran and flang:
+    ! error: Actual argument associated with TYPE(*) dummy argument 'a=' may not have a parameterized derived type
+    ! Error: Actual argument at (1) to assumed-type dummy has type parameters or is of derived type with type-bound or FINAL procedures
+#  else
+    ! So instead, we stage the data through an type-erased buffer and call the _cptr variant
+    block
+      integer(c_size_t) :: element_size, element_count
+      integer(c_int8_t), allocatable, target :: bytes(:)
+      element_size = storage_size(my_val(1))/8
+      element_count = size(my_val)
+      bytes = transfer(my_val, bytes)
+      call prif_co_reduce_cptr(c_loc(bytes), element_size, element_count, op, c_loc(context))
+      my_val = transfer(bytes, my_val, element_count)
+    end block
+#  endif
 
     expected = reduce(reshape([(values(:, mod(i-1,size(values,2))+1), i = 1, ni)], [size(values,1),ni]), add_array, dim=2)
     do i = 1, size(my_val)
