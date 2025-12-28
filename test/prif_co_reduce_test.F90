@@ -2,8 +2,8 @@
 #include "julienne-assert-macros.h"
 
 module prif_co_reduce_test_m
-  use iso_c_binding, only: c_ptr, c_funptr, c_size_t, c_f_pointer, c_f_procpointer, c_funloc, c_loc, c_null_ptr, c_associated
-  use prif, only : prif_co_reduce, prif_num_images, prif_this_image_no_coarray, prif_operation_wrapper_interface
+  use iso_c_binding, only: c_ptr, c_funptr, c_size_t, c_f_pointer, c_f_procpointer, c_funloc, c_loc, c_null_ptr, c_associated, c_int8_t
+  use prif, only : prif_co_reduce, prif_co_reduce_cptr, prif_num_images, prif_this_image_no_coarray, prif_operation_wrapper_interface
   use julienne_m, only : &
      call_julienne_assert_ &
     ,operator(.all.) &
@@ -122,6 +122,8 @@ contains
     procedure(prif_operation_wrapper_interface), pointer :: op
     real, parameter :: tolerance = 0D0
 
+    diag = .true.
+
     op => pair_adder
     call prif_this_image_no_coarray(this_image=me)
     call prif_num_images(ni)
@@ -145,8 +147,23 @@ contains
 #else
     expected = reduce(tmp, add_pair, dim=2)
 #endif
-    diag = .all. (my_val%fst .equalsExpected. expected%fst) &
-      .also. (.all. ( my_val%snd .approximates. expected%snd .within. tolerance))
+    ALSO(.all. (my_val%fst .equalsExpected. expected%fst))
+    ALSO(.all. (my_val%snd .approximates. expected%snd .within. tolerance))
+
+    ! now repeat the same test using the prif_co_reduce_cptr variant:
+    my_val = values(:, mod(me-1, size(values,2))+1)
+    block
+      integer(c_size_t) :: element_size, element_count
+      integer(c_int8_t), allocatable, target :: bytes(:)
+      element_size = storage_size(my_val(1))/8
+      element_count = size(my_val)
+      bytes = transfer(my_val, bytes)
+      call prif_co_reduce_cptr(c_loc(bytes), element_size, element_count, op, c_loc(dummy))
+      my_val = transfer(bytes, my_val, element_count)
+    end block
+    ALSO(.all. (my_val%fst .equalsExpected. expected%fst))
+    ALSO(.all. (my_val%snd .approximates. expected%snd .within. tolerance))
+
   end function
 
   pure function add_pair(lhs, rhs) result(total)
