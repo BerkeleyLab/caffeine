@@ -124,7 +124,7 @@ contains
 #     if HAVE_FINAL_FUNC_SUPPORT
         call c_f_procpointer(coarray_handle%info%final_func, coarray_cleanup)
         call coarray_cleanup(coarray_handle, local_stat, local_errmsg)
-        call prif_co_sum(local_stat) ! Need to be sure it didn't fail on any images
+        call prif_co_max(local_stat) ! Need to be sure it didn't fail on any images
         if (local_stat /= 0) then
           if (.not. allocated(local_errmsg)) then ! provide a default errmsg
             local_errmsg = "coarray_cleanup finalization callback failed"

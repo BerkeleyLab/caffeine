@@ -6,7 +6,7 @@ module prif_allocate_test_m
   use prif, only : &
       prif_num_images, prif_size_bytes, &
       prif_set_context_data, prif_get_context_data, prif_local_data_pointer, &
-      prif_alias_create, prif_alias_destroy
+      prif_alias_create, prif_alias_destroy, prif_this_image_no_coarray
 
   use julienne_m, only: test_description_t, test_diagnosis_t, test_result_t, test_t, string_t, usher &
     ,operator(.all.), operator(.also.), operator(.equalsExpected.), operator(//)
@@ -20,6 +20,15 @@ module prif_allocate_test_m
     procedure, nopass, non_overridable :: subject
     procedure, nopass, non_overridable :: results
   end type
+
+#if HAVE_FINAL_FUNC_SUPPORT
+  ! Global state used to coordinate with finalizers
+  integer :: ff_count
+  type(prif_coarray_handle) :: ff_handle
+  type(test_diagnosis_t) :: ff_diag
+  logical :: ff_force_fail = .false.
+  character(len=*), parameter :: ff_err = "test error message"
+#endif
 
 contains
 
@@ -39,6 +48,11 @@ contains
          usher(check_allocate_integer_array_coarray_with_corank2)) &
       ,test_description_t("allocating, using and deallocating memory non-symmetrically", &
          usher(check_allocate_non_symmetric)) &
+      ,test_description_t("allocating and deallocating coarrays with finalizers" &
+#      if HAVE_FINAL_FUNC_SUPPORT
+         , usher(check_final_func) &
+#      endif
+       ) &
     ]))
   end function
 
@@ -94,6 +108,106 @@ contains
     call prif_deallocate_coarray(coarray_handle)
 
   end function
+
+#if HAVE_FINAL_FUNC_SUPPORT
+  function check_final_func() result(retdiag)
+    type(test_diagnosis_t) retdiag
+
+    ! this function shares several global vars with finalizers, see ff_* above
+    ! globalize diag for ALSO:
+#   define diag ff_diag
+
+    integer(kind=c_int64_t), dimension(1) :: lcobounds, ucobounds
+    integer :: num_imgs, me, dummy_element
+    type(c_ptr) :: allocated_memory
+    integer, pointer :: local_slice
+    integer(c_size_t) :: data_size, query_size
+    integer(c_int) :: stat
+    character(len=len(ff_err)) :: errmsg
+    character(len=:), allocatable :: errmsg_alloc
+
+    diag = .true.
+
+    call prif_num_images(num_images=num_imgs)
+    call prif_this_image_no_coarray(this_image=me)
+    lcobounds(1) = 1
+    ucobounds(1) = num_imgs
+    data_size = storage_size(dummy_element)/8
+
+    ! simple final_func case
+    ff_count = 0
+    call prif_allocate_coarray( &
+      lcobounds, ucobounds, data_size, c_funloc(coarray_cleanup_simple), &
+      ff_handle, allocated_memory)
+    ALSO(ff_count .equalsExpected. 0)
+
+    call prif_deallocate_coarray(ff_handle)
+    ALSO(ff_count .equalsExpected. 1)
+    
+    ! final_func that errors on first three deallocations
+    ff_count = 0
+    call prif_allocate_coarray( &
+      lcobounds, ucobounds, data_size, c_funloc(coarray_cleanup_first_error), &
+      ff_handle, allocated_memory)
+    ALSO(ff_count .equalsExpected. 0)
+
+    call prif_deallocate_coarray3(ff_handle, stat, errmsg=errmsg)
+    ALSO(ff_count .equalsExpected. 1)
+    ALSO(stat .equalsExpected. 10)
+    ALSO(errmsg .equalsExpected. ff_err)
+    
+    call prif_deallocate_coarrays3([ff_handle], stat, errmsg_alloc=errmsg_alloc)
+    ALSO(ff_count .equalsExpected. 2)
+    ALSO(stat .equalsExpected. 20)
+    ALSO(errmsg_alloc .equalsExpected. ff_err)
+    deallocate(errmsg_alloc)
+   
+    if (me == num_imgs) then ! test non-single-valued failure
+      ff_force_fail = .true.
+    end if 
+    call prif_deallocate_coarray3(ff_handle, stat, errmsg_alloc=errmsg_alloc)
+    ALSO(ff_count .equalsExpected. 3)
+    ALSO(stat .equalsExpected. 30)
+    ALSO(errmsg_alloc .equalsExpected. ff_err)
+    deallocate(errmsg_alloc)
+    ff_force_fail = .false.
+    
+    call prif_deallocate_coarray3(ff_handle, stat, errmsg_alloc=errmsg_alloc)
+    ALSO(ff_count .equalsExpected. 4)
+    ALSO(stat .equalsExpected. 0)
+    ALSO(.not. allocated(errmsg_alloc))
+
+    retdiag = diag
+  end function
+
+  subroutine coarray_cleanup_simple(handle , stat, errmsg) bind(C)
+    type(prif_coarray_handle), pointer , intent(in) :: handle
+    integer(c_int), intent(out) :: stat
+    character(len=:), intent(out), allocatable :: errmsg
+
+    ALSO(assert_aliased(handle, ff_handle, 0))
+
+    ff_count = ff_count + 1
+    stat = 0
+  end subroutine
+
+  subroutine coarray_cleanup_first_error(handle , stat, errmsg) bind(C)
+    type(prif_coarray_handle), pointer , intent(in) :: handle
+    integer(c_int), intent(out) :: stat
+    character(len=:), intent(out), allocatable :: errmsg
+
+    ALSO(assert_aliased(handle, ff_handle, 0))
+
+    ff_count = ff_count + 1
+    errmsg = ff_err
+    if (ff_count <= 2 .or. ff_force_fail) then
+      stat = 10 * ff_count
+    else
+      stat = 0
+    end if
+  end subroutine
+# undef diag
+#endif
 
   function check_allocate_non_symmetric() result(diag)
     type(test_diagnosis_t) diag 
