@@ -29,6 +29,20 @@
 #endif  
 #endif
 
+#ifndef HAVE_FINAL_FUNC_SUPPORT
+# if defined(__GFORTRAN__) && HAVE_GCC_VERSION < 160000
+   ! gfortran 14-15 defect prevents declaration of the coarray_cleanup interface:
+   !   https://gcc.gnu.org/bugzilla/show_bug.cgi?id=113338
+   ! reportedly fixed in gfortran 16
+#  define HAVE_FINAL_FUNC_SUPPORT 0
+# elif defined(__flang__) && __flang_major__ < 20
+   ! also missing in flang before 20
+#  define HAVE_FINAL_FUNC_SUPPORT 0
+# else
+#  define HAVE_FINAL_FUNC_SUPPORT 1
+# endif
+#endif
+
 ! ISO_FORTRAN_ENV constant value control:
 ! The following knobs influence Caffeine's choice of value for the named constants 
 ! specified by PRIF for ISO_FORTRAN_ENV:
