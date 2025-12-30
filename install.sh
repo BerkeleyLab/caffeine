@@ -504,7 +504,8 @@ if echo "--help -help --version -version --list -list new update list clean publ
   set -x
   exec \$fpm "\$fpm_sub_cmd" "\$@"
 elif echo "build test run install" | grep -w -q -e "\$fpm_sub_cmd" ; then
-  sed -i 's/^link = .*\$/$FPM_TOML_LINK_ENTRY/' $FPM_TOML
+  sed -i.bak 's/^link = .*\$/$FPM_TOML_LINK_ENTRY/' $FPM_TOML
+  rm -f $FPM_TOML.bak # issue 282: this is the only portable way to use sed -i
   if test -n "$GASNET_RUNNER_ARG" && echo "test run" | grep -w -q -e "\$fpm_sub_cmd" ; then
     set -- "--runner=$GASNET_RUNNER_ARG" "\$@"
   fi
