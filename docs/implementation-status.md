@@ -69,8 +69,8 @@ are accepted, but in some cases, the associated runtime behavior is not fully im
 |-----------|--------|-------|
 | `prif_allocate_coarray`    | **YES** |  |
 | `prif_allocate`            | **YES** |  |
-| `prif_deallocate_coarray`  | *partial* | no `final_func` arg support |
-| `prif_deallocate_coarrays` | *partial* | no `final_func` arg support |
+| `prif_deallocate_coarray`  | **YES** | `final_func` support requires flang 20+ |
+| `prif_deallocate_coarrays` | **YES** | `final_func` support requires flang 20+ |
 | `prif_deallocate`          | **YES** |  |
 | `prif_alias_create`        | **YES** |  |
 | `prif_alias_destroy`       | **YES** |  |
