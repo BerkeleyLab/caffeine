@@ -1,4 +1,5 @@
 #include "test-utils.F90"
+#include "language-support.F90"
 
 module prif_allocate_test_m
   use prif, only : &
@@ -7,7 +8,7 @@ module prif_allocate_test_m
       prif_coarray_handle, prif_num_images, prif_size_bytes, &
       prif_set_context_data, prif_get_context_data, prif_local_data_pointer, &
       prif_alias_create, prif_alias_destroy
-#if FORCE_PRIF_0_5 || FORCE_PRIF_0_6
+#if CAF_PRIF_VERSION <= 6
   use prif, only : prif_deallocate_coarray_ => prif_deallocate_coarray
 # define prif_deallocate_coarray(h)    prif_deallocate_coarray_([h])
 # define prif_deallocate_coarrays(arr) prif_deallocate_coarray_(arr)
@@ -229,7 +230,7 @@ contains
     end block
 
     block ! check aliasing creation
-#   if FORCE_PRIF_0_5
+#   if CAF_PRIF_VERSION <= 5
 #     define data_pointer_offset
 #   else
 #     define data_pointer_offset 0_c_size_t,
@@ -251,7 +252,7 @@ contains
           ALSO(assert_aliased(a(i), a(j)))
           ALSO(assert_aliased(a(j), coarray_handle))
         end do
-#       if !FORCE_PRIF_0_5
+#       if CAF_PRIF_VERSION >= 6
           ! test PRIF 0.6 data_pointer_offset
           block
             type(prif_coarray_handle) :: b

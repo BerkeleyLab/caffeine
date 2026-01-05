@@ -1,4 +1,5 @@
 #include "test-utils.F90"
+#include "language-support.F90"
 
 module prif_image_index_test_m
     use iso_c_binding, only: c_int, c_ptr, c_size_t, c_null_funptr, c_int64_t
@@ -12,7 +13,7 @@ module prif_image_index_test_m
                     prif_this_image_with_coarray, prif_this_image_with_dim, &
                     prif_lcobound_no_dim, prif_ucobound_no_dim, &
                     prif_num_images_with_team, PRIF_INITIAL_TEAM
-#if FORCE_PRIF_0_5 || FORCE_PRIF_0_6
+#if CAF_PRIF_VERSION <= 6
   use prif, only : prif_deallocate_coarray_ => prif_deallocate_coarray
 # define prif_deallocate_coarray(h)    prif_deallocate_coarray_([h])
 # define prif_deallocate_coarrays(arr) prif_deallocate_coarray_(arr)

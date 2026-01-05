@@ -1,4 +1,5 @@
 #include "test-utils.F90"
+#include "language-support.F90"
 #include "assert_macros.h"
 
 ! TEST_ASSERT activates immediate assertions in test code
@@ -22,7 +23,7 @@ module prif_event_test_m
             prif_put, &
             prif_sync_all, &
             prif_this_image_no_coarray
-#if FORCE_PRIF_0_5 || FORCE_PRIF_0_6
+#if CAF_PRIF_VERSION <= 6
   use prif, only : prif_deallocate_coarray_ => prif_deallocate_coarray
 # define prif_deallocate_coarray(h)    prif_deallocate_coarray_([h])
 # define prif_deallocate_coarrays(arr) prif_deallocate_coarray_(arr)

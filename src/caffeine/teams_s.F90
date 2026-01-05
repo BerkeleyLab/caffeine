@@ -1,5 +1,8 @@
 ! Copyright (c), The Regents of the University of California
 ! Terms of use are as specified in LICENSE.txt
+
+#include "language-support.F90"
+
 submodule(prif:prif_private_s) teams_s
   ! DO NOT ADD USE STATEMENTS HERE
   ! All use statements belong in prif_private_s.F90
@@ -43,7 +46,7 @@ contains
         teams_coarrays(i)%info => tmp_data
         call c_f_pointer(tmp_data%next_handle, tmp_data)
       end do
-#if FORCE_PRIF_0_5 || FORCE_PRIF_0_6
+#if CAF_PRIF_VERSION <= 6
       call prif_deallocate_coarray &
 #else
       call prif_deallocate_coarrays &

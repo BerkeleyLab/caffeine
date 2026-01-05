@@ -1,4 +1,5 @@
 #include "test-utils.F90"
+#include "language-support.F90"
 
 module prif_coarray_inquiry_test_m
   use prif, only : &
@@ -8,7 +9,7 @@ module prif_coarray_inquiry_test_m
       prif_lcobound_no_dim, prif_lcobound_with_dim, &
       prif_ucobound_no_dim, prif_ucobound_with_dim, &
       prif_coshape
-#if FORCE_PRIF_0_5 || FORCE_PRIF_0_6
+#if CAF_PRIF_VERSION <= 6
   use prif, only : prif_deallocate_coarray_ => prif_deallocate_coarray
 # define prif_deallocate_coarray(h)    prif_deallocate_coarray_([h])
 # define prif_deallocate_coarrays(arr) prif_deallocate_coarray_(arr)

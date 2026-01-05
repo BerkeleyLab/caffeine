@@ -53,3 +53,23 @@
 #define CAF_IMPORT_TEAM_CONSTANTS   CAF_IMPORT_CONSTANTS
 #endif
 
+! PRIF specification version override and control
+! By default, Caffeine provides the latest ratified version of the PRIF specification.
+! Clients can optionally define one of the FORCE_* macros below to force compliance
+! with a differnt revision of the PRIF specification. These override settings are
+! NOT officially supported and may be removed at any time without notice.
+#define   CAF_PRIF_VERSION_MAJOR 0
+#if   FORCE_PRIF_0_5
+#  define CAF_PRIF_VERSION_MINOR 5
+#elif FORCE_PRIF_0_6
+#  define CAF_PRIF_VERSION_MINOR 6
+#elif FORCE_PRIF_0_7
+#  define CAF_PRIF_VERSION_MINOR 7
+#elif FORCE_PRIF_0_8
+#  define CAF_PRIF_VERSION_MINOR 8
+#else
+#  define CAF_PRIF_VERSION_MINOR 7
+#endif
+#define CAF_PRIF_VERSION (100 * CAF_PRIF_VERSION_MAJOR + CAF_PRIF_VERSION_MINOR)
+
+

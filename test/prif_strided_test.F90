@@ -1,3 +1,5 @@
+#include "language-support.F90"
+
 module prif_strided_test_m
     use iso_c_binding, only: &
             c_ptr, c_int64_t, c_intptr_t, c_size_t, c_null_funptr, c_f_pointer, c_loc, c_sizeof
@@ -14,7 +16,7 @@ module prif_strided_test_m
             prif_get_strided_indirect, &
             prif_sync_all, &
             prif_this_image_no_coarray
-#if FORCE_PRIF_0_5 || FORCE_PRIF_0_6
+#if CAF_PRIF_VERSION <= 6
   use prif, only : prif_deallocate_coarray_ => prif_deallocate_coarray
 # define prif_deallocate_coarray(h)    prif_deallocate_coarray_([h])
 # define prif_deallocate_coarrays(arr) prif_deallocate_coarray_(arr)

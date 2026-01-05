@@ -29,7 +29,7 @@ module prif
   public :: prif_register_stop_callback, prif_stop_callback_interface
   public :: prif_stop, prif_error_stop, prif_fail_image
   public :: prif_allocate_coarray, prif_allocate, prif_deallocate
-#if FORCE_PRIF_0_5 || FORCE_PRIF_0_6
+#if CAF_PRIF_VERSION <= 6
   public :: prif_deallocate_coarray
 #else
   public :: prif_deallocate_coarray, prif_deallocate_coarrays
@@ -65,8 +65,8 @@ module prif
   public :: prif_atomic_define_int, prif_atomic_define_int_indirect, prif_atomic_define_logical, prif_atomic_define_logical_indirect
   public :: prif_atomic_ref_int, prif_atomic_ref_int_indirect, prif_atomic_ref_logical, prif_atomic_ref_logical_indirect
 
-  integer(c_int), parameter, public :: PRIF_VERSION_MAJOR = 0
-  integer(c_int), parameter, public :: PRIF_VERSION_MINOR = 7
+  integer(c_int), parameter, public :: PRIF_VERSION_MAJOR = CAF_PRIF_VERSION_MAJOR
+  integer(c_int), parameter, public :: PRIF_VERSION_MINOR = CAF_PRIF_VERSION_MINOR
 
 #if CAF_IMPORT_ATOMIC_CONSTANTS
    integer(c_int), parameter, public :: PRIF_ATOMIC_INT_KIND =     ATOMIC_INT_KIND
@@ -219,7 +219,7 @@ module prif
       character(len=:), intent(inout), allocatable, optional :: errmsg_alloc
     end subroutine
 
-#if FORCE_PRIF_0_5 || FORCE_PRIF_0_6
+#if CAF_PRIF_VERSION <= 6
     module subroutine prif_deallocate_coarray(coarray_handles, stat, errmsg, errmsg_alloc)
       implicit none
       type(prif_coarray_handle), intent(in) :: coarray_handles(:)
@@ -498,7 +498,7 @@ module prif
     end subroutine
 
     module subroutine prif_alias_create(source_handle, alias_lcobounds, alias_ucobounds, &
-#   if !FORCE_PRIF_0_5
+#   if CAF_PRIF_VERSION >= 6
                                         data_pointer_offset, &
 #   endif
                                         alias_handle)
@@ -506,7 +506,7 @@ module prif
       type(prif_coarray_handle), intent(in) :: source_handle
       integer(c_int64_t), intent(in) :: alias_lcobounds(:)
       integer(c_int64_t), intent(in) :: alias_ucobounds(:)
-#   if !FORCE_PRIF_0_5
+#   if CAF_PRIF_VERSION >= 6
       integer(c_size_t), intent(in) :: data_pointer_offset
 #   endif
       type(prif_coarray_handle), intent(out) :: alias_handle
