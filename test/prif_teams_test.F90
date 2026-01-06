@@ -1,14 +1,8 @@
 #include "test-utils.F90"
-#include "language-support.F90"
 
 module prif_teams_test_m
-    use iso_c_binding, only: c_size_t, c_ptr, c_null_funptr, c_int64_t, c_int
+# include "test-uses-alloc.F90"
     use prif
-#if CAF_PRIF_VERSION <= 6
-  use prif, only : prif_deallocate_coarray_ => prif_deallocate_coarray
-# define prif_deallocate_coarray(h)    prif_deallocate_coarray_([h])
-# define prif_deallocate_coarrays(arr) prif_deallocate_coarray_(arr)
-#endif
     use julienne_m, only: test_description_t, test_diagnosis_t, test_result_t, test_t, string_t, usher &
       ,operator(.also.), operator(.isAtLeast.), operator(.isAtMost.), operator(.equalsExpected.), operator(//)
 

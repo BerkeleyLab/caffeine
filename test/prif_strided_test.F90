@@ -1,13 +1,6 @@
-#include "language-support.F90"
-
 module prif_strided_test_m
-    use iso_c_binding, only: &
-            c_ptr, c_int64_t, c_intptr_t, c_size_t, c_null_funptr, c_f_pointer, c_loc, c_sizeof
+# include "test-uses-alloc.F90"
     use prif, only: &
-            prif_coarray_handle, &
-            prif_allocate_coarray, &
-            prif_allocate, &
-            prif_deallocate, &
             prif_num_images, &
             prif_get, &
             prif_put_strided, &
@@ -16,13 +9,6 @@ module prif_strided_test_m
             prif_get_strided_indirect, &
             prif_sync_all, &
             prif_this_image_no_coarray
-#if CAF_PRIF_VERSION <= 6
-  use prif, only : prif_deallocate_coarray_ => prif_deallocate_coarray
-# define prif_deallocate_coarray(h)    prif_deallocate_coarray_([h])
-# define prif_deallocate_coarrays(arr) prif_deallocate_coarray_(arr)
-#else
-  use prif, only : prif_deallocate_coarray, prif_deallocate_coarrays
-#endif
     use julienne_m, only: test_description_t, test_diagnosis_t, test_result_t, test_t, usher &
       ,operator(.all.), operator(.equalsExpected.)
       

@@ -1,21 +1,14 @@
 #include "test-utils.F90"
-#include "language-support.F90"
 
 module prif_coarray_inquiry_test_m
+# include "test-uses-alloc.F90"
   use prif, only : &
-      prif_allocate_coarray, prif_deallocate_coarray, &
       prif_coarray_handle, prif_num_images, &
       prif_local_data_pointer, prif_size_bytes, &
       prif_lcobound_no_dim, prif_lcobound_with_dim, &
       prif_ucobound_no_dim, prif_ucobound_with_dim, &
       prif_coshape
-#if CAF_PRIF_VERSION <= 6
-  use prif, only : prif_deallocate_coarray_ => prif_deallocate_coarray
-# define prif_deallocate_coarray(h)    prif_deallocate_coarray_([h])
-# define prif_deallocate_coarrays(arr) prif_deallocate_coarray_(arr)
-#else
-  use prif, only : prif_deallocate_coarray, prif_deallocate_coarrays
-#endif
+
   use julienne_m, only: &
      operator(//) &
     ,operator(.all.) &
@@ -27,8 +20,6 @@ module prif_coarray_inquiry_test_m
     ,test_diagnosis_t &
     ,test_result_t &
     ,test_t
-  use iso_c_binding, only: &
-      c_ptr, c_null_ptr, c_int64_t, c_int, c_size_t, c_null_funptr, c_associated
 
   implicit none
   private
