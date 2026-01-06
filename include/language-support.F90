@@ -1,6 +1,9 @@
 ! Copyright (c), The Regents of the University of California
 ! Terms of use are as specified in LICENSE.txt
 
+#ifndef CAF_INCLUDED_LANGUAGE_SUPPORT
+#define CAF_INCLUDED_LANGUAGE_SUPPORT
+
 #ifdef __GNUC__
 #  define HAVE_GCC_VERSION (__GNUC__ * 10000 + __GNUC_MINOR__ * 100 + __GNUC_PATCHLEVEL__)
 #endif
@@ -72,4 +75,4 @@
 #endif
 #define CAF_PRIF_VERSION (100 * CAF_PRIF_VERSION_MAJOR + CAF_PRIF_VERSION_MINOR)
 
-
+#endif
