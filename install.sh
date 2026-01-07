@@ -22,6 +22,7 @@ USAGE:
  --prereqs          Display a list of prerequisite software.
                     Default prefix='\$HOME/.local/bin'
  --verbose          Show verbose build commands
+ --yes              Assume (yes) to all prompts for non-interactive build
 
 All unrecognized arguments will be passed to GASNet's configure.
 
@@ -39,9 +40,6 @@ Some influential environment variables:
 Use these variables to override the choices made by the installer or to help
 it to find libraries and programs with nonstandard names/locations.
 
-For a non-interactive build with the 'yes' utility installed, execute
-yes | ./install.sh
-
 Report bugs to fortran@lbl.gov or at https://go.lbl.gov/caffeine
 
 EOF
@@ -51,6 +49,7 @@ GCC_VERSION=${GCC_VERSION:=14}
 GASNET_VERSION="stable"
 VERBOSE=""
 GASNET_CONDUIT="${GASNET_CONDUIT:-smp}"
+YES=false
 
 list_prerequisites()
 {
@@ -103,6 +102,9 @@ while [ "$1" != "" ]; do
         --verbose)
             VERBOSE="--verbose"
             set -x
+            ;;
+        -y | --yes)
+            YES="true"
             ;;
         *)
             # We pass the unmodified argument to GASNet configure
@@ -196,6 +198,10 @@ CI=${CI:-"false"} # GitHub Actions workflows set CI=true
 
 exit_if_user_declines()
 {
+  if [ $YES = true ]; then 
+    echo " 'yes' assumed (--yes option)"
+    return
+  fi
   if [ $CI = true ]; then 
     echo " 'yes' assumed (GitHub Actions workflow detected)"
     return
@@ -498,7 +504,8 @@ if echo "--help -help --version -version --list -list new update list clean publ
   set -x
   exec \$fpm "\$fpm_sub_cmd" "\$@"
 elif echo "build test run install" | grep -w -q -e "\$fpm_sub_cmd" ; then
-  sed -i 's/^link = .*\$/$FPM_TOML_LINK_ENTRY/' $FPM_TOML
+  sed -i.bak 's/^link = .*\$/$FPM_TOML_LINK_ENTRY/' $FPM_TOML
+  rm -f $FPM_TOML.bak # issue 282: this is the only portable way to use sed -i
   if test -n "$GASNET_RUNNER_ARG" && echo "test run" | grep -w -q -e "\$fpm_sub_cmd" ; then
     set -- "--runner=$GASNET_RUNNER_ARG" "\$@"
   fi
