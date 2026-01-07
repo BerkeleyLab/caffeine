@@ -1,3 +1,6 @@
+#ifndef CAF_INCLUDED_TEST_UTILS
+#define CAF_INCLUDED_TEST_UTILS
+
 #ifndef CPP_STRINGIFY_SOURCE
 # if defined(__GFORTRAN__) || defined(_CRAYFTN) || defined(NAGFOR) || defined(__LFORTRAN__)
 #  define CPP_STRINGIFY_SOURCE(x) "x"
@@ -21,3 +24,4 @@
                       ( test_diagnosis_t(exp, NEW_LINE('')) // \
                         __FILE__ // ":" // CPP_LINE_STRING // ": FAILED: " // desc )
 
+#endif

@@ -18,7 +18,7 @@ Release Procedure for Caffeine
        necessary changes
     5. Update [docs/implementation-status.md](../docs/implementation-status.md) with current status
     6. If the PRIF specification revision is changing, search and update all instances of the old revision,
-       including `PRIF_VERSION_{MAJOR,MINOR}` in [prif.F90](../src/prif.F90)
+       including `CAF_PRIF_VERSION_{MAJOR,MINOR}` in [language-support.F90](../include/language-support.F90)
     7. Temporarily hardcode version of gasnet installer in [install.sh](../install.sh) as the
        last commit in the release. Set GASNET_VERSION flag to the latest gasnet release
 5. Produce the ChangeLog

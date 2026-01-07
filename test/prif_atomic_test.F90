@@ -2,16 +2,10 @@
 #include "test-utils.F90"
 
 module prif_atomic_test_m
-    use iso_c_binding, only: &
-            c_ptr, c_int64_t, c_intptr_t, c_size_t, c_null_funptr, c_f_pointer, c_loc, c_sizeof
+# include "test-uses-alloc.F90"
     use julienne_m, only: call_julienne_assert_, test_description_t, test_diagnosis_t, test_result_t, test_t, string_t, usher &
       ,operator(.also.), operator(.equalsExpected.), operator(.isAtLeast.), operator(.isAtMost.), operator(.lessThan.), operator(//)
     use prif
-#if FORCE_PRIF_0_5 || FORCE_PRIF_0_6
-  use prif, only : prif_deallocate_coarray_ => prif_deallocate_coarray
-# define prif_deallocate_coarray(h)    prif_deallocate_coarray_([h])
-# define prif_deallocate_coarrays(arr) prif_deallocate_coarray_(arr)
-#endif
 
     implicit none
     private

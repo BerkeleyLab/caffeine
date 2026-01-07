@@ -2,6 +2,7 @@
 ! Terms of use are as specified in LICENSE.txt
 
 #include "assert_macros.h"
+#include "language-support.F90"
 
 submodule(prif:prif_private_s) alias_s
   ! DO NOT ADD USE STATEMENTS HERE
@@ -20,7 +21,7 @@ contains
     ! start with a copy of the source descriptor
     alias_handle%info = source_handle%info
 
-#   if !FORCE_PRIF_0_5
+#   if CAF_PRIF_VERSION >= 6
        alias_handle%info%coarray_data = &
          as_c_ptr(as_int(alias_handle%info%coarray_data) + data_pointer_offset)
 #   endif

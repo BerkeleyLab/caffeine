@@ -10,25 +10,15 @@
 #endif
 
 module prif_event_test_m
+# include "test-uses-alloc.F90"
     use assert_m
-    use iso_c_binding, only: &
-            c_ptr, c_int64_t, c_intptr_t, c_size_t, c_null_funptr, c_f_pointer, c_loc, c_sizeof
     use prif, only: &
             prif_event_type, prif_event_post, prif_event_post_indirect, prif_event_wait, prif_event_query, &
             prif_notify_type, prif_notify_wait, prif_put_with_notify, prif_put_strided_with_notify, &
-            prif_coarray_handle, &
-            prif_allocate_coarray, &
             prif_num_images, &
             prif_put, &
             prif_sync_all, &
             prif_this_image_no_coarray
-#if FORCE_PRIF_0_5 || FORCE_PRIF_0_6
-  use prif, only : prif_deallocate_coarray_ => prif_deallocate_coarray
-# define prif_deallocate_coarray(h)    prif_deallocate_coarray_([h])
-# define prif_deallocate_coarrays(arr) prif_deallocate_coarray_(arr)
-#else
-  use prif, only : prif_deallocate_coarray, prif_deallocate_coarrays
-#endif
     use julienne_m, only: test_description_t, test_diagnosis_t, test_result_t, test_t, string_t, usher &
       ,operator(.all.), operator(.also.), operator(.equalsExpected.), operator(//)
 

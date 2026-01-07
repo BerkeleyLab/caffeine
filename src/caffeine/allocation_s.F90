@@ -2,6 +2,7 @@
 ! Terms of use are as specified in LICENSE.txt
 
 #include "assert_macros.h"
+#include "language-support.F90"
 
 submodule(prif:prif_private_s) allocation_s
   ! DO NOT ADD USE STATEMENTS HERE
@@ -72,7 +73,7 @@ contains
     allocated_memory = caf_allocate(non_symmetric_heap_mspace, size_in_bytes)
   end procedure
 
-#if FORCE_PRIF_0_5 || FORCE_PRIF_0_6
+#if CAF_PRIF_VERSION <= 6
   module procedure prif_deallocate_coarray
 #else
   module procedure prif_deallocate_coarray
