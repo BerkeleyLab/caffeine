@@ -59,7 +59,7 @@
 ! PRIF specification version override and control
 ! By default, Caffeine provides the latest ratified version of the PRIF specification.
 ! Clients can optionally define one of the FORCE_* macros below to force compliance
-! with a differnt revision of the PRIF specification. These override settings are
+! with a different revision of the PRIF specification. These override settings are
 ! NOT officially supported and may be removed at any time without notice.
 #define   CAF_PRIF_VERSION_MAJOR 0
 #if   FORCE_PRIF_0_5
