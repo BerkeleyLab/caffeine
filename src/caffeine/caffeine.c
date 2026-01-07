@@ -416,11 +416,11 @@ void caf_co_reduce(
 
   if (result_image) {
     ev = gex_Coll_ReduceToOneNB(
-      team, result_image-1, a_address, a_address, GEX_DT_USER, c_sizeof_a, num_elements, GEX_OP_USER, user_op, &c_sizeof_a, 0
+      team, result_image-1, a_address, a_address, GEX_DT_USER, c_sizeof_a, num_elements, GEX_OP_USER, user_op, client_data, 0
     );
   } else {
     ev = gex_Coll_ReduceToAllNB(
-      team,                 a_address, a_address, GEX_DT_USER, c_sizeof_a, num_elements, GEX_OP_USER, user_op, &c_sizeof_a, 0
+      team,                 a_address, a_address, GEX_DT_USER, c_sizeof_a, num_elements, GEX_OP_USER, user_op, client_data, 0
     );
   }
   gex_Event_Wait(ev);
