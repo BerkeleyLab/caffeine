@@ -81,22 +81,23 @@ contains
   end procedure
   module procedure prif_deallocate_coarrays
 #endif
-    ! gfortran is yelling that this isn't valid for bind(C)
-    ! https://gcc.gnu.org/bugzilla/show_bug.cgi?id=113338
-    ! abstract interface
-    !   subroutine coarray_cleanup_i(handle, stat, errmsg) bind(C)
-    !     import c_int, prif_coarray_handle
-    !     implicit none
-    !     type(prif_coarray_handle), pointer, intent(in) :: handle
-    !     integer(c_int), intent(out) :: stat
-    !     character(len=:), intent(out), allocatable :: errmsg
-    !   end subroutine
-    ! end interface
     integer :: i, num_handles
-    !integer(c_int) :: local_stat
-    !character(len=:), allocatable :: local_errmsg
-    ! procedure(coarray_cleanup_i), pointer :: coarray_cleanup
     character(len=*), parameter :: unallocated_message = "Attempted to deallocate unallocated coarray"
+    type(prif_coarray_handle), target :: coarray_handle
+# if HAVE_FINAL_FUNC_SUPPORT
+    abstract interface
+      subroutine coarray_cleanup_i(handle, stat, errmsg) bind(C)
+        import c_int, prif_coarray_handle
+        implicit none
+        type(prif_coarray_handle), pointer, intent(in) :: handle
+        integer(c_int), intent(out) :: stat
+        character(len=:), intent(out), allocatable :: errmsg
+      end subroutine
+    end interface
+    procedure(coarray_cleanup_i), pointer :: coarray_cleanup
+    integer(c_int) :: local_stat
+    character(len=:), allocatable :: local_errmsg
+#endif
 
     call prif_sync_all ! Need to ensure we don't deallocate anything till everyone gets here
     num_handles = size(coarray_handles)
@@ -115,27 +116,37 @@ contains
     end if
     call_assert(all(coarray_handle_check(coarray_handles)))
 
-    ! TODO: invoke finalizers from coarray_handles(:)%info%final_func
-    ! do i = 1, num_handles
-    !   if (coarray_handles(i)%info%final_func /= c_null_funptr) then
-    !     call c_f_procpointer(coarray_handles(i)%info%final_func, coarray_cleanup)
-    !     call coarray_cleanup(coarray_handles(i), local_stat, local_errmsg)
-    !     call prif_co_sum(local_stat) ! Need to be sure it didn't fail on any images
-    !     if (local_stat /= 0) then
-    !       if (present(stat)) then
-    !         stat = local_stat
-    !         if (present(errmsg)) then
-    !           errmsg = local_errmsg
-    !         else if (present(errmsg_alloc)) then
-    !           call move_alloc(local_errmsg, errmsg_alloc)
-    !         end if
-    !         return ! NOTE: We no longer have guarantees that coarrays are in consistent state
-    !       else
-    !         call prif_error_stop(.false._c_bool, stop_code_char=local_errmsg)
-    !       end if
-    !     end if
-    !   end if
-    ! end do
+
+    ! invoke finalizers from coarray_handles(:)%info%final_func
+    do i = 1, num_handles
+      coarray_handle = coarray_handles(i) ! Add target attribute
+      if (c_associated(coarray_handle%info%final_func)) then
+#     if HAVE_FINAL_FUNC_SUPPORT
+        call c_f_procpointer(coarray_handle%info%final_func, coarray_cleanup)
+        call coarray_cleanup(coarray_handle, local_stat, local_errmsg)
+        call prif_co_max(local_stat) ! Need to be sure it didn't fail on any images
+        if (local_stat /= 0) then
+          if (.not. allocated(local_errmsg)) then ! provide a default errmsg
+            local_errmsg = "coarray_cleanup finalization callback failed"
+          end if
+          if (present(stat)) then
+            stat = local_stat
+            if (present(errmsg)) then
+              errmsg = local_errmsg
+            else if (present(errmsg_alloc)) then
+              call move_alloc(local_errmsg, errmsg_alloc)
+            end if
+            return ! NOTE: We no longer have guarantees that coarrays are in consistent state
+          else
+            call prif_error_stop(.false._c_bool, stop_code_char=local_errmsg)
+          end if
+        end if
+#     else
+        ! TODO: issue a warning that we are ignoring the final_func?
+#     endif
+      end if
+    end do
+
     do i = 1, num_handles
       call remove_from_team_list(coarray_handles(i))
       if (current_team%info%this_image == 1) &
