@@ -104,6 +104,14 @@ of a given compiler suite installation. The C++ compiler is optional for
 single-node deployments (and can be disabled using command-line option `--without-cxx`), 
 but C++ is required for some network backends.
 
+*Note for macOS/Homebrew users*: Homebrew may be used to install
+[LLVM flang](https://formulae.brew.sh/formula/flang) for use with Caffeine, however
+by default Homebrew will not replace the incompatible Apple-provided `clang` in your `PATH`.
+Such users are recommended to use Homebrew's version-suffixed compiler variants, 
+for example setting `FC=flang-21 CC=clang-21 CXX=clang++-21` in the command above,
+to ensure that a matching set of LLVM compilers are used. 
+See also [issue #228](https://github.com/BerkeleyLab/caffeine/issues/228).
+
 The `install.sh` recognizes a number of command-line options and environment variables to
 customize behavior for your system. See the output of `./install.sh --help` for full documentation,
 including options for how to build for a distributed-memory platform.
