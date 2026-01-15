@@ -77,13 +77,16 @@ target_link_libraries(caffeine PRIVATE assert_lib_external)
 # GASNet-EX
 # -----------
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+set(GASNET_CONFIGURE_ARGS "" CACHE STRING "Arguments to prefix to GASNet-EX configure command (if used).")
 if (NOT DEFINED GASNet_THREADING)
   set(GASNet_THREADING seq)
 endif()
-if (NOT DEFINED GASNet_PREFERRED_CONDUITS)
-  set(GASNet_PREFERRED_CONDUITS smp)
-endif()
 
+# The default conduit is smp
+# TODO: check against an allow list, and ensure lower-case
+set(GASNET_CONDUIT "smp" CACHE STRING "Which GASNet-EX conduit (network) to use")
+
+set(GASNet_PREFERRED_CONDUITS ${GASNET_CONDUIT})
 find_package(GASNet QUIET)
 if (NOT GASNet_FOUND)
   set(GASNet_TAG "2025.8.0")
@@ -98,6 +101,12 @@ if (NOT GASNet_FOUND)
       set(CMAKE_CXX_FLAGS "-fPIC ${CMAKE_CXX_FLAGS}")
     endif()
   endif()
+
+  if(DEFINED GASNET_CONFIGURE_ARGS)
+    separate_arguments(GASNET_CONFIGURE_LIST NATIVE_COMMAND "${GASNET_CONFIGURE_ARGS}")
+  else()
+    unset(GASNET_CONFIGURE_LIST)
+  endif()
   
   ExternalProject_Add(gasnet_ex
       URL https://gasnet.lbl.gov/EX/GASNet-${GASNet_TAG}.tar.gz
@@ -106,10 +115,15 @@ if (NOT GASNet_FOUND)
       DOWNLOAD_EXTRACT_TIMESTAMP TRUE
       DOWNLOAD_NO_EXTRACT FALSE
       CONFIGURE_COMMAND 
-        <SOURCE_DIR>/configure ac_cv_cxx_exceptions=yes --prefix=<INSTALL_DIR> 
-                               --enable-static --enable-seq
+        <SOURCE_DIR>/configure ${GASNET_CONFIGURE_LIST}
+                               --prefix=<INSTALL_DIR>
+                               --enable-${GASNET_CONDUIT}
+                               --enable-seq --disable-par --disable-parsync
+                               --disable-segment-everything
+                               --disable-mpi-compat
                                --with-cflags=${CMAKE_C_FLAGS}
-                               --with-cppflags=${CMAKE_CXX_FLAGS}
+                               --with-cxxflags=${CMAKE_CXX_FLAGS}
+                               --with-mpi-cflags=${CMAKE_C_FLAGS}
                                --with-cc=${CMAKE_C_COMPILER}
                                --with-cxx=${CMAKE_CXX_COMPILER}
       BUILD_COMMAND make -j
@@ -117,16 +131,48 @@ if (NOT GASNet_FOUND)
       BUILD_IN_SOURCE 1
   )
   set(GASNET_INSTALL ${CMAKE_BINARY_DIR}/gasnet)
+
+  # Generate "response files" with GASNet's (conduit-specific) link flags.
+  # TODO?: Does this make sense to do for every conduit which was compiled?
+  set(GASNET_LDFLAGS_FILE "${GASNET_CONDUIT}-seq-ldflags.rsp")
+  set(GASNET_LIBS_FILE    "${GASNET_CONDUIT}-seq-libs.rsp")
+  find_program(PKG_CONFIG NAMES pkg-config)
+  if(PKG_CONFIG STREQUAL "NOTFOUND")
+    message(FATAL_ERROR "pkg-config not found")
+  endif()
+  set(GASNET_PKG_CONFIG
+    "env" "PKG_CONFIG_PATH=${GASNET_INSTALL}/lib/pkgconfig"
+    "${PKG_CONFIG}" "gasnet-${GASNET_CONDUIT}-seq"
+  )
+  ExternalProject_Add_Step(
+    gasnet_ex dump-vars
+    DEPENDEES install
+    COMMAND ${GASNET_PKG_CONFIG} --variable=GASNET_LDFLAGS > "${GASNET_INSTALL}/lib/${GASNET_LDFLAGS_FILE}"
+    COMMAND ${GASNET_PKG_CONFIG} --variable=GASNET_LIBS    > "${GASNET_INSTALL}/lib/${GASNET_LIBS_FILE}"
+  )
+
   add_library(gasnet_lib STATIC IMPORTED)
+  string(TOUPPER ${GASNET_CONDUIT} _conduit_uppercase)
   set_target_properties(gasnet_lib PROPERTIES
-    INTERFACE_COMPILE_DEFINITIONS "GASNET_CONDUIT_SMP;GASNET_SEQ"
-      IMPORTED_LOCATION ${GASNET_INSTALL}/lib/libgasnet-smp-seq.a
-      INTERFACE_INCLUDE_DIRECTORIES $<INSTALL_INTERFACE:${GASNET_INSTALL}/include>
+    INTERFACE_COMPILE_DEFINITIONS "GASNET_CONDUIT_${_conduit_uppercase};GASNET_SEQ"
+    IMPORTED_LOCATION ${GASNET_INSTALL}/lib/libgasnet-${GASNET_CONDUIT}-seq.a
+    INTERFACE_INCLUDE_DIRECTORIES $<INSTALL_INTERFACE:${GASNET_INSTALL}/include>
   )
   add_dependencies(gasnet_lib gasnet_ex)
+
+  target_link_options(caffeine PUBLIC
+     "$<BUILD_INTERFACE:@${GASNET_INSTALL}/lib/${GASNET_LDFLAGS_FILE}>"
+     "$<INSTALL_INTERFACE:@${CMAKE_INSTALL_PREFIX}/gasnet/lib/${GASNET_LDFLAGS_FILE}>"
+  )
   target_link_libraries(caffeine PUBLIC gasnet_lib)
+  target_link_libraries(caffeine PUBLIC
+    "$<BUILD_INTERFACE:-Wl,@${GASNET_INSTALL}/lib/${GASNET_LIBS_FILE}>"
+    "$<INSTALL_INTERFACE:-Wl,@${CMAKE_INSTALL_PREFIX}/gasnet/lib/${GASNET_LIBS_FILE}>"
+  )
   target_include_directories(caffeine PUBLIC ${GASNET_INSTALL}/include)
-  target_include_directories(caffeine PUBLIC ${GASNET_INSTALL}/include/smp-conduit)
+  target_include_directories(caffeine PUBLIC ${GASNET_INSTALL}/include/${GASNET_CONDUIT}-conduit)
+
+  install(DIRECTORY "${GASNET_INSTALL}/" DESTINATION "gasnet")
 else()
   target_link_libraries(caffeine PUBLIC GASNet::GASNet)
 endif()
