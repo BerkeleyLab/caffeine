@@ -41,7 +41,7 @@ if (USE_FPM)
         ${CMAKE_COMMAND} -E copy_directory <SOURCE_DIR>/include <INSTALL_DIR>/include
   ) 
 else()
-  message(STATUS "USE_FM is not used, libassert will be installed manually from source."
+  message(STATUS "Since USE_FPM is not enabled, libassert will be installed manually from source."
                  "If you want to use Assert's build system, please enable USE_FPM.")
   set(ASSERT_BUILD_COMMAND ${CMAKE_Fortran_COMPILER} -c <SOURCE_DIR>/src/assert_m.F90 
         -I<SOURCE_DIR>/include
@@ -153,5 +153,5 @@ if(CMAKE_Fortran_COMPILER_ID STREQUAL "LLVMFlang")
   
   add_test(NAME TestNativeMultiImage COMMAND test_native_multi_image)
 else()
-  message(STATUS "${CMAKE_Fortran_COMPILER_ID} doesn't support lowering to PRIF, not test can't be built.")
+  message(STATUS "${CMAKE_Fortran_COMPILER_ID} doesn't support lowering to PRIF, test can't be built.")
 endif()
