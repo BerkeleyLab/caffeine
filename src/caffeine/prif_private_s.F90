@@ -53,6 +53,11 @@ submodule(prif) prif_private_s
       integer(c_int), value :: exit_code
     end subroutine
 
+    subroutine caf_fail_image() bind(C)
+      !! void caf_fail_image();
+      implicit none
+    end subroutine
+
     pure subroutine caf_fatal_error(str) bind(C)
       !! void caf_fatal_error( const CFI_cdesc_t* Fstr )
       import c_char

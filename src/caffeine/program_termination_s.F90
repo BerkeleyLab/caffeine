@@ -135,7 +135,11 @@ contains
   end subroutine
 
   module procedure prif_fail_image
-    call unimplemented("prif_fail_image")
+#   ifndef CAF_FAIL_IMAGE_SUPPRESS_FLUSH
+      call flush_all()
+#   endif
+
+    call caf_fail_image()
   end procedure
 
   subroutine run_callbacks(is_error_stop, quiet, stop_code_int, stop_code_char)

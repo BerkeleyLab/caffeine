@@ -137,6 +137,18 @@ void caf_decaffeinate(int exit_code)
   gasnet_exit(exit_code);
 }
 
+void caf_fail_image() {
+  fprintf(stderr,"FAIL IMAGE on image %d\n", myproc+1);
+  gasnett_flush_streams();
+
+  if (numprocs > 1) {
+    // spin-wait until we are killed, while still servicing network requests:
+    GASNET_BLOCKUNTIL((gasnett_nsleep(1000), 0));
+  } 
+
+  gasnet_exit(1);
+}
+
 void caf_fatal_error( const CFI_cdesc_t* Fstr )
 {
   const char *msg = (char *)Fstr->base_addr;
