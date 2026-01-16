@@ -42,7 +42,7 @@ are accepted, but in some cases, the associated runtime behavior is not fully im
 |-----------|--------|-------|
 | `prif_init` | **YES** |  |
 | `prif_stop`, `prif_error_stop` | **YES** |  |
-| `prif_fail_image` | no |  |
+| `prif_fail_image` | **YES** | trivial implementation |
 | `prif_register_stop_callback` | **YES** |  |
 
 
