@@ -296,6 +296,11 @@ jobs:
         ./run-fpm.sh run --verbose --example stop_with_no_code
         ( set +e ; ./run-fpm.sh run --verbose --example stop_with_integer_code ; test $? = 99 )
         ( set +e ; ./run-fpm.sh run --verbose --example error_stop_with_integer_code ; test $? = 100 )
+        ( set +e ; \
+          export CAF_IMAGES=1; \
+          ./run-fpm.sh run --verbose --example fail_image 2>&1 | tee output ; \
+          test ${PIPESTATUS[0]} > 0 && grep -q "FAIL IMAGE" output \
+        )
         unset GASNET_SPAWN_VERBOSE
         for ((i=1; i<=4; i++)); do \
          (set +e ; \
