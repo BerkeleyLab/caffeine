@@ -153,12 +153,12 @@ Here are *a few* of the most useful GASNet knobs:
 
 See [GASNet documentation](https://gasnet.lbl.gov/dist-ex/README) for full details on all settings.
 
-Implementation Status
---------------------
+PRIF Implementation Status
+--------------------------
 
 ### Caffeine is an implementation of the [Parallel Runtime Interface for Fortran (PRIF)](#citing-prif-please-use-the-following-publication)
 
-![PRIF system stack diagram](https://github.com/BerkeleyLab/caffeine/wiki/img/prif-stack.gif)
+<img src="https://github.com/BerkeleyLab/prif-pubs/raw/main/img/PRIF-logo.gif" width="45%" align=top> <img src="https://github.com/BerkeleyLab/caffeine/wiki/img/prif-stack.gif" width="45%">
 
 For details on the PRIF features that are implemented, please see the [Implementation Status doc](docs/implementation-status.md).
 
