@@ -8,7 +8,9 @@ module prif
   use iso_c_binding, only: &
       c_char, c_int, c_bool, c_intptr_t, c_ptr, &
       c_funptr, c_size_t, c_ptrdiff_t, c_null_ptr, c_int64_t
-
+#if HAVE_LOGICAL64
+  use iso_fortran_env, only: logical64
+#endif
 #if CAF_IMPORT_ATOMIC_CONSTANTS
   use iso_fortran_env, only: ATOMIC_INT_KIND, ATOMIC_LOGICAL_KIND
 #endif
@@ -69,15 +71,17 @@ module prif
   integer(c_int), parameter, public :: PRIF_VERSION_MINOR = CAF_PRIF_VERSION_MINOR
 
 #if CAF_IMPORT_ATOMIC_CONSTANTS
-   integer(c_int), parameter, public :: PRIF_ATOMIC_INT_KIND =     ATOMIC_INT_KIND
-   integer(c_int), parameter, public :: PRIF_ATOMIC_LOGICAL_KIND = ATOMIC_LOGICAL_KIND
+   integer, parameter, public :: PRIF_ATOMIC_INT_KIND =     ATOMIC_INT_KIND
+   integer, parameter, public :: PRIF_ATOMIC_LOGICAL_KIND = ATOMIC_LOGICAL_KIND
 #else
-   integer(c_int), parameter, public :: PRIF_ATOMIC_INT_KIND = c_int64_t
+   integer, parameter, public :: PRIF_ATOMIC_INT_KIND = c_int64_t
 
 #  if HAVE_SELECTED_LOGICAL_KIND
-     integer(c_int), parameter, public :: PRIF_ATOMIC_LOGICAL_KIND = selected_logical_kind(64)
+     integer, parameter, public :: PRIF_ATOMIC_LOGICAL_KIND = selected_logical_kind(64)
+#  elif HAVE_LOGICAL64
+     integer, parameter, public :: PRIF_ATOMIC_LOGICAL_KIND = logical64
 #  else
-     integer(c_int), parameter, public :: PRIF_ATOMIC_LOGICAL_KIND = PRIF_ATOMIC_INT_KIND
+     integer, parameter, public :: PRIF_ATOMIC_LOGICAL_KIND = PRIF_ATOMIC_INT_KIND
 #  endif
 #endif
 

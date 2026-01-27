@@ -11,7 +11,7 @@
 #ifndef HAVE_SELECTED_LOGICAL_KIND
   ! Define whether the compiler supports standard intrinsic function selected_logical_kind(), 
   ! a feature introduced in Fortran 2023 clause 16.9.182.
-#if defined(_CRAYFTN) || defined(NAGFOR) || defined(__flang__)
+#if defined(_CRAYFTN) || defined(NAGFOR) || defined(__flang__) || (HAVE_GCC_VERSION >= 150000)
 #define HAVE_SELECTED_LOGICAL_KIND 1
 #else
 #define HAVE_SELECTED_LOGICAL_KIND 0
