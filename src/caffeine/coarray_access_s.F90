@@ -125,6 +125,8 @@ contains
         dest = current_image_buffer, &
         src = remote_ptr, &
         size = size_in_bytes)
+
+    if (present(stat)) stat = 0
   end procedure
 
   ! _______________________ Strided Get RMA ____________________________

@@ -9,18 +9,26 @@ contains
 
   module procedure prif_lock
     call unimplemented("prif_lock")
+
+    if (present(stat)) stat = 0
   end procedure
 
   module procedure prif_lock_indirect
     call unimplemented("prif_lock_indirect")
+
+    if (present(stat)) stat = 0
   end procedure
 
   module procedure prif_unlock
     call unimplemented("prif_unlock")
+
+    if (present(stat)) stat = 0
   end procedure
 
   module procedure prif_unlock_indirect
     call unimplemented("prif_unlock_indirect")
+
+    if (present(stat)) stat = 0
   end procedure
 
 end submodule locks_s

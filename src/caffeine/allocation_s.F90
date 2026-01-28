@@ -164,6 +164,7 @@ contains
 
   module procedure prif_deallocate
     call caf_deallocate(non_symmetric_heap_mspace, mem)
+    if (present(stat)) stat = 0
   end procedure
 
   subroutine add_to_team_list(coarray_handle)
