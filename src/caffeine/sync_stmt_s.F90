@@ -113,6 +113,7 @@ contains
                           acquire_fence=merge(1,0,i==u))
     end do
 
+    if (present(stat)) stat = 0
   end procedure
 
 end submodule
