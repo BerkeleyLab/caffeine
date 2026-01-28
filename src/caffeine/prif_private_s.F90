@@ -26,12 +26,14 @@ submodule(prif) prif_private_s
   type(prif_team_descriptor), target :: initial_team
   type(prif_team_type) :: current_team
   type(c_ptr) :: non_symmetric_heap_mspace
+  integer(c_intptr_t) :: total_heap_size, non_symmetric_heap_size
 
   interface
 
     ! ________ Program initiation and finalization ___________
 
     subroutine caf_caffeinate( &
+        total_heap_size, &
         symmetric_heap, &
         symmetric_heap_start, &
         symmetric_heap_size, &
@@ -40,9 +42,8 @@ submodule(prif) prif_private_s
         bind(C)
       import c_ptr, c_intptr_t
       implicit none
-      type(c_ptr), intent(out) :: symmetric_heap
-      integer(c_intptr_t), intent(out) :: symmetric_heap_start, symmetric_heap_size
-      type(c_ptr), intent(out) :: non_symmetric_heap
+      integer(c_intptr_t), intent(out) :: total_heap_size, symmetric_heap_start, symmetric_heap_size
+      type(c_ptr), intent(out) :: symmetric_heap, non_symmetric_heap
       type(c_ptr), intent(out) :: initial_team
     end subroutine
 
