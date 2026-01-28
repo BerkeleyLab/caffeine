@@ -381,6 +381,27 @@ contains
     end if
   end function
 
+  ! Report the provided error stat/msg using the provided optional stat/errmsg args
+  subroutine report_error(report_stat, report_msg, stat, errmsg, errmsg_alloc)
+    integer(c_int), intent(in) :: report_stat
+    character(len=*), intent(in) :: report_msg
+    integer(c_int), intent(out), optional :: stat
+    character(len=*), intent(inout), optional :: errmsg
+    character(len=:), intent(inout), allocatable , optional :: errmsg_alloc
+
+    call_assert(report_stat /= 0)
+    if (.not. present(stat)) then
+      call prif_error_stop(.false._c_bool, stop_code_char=report_msg)
+    else
+      stat = report_stat
+      if (present(errmsg)) then
+        errmsg = report_msg
+      else if (present(errmsg_alloc)) then
+        errmsg_alloc = report_msg
+      end if
+    end if
+  end subroutine
+
   ! verify state invariants for a coarray_handle
   ! Note this function validates invariants with deliberately UNconditional assertions
   ! Suggested caller usage for conditional validation is: 
