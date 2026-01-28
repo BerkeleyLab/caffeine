@@ -15,6 +15,7 @@ submodule(prif) prif_private_s
         c_f_pointer, &
         c_f_procpointer, &
         c_funloc, &
+        c_int32_t, &
         c_loc, &
         c_null_funptr, &
         c_sizeof, &
@@ -339,7 +340,55 @@ submodule(prif) prif_private_s
 
   end interface
 
+  interface num_to_str
+    module procedure num_to_str32
+    module procedure num_to_str64
+  end interface
+
 contains
+
+  pure function num_to_str32(num, is_mem_size) result(str)
+    integer(c_int32_t), value :: num
+    logical, intent(in), optional :: is_mem_size
+    character(len=:), allocatable :: str
+    
+    str = num_to_str64(int(num, c_int64_t), is_mem_size)
+  end function
+
+  pure function num_to_str64(num, is_mem_size) result(str)
+    integer(c_int64_t), value :: num
+    logical, intent(in), optional :: is_mem_size
+    character(len=:), allocatable :: str, unit
+    character(len=40) num_str
+    integer(c_int64_t) :: divisor
+
+    if (present(is_mem_size)) then
+    if (is_mem_size) then
+      divisor = 1 
+      ! Try to strike a compromise between digits and round off
+#     define CAF_USE_DIV(div, unit_str)  \
+        if ((num .ge. 10*div) .or. (num .ge. div .and. mod(num, div) == 0)) then ; \
+          divisor = div; unit = unit_str; exit; \
+        end if
+      do
+        CAF_USE_DIV(ishft(1_c_int64_t,40), " TiB")
+        CAF_USE_DIV(ishft(1_c_int64_t,30), " GiB")
+        CAF_USE_DIV(ishft(1_c_int64_t,20), " MiB")
+        CAF_USE_DIV(ishft(1_c_int64_t,10), " KiB")
+        CAF_USE_DIV(1_c_int64_t, " B");
+        exit
+      end do 
+      num = num / divisor
+#     undef CAF_USE_DIV
+    end if
+    end if
+
+    write(num_str, '(i0)') num
+    str = trim(adjustl(num_str))
+    if (allocated(unit)) then
+      str = str // unit
+    end if
+  end function
 
   pure function as_int(ptr)
     type(c_ptr), intent(in) :: ptr

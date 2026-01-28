@@ -183,9 +183,6 @@ void caf_fatal_error( const CFI_cdesc_t* Fstr )
 void* caf_allocate(mspace heap, size_t bytes)
 {
    void* allocated_space = mspace_memalign(heap, 8, bytes);
-   if (!allocated_space) // uh-oh, something went wrong..
-     gasnett_fatalerror("caf_allocate failed to mspace_memalign(%"PRIuSZ")", 
-                        bytes);
    return allocated_space;
 }
 
