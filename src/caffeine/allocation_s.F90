@@ -82,7 +82,6 @@ contains
   module procedure prif_deallocate_coarrays
 #endif
     integer :: i, num_handles
-    character(len=*), parameter :: unallocated_message = "Attempted to deallocate unallocated coarray"
     type(prif_coarray_handle), target :: coarray_handle
 # if HAVE_FINAL_FUNC_SUPPORT
     abstract interface
@@ -102,17 +101,9 @@ contains
     call prif_sync_all ! Need to ensure we don't deallocate anything till everyone gets here
     num_handles = size(coarray_handles)
     if (.not. all([(associated(coarray_handles(i)%info), i = 1, num_handles)])) then
-      if (present(stat)) then
-        stat = 1 ! TODO: decide what our stat codes should be
-        if (present(errmsg)) then
-          errmsg = unallocated_message
-        else if (present(errmsg_alloc)) then
-          errmsg_alloc = unallocated_message
-        end if
-        return
-      else
-        call prif_error_stop(.false._c_bool, stop_code_char=unallocated_message)
-      end if
+      call report_error(CAF_STAT_INVALID_ARGUMENT, "Attempted to deallocate unallocated coarray", &
+                        stat, errmsg, errmsg_alloc)
+      return
     end if
     call_assert(all(coarray_handle_check(coarray_handles)))
 
@@ -129,17 +120,9 @@ contains
           if (.not. allocated(local_errmsg)) then ! provide a default errmsg
             local_errmsg = "coarray_cleanup finalization callback failed"
           end if
-          if (present(stat)) then
-            stat = local_stat
-            if (present(errmsg)) then
-              errmsg = local_errmsg
-            else if (present(errmsg_alloc)) then
-              call move_alloc(local_errmsg, errmsg_alloc)
-            end if
-            return ! NOTE: We no longer have guarantees that coarrays are in consistent state
-          else
-            call prif_error_stop(.false._c_bool, stop_code_char=local_errmsg)
-          end if
+          call report_error(local_stat, local_errmsg, &
+                            stat, errmsg, errmsg_alloc)
+          return ! NOTE: We no longer have guarantees that coarrays are in consistent state
         end if
 #     else
         ! TODO: issue a warning that we are ignoring the final_func?
