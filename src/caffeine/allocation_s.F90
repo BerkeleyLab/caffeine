@@ -36,7 +36,11 @@ contains
       descriptor_size = c_sizeof(unused)
       total_size = descriptor_size + size_in_bytes
       whole_block = caf_allocate(current_team%info%heap_mspace, total_size)
-      block_offset = as_int(whole_block) - current_team%info%heap_start
+      if (.not. c_associated(whole_block)) then
+        block_offset = -1 ! out of memory
+      else
+        block_offset = as_int(whole_block) - current_team%info%heap_start
+      end if
     else
       block_offset = 0
     end if
@@ -44,6 +48,14 @@ contains
     ! Use a co_sum to aggregate broadcasing the information from image 1
     ! together with the team barrier spec-required by coarray allocation
     call prif_co_sum(block_offset)
+    if (block_offset == -1) then ! out of memory - abort allocation attempt
+      call report_error(PRIF_STAT_OUT_OF_MEMORY, out_of_memory_message(size_in_bytes, .true.), &
+                        stat, errmsg, errmsg_alloc)
+      if (caf_have_child_teams()) then ! unroll state change above before return
+        call caf_establish_child_heap
+      end if
+      return
+    end if
     if (me /= 1) whole_block = as_c_ptr(current_team%info%heap_start + block_offset)
 
     call c_f_pointer(whole_block, coarray_handle%info)
@@ -70,8 +82,50 @@ contains
   end procedure
 
   module procedure prif_allocate
-    allocated_memory = caf_allocate(non_symmetric_heap_mspace, size_in_bytes)
+    type(c_ptr) :: mem
+
+    mem = caf_allocate(non_symmetric_heap_mspace, size_in_bytes)
+    if (.not. c_associated(mem)) then
+      call report_error(PRIF_STAT_OUT_OF_MEMORY, out_of_memory_message(size_in_bytes, .false.), &
+                        stat, errmsg, errmsg_alloc)
+    else
+      allocated_memory = mem
+    end if
   end procedure
+
+  function out_of_memory_message(size_in_bytes, symmetric) result(message)
+    integer(c_size_t), intent(in) :: size_in_bytes
+    logical, intent(in) :: symmetric
+    character(len=:), allocatable :: mem_type
+    character(len=:), allocatable :: message
+
+    message = "Fortran shared heap is out of memory"
+    if (symmetric) then
+      mem_type = "coarray"
+    else
+      message = message // " on image " // num_to_str(initial_team%this_image)
+      mem_type = "non-coarray"
+    end if
+    message = message // new_line('') &
+       // "  while allocating " // num_to_str(size_in_bytes, .true.) // " of additional " &
+       // mem_type // " memory." // new_line('') &
+       // new_line('') &
+       // "  Shared heap size information:" // new_line('') &
+       // "    Total shared heap:          " // pad(num_to_str(total_heap_size, .true.)) &
+       // "    (CAF_HEAP_SIZE)" // new_line('') &
+       // "    Total non-coarray heap:     " // pad(num_to_str(non_symmetric_heap_size, .true.)) &
+       // "    (CAF_COMP_FRAC * CAF_HEAP_SIZE)" // new_line('') &
+       // "    Current team coarray heap:  " // pad(num_to_str(current_team%info%heap_size, .true.)) // new_line('') &
+       // new_line('') &
+       // "  Consider setting the CAF_HEAP_SIZE environment variable to request a larger heap."
+  contains
+    function pad(str) result(s)
+      character(len=*), intent(in) :: str
+      character(len=:), allocatable :: s
+      s = str
+      s = repeat(' ',max(0, 10 - len(str))) // s
+    end function
+  end function
 
 #if CAF_PRIF_VERSION <= 6
   module procedure prif_deallocate_coarray
@@ -82,7 +136,6 @@ contains
   module procedure prif_deallocate_coarrays
 #endif
     integer :: i, num_handles
-    character(len=*), parameter :: unallocated_message = "Attempted to deallocate unallocated coarray"
     type(prif_coarray_handle), target :: coarray_handle
 # if HAVE_FINAL_FUNC_SUPPORT
     abstract interface
@@ -102,17 +155,9 @@ contains
     call prif_sync_all ! Need to ensure we don't deallocate anything till everyone gets here
     num_handles = size(coarray_handles)
     if (.not. all([(associated(coarray_handles(i)%info), i = 1, num_handles)])) then
-      if (present(stat)) then
-        stat = 1 ! TODO: decide what our stat codes should be
-        if (present(errmsg)) then
-          errmsg = unallocated_message
-        else if (present(errmsg_alloc)) then
-          errmsg_alloc = unallocated_message
-        end if
-        return
-      else
-        call prif_error_stop(.false._c_bool, stop_code_char=unallocated_message)
-      end if
+      call report_error(CAF_STAT_INVALID_ARGUMENT, "Attempted to deallocate unallocated coarray", &
+                        stat, errmsg, errmsg_alloc)
+      return
     end if
     call_assert(all(coarray_handle_check(coarray_handles)))
 
@@ -129,17 +174,9 @@ contains
           if (.not. allocated(local_errmsg)) then ! provide a default errmsg
             local_errmsg = "coarray_cleanup finalization callback failed"
           end if
-          if (present(stat)) then
-            stat = local_stat
-            if (present(errmsg)) then
-              errmsg = local_errmsg
-            else if (present(errmsg_alloc)) then
-              call move_alloc(local_errmsg, errmsg_alloc)
-            end if
-            return ! NOTE: We no longer have guarantees that coarrays are in consistent state
-          else
-            call prif_error_stop(.false._c_bool, stop_code_char=local_errmsg)
-          end if
+          call report_error(local_stat, local_errmsg, &
+                            stat, errmsg, errmsg_alloc)
+          return ! NOTE: We no longer have guarantees that coarrays are in consistent state
         end if
 #     else
         ! TODO: issue a warning that we are ignoring the final_func?
@@ -164,6 +201,7 @@ contains
 
   module procedure prif_deallocate
     call caf_deallocate(non_symmetric_heap_mspace, mem)
+    if (present(stat)) stat = 0
   end procedure
 
   subroutine add_to_team_list(coarray_handle)

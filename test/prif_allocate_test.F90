@@ -6,10 +6,11 @@ module prif_allocate_test_m
   use prif, only : &
       prif_num_images, prif_size_bytes, &
       prif_set_context_data, prif_get_context_data, prif_local_data_pointer, &
-      prif_alias_create, prif_alias_destroy, prif_this_image_no_coarray
+      prif_alias_create, prif_alias_destroy, prif_this_image_no_coarray, &
+      PRIF_STAT_OUT_OF_MEMORY
 
   use julienne_m, only: test_description_t, test_diagnosis_t, test_result_t, test_t, string_t, usher &
-    ,operator(.all.), operator(.also.), operator(.equalsExpected.), operator(//)
+    ,operator(.all.), operator(.also.), operator(.equalsExpected.), operator(.isAtLeast.), operator(//)
 
   implicit none
   private
@@ -53,6 +54,8 @@ contains
          , usher(check_final_func) &
 #      endif
        ) &
+      ,test_description_t("reporting out-of-memory errors", &
+         usher(check_allocation_oom)) &
     ]))
   end function
 
@@ -379,4 +382,46 @@ contains
     call prif_deallocate_coarray(coarray_handle)
 
   end function
+
+  function check_allocation_oom() result(diag)
+    type(test_diagnosis_t) diag 
+
+    integer(c_size_t) :: size_in_bytes
+    type(c_ptr) :: allocated_memory
+    integer(c_int) :: stat
+    character(len=:), allocatable :: errmsg
+    integer(kind=c_int64_t), dimension(1) :: lcobounds, ucobounds
+    integer :: num_imgs
+    type(prif_coarray_handle) :: coarray_handle
+
+    diag = .true.
+
+    size_in_bytes = ishft(500_c_size_t, 40) ! 500TB
+
+    call prif_allocate(size_in_bytes, allocated_memory, stat, errmsg_alloc=errmsg)
+    ALSO(stat .equalsExpected. PRIF_STAT_OUT_OF_MEMORY)
+    ALSO(allocated(errmsg))
+    if (allocated(errmsg)) then
+      ALSO(len(errmsg) > 1)
+      ALSO(index(errmsg, 'out of memory') .isAtLeast. 1)
+    end if
+    deallocate(errmsg)
+
+    call prif_num_images(num_images=num_imgs)
+    lcobounds(1) = 1
+    ucobounds(1) = num_imgs
+
+    call prif_allocate_coarray( &
+      lcobounds, ucobounds, size_in_bytes, c_null_funptr, &
+      coarray_handle, allocated_memory, stat, errmsg_alloc=errmsg)
+    ALSO(stat .equalsExpected. PRIF_STAT_OUT_OF_MEMORY)
+    ALSO(allocated(errmsg))
+    if (allocated(errmsg)) then
+      ALSO(len(errmsg) > 1)
+      ALSO(index(errmsg, 'out of memory') .isAtLeast. 1)
+    end if
+    deallocate(errmsg)
+
+  end function
+
 end module prif_allocate_test_m

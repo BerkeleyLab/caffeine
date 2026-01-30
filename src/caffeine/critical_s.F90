@@ -9,6 +9,8 @@ contains
 
   module procedure prif_critical
     call unimplemented("prif_critical")
+    
+    if (present(stat)) stat = 0
   end procedure
 
   module procedure prif_end_critical

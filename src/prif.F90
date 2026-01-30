@@ -119,6 +119,9 @@ module prif
     PRIF_STAT_OUT_OF_MEMORY         = 301, &
     PRIF_STAT_ALREADY_INIT          = 302
 
+  integer(c_int), parameter, private :: &
+    CAF_STAT_INVALID_ARGUMENT       = 404
+
   type, public :: prif_event_type
     private
     integer(PRIF_ATOMIC_INT_KIND) :: counter = 0
