@@ -26,7 +26,6 @@ submodule(prif) prif_private_s
 
   type(prif_team_descriptor), target :: initial_team
   type(prif_team_type) :: current_team
-  type(c_ptr) :: non_symmetric_heap_mspace
   integer(c_intptr_t) :: total_heap_size, non_symmetric_heap_size
 
   interface
@@ -38,13 +37,12 @@ submodule(prif) prif_private_s
         symmetric_heap, &
         symmetric_heap_start, &
         symmetric_heap_size, &
-        non_symmetric_heap, &
         initial_team) &
         bind(C)
       import c_ptr, c_intptr_t
       implicit none
       integer(c_intptr_t), intent(out) :: total_heap_size, symmetric_heap_start, symmetric_heap_size
-      type(c_ptr), intent(out) :: symmetric_heap, non_symmetric_heap
+      type(c_ptr), intent(out) :: symmetric_heap
       type(c_ptr), intent(out) :: initial_team
     end subroutine
 
@@ -112,6 +110,13 @@ submodule(prif) prif_private_s
        type(c_ptr) :: ptr
     end function
 
+    function caf_allocate_non_symmetric(bytes) result(ptr) bind(c)
+       import c_size_t, c_ptr
+       implicit none
+       integer(c_size_t), intent(in), value :: bytes
+       type(c_ptr) :: ptr
+    end function
+
     subroutine caf_allocate_remaining(mspace, allocated_space, allocated_size) bind(c)
       import c_size_t, c_ptr
       implicit none
@@ -124,6 +129,12 @@ submodule(prif) prif_private_s
       import c_ptr
       implicit none
       type(c_ptr), intent(in), value :: mspace
+      type(c_ptr), intent(in), value :: mem
+    end subroutine
+
+    subroutine caf_deallocate_non_symmetric(mem) bind(c)
+      import c_ptr
+      implicit none
       type(c_ptr), intent(in), value :: mem
     end subroutine
 
