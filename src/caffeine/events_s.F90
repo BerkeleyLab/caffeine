@@ -41,7 +41,7 @@ contains
       threshold = 1
     endif
     call caf_event_wait(event_var_ptr, threshold, &
-           segment_boundary=1, acquire_fence=1)
+           segment_boundary=1, acquire_fence=1, maybe_concurrent=0)
 
     if (present(stat)) stat = 0
   end procedure
@@ -61,7 +61,7 @@ contains
       threshold = 1
     endif
     call caf_event_wait(notify_var_ptr, threshold, &
-           segment_boundary=0, acquire_fence=1)
+           segment_boundary=0, acquire_fence=1, maybe_concurrent=1)
 
     if (present(stat)) stat = 0
   end procedure

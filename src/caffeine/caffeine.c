@@ -346,7 +346,8 @@ void caf_event_query(void *event_var_ptr, int64_t *count) {
   );
 }
 
-void caf_event_wait(void *event_var_ptr, int64_t threshold, int segment_boundary, int acquire_fence) {
+void caf_event_wait(void *event_var_ptr, int64_t threshold, 
+                    int segment_boundary, int acquire_fence, int maybe_concurrent) {
   assert(event_AD != GEX_AD_INVALID);
   assert(event_var_ptr);
   assert(threshold >= 1);
@@ -364,18 +365,40 @@ void caf_event_wait(void *event_var_ptr, int64_t threshold, int segment_boundary
   }
 
   int64_t cnt = 0;
-  while (caf_event_query(event_var_ptr, &cnt), cnt < threshold) {
-    // issue #222 : TODO: we probably want to insert a wait hook here
-    gasnet_AMPoll();
-  }
+  if (maybe_concurrent) {
+    static gasnett_mutex_t notify_wait_lock = GASNETT_MUTEX_INITIALIZER;
+    while (1) {
+      while (caf_event_query(event_var_ptr, &cnt), cnt < threshold) {
+        // issue #222 : TODO: we probably want to insert a wait hook here
+        gasnet_AMPoll();
+      }
+      LOCK(notify_wait_lock);
+        if (caf_event_query(event_var_ptr, &cnt), cnt >= threshold) {
+          gex_Event_Wait(
+            gex_AD_OpNB_I64(event_AD, &cnt, 
+                            myproc, event_var_ptr,
+                            GEX_OP_FSUB, threshold, 0,
+                            flags)
+          );
+          assert(cnt >= threshold);
+          UNLOCK(notify_wait_lock);
+          break;
+        } else UNLOCK(notify_wait_lock);
+    }
+  } else { // not concurrent
+    while (caf_event_query(event_var_ptr, &cnt), cnt < threshold) {
+      // issue #222 : TODO: we probably want to insert a wait hook here
+      gasnet_AMPoll();
+    }
 
-  gex_Event_Wait(
-    gex_AD_OpNB_I64(event_AD, &cnt, 
-                    myproc, event_var_ptr,
-                    GEX_OP_FSUB, threshold, 0,
-                    flags)
-  );
-  assert(cnt >= threshold);
+    gex_Event_Wait(
+      gex_AD_OpNB_I64(event_AD, &cnt, 
+                      myproc, event_var_ptr,
+                      GEX_OP_FSUB, threshold, 0,
+                      flags)
+    );
+    assert(cnt >= threshold);
+  }
 }
 
 // _______________________ Atomics ____________________________
