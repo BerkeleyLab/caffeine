@@ -46,8 +46,12 @@ submodule(prif) prif_private_s
       type(c_ptr), intent(out) :: initial_team
     end subroutine
 
+    subroutine caf_acquire_exit_lock() bind(C)
+      !! void caf_acquire_exit_lock()
+    end subroutine
+
     subroutine caf_decaffeinate(exit_code) bind(C)
-      !! void c_decaffeinate();
+      !! void caf_decaffeinate(int exit_code)
       import c_int
       implicit none
       integer(c_int), value :: exit_code
