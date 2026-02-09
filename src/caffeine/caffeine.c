@@ -168,8 +168,12 @@ void caf_caffeinate(
   event_init();
 }
 
-void caf_decaffeinate(int exit_code)
-{
+void caf_acquire_exit_lock() {
+  static gasnett_mutex_t exit_lock = GASNETT_MUTEX_INITIALIZER;
+  LOCK(exit_lock);
+}
+
+void caf_decaffeinate(int exit_code) {
   gasnet_exit(exit_code);
 }
 
