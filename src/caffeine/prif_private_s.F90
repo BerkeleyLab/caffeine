@@ -232,14 +232,13 @@ submodule(prif) prif_private_s
       integer(c_int), intent(in), value :: release_fence
     end subroutine
 
-    subroutine caf_event_wait(event_var_ptr, threshold, segment_boundary, acquire_fence) bind(c)
-      !! void caf_event_wait(void *event_var_ptr, int64_t threshold, int segment_boundary, int acquire_fence)
+    subroutine caf_event_wait(event_var_ptr, threshold, segment_boundary, acquire_fence, maybe_concurrent) bind(c)
+      !! void caf_event_wait(void *event_var_ptr, int64_t threshold, int segment_boundary, int acquire_fence, int maybe_concurrent)
       import c_int64_t, c_ptr, c_int
       implicit none
       type(c_ptr), intent(in), value :: event_var_ptr
       integer(c_int64_t), intent(in), value :: threshold
-      integer(c_int), intent(in), value :: segment_boundary
-      integer(c_int), intent(in), value :: acquire_fence
+      integer(c_int), intent(in), value :: segment_boundary, acquire_fence, maybe_concurrent
     end subroutine
 
     subroutine caf_event_query(event_var_ptr, count) bind(c)
