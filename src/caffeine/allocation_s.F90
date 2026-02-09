@@ -84,7 +84,7 @@ contains
   module procedure prif_allocate
     type(c_ptr) :: mem
 
-    mem = caf_allocate(non_symmetric_heap_mspace, size_in_bytes)
+    mem = caf_allocate_non_symmetric(size_in_bytes)
     if (.not. c_associated(mem)) then
       call report_error(PRIF_STAT_OUT_OF_MEMORY, out_of_memory_message(size_in_bytes, .false.), &
                         stat, errmsg, errmsg_alloc)
@@ -200,7 +200,7 @@ contains
   end procedure
 
   module procedure prif_deallocate
-    call caf_deallocate(non_symmetric_heap_mspace, mem)
+    call caf_deallocate_non_symmetric(mem)
     if (present(stat)) stat = 0
   end procedure
 

@@ -30,6 +30,9 @@ static gex_Rank_t myproc, numprocs;
 static gex_Segment_t mysegment;
 static gex_TM_t myworldteam;
 
+static mspace* non_symmetric_heap;
+static gasnett_mutex_t non_symmetric_heap_lock = GASNETT_MUTEX_INITIALIZER;
+
 typedef void(*final_func_ptr)(void*, size_t) ;
 typedef uint8_t byte;
 
@@ -94,7 +97,6 @@ void caf_caffeinate(
   mspace* symmetric_heap,
   intptr_t* symmetric_heap_start,
   intptr_t* symmetric_heap_size,
-  mspace* non_symmetric_heap,
   gex_TM_t* initial_team
 ) {
   GASNET_SAFE(gex_Client_Init(&myclient, &myep, &myworldteam, "caffeine", NULL, NULL, 0));
@@ -157,9 +159,9 @@ void caf_caffeinate(
     assert(*symmetric_heap);
     mspace_set_footprint_limit(*symmetric_heap, *symmetric_heap_size);
   }
-  *non_symmetric_heap = create_mspace_with_base((void*)non_symmetric_heap_start, non_symmetric_heap_size, 0);
-  assert(*non_symmetric_heap);
-  mspace_set_footprint_limit(*non_symmetric_heap, non_symmetric_heap_size);
+  non_symmetric_heap = create_mspace_with_base((void*)non_symmetric_heap_start, non_symmetric_heap_size, 0);
+  assert(non_symmetric_heap);
+  mspace_set_footprint_limit(non_symmetric_heap, non_symmetric_heap_size);
 
   // init various subsystems:
   atomic_init();
@@ -191,10 +193,16 @@ void caf_fatal_error( const CFI_cdesc_t* Fstr )
   gasnett_fatalerror_nopos("%.*s", len, msg);
 }
 
-void* caf_allocate(mspace heap, size_t bytes)
-{
-   void* allocated_space = mspace_memalign(heap, 8, bytes);
-   return allocated_space;
+void* caf_allocate(mspace heap, size_t bytes) {
+  void* allocated_space = mspace_memalign(heap, 8, bytes);
+  return allocated_space;
+}
+
+void* caf_allocate_non_symmetric(size_t bytes) {
+  LOCK(non_symmetric_heap_lock);
+  void* allocated_space = caf_allocate(non_symmetric_heap, bytes);
+  UNLOCK(non_symmetric_heap_lock);
+  return allocated_space;
 }
 
 void caf_allocate_remaining(mspace heap, void** allocated_space, size_t* allocated_size)
@@ -217,9 +225,14 @@ void caf_allocate_remaining(mspace heap, void** allocated_space, size_t* allocat
                        *allocated_size);
 }
 
-void caf_deallocate(mspace heap, void* mem)
-{
+void caf_deallocate(mspace heap, void* mem) {
   mspace_free(heap, mem);
+}
+
+void caf_deallocate_non_symmetric(void* mem) {
+  LOCK(non_symmetric_heap_lock);
+  caf_deallocate(non_symmetric_heap, mem);
+  UNLOCK(non_symmetric_heap_lock);
 }
 
 void caf_establish_mspace(mspace* heap, void* heap_start, size_t heap_size)
