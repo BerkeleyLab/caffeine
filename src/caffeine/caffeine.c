@@ -37,6 +37,17 @@ static void event_init(void);
 static void atomic_init(void);
 
 // ---------------------------------------------------
+// Thread-safety support
+
+#if GASNET_PAR
+  #define LOCK(m)   gasnett_mutex_lock(&(m))
+  #define UNLOCK(m) gasnett_mutex_unlock(&(m))
+#else
+  #define LOCK(m)   do{}while(0)
+  #define UNLOCK(m) do{}while(0)
+#endif
+
+// ---------------------------------------------------
 // Floating-point exception support
 
 #ifndef IEEE_FE_MASK
