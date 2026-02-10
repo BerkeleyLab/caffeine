@@ -18,6 +18,7 @@
 #include "../dlmalloc/dl_malloc_caf.h"
 #include "../dlmalloc/dl_malloc.h"
 #include "caffeine-internal.h"
+#include "version.h"
 
 enum {
   UNRECOGNIZED_TYPE,
@@ -38,6 +39,34 @@ typedef uint8_t byte;
 
 static void event_init(void);
 static void atomic_init(void);
+
+#define CAF_IDENT(name, contents) \
+        GASNETT_IDENT(caf_IdentString_ ## name, \
+                      "$Caffeine" #name ": " contents " $")
+CAF_IDENT(Network, CAF_STRINGIFY(GASNET_CONDUIT_NAME));
+#if GASNET_SEQ
+  CAF_IDENT(ThreadMode, "SEQ");
+#elif GASNET_PAR
+  CAF_IDENT(ThreadMode, "PAR");
+#endif
+CAF_IDENT(LibraryVersion, CAF_STRINGIFY(CAF_RELEASE_VERSION_MAJOR) "."
+                          CAF_STRINGIFY(CAF_RELEASE_VERSION_MINOR) "."
+                          CAF_STRINGIFY(CAF_RELEASE_VERSION_PATCH));
+#if 0
+// TODO: PRIFVersion does not correctly respect FORCE_PRIF_X flags unless they are also passed in CFLAGS
+CAF_IDENT(PRIFVersion, CAF_STRINGIFY(CAF_PRIF_VERSION_MAJOR) "."
+                       CAF_STRINGIFY(CAF_PRIF_VERSION_MINOR));
+#endif
+#if 0
+#if ASSERTIONS // TODO: This doesn't yet work, until we fix issue #241
+  CAF_IDENT(Assertions, "1");
+#else
+  CAF_IDENT(Assertions, "0");
+#endif
+#endif
+CAF_IDENT(BuildTime, __DATE__ " " __TIME__ );
+CAF_IDENT(CompilerID, PLATFORM_COMPILER_IDSTR);
+CAF_IDENT(GASNetConfig, GASNET_CONFIG_STRING);
 
 // ---------------------------------------------------
 // Thread-safety support
