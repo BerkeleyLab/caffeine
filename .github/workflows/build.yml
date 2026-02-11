@@ -284,7 +284,7 @@ jobs:
         echo SUBJOB_PREFIX=${SUBJOB_PREFIX}
         while (( CAF_IMAGES > 0 )); do \
           echo CAF_IMAGES=${CAF_IMAGES} ; \
-          ( set -x ; ./run-fpm.sh test --verbose -- -d ) ; \
+          ( set -x ; ./run-fpm.sh test --verbose -- ) ; \
           sleep 1 ; \
           CAF_IMAGES=$(( CAF_IMAGES / 2 )) ; \
         done
@@ -318,4 +318,12 @@ jobs:
             && grep -q "stderr from image $CAF_IMAGES" output \
          ) ; \
         done
+
+    - name: Build and Test Caffeine (thread-safe)
+      run: |
+        for var in FC CC CXX FFLAGS CPPFLAGS CFLAGS LDFLAGS LIBS GASNET_CONFIGURE_ARGS ; do \
+            eval echo "$var=\$$var"; done
+        set -x
+        ./install.sh --prefix=${PREFIX} --network=${{ matrix.network }} --enable-threads --verbose
+        ./run-fpm.sh test --verbose --
 
