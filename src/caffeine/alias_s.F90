@@ -2,7 +2,7 @@
 ! Terms of use are as specified in LICENSE.txt
 
 #include "assert_macros.h"
-#include "language-support.F90"
+#include "version.h"
 
 submodule(prif:prif_private_s) alias_s
   ! DO NOT ADD USE STATEMENTS HERE

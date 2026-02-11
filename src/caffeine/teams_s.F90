@@ -1,7 +1,7 @@
 ! Copyright (c), The Regents of the University of California
 ! Terms of use are as specified in LICENSE.txt
 
-#include "language-support.F90"
+#include "version.h"
 
 submodule(prif:prif_private_s) teams_s
   ! DO NOT ADD USE STATEMENTS HERE
