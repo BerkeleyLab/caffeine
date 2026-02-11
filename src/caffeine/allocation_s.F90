@@ -2,6 +2,7 @@
 ! Terms of use are as specified in LICENSE.txt
 
 #include "assert_macros.h"
+#include "version.h"
 #include "language-support.F90"
 
 submodule(prif:prif_private_s) allocation_s
