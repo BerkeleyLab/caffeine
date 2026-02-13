@@ -114,7 +114,7 @@ See also [issue #228](https://github.com/BerkeleyLab/caffeine/issues/228).
 
 The `install.sh` recognizes a number of command-line options and environment variables to
 customize behavior for your system. See the output of `./install.sh --help` for full documentation,
-including options for how to build for a distributed-memory platform.
+including options for how to build for a distributed-memory platform or with thread-safety.
 
 
 Example Usage
