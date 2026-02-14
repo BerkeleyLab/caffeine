@@ -14,6 +14,7 @@ contains
        stat = PRIF_STAT_ALREADY_INIT
     else
        call caf_caffeinate( &
+          total_heap_size, &
           initial_team%heap_mspace, &
           initial_team%heap_start, &
           initial_team%heap_size, &
@@ -25,6 +26,7 @@ contains
        initial_team%team_number = -1
        initial_team%this_image = caf_this_image(initial_team%gex_team)
        initial_team%num_images = caf_num_images(initial_team%gex_team)
+       non_symmetric_heap_size = total_heap_size - initial_team%heap_size
 
        call sync_init()
 

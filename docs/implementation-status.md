@@ -31,11 +31,6 @@ the labels in the Caffeine [issue tracker](https://github.com/BerkeleyLab/caffei
 Caffeine contains definitions for all of the PRIF-relevant constants from ISO_FORTRAN_ENV and for
 all of the PRIF-specific constants.
 
-## `stat` and `errmsg` support
-
-Many PRIF procedures have optional arguments `stat`, `errmsg`, and `errmsg_alloc`. These arguments
-are accepted, but in some cases, the associated runtime behavior is not fully implemented.
-
 ## Program Startup and Shutdown
 
 | Procedure | Status | Notes |

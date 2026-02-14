@@ -23,6 +23,8 @@ contains
       call caf_establish_child_heap
     end if
     call prif_sync_all ! child team sync required by F23 11.1.5.2
+
+    if (present(stat)) stat = 0
   end procedure
 
   module procedure prif_end_team
@@ -61,6 +63,8 @@ contains
 
     ! set the current team back to the parent team
     current_team%info => current_team%info%parent_team
+
+    if (present(stat)) stat = 0
   end procedure
 
   module procedure prif_form_team
@@ -92,6 +96,8 @@ contains
       team%info%this_image = caf_this_image(team%info%gex_team)
       team%info%num_images = caf_num_images(team%info%gex_team)
     end block
+
+    if (present(stat)) stat = 0
   end procedure
 
   module procedure prif_get_team

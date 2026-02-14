@@ -15,6 +15,7 @@ submodule(prif) prif_private_s
         c_f_pointer, &
         c_f_procpointer, &
         c_funloc, &
+        c_int32_t, &
         c_loc, &
         c_null_funptr, &
         c_sizeof, &
@@ -26,12 +27,14 @@ submodule(prif) prif_private_s
   type(prif_team_descriptor), target :: initial_team
   type(prif_team_type) :: current_team
   type(c_ptr) :: non_symmetric_heap_mspace
+  integer(c_intptr_t) :: total_heap_size, non_symmetric_heap_size
 
   interface
 
     ! ________ Program initiation and finalization ___________
 
     subroutine caf_caffeinate( &
+        total_heap_size, &
         symmetric_heap, &
         symmetric_heap_start, &
         symmetric_heap_size, &
@@ -40,9 +43,8 @@ submodule(prif) prif_private_s
         bind(C)
       import c_ptr, c_intptr_t
       implicit none
-      type(c_ptr), intent(out) :: symmetric_heap
-      integer(c_intptr_t), intent(out) :: symmetric_heap_start, symmetric_heap_size
-      type(c_ptr), intent(out) :: non_symmetric_heap
+      integer(c_intptr_t), intent(out) :: total_heap_size, symmetric_heap_start, symmetric_heap_size
+      type(c_ptr), intent(out) :: symmetric_heap, non_symmetric_heap
       type(c_ptr), intent(out) :: initial_team
     end subroutine
 
@@ -338,7 +340,55 @@ submodule(prif) prif_private_s
 
   end interface
 
+  interface num_to_str
+    module procedure num_to_str32
+    module procedure num_to_str64
+  end interface
+
 contains
+
+  pure function num_to_str32(num, is_mem_size) result(str)
+    integer(c_int32_t), value :: num
+    logical, intent(in), optional :: is_mem_size
+    character(len=:), allocatable :: str
+    
+    str = num_to_str64(int(num, c_int64_t), is_mem_size)
+  end function
+
+  pure function num_to_str64(num, is_mem_size) result(str)
+    integer(c_int64_t), value :: num
+    logical, intent(in), optional :: is_mem_size
+    character(len=:), allocatable :: str, unit
+    character(len=40) num_str
+    integer(c_int64_t) :: divisor
+
+    if (present(is_mem_size)) then
+    if (is_mem_size) then
+      divisor = 1 
+      ! Try to strike a compromise between digits and round off
+#     define CAF_USE_DIV(div, unit_str)  \
+        if ((num .ge. 10*div) .or. (num .ge. div .and. mod(num, div) == 0)) then ; \
+          divisor = div; unit = unit_str; exit; \
+        end if
+      do
+        CAF_USE_DIV(ishft(1_c_int64_t,40), " TiB")
+        CAF_USE_DIV(ishft(1_c_int64_t,30), " GiB")
+        CAF_USE_DIV(ishft(1_c_int64_t,20), " MiB")
+        CAF_USE_DIV(ishft(1_c_int64_t,10), " KiB")
+        CAF_USE_DIV(1_c_int64_t, " B");
+        exit
+      end do 
+      num = num / divisor
+#     undef CAF_USE_DIV
+    end if
+    end if
+
+    write(num_str, '(i0)') num
+    str = trim(adjustl(num_str))
+    if (allocated(unit)) then
+      str = str // unit
+    end if
+  end function
 
   pure function as_int(ptr)
     type(c_ptr), intent(in) :: ptr
@@ -380,6 +430,27 @@ contains
       c_val = 0_c_int
     end if
   end function
+
+  ! Report the provided error stat/msg using the provided optional stat/errmsg args
+  subroutine report_error(report_stat, report_msg, stat, errmsg, errmsg_alloc)
+    integer(c_int), intent(in) :: report_stat
+    character(len=*), intent(in) :: report_msg
+    integer(c_int), intent(out), optional :: stat
+    character(len=*), intent(inout), optional :: errmsg
+    character(len=:), intent(inout), allocatable , optional :: errmsg_alloc
+
+    call_assert(report_stat /= 0)
+    if (.not. present(stat)) then
+      call prif_error_stop(.false._c_bool, stop_code_char=report_msg)
+    else
+      stat = report_stat
+      if (present(errmsg)) then
+        errmsg = report_msg
+      else if (present(errmsg_alloc)) then
+        errmsg_alloc = report_msg
+      end if
+    end if
+  end subroutine
 
   ! verify state invariants for a coarray_handle
   ! Note this function validates invariants with deliberately UNconditional assertions

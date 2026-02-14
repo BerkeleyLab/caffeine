@@ -139,10 +139,14 @@ contains
 
   module procedure prif_initial_team_index
     call initial_index_helper(coarray_handle, sub, current_team, initial_team_index)
+
+    if (present(stat)) stat = 0
   end procedure
 
   module procedure prif_initial_team_index_with_team
     call initial_index_helper(coarray_handle, sub, team, initial_team_index)
+
+    if (present(stat)) stat = 0
   end procedure
 
   module procedure prif_initial_team_index_with_team_number
@@ -152,7 +156,9 @@ contains
       call initial_index_helper(coarray_handle, sub, current_team, initial_team_index)
     else
       call unimplemented("prif_initial_team_index_with_team_number: no support for sibling teams")
-    end if 
+    end if
+
+    if (present(stat)) stat = 0
   end procedure
 
   !---------------------------------------------------------------------

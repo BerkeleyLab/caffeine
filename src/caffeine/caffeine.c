@@ -79,6 +79,7 @@ int caf_image_from_initial(gex_TM_t tm, int image_num) {
 // ---------------------------------------------------
 // NOTE: gex_TM_T is a typedef to a C pointer, so the `gex_TM_t* initial_team` arg in the C signature matches the BIND(C) interface of an `intent(out)` arg of type `c_ptr` for the same argument
 void caf_caffeinate(
+  intptr_t* total_heap_size,
   mspace* symmetric_heap,
   intptr_t* symmetric_heap_start,
   intptr_t* symmetric_heap_size,
@@ -90,41 +91,63 @@ void caf_caffeinate(
   numprocs = gex_TM_QuerySize(myworldteam);
   *initial_team = myworldteam;
 
+  #define PAGE_ALIGNUP(sz) ((sz + GASNET_PAGESIZE - 1) & ~(GASNET_PAGESIZE-1))
+
   // query largest possible segment GASNet can give us of the same size across all processes:
-  size_t max_seg = gasnet_getMaxGlobalSegmentSize();
+  uintptr_t max_seg = gasnet_getMaxGlobalSegmentSize();
   // impose a reasonable default size
   #ifndef CAF_DEFAULT_HEAP_SIZE
   #define CAF_DEFAULT_HEAP_SIZE (128*1024*1024) // 128 MiB
   #endif
-  size_t default_seg = MIN(max_seg, CAF_DEFAULT_HEAP_SIZE);
+  uintptr_t default_seg = MIN(max_seg, CAF_DEFAULT_HEAP_SIZE);
   // retrieve user preference, defaulting to the above and units of MiB
-  size_t segsz = gasnett_getenv_int_withdefault("CAF_HEAP_SIZE",
+  uintptr_t segsz = gasnett_getenv_int_withdefault("CAF_HEAP_SIZE",
                                                 default_seg, 1024*1024);
+  // ensure at least two full pages
+  segsz = MAX(segsz,2*GASNET_PAGESIZE);
+  // round-up to closest page size
+  segsz = PAGE_ALIGNUP(segsz);
   // cap user request to the largest available:
   // TODO: issue a console warning here instead of silently capping
   segsz = MIN(segsz,max_seg);
+  assert(segsz % GASNET_PAGESIZE == 0);
 
   GASNET_SAFE(gex_Segment_Attach(&mysegment, myworldteam, segsz));
 
   *symmetric_heap_start = (intptr_t)gex_Segment_QueryAddr(mysegment);
-  size_t total_heap_size = gex_Segment_QuerySize(mysegment);
+  *total_heap_size = gex_Segment_QuerySize(mysegment);
+  assert(*total_heap_size >= 2*GASNET_PAGESIZE);
 
   #ifndef CAF_DEFAULT_COMP_FRAC
   #define CAF_DEFAULT_COMP_FRAC 0.1f // 10%
   #endif
   float default_comp_frac = MAX(MIN(0.99f, CAF_DEFAULT_COMP_FRAC), 0.01f);
   float non_symmetric_fraction = gasnett_getenv_dbl_withdefault("CAF_COMP_FRAC", default_comp_frac);
-  assert(non_symmetric_fraction > 0 && non_symmetric_fraction < 1); // TODO: real error reporting
+  if (non_symmetric_fraction <= 0 || non_symmetric_fraction >= 1) {
+    gasnett_fatalerror_nopos("If used, environment variable 'CAF_COMP_FRAC' must be a valid floating point value or fraction between 0 and 1.");
+  }
 
-  size_t non_symmetric_heap_size = total_heap_size * non_symmetric_fraction;
-  *symmetric_heap_size = total_heap_size - non_symmetric_heap_size;
+  uintptr_t non_symmetric_heap_size = *total_heap_size * non_symmetric_fraction;
+  non_symmetric_heap_size = PAGE_ALIGNUP(non_symmetric_heap_size);
+  *symmetric_heap_size = *total_heap_size - non_symmetric_heap_size;
+  if (*symmetric_heap_size == 0) {
+    assert(non_symmetric_heap_size > GASNET_PAGESIZE);
+    non_symmetric_heap_size -= GASNET_PAGESIZE;
+    *symmetric_heap_size += GASNET_PAGESIZE;
+  }
+  assert(non_symmetric_heap_size > 0);
+  assert(non_symmetric_heap_size % GASNET_PAGESIZE == 0);
+  assert(*symmetric_heap_size > 0);
+  assert(*symmetric_heap_size % GASNET_PAGESIZE == 0);
   intptr_t non_symmetric_heap_start = *symmetric_heap_start + *symmetric_heap_size;
 
   if (myproc == 0) {
     *symmetric_heap = create_mspace_with_base((void*)*symmetric_heap_start, *symmetric_heap_size, 0);
+    assert(*symmetric_heap);
     mspace_set_footprint_limit(*symmetric_heap, *symmetric_heap_size);
   }
   *non_symmetric_heap = create_mspace_with_base((void*)non_symmetric_heap_start, non_symmetric_heap_size, 0);
+  assert(*non_symmetric_heap);
   mspace_set_footprint_limit(*non_symmetric_heap, non_symmetric_heap_size);
 
   // init various subsystems:
@@ -160,9 +183,6 @@ void caf_fatal_error( const CFI_cdesc_t* Fstr )
 void* caf_allocate(mspace heap, size_t bytes)
 {
    void* allocated_space = mspace_memalign(heap, 8, bytes);
-   if (!allocated_space) // uh-oh, something went wrong..
-     gasnett_fatalerror("caf_allocate failed to mspace_memalign(%"PRIuSZ")", 
-                        bytes);
    return allocated_space;
 }
 

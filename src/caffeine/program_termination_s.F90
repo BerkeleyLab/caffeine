@@ -52,12 +52,12 @@ contains
 
       if (present(stop_code)) then
         if (.not. quiet) then
-          write(output_unit, *) "STOP ", stop_code
+          write(output_unit, '(A, I0)') "STOP ", stop_code
         end if
         exit_code = stop_code
       else
         if (.not. quiet) then
-          write(output_unit, *) "STOP"
+          write(output_unit, '(A)') "STOP"
         end if
         exit_code = 0_c_int
       end if
@@ -74,7 +74,7 @@ contains
       character(len=*), intent(in) :: stop_code
 
       if (.not. quiet) then
-        write(output_unit, *) "STOP '" // stop_code // "'"
+        write(output_unit, '(A)') "STOP '" // stop_code // "'"
       end if
 
       call flush_all()
@@ -103,7 +103,7 @@ contains
     character(len=*), intent(in) :: stop_code
 
     if (.not. quiet) then
-      write(error_unit, *) "ERROR STOP '" // stop_code // "'"
+      write(error_unit, '(A)') "ERROR STOP '" // stop_code // "'"
     end if
 
     call flush_all()
@@ -124,7 +124,7 @@ contains
       exit_code = stop_code
     else
       if (.not.quiet) then
-        write(error_unit,'(a)') "ERROR STOP"
+        write(error_unit,'(A)') "ERROR STOP"
       end if
       exit_code = 1_c_int
     end if
