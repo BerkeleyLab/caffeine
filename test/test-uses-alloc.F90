@@ -5,7 +5,7 @@
 #ifndef CAF_INCLUDED_TEST_USES_ALLOC
 #define CAF_INCLUDED_TEST_USES_ALLOC
 
-#include "language-support.F90"
+#include "version.h"
 
 use prif, only : &
     prif_allocate_coarray, &

@@ -26,7 +26,6 @@ submodule(prif) prif_private_s
 
   type(prif_team_descriptor), target :: initial_team
   type(prif_team_type) :: current_team
-  type(c_ptr) :: non_symmetric_heap_mspace
   integer(c_intptr_t) :: total_heap_size, non_symmetric_heap_size
 
   interface
@@ -38,18 +37,21 @@ submodule(prif) prif_private_s
         symmetric_heap, &
         symmetric_heap_start, &
         symmetric_heap_size, &
-        non_symmetric_heap, &
         initial_team) &
         bind(C)
       import c_ptr, c_intptr_t
       implicit none
       integer(c_intptr_t), intent(out) :: total_heap_size, symmetric_heap_start, symmetric_heap_size
-      type(c_ptr), intent(out) :: symmetric_heap, non_symmetric_heap
+      type(c_ptr), intent(out) :: symmetric_heap
       type(c_ptr), intent(out) :: initial_team
     end subroutine
 
+    subroutine caf_acquire_exit_lock() bind(C)
+      !! void caf_acquire_exit_lock()
+    end subroutine
+
     subroutine caf_decaffeinate(exit_code) bind(C)
-      !! void c_decaffeinate();
+      !! void caf_decaffeinate(int exit_code)
       import c_int
       implicit none
       integer(c_int), value :: exit_code
@@ -112,6 +114,13 @@ submodule(prif) prif_private_s
        type(c_ptr) :: ptr
     end function
 
+    function caf_allocate_non_symmetric(bytes) result(ptr) bind(c)
+       import c_size_t, c_ptr
+       implicit none
+       integer(c_size_t), intent(in), value :: bytes
+       type(c_ptr) :: ptr
+    end function
+
     subroutine caf_allocate_remaining(mspace, allocated_space, allocated_size) bind(c)
       import c_size_t, c_ptr
       implicit none
@@ -124,6 +133,12 @@ submodule(prif) prif_private_s
       import c_ptr
       implicit none
       type(c_ptr), intent(in), value :: mspace
+      type(c_ptr), intent(in), value :: mem
+    end subroutine
+
+    subroutine caf_deallocate_non_symmetric(mem) bind(c)
+      import c_ptr
+      implicit none
       type(c_ptr), intent(in), value :: mem
     end subroutine
 
@@ -232,14 +247,13 @@ submodule(prif) prif_private_s
       integer(c_int), intent(in), value :: release_fence
     end subroutine
 
-    subroutine caf_event_wait(event_var_ptr, threshold, segment_boundary, acquire_fence) bind(c)
-      !! void caf_event_wait(void *event_var_ptr, int64_t threshold, int segment_boundary, int acquire_fence)
+    subroutine caf_event_wait(event_var_ptr, threshold, segment_boundary, acquire_fence, maybe_concurrent) bind(c)
+      !! void caf_event_wait(void *event_var_ptr, int64_t threshold, int segment_boundary, int acquire_fence, int maybe_concurrent)
       import c_int64_t, c_ptr, c_int
       implicit none
       type(c_ptr), intent(in), value :: event_var_ptr
       integer(c_int64_t), intent(in), value :: threshold
-      integer(c_int), intent(in), value :: segment_boundary
-      integer(c_int), intent(in), value :: acquire_fence
+      integer(c_int), intent(in), value :: segment_boundary, acquire_fence, maybe_concurrent
     end subroutine
 
     subroutine caf_event_query(event_var_ptr, count) bind(c)

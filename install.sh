@@ -23,6 +23,8 @@ USAGE:
                     Default prefix='\$HOME/.local/bin'
  --verbose          Show verbose build commands
  --yes              Assume (yes) to all prompts for non-interactive build
+ --enable-threads   Build a thread-safe Caffeine library and link to
+                    thread-safe GASNet, for use in threaded do-concurrent.
 
 All unrecognized arguments will be passed to GASNet's configure.
 
@@ -49,6 +51,7 @@ GCC_VERSION=${GCC_VERSION:=14}
 GASNET_VERSION="stable"
 VERBOSE=""
 GASNET_CONDUIT="${GASNET_CONDUIT:-smp}"
+GASNET_THREADMODE="${GASNET_THREADMODE:-seq}"
 YES=false
 
 list_prerequisites()
@@ -106,6 +109,9 @@ while [ "$1" != "" ]; do
         -y | --yes)
             YES="true"
             ;;
+        --enable-threads)  GASNET_THREADMODE=par ;;
+        --disable-threads) GASNET_THREADMODE=seq ;;
+
         *)
             # We pass the unmodified argument to GASNet configure
             # Quoting is believed sufficient for embedded whitespace but not quotes
@@ -328,7 +334,7 @@ EOF
   printf "Is it ok to download and install $1? [yes] "
 }
 
-pkg="gasnet-$GASNET_CONDUIT-seq"
+pkg="gasnet-$GASNET_CONDUIT-$GASNET_THREADMODE"
 export PKG_CONFIG_PATH
 
 if ! $PKG_CONFIG $pkg ; then
@@ -357,7 +363,7 @@ if ! $PKG_CONFIG $pkg ; then
       cmd="$cmd --with-cc=\"$CC\" --with-cxx=\"$CXX\""
       # select the GASNet config settings Caffeine requires, and disable unused features:
       cmd="$cmd --enable-$GASNET_CONDUIT"
-      cmd="$cmd --enable-seq --disable-par --disable-parsync"
+      cmd="$cmd --enable-seq --enable-par --disable-parsync"
       cmd="$cmd --disable-segment-everything"
       # TEMPORARY: disable MPI compatibility until we figure out how to support in fpm
       cmd="$cmd --disable-mpi-compat"
@@ -468,6 +474,10 @@ if ! [[ "$user_compiler_flags " =~ -[DU]ASSERTIONS[=\ ] ]] ; then
   compiler_flag+=" -DASSERTIONS"
 fi
 
+if [[ $GASNET_THREADMODE == "par" ]] ; then
+  compiler_flag+=" -DCAF_THREAD_SAFE"
+fi
+
 GASNET_CONDUIT_UPPER=$(tr '[:lower:]' '[:upper:]' <<<$GASNET_CONDUIT)
 compiler_flag+=" -DCAF_NETWORK_$GASNET_CONDUIT_UPPER"
 
@@ -530,7 +540,7 @@ chmod u+x $RUN_FPM_SH
 
 ./$RUN_FPM_SH build $VERBOSE
 
-LIBCAFFEINE_DST=libcaffeine-$GASNET_CONDUIT.a
+LIBCAFFEINE_DST=libcaffeine-$GASNET_CONDUIT-$GASNET_THREADMODE.a
 LIBCAFFEINE_SRC=$(./$RUN_FPM_SH install --list 2>/dev/null | grep libcaffeine | cut -d' ' -f2)
 
 if [ -z "$LIBCAFFEINE_SRC" ]; then
@@ -539,6 +549,7 @@ if [ -z "$LIBCAFFEINE_SRC" ]; then
 else
   mkdir -p "$PREFIX/lib"
   cp -af "$LIBCAFFEINE_SRC" "$PREFIX/lib/$LIBCAFFEINE_DST"
+  ln -sf "$LIBCAFFEINE_DST" "$PREFIX/lib/libcaffeine-$GASNET_CONDUIT.a"
   ln -sf "$LIBCAFFEINE_DST" "$PREFIX/lib/libcaffeine.a"
 fi
 

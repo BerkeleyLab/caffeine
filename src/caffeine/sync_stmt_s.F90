@@ -110,7 +110,8 @@ contains
       img = caf_image_to_initial( current_team%info%gex_team, img )
       call caf_event_wait(c_loc(si_evt(img)), 1_c_int64_t, &
                           segment_boundary=0, &
-                          acquire_fence=merge(1,0,i==u))
+                          acquire_fence=merge(1,0,i==u), &
+                          maybe_concurrent=0)
     end do
 
     if (present(stat)) stat = 0
