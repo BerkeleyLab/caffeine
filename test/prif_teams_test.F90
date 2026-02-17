@@ -1,4 +1,5 @@
 #include "test-utils.F90"
+#include "language-support.F90"
 
 module prif_teams_test_m
 # include "test-uses-alloc.F90"
@@ -15,6 +16,8 @@ module prif_teams_test_m
       procedure, nopass, non_overridable :: subject
       procedure, nopass, non_overridable :: results
     end type
+
+    integer :: cleanup_count = 0
 
 contains
     pure function subject()
@@ -34,12 +37,11 @@ contains
     function check_teams() result(diag)
         type(test_diagnosis_t) :: diag
 
-        ! TODO: use final_func to observe automatic deallocation of coarrays
         integer :: dummy_element, i
         integer(c_int) :: initial_num_imgs, num_imgs, me, me_child, x
         integer(c_size_t) :: element_size
         integer(c_int64_t) :: which_team, n
-        integer, parameter :: num_coarrays = 4
+        integer, parameter :: num_coarrays = 10
         type(prif_coarray_handle) :: coarrays(num_coarrays)
         type(c_ptr) :: allocated_memory
         type(prif_team_type) :: team, initial_team, t
@@ -159,19 +161,30 @@ contains
             call prif_this_image_no_coarray(team=initial_team, this_image=x)
             ALSO2(x .equalsExpected. me, "prif_this_image_no_coarray works with initial team")
 
+            ALSO(cleanup_count .equalsExpected. 0)
             do i = 1, num_coarrays
                 call prif_allocate_coarray( &
                     lcobounds = [1_c_int64_t], &
                     ucobounds = [int(num_imgs, c_int64_t)], &
                     size_in_bytes = element_size, &
+#if HAVE_FINAL_FUNC_SUPPORT
+                    final_func = c_funloc(coarray_cleanup), &
+#  define CHECK_COUNT(n) ALSO(cleanup_count .equalsExpected. n)
+#else
                     final_func = c_null_funptr, &
+#  define CHECK_COUNT(n) 
+#endif
                     coarray_handle = coarrays(i), &
                     allocated_memory = allocated_memory)
             end do
+            CHECK_COUNT(0)
             call prif_deallocate_coarrays(coarrays(4:4))
             call prif_deallocate_coarrays(coarrays(2:2))
+            call prif_deallocate_coarray(coarrays(7))
+            CHECK_COUNT(3)
 
         call prif_end_team()
+        CHECK_COUNT(num_coarrays)
 
         ! ensure prif_sync_team is usable
         call prif_sync_team(team=team)
@@ -183,4 +196,15 @@ contains
         ALSO2(n .equalsExpected. -1_c_int64_t, "prif_end_team restores initial team")
 
     end function
+
+#if HAVE_FINAL_FUNC_SUPPORT
+    subroutine coarray_cleanup(handle, stat, errmsg) bind(C)
+      type(prif_coarray_handle), pointer, intent(in) :: handle
+      integer(c_int), intent(out) :: stat
+      character(len=:), intent(out), allocatable :: errmsg
+
+      cleanup_count = cleanup_count + 1
+      stat = 0
+    end subroutine
+#endif
 end module prif_teams_test_m
