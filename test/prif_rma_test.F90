@@ -48,20 +48,16 @@ contains
         type(prif_coarray_handle) :: coarray_handle
         type(c_ptr) :: allocated_memory
         integer, pointer :: local_slice
-        integer(c_int64_t) :: lcobounds(1), ucobounds(1)
 
-        call prif_num_images(num_images=num_imgs)
-        lcobounds(1) = 1
-        ucobounds(1) = num_imgs
         call prif_allocate_coarray( &
-                lcobounds = lcobounds, &
-                ucobounds = ucobounds, &
+                [integer(c_int64_t) :: 1], [integer(c_int64_t)::], &
                 size_in_bytes = int(storage_size(dummy_element)/8, c_size_t), &
                 final_func = c_null_funptr, &
                 coarray_handle = coarray_handle, &
                 allocated_memory = allocated_memory)
         call c_f_pointer(allocated_memory, local_slice)
 
+        call prif_num_images(num_images=num_imgs)
         call prif_this_image_no_coarray(this_image=me)
         neighbor = merge(me+1, 1, me < num_imgs)
         expected = merge(me-1, num_imgs, me > 1)
@@ -96,15 +92,10 @@ contains
         type(prif_coarray_handle) :: coarray_handle
         type(c_ptr) :: allocated_memory
         type(my_type), pointer :: local_slice
-        integer(c_int64_t) :: lcobounds(1), ucobounds(1)
         integer(c_intptr_t) :: base_addr
 
-        call prif_num_images(num_images=num_imgs)
-        lcobounds(1) = 1
-        ucobounds(1) = num_imgs
         call prif_allocate_coarray( &
-                lcobounds = lcobounds, &
-                ucobounds = ucobounds, &
+                [integer(c_int64_t) :: 1], [integer(c_int64_t)::], &
                 size_in_bytes = int(storage_size(dummy_element)/8, c_size_t), &
                 final_func = c_null_funptr, &
                 coarray_handle = coarray_handle, &
@@ -115,6 +106,7 @@ contains
                 allocated_memory = local_slice%my_component)
         call prif_sync_all
 
+        call prif_num_images(num_images=num_imgs)
         call prif_this_image_no_coarray(this_image=me)
         neighbor = merge(me+1, 1, me < num_imgs)
         expected = merge(me-1, num_imgs, me > 1)
@@ -148,20 +140,16 @@ contains
         type(prif_coarray_handle) :: coarray_handle
         type(c_ptr) :: allocated_memory
         integer, pointer :: local_slice
-        integer(c_int64_t) :: lcobounds(1), ucobounds(1)
 
-        call prif_num_images(num_images=num_imgs)
-        lcobounds(1) = 1
-        ucobounds(1) = num_imgs
         call prif_allocate_coarray( &
-                lcobounds = lcobounds, &
-                ucobounds = ucobounds, &
+                [integer(c_int64_t) :: 1], [integer(c_int64_t)::], &
                 size_in_bytes = int(storage_size(dummy_element)/8, c_size_t), &
                 final_func = c_null_funptr, &
                 coarray_handle = coarray_handle, &
                 allocated_memory = allocated_memory)
         call c_f_pointer(allocated_memory, local_slice)
 
+        call prif_num_images(num_images=num_imgs)
         call prif_this_image_no_coarray(this_image=me)
         neighbor = merge(me+1, 1, me < num_imgs)
         expected = neighbor
@@ -194,15 +182,10 @@ contains
         type(prif_coarray_handle) :: coarray_handle
         type(c_ptr) :: allocated_memory
         type(my_type), pointer :: local_slice
-        integer(c_int64_t) :: lcobounds(1), ucobounds(1)
         integer(c_intptr_t) :: base_addr
 
-        call prif_num_images(num_images=num_imgs)
-        lcobounds(1) = 1
-        ucobounds(1) = num_imgs
         call prif_allocate_coarray( &
-                lcobounds = lcobounds, &
-                ucobounds = ucobounds, &
+                [integer(c_int64_t) :: 1], [integer(c_int64_t)::], &
                 size_in_bytes = int(storage_size(dummy_element)/8, c_size_t), &
                 final_func = c_null_funptr, &
                 coarray_handle = coarray_handle, &
@@ -212,6 +195,7 @@ contains
                 size_in_bytes = int(storage_size(dummy_component)/8, c_size_t), &
                 allocated_memory = local_slice%my_component)
 
+        call prif_num_images(num_images=num_imgs)
         call prif_this_image_no_coarray(this_image=me)
         neighbor = merge(me+1, 1, me < num_imgs)
         expected = neighbor

@@ -51,18 +51,14 @@ contains
   function check_prif_local_data_pointer() result(diag)
       type(test_diagnosis_t) :: diag
 
-      integer(kind=c_int64_t), dimension(1) :: lcobounds, ucobounds
-      integer :: dummy_element, num_imgs
+      integer :: dummy_element
       type(prif_coarray_handle) :: coarray_handle
       type(c_ptr) :: allocation_ptr, local_ptr
 
-      call prif_num_images(num_images=num_imgs)
-      lcobounds(1) = 1
-      ucobounds(1) = num_imgs
 
       call prif_allocate_coarray( &
-              lcobounds, &
-              ucobounds, &
+              [integer(c_int64_t):: 1], &
+              [integer(c_int64_t)::], &
               int(storage_size(dummy_element)/8, c_size_t), &
               c_null_funptr, &
               coarray_handle, &
@@ -72,15 +68,17 @@ contains
       call prif_deallocate_coarray(coarray_handle)
   end function
 
-  impure elemental function check_cobound(corank) result(diag)
+  impure elemental function check_cobound(corank, omit_trailing) result(diag)
     type(test_diagnosis_t) :: diag
     integer(c_int), intent(in) :: corank
+    logical, intent(in) :: omit_trailing
 
     ! Allocate memory for an integer scalar coarray with given corank
     ! and then test some queries on it
 
     integer :: num_imgs, i
     integer(kind=c_int64_t), dimension(corank) :: lcobounds, ucobounds, tmp_bounds
+    integer(kind=c_int64_t), dimension(corank-1) :: leading_ucobounds
     integer(kind=c_int64_t) :: tmp_bound
     integer(kind=c_size_t), dimension(corank)  :: sizes
     type(prif_coarray_handle) :: coarray_handle
@@ -94,15 +92,22 @@ contains
     ucobounds(1) = num_imgs
     do i = 2,corank
       lcobounds(i) = i
-      ucobounds(i) = i*2
+      ucobounds(i) = i + merge(1,0,mod(i,2)==0)
     end do
 
     allocated_memory = c_null_ptr
     data_size = 64 * corank
 
-    call prif_allocate_coarray( &
-      lcobounds, ucobounds, data_size, c_null_funptr, &
-      coarray_handle, allocated_memory)
+    if (omit_trailing) then
+      leading_ucobounds = ucobounds(1:corank-1)
+      call prif_allocate_coarray( lcobounds, leading_ucobounds, data_size, c_null_funptr, &
+        coarray_handle, allocated_memory)
+    else
+      call prif_allocate_coarray( lcobounds, ucobounds, data_size, c_null_funptr, &
+        coarray_handle, allocated_memory)
+    end if
+
+    if (corank > 1) ucobounds(corank) = lcobounds(corank) ! trailing ucobound gets rounded down
 
     ALSO(c_associated(allocated_memory))
 
@@ -133,7 +138,10 @@ contains
     type(test_diagnosis_t) :: diag
     integer(c_int) :: corank
 
-    diag = .all. check_cobound([(corank, corank = 1_c_int, 15_c_int)])
+    diag = .true.
+
+    ALSO(.all. check_cobound([(corank, corank = 1_c_int, 15_c_int)], .false.))
+    ALSO(.all. check_cobound([(corank, corank = 1_c_int, 15_c_int)], .true.))
   end function
 
 end module prif_coarray_inquiry_test_m

@@ -97,7 +97,7 @@ contains
         element_size = int(storage_size(dummy_element)/8, c_size_t)
         call prif_allocate_coarray( &
             lcobounds = [1_c_int64_t], &
-            ucobounds = [int(initial_num_imgs, c_int64_t)], &
+            ucobounds = [integer(c_int64_t)::], &
             size_in_bytes = element_size, &
             final_func = c_null_funptr, &
             coarray_handle = initial_coarray, &
@@ -180,7 +180,7 @@ contains
             do i = 1, num_coarrays
                 call prif_allocate_coarray( &
                     lcobounds = [1_c_int64_t], &
-                    ucobounds = [int(num_imgs, c_int64_t)], &
+                    ucobounds = [integer(c_int64_t)::], &
                     size_in_bytes = element_size, &
 #if HAVE_FINAL_FUNC_SUPPORT
                     final_func = c_funloc(coarray_cleanup), &

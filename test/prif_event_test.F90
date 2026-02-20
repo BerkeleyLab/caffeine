@@ -60,7 +60,7 @@ contains
     function check_event_serial() result(diag)
         type(test_diagnosis_t) diag 
 
-        integer :: me, num_imgs
+        integer :: me
         type(prif_event_type) :: dummy_event
         integer(c_size_t) :: sizeof_event
         type(prif_coarray_handle) :: coarray_handle
@@ -72,13 +72,12 @@ contains
         call RANDOM_INIT(REPEATABLE=.true., IMAGE_DISTINCT=.true.)
 
         sizeof_event = int(storage_size(dummy_event)/8, c_size_t)
-        call prif_num_images(num_images=num_imgs)
         call prif_this_image_no_coarray(this_image=me)
 
         ! type(event_type) :: evt[*]
         call prif_allocate_coarray( &
                 lcobounds = [1_c_int64_t], &
-                ucobounds = [int(num_imgs,c_int64_t)], &
+                ucobounds = [integer(c_int64_t)::], &
                 size_in_bytes = sizeof_event, &
                 final_func = c_null_funptr, &
                 coarray_handle = coarray_handle, &
@@ -168,7 +167,7 @@ contains
         ! type(event_type) :: evt[*]
         call prif_allocate_coarray( &
                 lcobounds = [1_c_int64_t], &
-                ucobounds = [int(num_imgs,c_int64_t)], &
+                ucobounds = [integer(c_int64_t)::], &
                 size_in_bytes = sizeof_event, &
                 final_func = c_null_funptr, &
                 coarray_handle = coarray_handle_evt, &
@@ -179,7 +178,7 @@ contains
         ! integer :: ctr(num_images())[*]
         call prif_allocate_coarray( &
                 lcobounds = [1_c_int64_t], &
-                ucobounds = [int(num_imgs,c_int64_t)], &
+                ucobounds = [integer(c_int64_t)::], &
                 size_in_bytes = num_imgs * sizeof_int, &
                 final_func = c_null_funptr, &
                 coarray_handle = coarray_handle_ctr, &
@@ -265,7 +264,7 @@ contains
         ! type(notify_type) :: evt[*]
         call prif_allocate_coarray( &
                 lcobounds = [1_c_int64_t], &
-                ucobounds = [int(num_imgs,c_int64_t)], &
+                ucobounds = [integer(c_int64_t)::], &
                 size_in_bytes = sizeof_notify, &
                 final_func = c_null_funptr, &
                 coarray_handle = coarray_handle_evt, &
@@ -276,7 +275,7 @@ contains
         ! integer :: ctr(num_images())[*]
         call prif_allocate_coarray( &
                 lcobounds = [1_c_int64_t], &
-                ucobounds = [int(num_imgs,c_int64_t)], &
+                ucobounds = [integer(c_int64_t)::], &
                 size_in_bytes = num_imgs * sizeof_int, &
                 final_func = c_null_funptr, &
                 coarray_handle = coarray_handle_ctr, &

@@ -65,8 +65,7 @@ contains
     ! Allocate memory for an integer scalar single corank coarray, such as the following decl
     ! integer :: coarr[*]
 
-    integer(kind=c_int64_t), dimension(1) :: lcobounds, ucobounds
-    integer :: dummy_element, num_imgs
+    integer :: dummy_element
     type(prif_coarray_handle) :: coarray_handle
     type(c_ptr) :: allocated_memory
     integer, pointer :: local_slice
@@ -74,17 +73,13 @@ contains
 
     diag = .true.
 
-    call prif_num_images(num_images=num_imgs)
-    lcobounds(1) = 1
-    ucobounds(1) = num_imgs
-
     allocated_memory = c_null_ptr
     local_slice => null()
     ALSO(.not. associated(local_slice))
 
     data_size = storage_size(dummy_element)/8
     call prif_allocate_coarray( &
-      lcobounds, ucobounds, data_size, c_null_funptr, &
+      [integer(c_int64_t) :: 1], [integer(c_int64_t) :: ], data_size, c_null_funptr, &
       coarray_handle, allocated_memory)
 
     call c_f_pointer(allocated_memory, local_slice)
@@ -120,7 +115,6 @@ contains
     ! globalize diag for ALSO:
 #   define diag ff_diag
 
-    integer(kind=c_int64_t), dimension(1) :: lcobounds, ucobounds
     integer :: num_imgs, me, dummy_element
     type(c_ptr) :: allocated_memory
     integer, pointer :: local_slice
@@ -133,14 +127,13 @@ contains
 
     call prif_num_images(num_images=num_imgs)
     call prif_this_image_no_coarray(this_image=me)
-    lcobounds(1) = 1
-    ucobounds(1) = num_imgs
     data_size = storage_size(dummy_element)/8
 
     ! simple final_func case
     ff_count = 0
     call prif_allocate_coarray( &
-      lcobounds, ucobounds, data_size, c_funloc(coarray_cleanup_simple), &
+      [integer(c_int64_t) :: 1], [integer(c_int64_t) :: ], &
+      data_size, c_funloc(coarray_cleanup_simple), &
       ff_handle, allocated_memory)
     ALSO(ff_count .equalsExpected. 0)
 
@@ -150,7 +143,8 @@ contains
     ! final_func that errors on first three deallocations
     ff_count = 0
     call prif_allocate_coarray( &
-      lcobounds, ucobounds, data_size, c_funloc(coarray_cleanup_first_error), &
+      [integer(c_int64_t) :: 1], [integer(c_int64_t) :: ], &
+      data_size, c_funloc(coarray_cleanup_first_error), &
       ff_handle, allocated_memory)
     ALSO(ff_count .equalsExpected. 0)
 
@@ -290,7 +284,6 @@ contains
     ! Allocate memory for an integer scalar single corank coarray, such as the following decl
     ! integer :: coarr(10)[4,*]
 
-    integer(kind=c_int64_t), dimension(2) :: lcobounds, ucobounds
     integer :: dummy_element, num_imgs, i
     type(prif_coarray_handle) :: coarray_handle
     type(c_ptr) :: allocated_memory
@@ -300,10 +293,6 @@ contains
     diag = .true.
 
     call prif_num_images(num_images=num_imgs)
-    lcobounds(1) = 1
-    ucobounds(1) = 4
-    lcobounds(2) = 1
-    ucobounds(2) = num_imgs
 
     allocated_memory = c_null_ptr
     local_slice => null()
@@ -311,7 +300,7 @@ contains
 
     data_size = 10*storage_size(dummy_element)/8
     call prif_allocate_coarray( &
-      lcobounds, ucobounds, data_size, c_null_funptr, &
+      [integer(c_int64_t) :: 1,1], [integer(c_int64_t) :: 4], data_size, c_null_funptr, &
       coarray_handle, allocated_memory)
 
     call prif_size_bytes(coarray_handle, data_size=query_size)
@@ -345,17 +334,14 @@ contains
       integer i, j
       integer, parameter :: lim = 10
       type(prif_coarray_handle) :: a(lim)
-      integer(c_int64_t) :: lco(1), uco(1)
       a(1) = coarray_handle
       do i=2, lim
-        lco(1) = i
-        uco(1) = i + num_imgs
-        call prif_alias_create(a(i-1), lco, uco, data_pointer_offset a(i))
+        call prif_alias_create(a(i-1), [integer(c_int64_t) :: i-5], [integer(c_int64_t) :: i-5 + num_imgs], &
+                               data_pointer_offset a(i))
         ALSO(assert_aliased(a(i-1), a(i)))
         do j = i+1,lim
-          lco(1) = j
-          uco(1) = j + num_imgs
-          call prif_alias_create(a(i), lco, uco, data_pointer_offset a(j))
+          call prif_alias_create(a(i), [integer(c_int64_t) :: i, j-5], [integer(c_int64_t) :: j], &
+                                 data_pointer_offset a(j))
           ALSO(assert_aliased(a(i), a(j)))
           ALSO(assert_aliased(a(j), coarray_handle))
         end do
@@ -365,7 +351,8 @@ contains
             type(prif_coarray_handle) :: b
             integer(c_size_t) :: off
             off = i
-            call prif_alias_create(a(i), lco, uco, off, b)
+            call prif_alias_create(a(i), [integer(c_int64_t) :: i], [integer(c_int64_t) :: ], &
+                                   off, b)
             ALSO(assert_aliased(a(i), b, off))
             call prif_alias_destroy(b)
           end block
@@ -390,8 +377,6 @@ contains
     type(c_ptr) :: allocated_memory
     integer(c_int) :: stat
     character(len=:), allocatable :: errmsg
-    integer(kind=c_int64_t), dimension(1) :: lcobounds, ucobounds
-    integer :: num_imgs
     type(prif_coarray_handle) :: coarray_handle
 
     diag = .true.
@@ -407,12 +392,8 @@ contains
     end if
     deallocate(errmsg)
 
-    call prif_num_images(num_images=num_imgs)
-    lcobounds(1) = 1
-    ucobounds(1) = num_imgs
-
     call prif_allocate_coarray( &
-      lcobounds, ucobounds, size_in_bytes, c_null_funptr, &
+      [integer(c_int64_t) :: 1], [integer(c_int64_t) :: ], size_in_bytes, c_null_funptr, &
       coarray_handle, allocated_memory, stat, errmsg_alloc=errmsg)
     ALSO(stat .equalsExpected. PRIF_STAT_OUT_OF_MEMORY)
     ALSO(allocated(errmsg))
