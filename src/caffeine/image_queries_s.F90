@@ -58,7 +58,6 @@ contains
         offset = offset / dsz
       end do
       cosubscripts(info%corank) = offset + info%lcobounds(info%corank)
-      call_assert(cosubscripts(info%corank) <= info%ucobounds(info%corank))
     end associate
 
 #   if ASSERTIONS

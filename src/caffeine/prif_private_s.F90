@@ -431,6 +431,24 @@ contains
     end if
   end function
 
+  pure subroutine compute_coshape_epp(lcobounds, ucobounds, coshape_epp)
+    !! Compute the exclusive prefix product of the coshape for the given cobounds
+    integer(c_int64_t), intent(in) :: lcobounds(:), ucobounds(:)
+    integer(c_int), intent(out) :: coshape_epp(:)
+    integer :: d
+
+    associate (corank => size(lcobounds))
+      call_assert(corank > 0)
+      call_assert(size(coshape_epp) == corank)
+      call_assert(size(ucobounds) == corank .or. size(ucobounds) == corank-1)
+
+      coshape_epp(1) = 1
+      do d = 2, corank
+        coshape_epp(d) = coshape_epp(d-1) * int(ucobounds(d-1) - lcobounds(d-1) + 1, c_int)
+      end do
+    end associate
+  end subroutine
+
   ! Report the provided error stat/msg using the provided optional stat/errmsg args
   subroutine report_error(report_stat, report_msg, stat, errmsg, errmsg_alloc)
     integer(c_int), intent(in) :: report_stat
@@ -460,16 +478,19 @@ contains
     implicit none
     type(prif_coarray_handle), intent(in) :: coarray_handle
     logical :: result_
-    integer(c_int) :: i
+    integer(c_int) :: i, epp(15)
 
     call assert_always(associated(coarray_handle%info), "unassociated info pointer in prif_coarray_handle")
-    associate(info => coarray_handle%info)
-      call assert_always(info%corank >= 1, "invalid corank in prif_coarray_handle")
-      call assert_always(info%corank <= size(info%ucobounds), "invalid corank in prif_coarray_handle")
-      call assert_always(all([(info%lcobounds(i) <= info%ucobounds(i), i = 1, info%corank)]), &
+    associate(info => coarray_handle%info, corank => coarray_handle%info%corank)
+      call assert_always(corank >= 1, "invalid corank in prif_coarray_handle")
+      call assert_always(corank <= size(info%lcobounds), "invalid corank in prif_coarray_handle")
+      call assert_always(all([(info%lcobounds(i) <= info%ucobounds(i), i = 1, corank-1)]), &
                          "invalid cobounds in prif_coarray_handle")
       call assert_always(info%coarray_size > 0, "invalid data size in prif_coarray_handle")
       call assert_always(c_associated(info%coarray_data), "invalid data pointer in prif_coarray_handle")
+      call compute_coshape_epp(info%lcobounds(1:corank),info%ucobounds(1:corank-1),epp(1:corank))
+      call assert_always(all(info%coshape_epp(1:corank) == epp(1:corank)), &
+                         "invalid coshape_epp in prif_coarray_handle")
     end associate
 
     result_ = .true.
