@@ -29,17 +29,17 @@ contains
     associate (info => coarray_handle%info, corank => coarray_handle%info%corank) 
       call_assert(dim >= 1 .and. dim <= corank)
 
-      if (dim < corank) then
+      if (corank == 1) then ! common-case optimization
+        ucobound = info%lcobounds(1) + current_team%info%num_images - 1
+      elseif (dim < corank) then
         ucobound = info%ucobounds(dim)
       else ! compute trailing ucobound, based on current team size
         call_assert(dim == corank)
         associate (epp => info%coshape_epp(corank), num_imgs => current_team%info%num_images)
-          if (epp >= num_imgs) then
+          if (epp >= num_imgs) then ! optimization to skip a divide
             ucobound = info%lcobounds(corank)
           else
-            associate (quot => num_imgs / epp, rem => mod(num_imgs, epp))
-              ucobound = info%lcobounds(corank) + quot + merge(0,1,rem==0) - 1
-            end associate
+            ucobound = info%lcobounds(corank) + (num_imgs + epp - 1) / epp - 1
           end if
         end associate
       end if
@@ -61,9 +61,18 @@ contains
     call_assert(coarray_handle_check(coarray_handle))
 
     associate(info => coarray_handle%info, corank => coarray_handle%info%corank)
-      sizes(1:corank-1) = info%ucobounds(1:corank-1) - info%lcobounds(1:corank-1) + 1
-      call prif_ucobound_with_dim(coarray_handle, corank, trailing_ucobound)
-      sizes(corank) = trailing_ucobound - info%lcobounds(corank) + 1
+      if (corank == 1) then ! common-case optimization
+        sizes(1) = current_team%info%num_images
+      else
+        sizes(1:corank-1) = info%ucobounds(1:corank-1) - info%lcobounds(1:corank-1) + 1
+        associate (epp => info%coshape_epp(corank), num_imgs => current_team%info%num_images)
+          if (epp >= num_imgs) then ! optimization to skip a divide
+            sizes(corank) = 1
+          else
+            sizes(corank) = (num_imgs + epp - 1) / epp
+          end if
+        end associate
+      end if
     end associate
   end procedure
 

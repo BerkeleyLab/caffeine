@@ -435,6 +435,7 @@ contains
     !! Compute the exclusive prefix product of the coshape for the given cobounds
     integer(c_int64_t), intent(in) :: lcobounds(:), ucobounds(:)
     integer(c_int), intent(out) :: coshape_epp(:)
+    integer(c_int64_t) :: product
     integer :: d
 
     associate (corank => size(lcobounds))
@@ -443,8 +444,11 @@ contains
       call_assert(size(ucobounds) == corank .or. size(ucobounds) == corank-1)
 
       coshape_epp(1) = 1
+      product = 1
       do d = 2, corank
-        coshape_epp(d) = coshape_epp(d-1) * int(ucobounds(d-1) - lcobounds(d-1) + 1, c_int)
+        product = product * (ucobounds(d-1) - lcobounds(d-1) + 1)
+        call_assert_describe(product < huge(0_c_int), "Overflow in cobounds. product(coshape(a)) must be < 2 billion")
+        coshape_epp(d) = int(product, c_int)
       end do
     end associate
   end subroutine
