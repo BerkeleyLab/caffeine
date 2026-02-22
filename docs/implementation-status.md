@@ -62,12 +62,12 @@ all of the PRIF-specific constants.
 
 | Procedure | Status | Notes |
 |-----------|--------|-------|
-| `prif_allocate_coarray`    | **YES** |  |
+| `prif_allocate_coarray`    | **YES** | includes ucobound relaxation expected in PRIF 0.8 |
 | `prif_allocate`            | **YES** |  |
 | `prif_deallocate_coarray`  | **YES** | `final_func` support requires flang 20+ |
 | `prif_deallocate_coarrays` | **YES** | `final_func` support requires flang 20+ |
 | `prif_deallocate`          | **YES** |  |
-| `prif_alias_create`        | **YES** |  |
+| `prif_alias_create`        | **YES** | includes ucobound relaxation expected in PRIF 0.8 |
 | `prif_alias_destroy`       | **YES** |  |
 
 ---
