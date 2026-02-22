@@ -41,6 +41,7 @@ contains
     integer :: dim
 
     call_assert(coarray_handle_check(coarray_handle))
+    call_assert(size(cosubscripts) == coarray_handle%info%corank)
 
     if (present(team)) then
       offset = team%info%this_image - 1

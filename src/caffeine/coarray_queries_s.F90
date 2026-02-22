@@ -19,6 +19,7 @@ contains
 
   module procedure prif_lcobound_no_dim
     call_assert(coarray_handle_check(coarray_handle))
+    call_assert(size(lcobounds) == coarray_handle%info%corank)
 
     lcobounds = coarray_handle%info%lcobounds(1:coarray_handle%info%corank)
   end procedure
@@ -48,6 +49,7 @@ contains
 
   module procedure prif_ucobound_no_dim
     call_assert(coarray_handle_check(coarray_handle))
+    call_assert(size(ucobounds) == coarray_handle%info%corank)
 
     associate (corank => coarray_handle%info%corank) 
       ucobounds(1:corank-1) = coarray_handle%info%ucobounds(1:corank-1)
@@ -59,6 +61,7 @@ contains
     integer(c_int64_t) :: trailing_ucobound
 
     call_assert(coarray_handle_check(coarray_handle))
+    call_assert(size(sizes) == coarray_handle%info%corank)
 
     associate(info => coarray_handle%info, corank => coarray_handle%info%corank)
       if (corank == 1) then ! common-case optimization
