@@ -37,32 +37,38 @@ jobs:
             version: 21
             network: smp
 
+          # https://hub.docker.com/r/snowstep/llvm/tags
           - os: ubuntu-24.04
             compiler: flang
             version: latest
             network: smp
             native_multi_image: 1
             FFLAGS: -fcoarray
-            # https://hub.docker.com/r/snowstep/llvm/tags
             container: snowstep/llvm:ubuntu-24.04-latest
+
+          # https://hub.docker.com/r/phhargrove/llvm-flang/tags
+          - os: ubuntu-24.04
+            compiler: flang
+            version: 22
+            network: smp
+            native_multi_image: 1
+            FFLAGS: -fcoarray
+            container: phhargrove/llvm-flang:22.1.0-latest
           - os: ubuntu-24.04
             compiler: flang
             version: 21
             network: smp
-            # https://hub.docker.com/r/phhargrove/llvm-flang/tags
             container: phhargrove/llvm-flang:21.1.0-latest
           - os: ubuntu-24.04
             compiler: flang
             version: 20
             network: smp
-            # https://hub.docker.com/r/phhargrove/llvm-flang/tags
             container: phhargrove/llvm-flang:20.1.0-latest
           - os: ubuntu-24.04
             compiler: flang
             version: 19
             network: smp
             FFLAGS: -mmlir -allow-assumed-rank
-            # https://hub.docker.com/r/phhargrove/llvm-flang/tags
             container: phhargrove/llvm-flang:19.1.1-latest
 
         # --- PRIF-old coverage ---
@@ -119,6 +125,13 @@ jobs:
             version: 21
             network: udp
             container: phhargrove/llvm-flang:21.1.0-latest
+          - os: ubuntu-24.04
+            compiler: flang
+            version: 22
+            network: udp
+            native_multi_image: 1
+            FFLAGS: -fcoarray
+            container: phhargrove/llvm-flang:22.1.0-latest
           - os: ubuntu-24.04
             compiler: flang
             version: latest
