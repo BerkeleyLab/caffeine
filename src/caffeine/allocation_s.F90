@@ -19,11 +19,19 @@ contains
     type(c_ptr) :: whole_block
     integer(c_ptrdiff_t) :: block_offset
     integer(c_size_t) :: descriptor_size, total_size
+    integer(c_int) :: corank
     type(prif_coarray_descriptor) :: unused
     type(prif_coarray_descriptor), pointer :: unused2(:)
 
-    call_assert(size(lcobounds) == size(ucobounds))
-    call_assert(product(ucobounds - lcobounds + 1) >= current_team%info%num_images)
+    corank = size(lcobounds)
+    call_assert(corank > 0)
+    if (size(ucobounds) == corank) then
+      call_assert(all(lcobounds <= ucobounds))
+      call_assert(product(ucobounds - lcobounds + 1) >= current_team%info%num_images)
+    else
+      call_assert(size(ucobounds) == corank - 1)
+      call_assert(all(lcobounds(1:corank-1) <= ucobounds))
+    end if
 
     me = current_team%info%this_image
     if (caf_have_child_teams()) then
@@ -62,11 +70,18 @@ contains
     call c_f_pointer(whole_block, unused2, [2])
 
     coarray_handle%info%coarray_data = c_loc(unused2(2))
-    coarray_handle%info%corank = size(lcobounds)
+    coarray_handle%info%corank = corank
     coarray_handle%info%coarray_size = size_in_bytes
     coarray_handle%info%final_func = final_func
-    coarray_handle%info%lcobounds(1:size(lcobounds)) = lcobounds
-    coarray_handle%info%ucobounds(1:size(ucobounds)) = ucobounds
+    coarray_handle%info%lcobounds(1:corank) = lcobounds
+    coarray_handle%info%ucobounds(1:corank-1) = ucobounds(1:corank-1)
+    call compute_coshape_epp(lcobounds, ucobounds, coarray_handle%info%coshape_epp(1:corank))
+#   if ASSERTIONS
+      ! The following entries are dead, but initialize them to help detect defects
+      coarray_handle%info%lcobounds(corank+1:15) = huge(0_c_int64_t)
+      coarray_handle%info%ucobounds(corank:14) = -huge(0_c_int64_t)
+      coarray_handle%info%coshape_epp(corank+1:15) = 0
+#   endif
     coarray_handle%info%previous_handle = c_null_ptr
     coarray_handle%info%next_handle = c_null_ptr
     call add_to_team_list(coarray_handle)

@@ -12,10 +12,20 @@ submodule(prif:prif_private_s) alias_s
 contains
 
   module procedure prif_alias_create
-    call_assert(coarray_handle_check(source_handle))
+    integer(c_int) :: corank
 
-    call_assert(size(alias_lcobounds) == size(alias_ucobounds))
-    call_assert(product(alias_ucobounds - alias_lcobounds + 1) >= current_team%info%num_images)
+    ! validate inputs
+    call_assert(coarray_handle_check(source_handle))
+    corank = size(alias_lcobounds)
+    call_assert(corank > 0)
+    if (size(alias_ucobounds) == corank) then
+      call_assert(all(alias_lcobounds <= alias_ucobounds))
+      call_assert(product(alias_ucobounds - alias_lcobounds + 1) >= current_team%info%num_images)
+    else
+      call_assert(size(alias_ucobounds) == corank - 1)
+      call_assert(all(alias_lcobounds(1:corank-1) <= alias_ucobounds))
+    end if
+
 
     allocate(alias_handle%info)
     ! start with a copy of the source descriptor
@@ -27,9 +37,17 @@ contains
 #   endif
 
     ! apply provided cobounds
-    alias_handle%info%corank = size(alias_lcobounds)
-    alias_handle%info%lcobounds(1:size(alias_lcobounds)) = alias_lcobounds
-    alias_handle%info%ucobounds(1:size(alias_ucobounds)) = alias_ucobounds
+    alias_handle%info%corank = corank
+    alias_handle%info%lcobounds(1:corank) = alias_lcobounds
+    alias_handle%info%ucobounds(1:corank-1) = alias_ucobounds(1:corank-1)
+    call compute_coshape_epp(alias_lcobounds, alias_ucobounds, &
+                             alias_handle%info%coshape_epp(1:corank))
+#   if ASSERTIONS
+      ! The following entries are dead, but initialize them to help detect defects
+      alias_handle%info%lcobounds(corank+1:15) = huge(0_c_int64_t)
+      alias_handle%info%ucobounds(corank:14) = -huge(0_c_int64_t)
+      alias_handle%info%coshape_epp(corank+1:15) = 0
+#   endif
 
     ! reset some fields that are unused in aliases
     alias_handle%info%reserved = c_null_ptr 

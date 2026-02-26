@@ -92,7 +92,7 @@ contains
         ! integer(PRIF_ATOMIC_INT_KIND) :: atomic_int[*]
         call prif_allocate_coarray( &
                 lcobounds = [1_c_int64_t], &
-                ucobounds = [int(num_imgs,c_int64_t)], &
+                ucobounds = [integer(c_int64_t)::], &
                 size_in_bytes = sizeof_atomic_int, &
                 final_func = c_null_funptr, &
                 coarray_handle = coarray_handle_int, &
@@ -102,7 +102,7 @@ contains
         ! logical(PRIF_ATOMIC_LOGICAL_KIND) :: atomic_logical[*]
         call prif_allocate_coarray( &
                 lcobounds = [1_c_int64_t], &
-                ucobounds = [int(num_imgs,c_int64_t)], &
+                ucobounds = [integer(c_int64_t)::], &
                 size_in_bytes = sizeof_atomic_logical, &
                 final_func = c_null_funptr, &
                 coarray_handle = coarray_handle_logical, &

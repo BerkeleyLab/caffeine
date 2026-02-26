@@ -1179,7 +1179,8 @@ module prif
     integer(c_size_t) :: coarray_size
     type(c_funptr) :: final_func
     type(c_ptr) :: previous_handle = c_null_ptr, next_handle = c_null_ptr
-    integer(c_int64_t) :: lcobounds(15), ucobounds(15)
+    integer(c_int64_t) :: lcobounds(15), ucobounds(14)
+    integer(c_int) :: coshape_epp(15)
     type(c_ptr) :: p_context_data
     type(c_ptr) :: reserved
   end type

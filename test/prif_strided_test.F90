@@ -50,7 +50,6 @@ contains
         integer, target :: mydata(1:4, 1:4)
         integer, target :: expected(1:4, 1:4)
         integer, pointer :: local_slice(:,:)
-        integer(c_int64_t) :: lcobounds(1), ucobounds(1)
         integer(c_size_t) :: sizeof_int
 
         sizeof_int = storage_size(me)/8
@@ -58,11 +57,8 @@ contains
         call prif_this_image_no_coarray(this_image=me)
         neighbor = merge(me+1, 1, me < num_imgs)
 
-        lcobounds(1) = 1
-        ucobounds(1) = num_imgs
         call prif_allocate_coarray( &
-                lcobounds = lcobounds, &
-                ucobounds = ucobounds, &
+                [integer(c_int64_t) :: 1], [integer(c_int64_t)::], &
                 size_in_bytes = sizeof_int*product(shape(mydata)), &
                 final_func = c_null_funptr, &
                 coarray_handle = coarray_handle, &
@@ -112,7 +108,6 @@ contains
         type(prif_coarray_handle) :: coarray_handle
         type(c_ptr) :: allocated_memory
         type(my_type), pointer :: local_slice
-        integer(c_int64_t) :: lcobounds(1), ucobounds(1)
         integer(c_intptr_t) :: base_addr
         integer(c_size_t) :: sizeof_int
 
@@ -121,11 +116,8 @@ contains
         call prif_this_image_no_coarray(this_image=me)
         neighbor = merge(me+1, 1, me < num_imgs)
 
-        lcobounds(1) = 1
-        ucobounds(1) = num_imgs
         call prif_allocate_coarray( &
-                lcobounds = lcobounds, &
-                ucobounds = ucobounds, &
+                [integer(c_int64_t) :: 1], [integer(c_int64_t)::], &
                 size_in_bytes = int(storage_size(dummy_element)/8, c_size_t), &
                 final_func = c_null_funptr, &
                 coarray_handle = coarray_handle, &
@@ -181,7 +173,6 @@ contains
         integer, target :: mydata(1:4, 1:4)
         integer, target :: expected(1:4, 1:4)
         integer, pointer :: local_slice(:,:)
-        integer(c_int64_t) :: lcobounds(1), ucobounds(1)
         integer(c_size_t) :: sizeof_int
 
         sizeof_int = storage_size(me)/8
@@ -189,11 +180,8 @@ contains
         call prif_this_image_no_coarray(this_image=me)
         neighbor = merge(me+1, 1, me < num_imgs)
 
-        lcobounds(1) = 1
-        ucobounds(1) = num_imgs
         call prif_allocate_coarray( &
-                lcobounds = lcobounds, &
-                ucobounds = ucobounds, &
+                [integer(c_int64_t) :: 1], [integer(c_int64_t)::], &
                 size_in_bytes = sizeof_int*product(shape(mydata)), &
                 final_func = c_null_funptr, &
                 coarray_handle = coarray_handle, &
@@ -241,7 +229,6 @@ contains
         type(prif_coarray_handle) :: coarray_handle
         type(c_ptr) :: allocated_memory
         type(my_type), pointer :: local_slice
-        integer(c_int64_t) :: lcobounds(1), ucobounds(1)
         integer(c_intptr_t) :: base_addr
         integer(c_size_t) :: sizeof_int
 
@@ -250,11 +237,8 @@ contains
         call prif_this_image_no_coarray(this_image=me)
         neighbor = merge(me+1, 1, me < num_imgs)
 
-        lcobounds(1) = 1
-        ucobounds(1) = num_imgs
         call prif_allocate_coarray( &
-                lcobounds = lcobounds, &
-                ucobounds = ucobounds, &
+                [integer(c_int64_t) :: 1], [integer(c_int64_t)::], &
                 size_in_bytes = int(storage_size(dummy_element)/8, c_size_t), &
                 final_func = c_null_funptr, &
                 coarray_handle = coarray_handle, &

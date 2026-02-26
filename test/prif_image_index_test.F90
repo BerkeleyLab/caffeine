@@ -69,7 +69,7 @@ contains
           ALSO(co .equalsExpected. cosubscripts(i))
 
           ALSO(co .isAtLeast. colbound(i))
-          ALSO(co .isatMost. coubound(i))
+          if (i /= corank) ALSO(co .isatMost. coubound(i)) ! trailing will differ with team
         end do
 
         ! verify reverse mapping
@@ -95,15 +95,13 @@ contains
 
         type(prif_coarray_handle) :: coarray_handle
         type(c_ptr) :: allocated_memory
-        integer(c_int) :: answer, ni
+        integer(c_int) :: answer
 
         diag = .true.
 
-        call prif_num_images(num_images=ni)
-
         call prif_allocate_coarray( &
                 lcobounds = [1_c_int64_t], &
-                ucobounds = [ni+2_c_int64_t], &
+                ucobounds = [integer(c_int64_t)::], &
                 size_in_bytes = 1_c_size_t, &
                 final_func = c_null_funptr, &
                 coarray_handle = coarray_handle, &
@@ -124,15 +122,13 @@ contains
 
         type(prif_coarray_handle) :: coarray_handle
         type(c_ptr) :: allocated_memory
-        integer(c_int) :: answer, ni
+        integer(c_int) :: answer
 
         diag = .true.
 
-        call prif_num_images(num_images=ni)
-
         call prif_allocate_coarray( &
                 lcobounds = [2_c_int64_t, 3_c_int64_t], &
-                ucobounds = [3_c_int64_t, ni+4_c_int64_t], &
+                ucobounds = [3_c_int64_t], &
                 size_in_bytes = 1_c_size_t, &
                 final_func = c_null_funptr, &
                 coarray_handle = coarray_handle, &
@@ -153,15 +149,13 @@ contains
 
         type(prif_coarray_handle) :: coarray_handle
         type(c_ptr) :: allocated_memory
-        integer(c_int) :: answer, ni
+        integer(c_int) :: answer
 
         diag = .true.
 
-        call prif_num_images(num_images=ni)
-
         call prif_allocate_coarray( &
                 lcobounds = [-2_c_int64_t, 2_c_int64_t], &
-                ucobounds = [2_c_int64_t, ni+6_c_int64_t], &
+                ucobounds = [2_c_int64_t], &
                 size_in_bytes = 1_c_size_t, &
                 final_func = c_null_funptr, &
                 coarray_handle = coarray_handle, &
@@ -187,7 +181,7 @@ contains
 
         call prif_allocate_coarray( &
                 lcobounds = [1_c_int64_t, 2_c_int64_t], &
-                ucobounds = [2_c_int64_t, ni+3_c_int64_t], &
+                ucobounds = [2_c_int64_t], &
                 size_in_bytes = 1_c_size_t, &
                 final_func = c_null_funptr, &
                 coarray_handle = coarray_handle, &
@@ -221,7 +215,7 @@ contains
 
         call prif_allocate_coarray( &
                 lcobounds = [1_c_int64_t, 0_c_int64_t, 0_c_int64_t], &
-                ucobounds = [2_c_int64_t, 1_c_int64_t, ni+0_c_int64_t], &
+                ucobounds = [2_c_int64_t, 1_c_int64_t], &
                 size_in_bytes = 1_c_size_t, &
                 final_func = c_null_funptr, &
                 coarray_handle = coarray_handle, &
@@ -261,7 +255,7 @@ contains
 
         call prif_allocate_coarray( &
                 lcobounds = [0_c_int64_t, 2_c_int64_t], &
-                ucobounds = [1_c_int64_t, ni+3_c_int64_t], &
+                ucobounds = [1_c_int64_t], &
                 size_in_bytes = 1_c_size_t, &
                 final_func = c_null_funptr, &
                 coarray_handle = coarray_handle, &

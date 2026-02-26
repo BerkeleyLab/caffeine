@@ -41,6 +41,7 @@ contains
     integer :: dim
 
     call_assert(coarray_handle_check(coarray_handle))
+    call_assert(size(cosubscripts) == coarray_handle%info%corank)
 
     if (present(team)) then
       offset = team%info%this_image - 1
@@ -58,7 +59,6 @@ contains
         offset = offset / dsz
       end do
       cosubscripts(info%corank) = offset + info%lcobounds(info%corank)
-      call_assert(cosubscripts(info%corank) <= info%ucobounds(info%corank))
     end associate
 
 #   if ASSERTIONS
