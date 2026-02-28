@@ -22,20 +22,28 @@ jobs:
         # --- flang coverage ---
           - os: macos-14
             compiler: flang
-            version: 21
+            version: 22
             network: smp
+            native_multi_image: 1
+            FFLAGS: -fcoarray
           - os: macos-15
             compiler: flang
-            version: 21
+            version: 22
             network: smp
+            native_multi_image: 1
+            FFLAGS: -fcoarray
           - os: macos-15-intel
             compiler: flang
-            version: 21
+            version: 22
             network: smp
+            native_multi_image: 1
+            FFLAGS: -fcoarray
           - os: macos-26
             compiler: flang
-            version: 21
+            version: 22
             network: smp
+            native_multi_image: 1
+            FFLAGS: -fcoarray
 
           # https://hub.docker.com/r/snowstep/llvm/tags
           - os: ubuntu-24.04
@@ -104,16 +112,22 @@ jobs:
 
           - os: macos-15-intel
             compiler: flang
-            version: 21
+            version: 22
             network: udp
+            native_multi_image: 1
+            FFLAGS: -fcoarray
           - os: macos-15
             compiler: flang
-            version: 21
+            version: 22
             network: udp
+            native_multi_image: 1
+            FFLAGS: -fcoarray
           - os: macos-26
             compiler: flang
-            version: 21
+            version: 22
             network: udp
+            native_multi_image: 1
+            FFLAGS: -fcoarray
 
           - os: ubuntu-24.04
             compiler: flang
