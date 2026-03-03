@@ -25,23 +25,27 @@ jobs:
             version: 22
             network: smp
             native_multi_image: 1
+            brew_via_install: 1
             FFLAGS: -fcoarray
           - os: macos-15
             compiler: flang
             version: 22
             network: smp
+            brew_via_install: 1
             native_multi_image: 1
             FFLAGS: -fcoarray
           - os: macos-15-intel
             compiler: flang
             version: 22
             network: smp
+            brew_via_install: 1
             native_multi_image: 1
             FFLAGS: -fcoarray
           - os: macos-26
             compiler: flang
             version: 22
             network: smp
+            brew_via_install: 1
             native_multi_image: 1
             FFLAGS: -fcoarray
 
@@ -177,7 +181,7 @@ jobs:
         echo "CXX=g++-${COMPILER_VERSION}" >> "$GITHUB_ENV"
 
     - name: Set flang variables
-      if: matrix.compiler == 'flang'
+      if: ${{ matrix.compiler == 'flang' && !matrix.brew_via_install }}
       run: |
         set -x
         echo "FC=flang-new" >> "$GITHUB_ENV" 
@@ -239,7 +243,7 @@ jobs:
         apt install -y build-essential pkg-config make git curl
 
     - name: Install macOS Dependencies
-      if: contains(matrix.os, 'macos')
+      if: ${{ contains(matrix.os, 'macos') && !matrix.brew_via_install }}
       run: |
         set -x
         brew update
@@ -247,7 +251,7 @@ jobs:
         brew install gcc@12
 
     - name: Install LLVM flang on macOS
-      if: contains(matrix.os, 'macos') && matrix.compiler == 'flang'
+      if: ${{ contains(matrix.os, 'macos') && matrix.compiler == 'flang' && !matrix.brew_via_install }}
       run: |
         set -x
         brew install llvm@${COMPILER_VERSION} flang
@@ -258,6 +262,7 @@ jobs:
         echo "PATH=$(brew --prefix)/opt/llvm/bin:${PATH}" >> "$GITHUB_ENV"
 
     - name: Setup FPM
+      if: ${{ !matrix.brew_via_install }}
       uses: fortran-lang/setup-fpm@main
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
@@ -283,7 +288,9 @@ jobs:
         echo
         echo PATH="$PATH"
         for tool in ${FC} ${CC} ${CXX} fpm ; do
-          ( echo ; set -x ; w=$(which $tool) ; ls -al $w ; ls -alhL $w ; $tool --version )
+          if command -v $tool > /dev/null 2>&1 ; then
+            ( echo ; set -x ; w=$(which $tool) ; ls -al $w ; ls -alhL $w ; $tool --version )
+          fi
         done
 
     - name: Build Caffeine (install.sh)
