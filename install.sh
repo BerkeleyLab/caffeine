@@ -49,6 +49,7 @@ GASNET_VERSION="stable"
 VERBOSE=""
 GASNET_CONDUIT="${GASNET_CONDUIT:-smp}"
 YES=false
+APPEND_CFLAGS=""
 
 list_prerequisites()
 {
@@ -363,6 +364,13 @@ if [[ $FPM_FC == *flang* ]]; then
 fi
 FPM_CC="$($REALPATH $(command -v $CC))"
 
+# workaround issue #228: clang cannot find Homebrew flang's C header
+if [ "${BREW_PREFIX:-unset}" != unset ] ; then
+  if [[ $FPM_FC =~ flang ]] && [[ $FPM_FC =~ $BREW_PREFIX ]] ; then
+    APPEND_CFLAGS="-I$(dirname $(find "$BREW_PREFIX/Cellar/flang" -name ISO_Fortran_binding.h | head -1))"
+  fi
+fi
+
 ask_package_permission()
 {
   cat << EOF
@@ -482,7 +490,7 @@ cat << EOF > $CAFFEINE_PC
 CAFFEINE_FPM_LDFLAGS=$GASNET_LDFLAGS $GASNET_LIB_LOCATIONS
 CAFFEINE_FPM_FC=$FPM_FC
 CAFFEINE_FPM_CC=$GASNET_CC
-CAFFEINE_FPM_CFLAGS=$GASNET_CFLAGS $GASNET_CPPFLAGS
+CAFFEINE_FPM_CFLAGS=$GASNET_CFLAGS $GASNET_CPPFLAGS $APPEND_CFLAGS
 Name: caffeine
 Description: Coarray Fortran parallel runtime library
 URL: https://gitlab.lbl.gov/berkeleylab/caffeine
