@@ -45,7 +45,6 @@ Report bugs to fortran@lbl.gov or at https://go.lbl.gov/caffeine
 EOF
 }
 
-GCC_VERSION=${GCC_VERSION:=14}
 GASNET_VERSION="stable"
 VERBOSE=""
 GASNET_CONDUIT="${GASNET_CONDUIT:-smp}"
@@ -58,7 +57,7 @@ Caffeine and this installer were developed with the following prerequisites.
 If any are missing and if permission is granted, the installer will install
 the latest versions using Homebrew:
 
-  GCC $GCC_VERSION
+  LLVM flang
   GASNet-EX $GASNET_VERSION
   fpm
   git (used by fpm to clone dependencies)
@@ -115,22 +114,56 @@ while [ "$1" != "" ]; do
     shift
 done
 
-set -u # error on use of undefined variable
-
-if [ -z ${FC+x} ] || [ -z ${CC+x} ] || [ -z ${CXX+x} ]; then
-  if command -v gfortran-$GCC_VERSION > /dev/null 2>&1; then
-    FC=`which gfortran-$GCC_VERSION`
-    echo "Setting FC=$FC"
+# Early check for pre-installed Homebrew
+BREW="${BREW:-brew}"
+if command -v "$BREW" > /dev/null 2>&1; then
+  BREW_PREFIX=`$BREW --prefix || exit 0`
+  if [ -z ${BREW_PREFIX:+x} ] || [ ! -d "$BREW_PREFIX" ] ; then
+    echo Warning: Failed to detect Homebrew prefix
+    BREW_PREFIX=
   fi
-  if command -v gcc-$GCC_VERSION > /dev/null 2>&1; then
-    CC=`which gcc-$GCC_VERSION`
+fi
+
+if [ -z ${FC:+x} ] || [ -z ${CC:+x} ]; then
+  if command -v flang > /dev/null 2>&1; then
+    FC=`which flang`
+    echo "Setting FC=$FC"
+    if [ -n "$BREW_PREFIX" ] && [[ $FC =~ $BREW_PREFIX ]] ; then
+      # We are using Homebrew flang, so prefer Homebrew clang/clang++
+      export PATH="$BREW_PREFIX/opt/llvm/bin:$PATH"
+    fi
+  fi
+  if command -v clang > /dev/null 2>&1; then
+    CC=`which clang`
     echo "Setting CC=$CC"
   fi
-  if command -v g++-$GCC_VERSION > /dev/null 2>&1; then
-    CXX=`which g++-$GCC_VERSION`
+fi
+if [ -n "$CC" ] && ! command -v "$CC" > /dev/null 2>&1; then
+  echo "CC=$CC not found. If you don't yet have a C compiler, please leave environment variable CC unset."
+  exit 1
+fi
+if [ -n "$FC" ] && ! command -v "$FC" > /dev/null 2>&1; then
+  echo "FC=$FC not found. If you don't yet have a Fortran compiler, please leave environment variable FC unset."
+  exit 1
+fi
+if [ -z ${CXX:+x} ] && [ -n "$CC" ] ; then 
+  # C++ is an optional dependency
+  # try to auto-detect from CC
+  if [[ $(basename $CC) =~ clang ]] ; then 
+    CXX_guess=clang++
+  else
+    CXX_guess=g++
+  fi
+  if [[ $CC =~ (-[0-9]+)$ ]] ; then 
+    CXX_guess=${CXX_guess}${BASH_REMATCH[0]} 
+  fi
+  if command -v $CXX_guess > /dev/null 2>&1; then
+    CXX=`which $CXX_guess`
     echo "Setting CXX=$CXX"
   fi
 fi
+
+set -u # error on use of undefined variable
 
 if command -v pkg-config > /dev/null 2>&1; then
   PKG_CONFIG=`which pkg-config`
@@ -163,7 +196,7 @@ ask_permission_to_use_homebrew()
 {
   cat << EOF
 
-Either one or more of the environment variables FC, CC, and CXX are unset or
+Either one or more of the environment variables FC and CC are unset or
 one or more of the following packages are not in the PATH: pkg-config, realpath, make, fpm.
 If you grant permission to install prerequisites, you will be prompted before each installation.
 
@@ -212,9 +245,9 @@ exit_if_user_declines()
     case ${1:-} in  
       *GASNet*) 
         echo "Please ensure the $pkg.pc file is in $PKG_CONFIG_PATH and then rerun './install.sh'." ;;
-      *GCC*) 
-        echo "To use compilers other than Homebrew-installed gcc-$GCC_VERSION, g++-$GCC_VERSION, and gfortran-$GCC_VERSION,"
-        echo "please set the FC, CC, and CXX environment variables and rerun './install.sh'." ;;
+      *FC*) 
+        echo "To use compilers other than Homebrew-installed LLVM flang and clang,"
+        echo "please set the FC and CC environment variables and rerun './install.sh'." ;;
       *) 
         echo "Please ensure that $1 is installed and in your PATH and then rerun './install.sh'." ;;
     esac
@@ -228,12 +261,10 @@ if [ ! -d $DEPENDENCIES_DIR ]; then
   mkdir -p $DEPENDENCIES_DIR
 fi
 
-if [ -z ${FC+x} ] || [ -z ${CC+x} ] || [ -z ${CXX+x} ] || [ -z ${PKG_CONFIG+x} ] || [ -z ${REALPATH+x} ] || [ -z ${MAKE+x} ] || [ -z ${FPM+x} ] ; then
+if [ -z ${FC:+x} ] || [ -z ${CC:+x} ] || [ -z ${PKG_CONFIG:+x} ] || [ -z ${REALPATH:+x} ] || [ -z ${MAKE:+x} ] || [ -z ${FPM:+x} ] ; then
 
   ask_permission_to_use_homebrew 
   exit_if_user_declines "brew"
-
-  BREW="brew"
 
   if ! command -v $BREW > /dev/null 2>&1; then
 
@@ -264,39 +295,54 @@ EOF
     fi
   fi
 
-  if [ -z ${FC+x} ] || [ -z ${CC+x} ] || [ -z ${CXX+x} ]; then
-    ask_permission_to_install_homebrew_package "gfortran, gcc, and g++" "gcc@$GCC_VERSION" 
-    exit_if_user_declines "GCC"
-    "$BREW" install gcc@$GCC_VERSION
-    if [ uname == "Linux" ]; then
-      brew link --force glibc
-    fi
+  BREW_PREFIX=`$BREW --prefix || exit 0`
+  if [ -z ${BREW_PREFIX:+x} ] || [ ! -d "$BREW_PREFIX" ] ; then
+    echo Failed to detect Homebrew prefix
+    echo 1
   fi
-  CC=`which gcc-$GCC_VERSION`
-  CXX=`which g++-$GCC_VERSION`
-  FC=`which gfortran-$GCC_VERSION`
 
-  if [ -z ${REALPATH+x} ] || [ -z ${MAKE+x} ] ; then
+  # fetch the latest package definitions:
+  $BREW update
+
+  if [ -z ${FC:+x} ] || [ -z ${CC:+x} ] ; then
+    ask_permission_to_install_homebrew_package "'llvm' and 'flang'"
+    exit_if_user_declines "FC"
+    $BREW install llvm flang
+
+    # Homebrew does not inject clang/clang++ into PATH on macOS
+    export PATH="$BREW_PREFIX/opt/llvm/bin:$PATH"
+    CC=`which clang`
+    CXX=`which clang++`
+    FC=`which flang-new`
+    for tool in $CC $CXX $FC ; do
+      if ! command -v $tool > /dev/null 2>&1 ; then
+        echo Failed to detect Homebrew compiler install at $tool
+        exit 1
+      fi
+    done
+  fi
+
+  if [ -z ${REALPATH:+x} ] || [ -z ${MAKE:+x} ] ; then
     ask_permission_to_install_homebrew_package "'realpath' and 'make'" "coreutils"
-    exit_if_user_declines "realpath"
-    "$BREW" install coreutils
+    exit_if_user_declines "realpath and make"
+    $BREW install coreutils
+    REALPATH=`which realpath`
+    MAKE=`which make`
   fi
-  REALPATH=`which realpath`
 
-  if [ -z ${PKG_CONFIG+x} ]; then
+  if [ -z ${PKG_CONFIG:+x} ]; then
     ask_permission_to_install_homebrew_package "'pkg-config'"
     exit_if_user_declines "pkg-config"
-    "$BREW" install pkg-config
+    $BREW install pkg-config
+    PKG_CONFIG=`which pkg-config`
   fi
-  PKG_CONFIG=`which pkg-config`
 
-  if [ -z ${FPM+x} ] ; then
+  if [ -z ${FPM:+x} ] ; then
     ask_permission_to_install_homebrew_package "'fpm'"
     exit_if_user_declines "fpm"
-    "$BREW" tap fortran-lang/hombrew-fortran
-    "$BREW" install fpm
+    $BREW install fpm
+    FPM=`which fpm`
   fi
-  FPM=`which fpm`
 fi
 
 PREFIX=${PREFIX:-"${HOME}/.local"}
@@ -304,7 +350,7 @@ mkdir -p "$PREFIX"
 PREFIX=`$REALPATH "$PREFIX"`
 echo "PREFIX=$PREFIX"
 
-if [ -z ${PKG_CONFIG_PATH+x} ]; then
+if [ -z ${PKG_CONFIG_PATH:+x} ]; then
   PKG_CONFIG_PATH="$PREFIX/lib/pkgconfig"
 else
   PKG_CONFIG_PATH="$PREFIX/lib/pkgconfig:$PKG_CONFIG_PATH"
