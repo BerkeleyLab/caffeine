@@ -28,8 +28,10 @@ the labels in the Caffeine [issue tracker](https://github.com/BerkeleyLab/caffei
 
 ## Named Constants
 
-Caffeine contains definitions for all of the PRIF-relevant constants from ISO_FORTRAN_ENV and for
+Caffeine contains definitions for all of the PRIF-relevant constants from `ISO_FORTRAN_ENV` and for
 all of the PRIF-specific constants.
+Configuration settings (`CAF_IMPORT_*` preprocessor defines) can optionally be used to import
+selected constant values from `ISO_FORTRAN_ENV` of the hosting compiler.
 
 ## Program Startup and Shutdown
 
