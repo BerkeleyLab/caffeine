@@ -45,7 +45,7 @@ Report bugs to fortran@lbl.gov or at https://go.lbl.gov/caffeine
 EOF
 }
 
-GASNET_VERSION="stable"
+GASNET_VERSION="2025.8.0"
 VERBOSE=""
 GASNET_CONDUIT="${GASNET_CONDUIT:-smp}"
 YES=false
