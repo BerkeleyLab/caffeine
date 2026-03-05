@@ -50,9 +50,7 @@ Prerequisites & Dependencies
 ### Build prerequisites
 The `install.sh` script uses the following packages:
 * Fortran and C compilers
-    * We regularly test with: GNU Fortran versions 13, 14, 15 and LLVM Flang versions 19, 20, 21
-    * On macOS the Homebrew-installed `llvm` and `flang` packages may require some
-      additional settings, see [issue #228](https://github.com/BerkeleyLab/caffeine/issues/228) for the latest information.
+    * We regularly test with: LLVM Flang versions 19:22 and GNU Fortran versions 13:15
 * [Fortran package manager] `fpm`
 * [pkg-config]
 * [realpath]
@@ -98,7 +96,10 @@ env FC=<Fortran-compiler> CC=<C-compiler> CXX=<C++-compiler> ./install.sh <optio
 env CAF_IMAGES=8 ./run-fpm.sh run --example hello
 ```
 
-The provided compilers MUST be "compatible": for the best experience you are
+If `$FC` or `$CC` are unset, then `install.sh` will look for LLVM-based compilers in
+the `PATH`, and failing that, offer to install such compilers using Homebrew.
+
+The selected compilers MUST be "compatible": for the best experience you are
 HIGHLY recommended to specify the language frontends provided by a single version
 of a given compiler suite installation. The C++ compiler is optional for
 single-node deployments (and can be disabled using command-line option `--without-cxx`), 
@@ -107,10 +108,9 @@ but C++ is required for some network backends.
 *Note for macOS/Homebrew users*: Homebrew may be used to install
 [LLVM flang](https://formulae.brew.sh/formula/flang) for use with Caffeine, however
 by default Homebrew will not replace the incompatible Apple-provided `clang` in your `PATH`.
-Such users are recommended to use Homebrew's version-suffixed compiler variants, 
-for example setting `FC=flang-21 CC=clang-21 CXX=clang++-21` in the command above,
+Such users are recommended to use Homebrew's matching LLVM C/C++ compilers
+(usually installed in `/opt/homebrew/opt/llvm/bin`)
 to ensure that a matching set of LLVM compilers are used. 
-See also [issue #228](https://github.com/BerkeleyLab/caffeine/issues/228).
 
 The `install.sh` recognizes a number of command-line options and environment variables to
 customize behavior for your system. See the output of `./install.sh --help` for full documentation,
