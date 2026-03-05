@@ -255,9 +255,6 @@ jobs:
       run: |
         set -x
         brew install llvm@${COMPILER_VERSION} flang
-        # workaround issue #228: clang cannot find homebrew flang's C header
-        for p in /opt/homebrew /usr/local $(brew --prefix) ; do find $p/Cellar/flang -name ISO_Fortran_binding.h 2>/dev/null || true ; done
-        echo "CFLAGS=-I$(dirname $(find $(brew --prefix)/Cellar/flang -name ISO_Fortran_binding.h | head -1)) ${CFLAGS}" >> "$GITHUB_ENV"
         # Prepend homebrew clang to PATH:
         echo "PATH=$(brew --prefix)/opt/llvm/bin:${PATH}" >> "$GITHUB_ENV"
 
