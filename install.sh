@@ -494,7 +494,7 @@ CAFFEINE_FPM_CFLAGS=$GASNET_CFLAGS $GASNET_CPPFLAGS $APPEND_CFLAGS
 Name: caffeine
 Description: The CoArray Fortran Framework of Efficient Interfaces to Network Environments (Caffeine) implements the Parallel Runtime Interface for Fortran (PRIF), providing runtime support for multi-image features in modern Fortran compilers.
 URL: https://go.lbl.gov/caffeine
-Version: 0.7.2
+Version: 0.7.3
 EOF
 
 exit_if_pkg_config_pc_file_missing "caffeine"
