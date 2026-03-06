@@ -8,12 +8,11 @@ more details about the implementation of the various PRIF features, please see t
 following sections:
 
 - [Named Constants](#Named-Constants)
-- [`stat` and `errmsg` support](#stat-and-errmsg-support)
 - [Program Startup and Shutdown](#Program-Startup-and-Shutdown)
 - [Image Queries](#Image-Queries)
 - [Storage Management](#Storage-Management)
 - [Coarray Queries](#Coarray-Queries)
-- [Continguous Coarray Access](#Continguous-Coarray-Access)
+- [Contiguous Coarray Access](#Contiguous-Coarray-Access)
 - [Strided Coarray Access](#Strided-Coarray-Access)
 - [SYNC Statements](#SYNC-Statements)
 - [Locks and Unlocks](#Locks-and-Unlocks)
@@ -23,7 +22,7 @@ following sections:
 - [Collectives](#Collectives)
 - [Atomic Memory Operations](#Atomic-Memory-Operations)
 
-The priorites for feature implementation and addressing known defects is communicated by
+The priorites for feature implementation and addressing known defects are communicated by
 the labels in the Caffeine [issue tracker](https://github.com/BerkeleyLab/caffeine/issues).
 
 ## Named Constants

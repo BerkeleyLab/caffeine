@@ -24,25 +24,26 @@ program that execute asynchronously in shared or distributed memory, except
 where a program uses specific synchronization mechanisms.  Fortran's
 coarray feature provides distributed data structures that offer a subscripted,
 multidimensional array notation defining a partitioned global address space
-(PGAS). One image can use the cosubscript notation to perform one-sided access
+(PGAS). One image can use a coindexed notation to perform one-sided access
 of coarray data associated with another image.
 
-Fortran 2018 greatly expanded this feature set to include such concepts as
+Fortran 2018 greatly expanded this feature set to include concepts such as
 teams (groupings) of images, events (counting semaphores), collective
 subroutines and failed-image detection (fault tolerance). Fortran 2023 provided
 additional, minor multi-image extensions, including notified remote data access.
 
 Several popular Fortran compilers, including [LLVM Flang](https://flang.llvm.org/docs/FortranStandardsSupport.html)
-and LFortran, currently
+and [LFortran](https://github.com/lfortran/lfortran), currently
 lack complete support for multi-image parallel execution. These features are a mandatory
 part of Fortran, and thus are an important part of reaching full compliance with
-the 2008, 2018, or 2023 versions of the Fortran standard. Thanks to PRIF and Caffeine,
-the forthcoming LLVM Flang 22 release is expected to support a meaningful subset of
-multi-image Fortran features. For more details, see
-[LLVM-HPC2025 paper](#Additional-Publications) below.
+the 2008, 2018, or 2023 revisions of the Fortran standard.
+The latest LLVM Flang 22 release adds experimental support for a 
+[meaningful subset](https://flang.llvm.org/docs/FortranStandardsSupport.html#fortran-2018)
+of multi-image Fortran features using PRIF and Caffeine. 
+For more details, see [LLVM-HPC2025 paper](#Additional-Publications) below.
 
 Caffeine provides a portable, high-performance and open-source parallel
-runtime library that such compilers can target in code generation as part of
+runtime library that compilers can target in code generation as part of
 their solution to support Fortran's multi-image parallel features.
 
 Prerequisites & Dependencies
@@ -132,9 +133,15 @@ using Fortran's multi-image features to print a message from each image.
 
 Run tests
 ---------
+
+After installation, one can optionally issue the following command to run
+Caffeine's correctness unit tests to exercise the PRIF subroutines:
+
 ```
 ./run-fpm.sh test
 ```
+
+Note that some unit tests are conditionally skipped based on platform and configuration details.
 
 Recognized Environment Variables
 --------------------------------
