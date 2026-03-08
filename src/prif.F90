@@ -145,9 +145,9 @@ module prif
     integer(PRIF_ATOMIC_INT_KIND) :: counter = 0
   end type
 
-  type, public :: prif_coarray_handle
+  type, public, bind(C) :: prif_coarray_handle
     private
-    type(prif_coarray_descriptor), pointer :: info
+    type(c_ptr) :: info
   end type
 
   type, public :: prif_team_type

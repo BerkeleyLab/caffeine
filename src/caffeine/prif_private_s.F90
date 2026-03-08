@@ -442,14 +442,31 @@ contains
     as_c_ptr = transfer(i, as_c_ptr)
   end function
 
+  function handle_to_dp(coarray_handle) result(dp)
+    type(prif_coarray_handle), intent(in) :: coarray_handle
+    type(prif_coarray_descriptor), pointer :: dp
+    call_assert(c_associated(coarray_handle%info))
+    call c_f_pointer(coarray_handle%info, dp)
+  end function
+
+  ! dp = "descriptor pointer"
+  pure function dp_to_handle(dp) result(coarray_handle)
+    type(prif_coarray_descriptor), pointer, intent(in) :: dp
+    type(prif_coarray_handle) :: coarray_handle
+    call_assert(associated(dp))
+    coarray_handle%info = c_loc(dp)
+  end function
+
   subroutine base_pointer(coarray_handle, image_num, ptr)
     type(prif_coarray_handle), intent(in) :: coarray_handle
     integer(c_int), intent(in) :: image_num
     integer(c_intptr_t), intent(out) :: ptr
+    type(prif_coarray_descriptor), pointer :: dp
 
     call_assert(coarray_handle_check(coarray_handle))
     call_assert_describe(image_num > 0 .and. image_num <= initial_team%num_images, "base_pointer: image_num not within valid range")
-    ptr = caf_convert_base_addr(coarray_handle%info%coarray_data, image_num)
+    dp => handle_to_dp(coarray_handle)
+    ptr = caf_convert_base_addr(dp%coarray_data, image_num)
   end subroutine
 
   subroutine unimplemented(proc_name)
@@ -519,17 +536,19 @@ contains
     type(prif_coarray_handle), intent(in) :: coarray_handle
     logical :: result_
     integer(c_int) :: i, epp(15)
+    type(prif_coarray_descriptor), pointer :: dp
 
-    call assert_always(associated(coarray_handle%info), "unassociated info pointer in prif_coarray_handle")
-    associate(info => coarray_handle%info, corank => coarray_handle%info%corank)
+    call assert_always(c_associated(coarray_handle%info), "unassociated info pointer in prif_coarray_handle")
+    dp => handle_to_dp(coarray_handle)
+    associate(corank => dp%corank)
       call assert_always(corank >= 1, "invalid corank in prif_coarray_handle")
-      call assert_always(corank <= size(info%lcobounds), "invalid corank in prif_coarray_handle")
-      call assert_always(all([(info%lcobounds(i) <= info%ucobounds(i), i = 1, corank-1)]), &
+      call assert_always(corank <= size(dp%lcobounds), "invalid corank in prif_coarray_handle")
+      call assert_always(all([(dp%lcobounds(i) <= dp%ucobounds(i), i = 1, corank-1)]), &
                          "invalid cobounds in prif_coarray_handle")
-      call assert_always(info%coarray_size > 0, "invalid data size in prif_coarray_handle")
-      call assert_always(c_associated(info%coarray_data), "invalid data pointer in prif_coarray_handle")
-      call compute_coshape_epp(info%lcobounds(1:corank),info%ucobounds(1:corank-1),epp(1:corank))
-      call assert_always(all(info%coshape_epp(1:corank) == epp(1:corank)), &
+      call assert_always(dp%coarray_size > 0, "invalid data size in prif_coarray_handle")
+      call assert_always(c_associated(dp%coarray_data), "invalid data pointer in prif_coarray_handle")
+      call compute_coshape_epp(dp%lcobounds(1:corank),dp%ucobounds(1:corank-1),epp(1:corank))
+      call assert_always(all(dp%coshape_epp(1:corank) == epp(1:corank)), &
                          "invalid coshape_epp in prif_coarray_handle")
     end associate
 
