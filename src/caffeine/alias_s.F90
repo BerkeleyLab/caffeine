@@ -13,6 +13,8 @@ contains
 
   module procedure prif_alias_create
     integer(c_int) :: corank
+    type(prif_coarray_descriptor), pointer :: dp
+    type(prif_coarray_descriptor), pointer :: alias_dp
 
     ! validate inputs
     call_assert(coarray_handle_check(source_handle))
@@ -26,35 +28,35 @@ contains
       call_assert(all(alias_lcobounds(1:corank-1) <= alias_ucobounds))
     end if
 
-
-    allocate(alias_handle%info)
+    dp => handle_to_dp(source_handle)
     ! start with a copy of the source descriptor
-    alias_handle%info = source_handle%info
+    allocate(alias_dp, source=dp)
 
 #   if CAF_PRIF_VERSION >= 6
-       alias_handle%info%coarray_data = &
-         as_c_ptr(as_int(alias_handle%info%coarray_data) + data_pointer_offset)
+       alias_dp%coarray_data = &
+         as_c_ptr(as_int(alias_dp%coarray_data) + data_pointer_offset)
 #   endif
 
     ! apply provided cobounds
-    alias_handle%info%corank = corank
-    alias_handle%info%lcobounds(1:corank) = alias_lcobounds
-    alias_handle%info%ucobounds(1:corank-1) = alias_ucobounds(1:corank-1)
+    alias_dp%corank = corank
+    alias_dp%lcobounds(1:corank) = alias_lcobounds
+    alias_dp%ucobounds(1:corank-1) = alias_ucobounds(1:corank-1)
     call compute_coshape_epp(alias_lcobounds, alias_ucobounds, &
-                             alias_handle%info%coshape_epp(1:corank))
+                             alias_dp%coshape_epp(1:corank))
 #   if ASSERTIONS
       ! The following entries are dead, but initialize them to help detect defects
-      alias_handle%info%lcobounds(corank+1:15) = huge(0_c_int64_t)
-      alias_handle%info%ucobounds(corank:14) = -huge(0_c_int64_t)
-      alias_handle%info%coshape_epp(corank+1:15) = 0
+      alias_dp%lcobounds(corank+1:15) = huge(0_c_int64_t)
+      alias_dp%ucobounds(corank:14) = -huge(0_c_int64_t)
+      alias_dp%coshape_epp(corank+1:15) = 0
 #   endif
 
     ! reset some fields that are unused in aliases
-    alias_handle%info%reserved = c_null_ptr 
-    alias_handle%info%previous_handle = c_null_ptr
-    alias_handle%info%next_handle = c_null_ptr
-    alias_handle%info%final_func = c_null_funptr
+    alias_dp%reserved = c_null_ptr 
+    alias_dp%previous_handle = c_null_ptr
+    alias_dp%next_handle = c_null_ptr
+    alias_dp%final_func = c_null_funptr
 
+    alias_handle = dp_to_handle(alias_dp)
     call_assert(coarray_handle_check(alias_handle))
   end procedure
 
@@ -63,7 +65,7 @@ contains
 
     call_assert(coarray_handle_check(alias_handle))
 
-    info => alias_handle%info
+    info => handle_to_dp(alias_handle)
     call_assert(.not. c_associated(info%reserved))
     call_assert(.not. c_associated(info%previous_handle))
     call_assert(.not. c_associated(info%next_handle))
