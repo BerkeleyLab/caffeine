@@ -20,6 +20,7 @@ program test_suite_driver
   use prif_allocate_test_m, only : prif_allocate_test_t
   use prif_coarray_inquiry_test_m, only :  prif_coarray_inquiry_test_t
   use prif_teams_test_m, only : prif_teams_test_t 
+  use prif_threaded_test_m, only : prif_threaded_test_t 
   use prif_rma_test_m, only : prif_rma_test_t   
   use prif_strided_test_m, only : prif_strided_test_t
   use prif_event_test_m, only : prif_event_test_t 
@@ -69,6 +70,7 @@ program test_suite_driver
 
     ! complicated multi-feature tests
     ,test_fixture_t( prif_teams_test_t() ) &
+    ,test_fixture_t( prif_threaded_test_t() ) &
 
     ! exit tests
     ,test_fixture_t( prif_error_stop_test_t() ) &

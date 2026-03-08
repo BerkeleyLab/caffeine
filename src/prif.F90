@@ -2,6 +2,7 @@
 ! Terms of use are as specified in LICENSE.txt
 
 #include "language-support.F90"
+#include "version.h"
 
 module prif
 
