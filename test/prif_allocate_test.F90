@@ -31,6 +31,15 @@ module prif_allocate_test_m
   logical :: ff_force_fail = .false.
   character(len=*), parameter :: ff_err = "test error message"
 
+  interface
+    subroutine coarray_cleanup_simple_c(handle, stat, errmsg) bind(C)
+      import c_int, c_char, prif_coarray_handle
+      type(prif_coarray_handle), value, intent(in) :: handle
+      integer(c_int), intent(out) :: stat
+      character(kind=c_char,len=:), intent(out), allocatable :: errmsg
+    end subroutine
+  end interface
+
 contains
 
   pure function subject()
@@ -135,6 +144,16 @@ contains
 
     call prif_deallocate_coarray(ff_handle)
     ALSO(ff_count .equalsExpected. 1)
+
+    ! final_func written in C
+    call prif_allocate_coarray( &
+      [integer(c_int64_t) :: 1], [integer(c_int64_t) :: ], &
+      data_size, c_funloc(coarray_cleanup_simple_c), &
+      ff_handle, allocated_memory)
+    ALSO(ff_count .equalsExpected. 1)
+
+    call prif_deallocate_coarray(ff_handle)
+    ALSO(ff_count .equalsExpected. 2)
     
     ! final_func that errors on first three deallocations
     ff_count = 0
