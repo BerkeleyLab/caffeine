@@ -162,7 +162,6 @@ contains
     integer :: i, num_handles
     type(prif_coarray_handle), target :: coarray_handle
     type(prif_coarray_descriptor), pointer :: dp
-# if HAVE_FINAL_FUNC_SUPPORT
     abstract interface
       subroutine coarray_cleanup_i(handle, stat, errmsg) bind(C)
         import c_char, c_int, prif_coarray_handle
@@ -175,7 +174,6 @@ contains
     procedure(coarray_cleanup_i), pointer :: coarray_cleanup
     integer(c_int) :: local_stat
     character(len=:), allocatable :: local_errmsg
-#endif
 
     call prif_sync_all ! Need to ensure we don't deallocate anything till everyone gets here
     num_handles = size(coarray_handles)
@@ -192,7 +190,6 @@ contains
       coarray_handle = coarray_handles(i) ! Add target attribute
       dp => handle_to_dp(coarray_handle)
       if (c_associated(dp%final_func)) then
-#     if HAVE_FINAL_FUNC_SUPPORT
         call c_f_procpointer(dp%final_func, coarray_cleanup)
         call coarray_cleanup(coarray_handle, local_stat, local_errmsg)
         call prif_co_max(local_stat) ! Need to be sure it didn't fail on any images
@@ -204,9 +201,6 @@ contains
                             stat, errmsg, errmsg_alloc)
           return ! NOTE: We no longer have guarantees that coarrays are in consistent state
         end if
-#     else
-        ! TODO: issue a warning that we are ignoring the final_func?
-#     endif
       end if
     end do
 

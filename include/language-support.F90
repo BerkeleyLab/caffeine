@@ -29,20 +29,6 @@
 #endif  
 #endif
 
-#ifndef HAVE_FINAL_FUNC_SUPPORT
-# if defined(__GFORTRAN__) && HAVE_GCC_VERSION < 160000
-   ! gfortran 14-15 defect prevents declaration of the coarray_cleanup interface:
-   !   https://gcc.gnu.org/bugzilla/show_bug.cgi?id=113338
-   ! reportedly fixed in gfortran 16
-#  define HAVE_FINAL_FUNC_SUPPORT 0
-# elif defined(__flang__) && __flang_major__ < 20
-   ! also missing in flang before 20
-#  define HAVE_FINAL_FUNC_SUPPORT 0
-# else
-#  define HAVE_FINAL_FUNC_SUPPORT 1
-# endif
-#endif
-
 #ifndef NEED_C_FUNLOC_WORKAROUND
 # if __GFORTRAN__ && HAVE_GCC_VERSION <= 150200
   ! Gfortran 13..15.2 bug workaround, believed to be fixed in 15.3 and 16.x:
