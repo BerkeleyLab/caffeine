@@ -24,14 +24,12 @@ module prif_allocate_test_m
     procedure, nopass, non_overridable :: results
   end type
 
-#if HAVE_FINAL_FUNC_SUPPORT
   ! Global state used to coordinate with finalizers
   integer :: ff_count
   type(prif_coarray_handle) :: ff_handle
   type(test_diagnosis_t) :: ff_diag
   logical :: ff_force_fail = .false.
   character(len=*), parameter :: ff_err = "test error message"
-#endif
 
 contains
 
@@ -52,9 +50,7 @@ contains
       ,test_description_t("allocating, using and deallocating memory non-symmetrically", &
          usher(check_allocate_non_symmetric)) &
       ,test_description_t("allocating and deallocating coarrays with finalizers" &
-#      if HAVE_FINAL_FUNC_SUPPORT
          , usher(check_final_func) &
-#      endif
        ) &
       ,test_description_t("reporting out-of-memory errors", &
          usher(check_allocation_oom)) &
@@ -109,7 +105,6 @@ contains
 
   end function
 
-#if HAVE_FINAL_FUNC_SUPPORT
   function check_final_func() result(retdiag)
     type(test_diagnosis_t) retdiag
 
@@ -205,7 +200,6 @@ contains
     end if
   end subroutine
 # undef diag
-#endif
 
   function check_allocate_non_symmetric() result(diag)
     type(test_diagnosis_t) diag 

@@ -183,16 +183,11 @@ contains
                     lcobounds = [1_c_int64_t], &
                     ucobounds = [integer(c_int64_t)::], &
                     size_in_bytes = element_size, &
-#if HAVE_FINAL_FUNC_SUPPORT
                     final_func = c_funloc(coarray_cleanup), &
-#  define CHECK_COUNT(n) ALSO(cleanup_count .equalsExpected. n)
-#else
-                    final_func = c_null_funptr, &
-#  define CHECK_COUNT(n) 
-#endif
                     coarray_handle = coarrays(i), &
                     allocated_memory = allocated_memory)
             end do
+#  define CHECK_COUNT(n) ALSO(cleanup_count .equalsExpected. n)
             CHECK_COUNT(0)
             call prif_deallocate_coarrays(coarrays(4:4))
             call prif_deallocate_coarrays(coarrays(2:2))
@@ -247,7 +242,6 @@ contains
 
     end function
 
-#if HAVE_FINAL_FUNC_SUPPORT
     subroutine coarray_cleanup(handle, stat, errmsg) bind(C)
       type(prif_coarray_handle), value, intent(in) :: handle
       integer(c_int), intent(out) :: stat
@@ -256,5 +250,5 @@ contains
       cleanup_count = cleanup_count + 1
       stat = 0
     end subroutine
-#endif
+
 end module prif_teams_test_m
