@@ -80,7 +80,11 @@ contains
     end block
     dp%corank = corank
     dp%coarray_size = size_in_bytes
-    dp%final_func = final_func
+    if (associated(final_func)) then
+      dp%final_func = c_funloc(final_func)
+    else
+      dp%final_func = c_null_funptr
+    end if
     dp%lcobounds(1:corank) = lcobounds
     dp%ucobounds(1:corank-1) = ucobounds(1:corank-1)
     call compute_coshape_epp(lcobounds, ucobounds, dp%coshape_epp(1:corank))
@@ -162,16 +166,7 @@ contains
     integer :: i, num_handles
     type(prif_coarray_handle), target :: coarray_handle
     type(prif_coarray_descriptor), pointer :: dp
-    abstract interface
-      subroutine coarray_cleanup_i(handle, stat, errmsg) bind(C)
-        import c_char, c_int, prif_coarray_handle
-        implicit none
-        type(prif_coarray_handle), value, intent(in) :: handle
-        integer(c_int), intent(out) :: stat
-        character(kind=c_char,len=:), intent(out), allocatable :: errmsg
-      end subroutine
-    end interface
-    procedure(coarray_cleanup_i), pointer :: coarray_cleanup
+    procedure(prif_coarray_cleanup_interface), pointer :: coarray_cleanup
     integer(c_int) :: local_stat
     character(len=:), allocatable :: local_errmsg
 

@@ -1,5 +1,5 @@
 program out_of_memory
-  use iso_c_binding, only: c_bool, c_size_t, c_ptr, c_null_funptr, c_int64_t
+  use iso_c_binding, only: c_bool, c_size_t, c_ptr, c_int64_t
   use prif
   implicit none
 
@@ -37,7 +37,7 @@ program out_of_memory
       ucobounds(1) = num_imgs
 
       call prif_allocate_coarray( &
-        lcobounds, ucobounds, size_in_bytes, c_null_funptr, &
+        lcobounds, ucobounds, size_in_bytes, NULL(), &
         coarray_handle, allocated_memory)
     end block
   else

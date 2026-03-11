@@ -28,7 +28,7 @@ use prif, only : &
 
   use iso_c_binding, only: &
       c_ptr, c_int, c_int64_t, c_size_t, c_intptr_t, &
-      c_null_funptr, c_null_ptr, &
+      c_null_ptr, &
       c_associated, c_f_pointer, c_funloc, c_loc, c_sizeof
 
 #endif
