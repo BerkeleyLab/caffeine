@@ -165,11 +165,11 @@ contains
 # if HAVE_FINAL_FUNC_SUPPORT
     abstract interface
       subroutine coarray_cleanup_i(handle, stat, errmsg) bind(C)
-        import c_int, prif_coarray_handle
+        import c_char, c_int, prif_coarray_handle
         implicit none
-        type(prif_coarray_handle), pointer, intent(in) :: handle
+        type(prif_coarray_handle), value, intent(in) :: handle
         integer(c_int), intent(out) :: stat
-        character(len=:), intent(out), allocatable :: errmsg
+        character(kind=c_char,len=:), intent(out), allocatable :: errmsg
       end subroutine
     end interface
     procedure(coarray_cleanup_i), pointer :: coarray_cleanup
