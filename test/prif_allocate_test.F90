@@ -4,6 +4,7 @@
 
 module prif_allocate_test_m
 # include "test-uses-alloc.F90"
+  use iso_c_binding, only: c_char
   use prif, only : &
       prif_num_images, prif_size_bytes, &
       prif_set_context_data, prif_get_context_data, prif_local_data_pointer, &
@@ -118,7 +119,6 @@ contains
 
     integer :: num_imgs, me, dummy_element
     type(c_ptr) :: allocated_memory
-    integer, pointer :: local_slice
     integer(c_size_t) :: data_size, query_size
     integer(c_int) :: stat
     character(len=len(ff_err)) :: errmsg
@@ -179,22 +179,22 @@ contains
   end function
 
   subroutine coarray_cleanup_simple(handle , stat, errmsg) bind(C)
-    type(prif_coarray_handle), pointer , intent(in) :: handle
+    type(prif_coarray_handle), value, intent(in) :: handle
     integer(c_int), intent(out) :: stat
-    character(len=:), intent(out), allocatable :: errmsg
+    character(kind=c_char,len=:), intent(out), allocatable :: errmsg
 
-    ALSO(assert_aliased(handle, ff_handle, 0))
+    ALSO(assert_aliased(handle, ff_handle))
 
     ff_count = ff_count + 1
     stat = 0
   end subroutine
 
   subroutine coarray_cleanup_first_error(handle , stat, errmsg) bind(C)
-    type(prif_coarray_handle), pointer , intent(in) :: handle
+    type(prif_coarray_handle), value, intent(in) :: handle
     integer(c_int), intent(out) :: stat
-    character(len=:), intent(out), allocatable :: errmsg
+    character(kind=c_char,len=:), intent(out), allocatable :: errmsg
 
-    ALSO(assert_aliased(handle, ff_handle, 0))
+    ALSO(assert_aliased(handle, ff_handle))
 
     ff_count = ff_count + 1
     errmsg = ff_err

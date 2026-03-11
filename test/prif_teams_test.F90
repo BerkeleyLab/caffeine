@@ -3,6 +3,7 @@
 
 module prif_teams_test_m
 # include "test-uses-alloc.F90"
+    use iso_c_binding, only: c_char
     use prif
     use julienne_m, only: test_description_t, test_diagnosis_t, test_result_t, test_t, string_t, usher &
       ,operator(.also.), operator(.isAtLeast.), operator(.isAtMost.), operator(.equalsExpected.), operator(//)
@@ -248,9 +249,9 @@ contains
 
 #if HAVE_FINAL_FUNC_SUPPORT
     subroutine coarray_cleanup(handle, stat, errmsg) bind(C)
-      type(prif_coarray_handle), pointer, intent(in) :: handle
+      type(prif_coarray_handle), value, intent(in) :: handle
       integer(c_int), intent(out) :: stat
-      character(len=:), intent(out), allocatable :: errmsg
+      character(kind=c_char, len=:), intent(out), allocatable :: errmsg
 
       cleanup_count = cleanup_count + 1
       stat = 0
