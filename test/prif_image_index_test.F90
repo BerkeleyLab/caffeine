@@ -103,7 +103,7 @@ contains
                 lcobounds = [1_c_int64_t], &
                 ucobounds = [integer(c_int64_t)::], &
                 size_in_bytes = 1_c_size_t, &
-                final_func = c_null_funptr, &
+                final_func = NULL(), &
                 coarray_handle = coarray_handle, &
                 allocated_memory = allocated_memory)
         call prif_image_index(coarray_handle, [1_c_int64_t], image_index=answer)
@@ -130,7 +130,7 @@ contains
                 lcobounds = [2_c_int64_t, 3_c_int64_t], &
                 ucobounds = [3_c_int64_t], &
                 size_in_bytes = 1_c_size_t, &
-                final_func = c_null_funptr, &
+                final_func = NULL(), &
                 coarray_handle = coarray_handle, &
                 allocated_memory = allocated_memory)
         call prif_image_index(coarray_handle, [2_c_int64_t, 3_c_int64_t], image_index=answer)
@@ -157,7 +157,7 @@ contains
                 lcobounds = [-2_c_int64_t, 2_c_int64_t], &
                 ucobounds = [2_c_int64_t], &
                 size_in_bytes = 1_c_size_t, &
-                final_func = c_null_funptr, &
+                final_func = NULL(), &
                 coarray_handle = coarray_handle, &
                 allocated_memory = allocated_memory)
         call prif_image_index(coarray_handle, [-1_c_int64_t, 1_c_int64_t], image_index=answer)
@@ -183,7 +183,7 @@ contains
                 lcobounds = [1_c_int64_t, 2_c_int64_t], &
                 ucobounds = [2_c_int64_t], &
                 size_in_bytes = 1_c_size_t, &
-                final_func = c_null_funptr, &
+                final_func = NULL(), &
                 coarray_handle = coarray_handle, &
                 allocated_memory = allocated_memory)
         call prif_image_index(coarray_handle, [1_c_int64_t, 3_c_int64_t], image_index=answer)
@@ -217,7 +217,7 @@ contains
                 lcobounds = [1_c_int64_t, 0_c_int64_t, 0_c_int64_t], &
                 ucobounds = [2_c_int64_t, 1_c_int64_t], &
                 size_in_bytes = 1_c_size_t, &
-                final_func = c_null_funptr, &
+                final_func = NULL(), &
                 coarray_handle = coarray_handle, &
                 allocated_memory = allocated_memory)
         call prif_image_index_with_team(coarray_handle, &
@@ -257,7 +257,7 @@ contains
                 lcobounds = [0_c_int64_t, 2_c_int64_t], &
                 ucobounds = [1_c_int64_t], &
                 size_in_bytes = 1_c_size_t, &
-                final_func = c_null_funptr, &
+                final_func = NULL(), &
                 coarray_handle = coarray_handle, &
                 allocated_memory = allocated_memory)
 

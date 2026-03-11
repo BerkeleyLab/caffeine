@@ -32,6 +32,7 @@ module prif
   public :: prif_register_stop_callback, prif_stop_callback_interface
   public :: prif_stop, prif_error_stop, prif_fail_image
   public :: prif_allocate_coarray, prif_allocate, prif_deallocate
+  public :: prif_coarray_cleanup_interface
 #if CAF_PRIF_VERSION <= 6
   public :: prif_deallocate_coarray
 #else
@@ -172,6 +173,14 @@ module prif
       integer(c_size_t), intent(in), value :: count
       type(c_ptr), intent(in), value :: cdata
     end subroutine
+
+    subroutine prif_coarray_cleanup_interface(handle, stat, errmsg) bind(C)
+      import :: c_int, c_char, prif_coarray_handle
+      implicit none
+      type(prif_coarray_handle), value, intent(in) :: handle
+      integer(c_int), intent(out) :: stat
+      character(kind=c_char,len=:), intent(out), allocatable :: errmsg
+    end subroutine
   end interface
 
   interface
@@ -210,7 +219,7 @@ module prif
       implicit none
       integer(c_int64_t), dimension(:), intent(in) :: lcobounds, ucobounds
       integer(c_size_t), intent(in) :: size_in_bytes
-      type(c_funptr), intent(in) :: final_func
+      procedure(prif_coarray_cleanup_interface), pointer, intent(in) :: final_func
       type(prif_coarray_handle), intent(out) :: coarray_handle
       type(c_ptr), intent(out) :: allocated_memory
       integer(c_int), intent(out), optional :: stat

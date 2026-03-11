@@ -94,7 +94,7 @@ contains
                 lcobounds = [1_c_int64_t], &
                 ucobounds = [integer(c_int64_t)::], &
                 size_in_bytes = sizeof_atomic_int, &
-                final_func = c_null_funptr, &
+                final_func = NULL(), &
                 coarray_handle = coarray_handle_int, &
                 allocated_memory = c_ptr_int)
         base_addr_int = transfer(c_ptr_int, base_addr_int)
@@ -104,7 +104,7 @@ contains
                 lcobounds = [1_c_int64_t], &
                 ucobounds = [integer(c_int64_t)::], &
                 size_in_bytes = sizeof_atomic_logical, &
-                final_func = c_null_funptr, &
+                final_func = NULL(), &
                 coarray_handle = coarray_handle_logical, &
                 allocated_memory = c_ptr_logical)
         base_addr_logical = transfer(c_ptr_logical, base_addr_logical)

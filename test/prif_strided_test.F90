@@ -60,7 +60,7 @@ contains
         call prif_allocate_coarray( &
                 [integer(c_int64_t) :: 1], [integer(c_int64_t)::], &
                 size_in_bytes = sizeof_int*product(shape(mydata)), &
-                final_func = c_null_funptr, &
+                final_func = NULL(), &
                 coarray_handle = coarray_handle, &
                 allocated_memory = allocated_memory)
         call c_f_pointer(allocated_memory, local_slice, shape(mydata))
@@ -119,7 +119,7 @@ contains
         call prif_allocate_coarray( &
                 [integer(c_int64_t) :: 1], [integer(c_int64_t)::], &
                 size_in_bytes = int(storage_size(dummy_element)/8, c_size_t), &
-                final_func = c_null_funptr, &
+                final_func = NULL(), &
                 coarray_handle = coarray_handle, &
                 allocated_memory = allocated_memory)
         call c_f_pointer(allocated_memory, local_slice)
@@ -183,7 +183,7 @@ contains
         call prif_allocate_coarray( &
                 [integer(c_int64_t) :: 1], [integer(c_int64_t)::], &
                 size_in_bytes = sizeof_int*product(shape(mydata)), &
-                final_func = c_null_funptr, &
+                final_func = NULL(), &
                 coarray_handle = coarray_handle, &
                 allocated_memory = allocated_memory)
         call c_f_pointer(allocated_memory, local_slice, shape(mydata))
@@ -240,7 +240,7 @@ contains
         call prif_allocate_coarray( &
                 [integer(c_int64_t) :: 1], [integer(c_int64_t)::], &
                 size_in_bytes = int(storage_size(dummy_element)/8, c_size_t), &
-                final_func = c_null_funptr, &
+                final_func = NULL(), &
                 coarray_handle = coarray_handle, &
                 allocated_memory = allocated_memory)
         call c_f_pointer(allocated_memory, local_slice)

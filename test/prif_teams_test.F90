@@ -100,7 +100,7 @@ contains
             lcobounds = [1_c_int64_t], &
             ucobounds = [integer(c_int64_t)::], &
             size_in_bytes = element_size, &
-            final_func = c_null_funptr, &
+            final_func = NULL(), &
             coarray_handle = initial_coarray, &
             allocated_memory = allocated_memory)
         n = 0 ! clear outputs
@@ -183,7 +183,7 @@ contains
                     lcobounds = [1_c_int64_t], &
                     ucobounds = [integer(c_int64_t)::], &
                     size_in_bytes = element_size, &
-                    final_func = c_funloc(coarray_cleanup), &
+                    final_func = coarray_cleanup, &
                     coarray_handle = coarrays(i), &
                     allocated_memory = allocated_memory)
             end do
