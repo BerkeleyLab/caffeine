@@ -121,6 +121,13 @@ jobs:
             label: PRIF-0.6
             FFLAGS: -DFORCE_PRIF_0_6
             container: phhargrove/llvm-flang:21.1.0-latest
+          - os: ubuntu-24.04
+            compiler: flang
+            version: 21
+            network: smp
+            label: PRIF-0.7
+            FFLAGS: -DFORCE_PRIF_0_7
+            container: phhargrove/llvm-flang:21.1.0-latest
 
         # --- udp coverage for selected configs ---
           - os: macos-15
