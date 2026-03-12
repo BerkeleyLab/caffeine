@@ -1,4 +1,5 @@
 #include "test-utils.F90"
+#include "version.h"
 #include "language-support.F90"
 
 module prif_allocate_test_m

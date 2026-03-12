@@ -4,6 +4,9 @@
 # /* NOTE: this is a dual-language header file, */
 # /*       and should ONLY contain portable preprocessor directives. */
 
+#ifndef CAF_INCLUDED_CAFFEINE_INTERNAL_H
+#define CAF_INCLUDED_CAFFEINE_INTERNAL_H
+
 # /* define some macro portability helpers */
 #if defined(__GFORTRAN__) || defined(_CRAYFTN) || defined(NAGFOR)
 #  define CAF_CONCAT2(x,y)     x/**/y
@@ -30,3 +33,4 @@
 #define CAF_OP_FXOR	9
 #define CAF_OP_FCAS	10
 
+#endif

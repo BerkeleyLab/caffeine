@@ -18,6 +18,7 @@
 #include "../dlmalloc/dl_malloc_caf.h"
 #include "../dlmalloc/dl_malloc.h"
 #include "caffeine-internal.h"
+#include "version.h"
 
 enum {
   UNRECOGNIZED_TYPE,
@@ -30,11 +31,53 @@ static gex_Rank_t myproc, numprocs;
 static gex_Segment_t mysegment;
 static gex_TM_t myworldteam;
 
+static mspace* non_symmetric_heap;
+static gasnett_mutex_t non_symmetric_heap_lock = GASNETT_MUTEX_INITIALIZER;
+
 typedef void(*final_func_ptr)(void*, size_t) ;
 typedef uint8_t byte;
 
 static void event_init(void);
 static void atomic_init(void);
+
+#define CAF_IDENT(name, contents) \
+        GASNETT_IDENT(caf_IdentString_ ## name, \
+                      "$Caffeine" #name ": " contents " $")
+CAF_IDENT(Network, CAF_STRINGIFY(GASNET_CONDUIT_NAME));
+#if GASNET_SEQ
+  CAF_IDENT(ThreadMode, "SEQ");
+#elif GASNET_PAR
+  CAF_IDENT(ThreadMode, "PAR");
+#endif
+CAF_IDENT(LibraryVersion, CAF_STRINGIFY(CAF_RELEASE_VERSION_MAJOR) "."
+                          CAF_STRINGIFY(CAF_RELEASE_VERSION_MINOR) "."
+                          CAF_STRINGIFY(CAF_RELEASE_VERSION_PATCH));
+#if 0
+// TODO: PRIFVersion does not correctly respect FORCE_PRIF_X flags unless they are also passed in CFLAGS
+CAF_IDENT(PRIFVersion, CAF_STRINGIFY(CAF_PRIF_VERSION_MAJOR) "."
+                       CAF_STRINGIFY(CAF_PRIF_VERSION_MINOR));
+#endif
+#if 0
+#if ASSERTIONS // TODO: This doesn't yet work, until we fix issue #241
+  CAF_IDENT(Assertions, "1");
+#else
+  CAF_IDENT(Assertions, "0");
+#endif
+#endif
+CAF_IDENT(BuildTime, __DATE__ " " __TIME__ );
+CAF_IDENT(CompilerID, PLATFORM_COMPILER_IDSTR);
+CAF_IDENT(GASNetConfig, GASNET_CONFIG_STRING);
+
+// ---------------------------------------------------
+// Thread-safety support
+
+#if GASNET_PAR
+  #define LOCK(m)   gasnett_mutex_lock(&(m))
+  #define UNLOCK(m) gasnett_mutex_unlock(&(m))
+#else
+  #define LOCK(m)   do{}while(0)
+  #define UNLOCK(m) do{}while(0)
+#endif
 
 // ---------------------------------------------------
 // Floating-point exception support
@@ -83,7 +126,6 @@ void caf_caffeinate(
   mspace* symmetric_heap,
   intptr_t* symmetric_heap_start,
   intptr_t* symmetric_heap_size,
-  mspace* non_symmetric_heap,
   gex_TM_t* initial_team
 ) {
   GASNET_SAFE(gex_Client_Init(&myclient, &myep, &myworldteam, "caffeine", NULL, NULL, 0));
@@ -146,17 +188,21 @@ void caf_caffeinate(
     assert(*symmetric_heap);
     mspace_set_footprint_limit(*symmetric_heap, *symmetric_heap_size);
   }
-  *non_symmetric_heap = create_mspace_with_base((void*)non_symmetric_heap_start, non_symmetric_heap_size, 0);
-  assert(*non_symmetric_heap);
-  mspace_set_footprint_limit(*non_symmetric_heap, non_symmetric_heap_size);
+  non_symmetric_heap = create_mspace_with_base((void*)non_symmetric_heap_start, non_symmetric_heap_size, 0);
+  assert(non_symmetric_heap);
+  mspace_set_footprint_limit(non_symmetric_heap, non_symmetric_heap_size);
 
   // init various subsystems:
   atomic_init();
   event_init();
 }
 
-void caf_decaffeinate(int exit_code)
-{
+void caf_acquire_exit_lock() {
+  static gasnett_mutex_t exit_lock = GASNETT_MUTEX_INITIALIZER;
+  LOCK(exit_lock);
+}
+
+void caf_decaffeinate(int exit_code) {
   gasnet_exit(exit_code);
 }
 
@@ -180,10 +226,16 @@ void caf_fatal_error( const CFI_cdesc_t* Fstr )
   gasnett_fatalerror_nopos("%.*s", len, msg);
 }
 
-void* caf_allocate(mspace heap, size_t bytes)
-{
-   void* allocated_space = mspace_memalign(heap, 8, bytes);
-   return allocated_space;
+void* caf_allocate(mspace heap, size_t bytes) {
+  void* allocated_space = mspace_memalign(heap, 8, bytes);
+  return allocated_space;
+}
+
+void* caf_allocate_non_symmetric(size_t bytes) {
+  LOCK(non_symmetric_heap_lock);
+  void* allocated_space = caf_allocate(non_symmetric_heap, bytes);
+  UNLOCK(non_symmetric_heap_lock);
+  return allocated_space;
 }
 
 void caf_allocate_remaining(mspace heap, void** allocated_space, size_t* allocated_size)
@@ -206,9 +258,14 @@ void caf_allocate_remaining(mspace heap, void** allocated_space, size_t* allocat
                        *allocated_size);
 }
 
-void caf_deallocate(mspace heap, void* mem)
-{
+void caf_deallocate(mspace heap, void* mem) {
   mspace_free(heap, mem);
+}
+
+void caf_deallocate_non_symmetric(void* mem) {
+  LOCK(non_symmetric_heap_lock);
+  caf_deallocate(non_symmetric_heap, mem);
+  UNLOCK(non_symmetric_heap_lock);
 }
 
 void caf_establish_mspace(mspace* heap, void* heap_start, size_t heap_size)
@@ -335,7 +392,8 @@ void caf_event_query(void *event_var_ptr, int64_t *count) {
   );
 }
 
-void caf_event_wait(void *event_var_ptr, int64_t threshold, int segment_boundary, int acquire_fence) {
+void caf_event_wait(void *event_var_ptr, int64_t threshold, 
+                    int segment_boundary, int acquire_fence, int maybe_concurrent) {
   assert(event_AD != GEX_AD_INVALID);
   assert(event_var_ptr);
   assert(threshold >= 1);
@@ -353,18 +411,40 @@ void caf_event_wait(void *event_var_ptr, int64_t threshold, int segment_boundary
   }
 
   int64_t cnt = 0;
-  while (caf_event_query(event_var_ptr, &cnt), cnt < threshold) {
-    // issue #222 : TODO: we probably want to insert a wait hook here
-    gasnet_AMPoll();
-  }
+  if (maybe_concurrent) {
+    static gasnett_mutex_t notify_wait_lock = GASNETT_MUTEX_INITIALIZER;
+    while (1) {
+      while (caf_event_query(event_var_ptr, &cnt), cnt < threshold) {
+        // issue #222 : TODO: we probably want to insert a wait hook here
+        gasnet_AMPoll();
+      }
+      LOCK(notify_wait_lock);
+        if (caf_event_query(event_var_ptr, &cnt), cnt >= threshold) {
+          gex_Event_Wait(
+            gex_AD_OpNB_I64(event_AD, &cnt, 
+                            myproc, event_var_ptr,
+                            GEX_OP_FSUB, threshold, 0,
+                            flags)
+          );
+          assert(cnt >= threshold);
+          UNLOCK(notify_wait_lock);
+          break;
+        } else UNLOCK(notify_wait_lock);
+    }
+  } else { // not concurrent
+    while (caf_event_query(event_var_ptr, &cnt), cnt < threshold) {
+      // issue #222 : TODO: we probably want to insert a wait hook here
+      gasnet_AMPoll();
+    }
 
-  gex_Event_Wait(
-    gex_AD_OpNB_I64(event_AD, &cnt, 
-                    myproc, event_var_ptr,
-                    GEX_OP_FSUB, threshold, 0,
-                    flags)
-  );
-  assert(cnt >= threshold);
+    gex_Event_Wait(
+      gex_AD_OpNB_I64(event_AD, &cnt, 
+                      myproc, event_var_ptr,
+                      GEX_OP_FSUB, threshold, 0,
+                      flags)
+    );
+    assert(cnt >= threshold);
+  }
 }
 
 // _______________________ Atomics ____________________________
