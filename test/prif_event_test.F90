@@ -79,7 +79,7 @@ contains
                 lcobounds = [1_c_int64_t], &
                 ucobounds = [integer(c_int64_t)::], &
                 size_in_bytes = sizeof_event, &
-                final_func = NULL(), &
+                final_func = null_final_func, &
                 coarray_handle = coarray_handle, &
                 allocated_memory = allocated_memory)
         call c_f_pointer(allocated_memory, local_event)
@@ -169,7 +169,7 @@ contains
                 lcobounds = [1_c_int64_t], &
                 ucobounds = [integer(c_int64_t)::], &
                 size_in_bytes = sizeof_event, &
-                final_func = NULL(), &
+                final_func = null_final_func, &
                 coarray_handle = coarray_handle_evt, &
                 allocated_memory = allocated_memory)
         call c_f_pointer(allocated_memory, local_evt)
@@ -180,7 +180,7 @@ contains
                 lcobounds = [1_c_int64_t], &
                 ucobounds = [integer(c_int64_t)::], &
                 size_in_bytes = num_imgs * sizeof_int, &
-                final_func = NULL(), &
+                final_func = null_final_func, &
                 coarray_handle = coarray_handle_ctr, &
                 allocated_memory = allocated_memory)
         call c_f_pointer(allocated_memory, local_ctr, [num_imgs])
@@ -266,7 +266,7 @@ contains
                 lcobounds = [1_c_int64_t], &
                 ucobounds = [integer(c_int64_t)::], &
                 size_in_bytes = sizeof_notify, &
-                final_func = NULL(), &
+                final_func = null_final_func, &
                 coarray_handle = coarray_handle_evt, &
                 allocated_memory = allocated_memory)
         call c_f_pointer(allocated_memory, local_evt)
@@ -277,7 +277,7 @@ contains
                 lcobounds = [1_c_int64_t], &
                 ucobounds = [integer(c_int64_t)::], &
                 size_in_bytes = num_imgs * sizeof_int, &
-                final_func = NULL(), &
+                final_func = null_final_func, &
                 coarray_handle = coarray_handle_ctr, &
                 allocated_memory = allocated_memory)
         call c_f_pointer(allocated_memory, local_ctr, [num_imgs])

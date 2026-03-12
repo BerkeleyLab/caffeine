@@ -1,6 +1,7 @@
 ! Copyright (c), The Regents of the University of California
 ! Terms of use are as specified in LICENSE.txt
 
+#include "version.h"
 #include "assert_macros.h"
 
 submodule(prif:prif_private_s) sync_stmt_s
@@ -39,6 +40,11 @@ contains
     !   ALLOCATE( si_evt(NUM_IMAGES()) )
     type(prif_event_type) :: dummy_event
     type(c_ptr) :: allocated_memory
+#   if CAF_PRIF_VERSION >= 8
+      procedure(prif_coarray_cleanup_interface), pointer :: null_final_func => NULL()
+#   else
+      type(c_funptr) :: null_final_func = c_null_funptr
+#   endif
 
     associate(num_imgs => initial_team%num_images) 
 
@@ -48,7 +54,7 @@ contains
             lcobounds = [1_c_int64_t], &
             ucobounds = [int(num_imgs,c_int64_t)], &
             size_in_bytes = sizeof_event * num_imgs, &
-            final_func = NULL(), &
+            final_func = null_final_func, &
             coarray_handle = si_coarray_handle, &
             allocated_memory = allocated_memory)
       call c_f_pointer(allocated_memory, si_evt, [num_imgs])

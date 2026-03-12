@@ -1,6 +1,5 @@
 #include "test-utils.F90"
 #include "version.h"
-#include "language-support.F90"
 
 module prif_allocate_test_m
 # include "test-uses-alloc.F90"
@@ -86,7 +85,7 @@ contains
 
     data_size = storage_size(dummy_element)/8
     call prif_allocate_coarray( &
-      [integer(c_int64_t) :: 1], [integer(c_int64_t) :: ], data_size, NULL(), &
+      [integer(c_int64_t) :: 1], [integer(c_int64_t) :: ], data_size, null_final_func, &
       coarray_handle, allocated_memory)
 
     call c_f_pointer(allocated_memory, local_slice)
@@ -138,7 +137,7 @@ contains
     ff_count = 0
     call prif_allocate_coarray( &
       [integer(c_int64_t) :: 1], [integer(c_int64_t) :: ], &
-      data_size, coarray_cleanup_simple, &
+      data_size, final_func(coarray_cleanup_simple), &
       ff_handle, allocated_memory)
     ALSO(ff_count .equalsExpected. 0)
 
@@ -148,7 +147,7 @@ contains
     ! final_func written in C
     call prif_allocate_coarray( &
       [integer(c_int64_t) :: 1], [integer(c_int64_t) :: ], &
-      data_size, coarray_cleanup_simple_c, &
+      data_size, final_func(coarray_cleanup_simple_c), &
       ff_handle, allocated_memory)
     ALSO(ff_count .equalsExpected. 1)
 
@@ -159,7 +158,7 @@ contains
     ff_count = 0
     call prif_allocate_coarray( &
       [integer(c_int64_t) :: 1], [integer(c_int64_t) :: ], &
-      data_size, coarray_cleanup_first_error, &
+      data_size, final_func(coarray_cleanup_first_error), &
       ff_handle, allocated_memory)
     ALSO(ff_count .equalsExpected. 0)
 
@@ -314,7 +313,7 @@ contains
 
     data_size = 10*storage_size(dummy_element)/8
     call prif_allocate_coarray( &
-      [integer(c_int64_t) :: 1,1], [integer(c_int64_t) :: 4], data_size, NULL(), &
+      [integer(c_int64_t) :: 1,1], [integer(c_int64_t) :: 4], data_size, null_final_func, &
       coarray_handle, allocated_memory)
 
     call prif_size_bytes(coarray_handle, data_size=query_size)
@@ -407,7 +406,7 @@ contains
     deallocate(errmsg)
 
     call prif_allocate_coarray( &
-      [integer(c_int64_t) :: 1], [integer(c_int64_t) :: ], size_in_bytes, NULL(), &
+      [integer(c_int64_t) :: 1], [integer(c_int64_t) :: ], size_in_bytes, null_final_func, &
       coarray_handle, allocated_memory, stat, errmsg_alloc=errmsg)
     ALSO(stat .equalsExpected. PRIF_STAT_OUT_OF_MEMORY)
     ALSO(allocated(errmsg))
