@@ -63,14 +63,14 @@ int caf_num_images(gex_TM_t tm) {
 // Given team and corresponding image_num, return image number in the initial team
 int caf_image_to_initial(gex_TM_t tm, int image_num) {
   assert(image_num >= 1);
-  assert(image_num <= gex_TM_QuerySize(tm));
+  assert(image_num <= (int)gex_TM_QuerySize(tm));
   gex_Rank_t proc = gex_TM_TranslateRankToJobrank(tm, image_num-1);
   return proc + 1;
 }
 // Given image number in the initial team, return image number corresponding to given team
 int caf_image_from_initial(gex_TM_t tm, int image_num) {
   assert(image_num >= 1);
-  assert(image_num <= numprocs);
+  assert(image_num <= (int)numprocs);
   gex_Rank_t proc = gex_TM_TranslateJobrankToRank(tm, image_num-1);
   // GEX_RANK_INVALID indicates the provided image_num in initial team is not part of tm
   assert(proc != GEX_RANK_INVALID); 
@@ -405,7 +405,7 @@ static void atomic_init(void) {
 void caf_atomic_int(int opcode, int image, void* addr, int64_t *result, int64_t op1, int64_t op2) {
   assert(atomic_AD != GEX_AD_INVALID);
   assert(addr);
-  assert(opcode >= 0 && opcode < sizeof(op_map)/sizeof(op_map[0]));
+  assert(opcode >= 0 && opcode < (int)(sizeof(op_map)/sizeof(op_map[0])));
 
   gex_OP_t op = op_map[opcode];
   gex_Event_Wait(
@@ -550,7 +550,7 @@ static int64_t *widen_from_array(CFI_cdesc_t* a_desc, size_t num_elements) {
   } else if (a_desc->elem_len == 2) {
     int16_t *src = a_desc->base_addr;
     for (size_t i=0; i < num_elements; i++) res[i] = src[i];
-  } else gasnett_fatalerror("Logic error in widen_from_array: %i", a_desc->elem_len);
+  } else gasnett_fatalerror("Logic error in widen_from_array: %i", (int)a_desc->elem_len);
   return res;
 }
 
@@ -564,7 +564,7 @@ static void narrow_to_array(CFI_cdesc_t* a_desc, int64_t *src, size_t num_elemen
   } else if (a_desc->elem_len == 2) {
     int16_t *dst = a_desc->base_addr;
     for (size_t i=0; i < num_elements; i++) dst[i] = src[i];
-  } else gasnett_fatalerror("Logic error in narrow_to_array: %i", a_desc->elem_len);
+  } else gasnett_fatalerror("Logic error in narrow_to_array: %i", (int)a_desc->elem_len);
   free(src);
 }
 
