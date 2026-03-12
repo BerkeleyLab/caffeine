@@ -1,5 +1,5 @@
 #include "test-utils.F90"
-#include "language-support.F90"
+#include "version.h"
 
 module prif_teams_test_m
 # include "test-uses-alloc.F90"
@@ -100,7 +100,7 @@ contains
             lcobounds = [1_c_int64_t], &
             ucobounds = [integer(c_int64_t)::], &
             size_in_bytes = element_size, &
-            final_func = NULL(), &
+            final_func = null_final_func, &
             coarray_handle = initial_coarray, &
             allocated_memory = allocated_memory)
         n = 0 ! clear outputs
@@ -183,7 +183,7 @@ contains
                     lcobounds = [1_c_int64_t], &
                     ucobounds = [integer(c_int64_t)::], &
                     size_in_bytes = element_size, &
-                    final_func = coarray_cleanup, &
+                    final_func = final_func(coarray_cleanup), &
                     coarray_handle = coarrays(i), &
                     allocated_memory = allocated_memory)
             end do

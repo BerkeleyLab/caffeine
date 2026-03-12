@@ -12,7 +12,23 @@ submodule(prif:prif_private_s) allocation_s
 
 contains
 
-  module procedure prif_allocate_coarray
+  module subroutine prif_allocate_coarray(lcobounds, ucobounds, size_in_bytes, final_func, coarray_handle, &
+        allocated_memory, stat, errmsg, errmsg_alloc)
+      implicit none
+      ! redundant redeclaration of arguments here is a GCC 13..15 bug workaround:
+      integer(c_int64_t), dimension(:), intent(in) :: lcobounds, ucobounds
+      integer(c_size_t), intent(in) :: size_in_bytes
+#   if CAF_PRIF_VERSION >= 8
+      procedure(prif_coarray_cleanup_interface), pointer, intent(in) :: final_func
+#   else
+      type(c_funptr), intent(in) :: final_func
+#   endif
+      type(prif_coarray_handle), intent(out) :: coarray_handle
+      type(c_ptr), intent(out) :: allocated_memory
+      integer(c_int), intent(out), optional :: stat
+      character(len=*), intent(inout), optional :: errmsg
+      character(len=:), intent(inout), allocatable, optional :: errmsg_alloc
+
     ! TODO: determining the size of the handle and where the coarray begins
     !       becomes a bit more complicated if we don't allocate space for
     !       15 cobounds
@@ -80,11 +96,15 @@ contains
     end block
     dp%corank = corank
     dp%coarray_size = size_in_bytes
-    if (associated(final_func)) then
-      dp%final_func = c_funloc(final_func)
-    else
-      dp%final_func = c_null_funptr
-    end if
+#   if CAF_PRIF_VERSION >= 8
+      if (associated(final_func)) then
+        dp%final_func = CAF_C_FUNLOC_PROCPTR(final_func)
+      else
+        dp%final_func = c_null_funptr
+      end if
+#   else
+      dp%final_func = final_func
+#   endif
     dp%lcobounds(1:corank) = lcobounds
     dp%ucobounds(1:corank-1) = ucobounds(1:corank-1)
     call compute_coshape_epp(lcobounds, ucobounds, dp%coshape_epp(1:corank))
@@ -107,7 +127,7 @@ contains
 
     call_assert(coarray_handle_check(coarray_handle))
     call_assert(team_check(current_team))
-  end procedure
+  end subroutine
 
   module procedure prif_allocate
     type(c_ptr) :: mem
@@ -166,7 +186,20 @@ contains
     integer :: i, num_handles
     type(prif_coarray_handle), target :: coarray_handle
     type(prif_coarray_descriptor), pointer :: dp
-    procedure(prif_coarray_cleanup_interface), pointer :: coarray_cleanup
+#   if CAF_PRIF_VERSION >= 8
+      procedure(prif_coarray_cleanup_interface), pointer :: coarray_cleanup
+#   else
+      abstract interface
+      subroutine coarray_cleanup_i(handle, stat, errmsg) bind(C)
+        import c_char, c_int, prif_coarray_handle
+        implicit none
+        type(prif_coarray_handle), value, intent(in) :: handle
+        integer(c_int), intent(out) :: stat
+        character(kind=c_char,len=:), intent(out), allocatable :: errmsg
+      end subroutine
+      end interface
+      procedure(coarray_cleanup_i), pointer :: coarray_cleanup
+#   endif
     integer(c_int) :: local_stat
     character(len=:), allocatable :: local_errmsg
 
