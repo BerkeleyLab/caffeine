@@ -58,8 +58,6 @@ contains
   end procedure
 
   module procedure prif_coshape
-    integer(c_int64_t) :: trailing_ucobound
-
     call_assert(coarray_handle_check(coarray_handle))
     call_assert(size(sizes) == coarray_handle%info%corank)
 
