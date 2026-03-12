@@ -428,6 +428,13 @@ void caf_atomic_logical(int opcode, int image, void* addr, int64_t *result, int6
 }
 
 //-------------------------------------------------------------------
+// gfortran 13.2 .. 15 : c_funloc is non-compliant
+// it erroneously generates a non-callable pointer to a pointer to the subroutine
+// This helper is used to undo that incorrect extra level of indirection
+typedef void (*funloc_t)(void);
+funloc_t caf_c_funloc_deref(funloc_t funloc) {
+  return *(funloc_t *)funloc;
+}
 
 void caf_co_reduce(
   CFI_cdesc_t* a_desc, int result_image, size_t num_elements, gex_Coll_ReduceFn_t user_op, void* client_data, gex_TM_t team
@@ -436,12 +443,7 @@ void caf_co_reduce(
   assert(result_image >= 0);
   assert(num_elements > 0);
   assert(user_op);
-#if PLATFORM_COMPILER_GNU
-  // gfortran 13.2 & 14 - c_funloc is non-compliant
-  // it erroneously generates a non-callable pointer to a pointer to the subroutine
-  // Here we undo that incorrect extra level of indirection
-  user_op = *(gex_Coll_ReduceFn_t *)user_op; 
-#endif
+
   char* a_address = (char*) a_desc->base_addr;
   size_t c_sizeof_a = a_desc->elem_len;
   gex_Event_t ev;
