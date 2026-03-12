@@ -352,6 +352,15 @@ submodule(prif) prif_private_s
       integer(c_int), intent(in), value :: new_index
      end subroutine
 
+    ! ______________ Misc helpers  __________________
+     function caf_c_funloc_deref(funloc) result(res) bind(C)
+       !! funloc_t caf_c_funloc_deref(funloc_t funloc)
+       import c_funptr
+       implicit none
+       type(c_funptr), value :: funloc
+       type(c_funptr) :: res
+     end function
+
   end interface
 
   interface num_to_str
