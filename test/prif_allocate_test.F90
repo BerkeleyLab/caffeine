@@ -30,14 +30,14 @@ module prif_allocate_test_m
   logical :: ff_force_fail = .false.
   character(len=*), parameter :: ff_err = "test error message"
 
+#if CAF_PRIF_VERSION >= 8
   interface
-    subroutine coarray_cleanup_simple_c(handle, stat, errmsg) bind(C)
+    subroutine coarray_cleanup_simple_c(handle) bind(C)
       import c_int, c_char, prif_coarray_handle
       type(prif_coarray_handle), value, intent(in) :: handle
-      integer(c_int), intent(out) :: stat
-      character(kind=c_char,len=:), intent(out), allocatable :: errmsg
     end subroutine
   end interface
+#endif
 
 contains
 
@@ -146,6 +146,7 @@ contains
     call prif_deallocate_coarray(ff_handle)
     ALSO(ff_count .equalsExpected. 1)
 
+# if CAF_PRIF_VERSION >= 8
     ! final_func written in C
     call prif_allocate_coarray( &
       [integer(c_int64_t) :: 1], [integer(c_int64_t) :: ], &
@@ -163,6 +164,8 @@ contains
     call prif_deallocate_coarray(ff_handle)
     ALSO(ff_count .equalsExpected. 3)
     
+#else 
+    ! CAF_PRIF_VERSION < 8
     ! final_func that errors on first three deallocations
     ff_count = 0
     call prif_allocate_coarray( &
@@ -196,21 +199,29 @@ contains
     ALSO(ff_count .equalsExpected. 4)
     ALSO(stat .equalsExpected. 0)
     ALSO(.not. allocated(errmsg_alloc))
-
+# endif
     retdiag = diag
   end function
 
+#if CAF_PRIF_VERSION < 8
   subroutine coarray_cleanup_simple(handle , stat, errmsg) bind(C)
     type(prif_coarray_handle), value, intent(in) :: handle
     integer(c_int), intent(out) :: stat
     character(kind=c_char,len=:), intent(out), allocatable :: errmsg
+#else
+  subroutine coarray_cleanup_simple(handle) bind(C)
+    type(prif_coarray_handle), value, intent(in) :: handle
+#endif
 
     ALSO(assert_aliased(handle, ff_handle))
 
     ff_count = ff_count + 1
+#  if CAF_PRIF_VERSION < 8
     stat = 0
+#  endif
   end subroutine
 
+#if CAF_PRIF_VERSION < 8
   subroutine coarray_cleanup_first_error(handle , stat, errmsg) bind(C)
     type(prif_coarray_handle), value, intent(in) :: handle
     integer(c_int), intent(out) :: stat
@@ -226,6 +237,7 @@ contains
       stat = 0
     end if
   end subroutine
+#endif
 # undef diag
 
   function check_allocate_non_symmetric() result(diag)
