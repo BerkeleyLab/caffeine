@@ -680,26 +680,26 @@ module prif
       integer(c_int), intent(out) :: image_status
     end subroutine
 
-    module subroutine prif_local_data_pointer(coarray_handle, local_data)
-      type(prif_coarray_handle), intent(in) :: coarray_handle
+    module subroutine prif_local_data_pointer(coarray_handle, local_data) bind(C)
+      type(prif_coarray_handle), value, intent(in) :: coarray_handle
       type(c_ptr), intent(out) :: local_data
     end subroutine
 
-    module subroutine prif_set_context_data(coarray_handle, context_data)
+    module subroutine prif_set_context_data(coarray_handle, context_data) bind(C)
       implicit none
-      type(prif_coarray_handle), intent(in) :: coarray_handle
-      type(c_ptr), intent(in) :: context_data
+      type(prif_coarray_handle), value, intent(in) :: coarray_handle
+      type(c_ptr), value, intent(in) :: context_data
     end subroutine
 
-    module subroutine prif_get_context_data(coarray_handle, context_data)
+    module subroutine prif_get_context_data(coarray_handle, context_data) bind(C)
       implicit none
-      type(prif_coarray_handle), intent(in) :: coarray_handle
+      type(prif_coarray_handle), value, intent(in) :: coarray_handle
       type(c_ptr), intent(out) :: context_data
     end subroutine
 
-    module subroutine prif_size_bytes(coarray_handle, data_size)
+    module subroutine prif_size_bytes(coarray_handle, data_size) bind(C)
       implicit none
-      type(prif_coarray_handle), intent(in) :: coarray_handle
+      type(prif_coarray_handle), value, intent(in) :: coarray_handle
       integer(c_size_t), intent(out) :: data_size
     end subroutine
 
