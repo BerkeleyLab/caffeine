@@ -242,6 +242,7 @@ contains
 
     end function
 
+# if CAF_PRIF_VERSION < 8
     subroutine coarray_cleanup(handle, stat, errmsg) bind(C)
       type(prif_coarray_handle), value, intent(in) :: handle
       integer(c_int), intent(out) :: stat
@@ -250,5 +251,12 @@ contains
       cleanup_count = cleanup_count + 1
       stat = 0
     end subroutine
+# else
+    subroutine coarray_cleanup(handle) bind(C)
+      type(prif_coarray_handle), value, intent(in) :: handle
+
+      cleanup_count = cleanup_count + 1
+    end subroutine
+# endif
 
 end module prif_teams_test_m

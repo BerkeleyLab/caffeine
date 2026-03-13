@@ -8,13 +8,13 @@ struct coarray_handle {
   void *info;
 };
 
-extern void coarray_cleanup_simple(struct coarray_handle handle, int* stat, CFI_cdesc_t* errmsg);
+extern void coarray_cleanup_simple(struct coarray_handle handle);
 extern void prif_get_context_data(struct coarray_handle handle, void **context_data);
 extern void prif_set_context_data(struct coarray_handle handle, void *context_data);
 extern void prif_local_data_pointer(struct coarray_handle handle, void **local_data);
 extern void prif_size_bytes(struct coarray_handle handle, size_t *data_size);
 
-extern void coarray_cleanup_simple_c(struct coarray_handle handle, int* stat, CFI_cdesc_t* errmsg) {
+extern void coarray_cleanup_simple_c(struct coarray_handle handle) {
 #if VERBOSE
   printf("Hello from coarray_cleanup_simple_c in C! ff_count=%i\n", ff_count); fflush(0);
 #endif
@@ -38,7 +38,5 @@ extern void coarray_cleanup_simple_c(struct coarray_handle handle, int* stat, CF
   assert(p == &p);
 
   // dispatch back to the test cleanup function written in Fortran:
-  coarray_cleanup_simple(handle, stat, errmsg);
-
-  assert(*stat == 0);
+  coarray_cleanup_simple(handle);
 }

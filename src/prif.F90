@@ -177,12 +177,10 @@ module prif
     end subroutine
 
 #  if CAF_PRIF_VERSION >= 8
-    subroutine prif_coarray_cleanup_interface(handle, stat, errmsg) bind(C)
-      import :: c_int, c_char, prif_coarray_handle
+    subroutine prif_coarray_cleanup_interface(handle) bind(C)
+      import :: prif_coarray_handle
       implicit none
       type(prif_coarray_handle), value, intent(in) :: handle
-      integer(c_int), intent(out) :: stat
-      character(kind=c_char,len=:), intent(out), allocatable :: errmsg
     end subroutine
 #  endif
   end interface

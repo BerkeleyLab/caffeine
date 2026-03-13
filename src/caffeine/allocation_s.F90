@@ -199,9 +199,9 @@ contains
       end subroutine
       end interface
       procedure(coarray_cleanup_i), pointer :: coarray_cleanup
+      integer(c_int) :: local_stat
+      character(len=:), allocatable :: local_errmsg
 #   endif
-    integer(c_int) :: local_stat
-    character(len=:), allocatable :: local_errmsg
 
     call prif_sync_all ! Need to ensure we don't deallocate anything till everyone gets here
     num_handles = size(coarray_handles)
@@ -219,6 +219,9 @@ contains
       dp => handle_to_dp(coarray_handle)
       if (c_associated(dp%final_func)) then
         call c_f_procpointer(dp%final_func, coarray_cleanup)
+#     if CAF_PRIF_VERSION >= 8
+        call coarray_cleanup(coarray_handle)
+#     else
         call coarray_cleanup(coarray_handle, local_stat, local_errmsg)
         call prif_co_max(local_stat) ! Need to be sure it didn't fail on any images
         if (local_stat /= 0) then
@@ -229,6 +232,7 @@ contains
                             stat, errmsg, errmsg_alloc)
           return ! NOTE: We no longer have guarantees that coarrays are in consistent state
         end if
+#     endif
       end if
     end do
 
