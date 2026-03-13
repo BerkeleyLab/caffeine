@@ -24,7 +24,7 @@ module prif_allocate_test_m
   end type
 
   ! Global state used to coordinate with finalizers
-  integer :: ff_count
+  integer(kind=c_int), bind(c), target :: ff_count
   type(prif_coarray_handle) :: ff_handle
   type(test_diagnosis_t) :: ff_diag
   logical :: ff_force_fail = .false.
@@ -120,12 +120,14 @@ contains
     ! globalize diag for ALSO:
 #   define diag ff_diag
 
-    integer :: num_imgs, me, dummy_element
+    integer :: num_imgs, me
+    integer(c_int) :: dummy_element
     type(c_ptr) :: allocated_memory
     integer(c_size_t) :: data_size, query_size
     integer(c_int) :: stat
     character(len=len(ff_err)) :: errmsg
     character(len=:), allocatable :: errmsg_alloc
+    integer(c_int), pointer :: local_slice
 
     diag = .true.
 
@@ -151,8 +153,15 @@ contains
       ff_handle, allocated_memory)
     ALSO(ff_count .equalsExpected. 1)
 
+    ! set-up some values to be checked from C
+    call c_f_pointer(allocated_memory, local_slice)
+    ALSO(associated(local_slice))
+    local_slice = 42
+    ALSO(local_slice .equalsExpected. 42)
+    call prif_set_context_data(ff_handle, c_loc(ff_count))
+
     call prif_deallocate_coarray(ff_handle)
-    ALSO(ff_count .equalsExpected. 2)
+    ALSO(ff_count .equalsExpected. 3)
     
     ! final_func that errors on first three deallocations
     ff_count = 0
