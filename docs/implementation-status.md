@@ -188,6 +188,7 @@ selected constant values from `ISO_FORTRAN_ENV` of the hosting compiler.
 | Procedure | Status | Notes |
 |-----------|--------|-------|
 | `prif_co_broadcast`     | **YES** |  |
+| `prif_co_broadcast_cptr`| **YES** | expected in PRIF 0.8 |
 | `prif_co_max`           | **YES** |  |
 | `prif_co_max_character` | **YES** |  |
 | `prif_co_min`           | **YES** |  |
