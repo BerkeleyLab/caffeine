@@ -548,17 +548,22 @@ void caf_co_reduce( CFI_cdesc_t* a_desc, int result_image, size_t num_elements,
                      op_wrapper, client_data, team);
 }
 
-void caf_co_broadcast(CFI_cdesc_t * a_desc, int source_image, int num_elements, gex_TM_t team)
-{
-  char* c_loc_a = (char*) a_desc->base_addr;
-  size_t c_sizeof_a = a_desc->elem_len;
-  int nbytes = num_elements * c_sizeof_a;
-
-  int data_type = a_desc->type;
+void caf_co_broadcast_cptr(void *a_ptr, int source_image, size_t nbytes, gex_TM_t team) {
+  assert(a_ptr);
+  assert(source_image >= 0);
+  assert(nbytes > 0);
 
   gex_Event_t ev
-    = gex_Coll_BroadcastNB(team, source_image-1, c_loc_a, c_loc_a, nbytes, 0);
+    = gex_Coll_BroadcastNB(team, source_image-1, a_ptr, a_ptr, nbytes, 0);
   gex_Event_Wait(ev);
+}
+
+void caf_co_broadcast(CFI_cdesc_t * a_desc, int source_image, int num_elements, gex_TM_t team) {
+  assert(a_desc);
+  char* a_ptr = (char*) a_desc->base_addr;
+  size_t element_size = a_desc->elem_len;
+  int nbytes = num_elements * element_size;
+  caf_co_broadcast_cptr(a_ptr, source_image, nbytes, team);
 }
 
 //-------------------------------------------------------------------

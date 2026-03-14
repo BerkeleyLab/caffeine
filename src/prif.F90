@@ -50,7 +50,7 @@ module prif
   public :: prif_num_images, prif_num_images_with_team, prif_num_images_with_team_number
   public :: prif_failed_images, prif_stopped_images, prif_image_status
   public :: prif_local_data_pointer, prif_set_context_data, prif_get_context_data, prif_size_bytes
-  public :: prif_co_sum, prif_co_max, prif_co_min, prif_co_reduce, prif_co_reduce_cptr, prif_co_broadcast
+  public :: prif_co_sum, prif_co_max, prif_co_min, prif_co_reduce, prif_co_reduce_cptr, prif_co_broadcast, prif_co_broadcast_cptr
   public :: prif_co_min_character, prif_co_max_character
   public :: prif_operation_wrapper_interface
   public :: prif_form_team, prif_change_team, prif_end_team, prif_get_team, prif_team_number
@@ -758,6 +758,16 @@ module prif
     module subroutine prif_co_broadcast(a, source_image, stat, errmsg, errmsg_alloc)
       implicit none
       type(*), intent(inout), target :: a(..)
+      integer(c_int), intent(in) :: source_image
+      integer(c_int), intent(out), optional :: stat
+      character(len=*), intent(inout), optional :: errmsg
+      character(len=:), intent(inout), allocatable, optional :: errmsg_alloc
+    end subroutine
+
+    module subroutine prif_co_broadcast_cptr(a_ptr, size_in_bytes, source_image, stat, errmsg, errmsg_alloc)
+      implicit none
+      type(c_ptr), intent(in) :: a_ptr
+      integer(c_size_t), intent(in) :: size_in_bytes
       integer(c_int), intent(in) :: source_image
       integer(c_int), intent(out), optional :: stat
       character(len=*), intent(inout), optional :: errmsg
