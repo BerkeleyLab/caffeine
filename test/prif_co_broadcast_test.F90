@@ -1,12 +1,17 @@
+#include "test-utils.F90"
+
 module prif_co_broadcast_test_m
-  use prif, only : prif_co_broadcast, prif_num_images, prif_this_image_no_coarray
+  use iso_c_binding, only: c_loc, c_size_t
+  use prif, only : prif_co_broadcast, prif_co_broadcast_cptr, prif_num_images, prif_this_image_no_coarray
   use julienne_m, only : &
      usher &
+    ,string_t &
     ,test_description_t &
     ,test_diagnosis_t &
     ,test_result_t &
     ,test_t &
     ,operator(//) &
+    ,operator(.also.) &
     ,operator(.expect.) &
     ,operator(.equalsExpected.)
 
@@ -60,27 +65,45 @@ contains
 
   function broadcast_default_integer_scalar() result(diag)
     type(test_diagnosis_t) :: diag
-    integer iPhone, me
+    integer, target :: a, me
     integer, parameter :: source_value = 7779311, junk = -99
 
+    diag = .true.
+
     call prif_this_image_no_coarray(this_image=me)
-    iPhone = merge(source_value, junk, me==1)
-    call prif_co_broadcast(iPhone, source_image=1)
-    diag = iPhone .equalsExpected. source_value 
+
+    a = merge(source_value, junk, me==1)
+    call prif_co_broadcast(a, source_image=1)
+    ALSO(a .equalsExpected. source_value)
+
+    a = merge(source_value*7, junk, me==1)
+    call prif_co_broadcast_cptr(c_loc(a), size_in_bytes=storage_size(a,c_size_t)/8, source_image=1)
+    ALSO(a .equalsExpected. source_value*7)
   end function
 
   function broadcast_derived_type() result(diag)
     type(test_diagnosis_t) :: diag
-    type(object_t) object
+    type(object_t), target :: object
     integer me, ni
+
+    diag = .true.
 
     call prif_this_image_no_coarray(this_image=me)
     call prif_num_images(num_images=ni)
+
     object = object_t(me, .false., "gooey", me*(1.,0.))
     call prif_co_broadcast(object, source_image=ni)
     associate(expected_object => object_t(ni, .false., "gooey", ni*(1.,0.)))
-      diag = .expect. (object == expected_object) // "co_broadcast derived type"
+      ALSO2(object == expected_object, "co_broadcast derived type")
     end associate
+
+    object = object_t(me, .true., "hooey", me*(10.,0.))
+    call prif_co_broadcast_cptr(c_loc(object), storage_size(object,c_size_t)/8, source_image=ni)
+    associate(expected_object => object_t(ni, .true., "hooey", ni*(10.,0.)))
+      ALSO2(object == expected_object, "co_broadcast_cptr derived type")
+    end associate
+
+
   end function
 
 end module prif_co_broadcast_test_m
