@@ -16,11 +16,13 @@ submodule(prif:prif_private_s) sync_stmt_s
 contains
 
   module procedure prif_sync_all
+    call_assert(team_check(current_team))
     call caf_sync_team(current_team%info%gex_team)
     if (present(stat)) stat = 0
   end procedure
 
   module procedure prif_sync_team
+    call_assert(team_check(team))
     call caf_sync_team(team%info%gex_team)
     if (present(stat)) stat = 0
   end procedure
@@ -61,6 +63,7 @@ contains
     integer(c_intptr_t) :: evt_ptr
 
     call_assert(coarray_handle_check(si_coarray_handle))
+    call_assert(team_check(current_team))
 
     call caf_sync_memory ! end segment and amortize release fence
 
