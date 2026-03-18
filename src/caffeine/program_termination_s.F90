@@ -149,6 +149,7 @@ contains
 
     type(callback_entry), pointer :: next_entry
 
+    call caf_acquire_exit_lock()
     next_entry => callback_list
     do while (associated(next_entry))
       call next_entry%callback(is_error_stop, quiet, stop_code_int, stop_code_char)
