@@ -36,7 +36,13 @@ contains
 
     if (present(stat)) stat=0
 
-    funptr = c_funloc(operation_wrapper)
+#   if __GFORTRAN__
+      ! Gfortran 13..15 bug workaround
+      funptr = caf_c_funloc_deref(c_funloc(operation_wrapper))
+#   else
+      funptr = c_funloc(operation_wrapper)
+#   endif
+
     call_assert(c_associated(funptr))
 
     call caf_co_reduce( &

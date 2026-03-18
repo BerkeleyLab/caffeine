@@ -26,6 +26,7 @@ contains
 
   module procedure prif_ucobound_with_dim
     call_assert(coarray_handle_check(coarray_handle))
+    call_assert(team_check(current_team))
 
     associate (info => coarray_handle%info, corank => coarray_handle%info%corank) 
       call_assert(dim >= 1 .and. dim <= corank)
@@ -58,10 +59,9 @@ contains
   end procedure
 
   module procedure prif_coshape
-    integer(c_int64_t) :: trailing_ucobound
-
     call_assert(coarray_handle_check(coarray_handle))
     call_assert(size(sizes) == coarray_handle%info%corank)
+    call_assert(team_check(current_team))
 
     associate(info => coarray_handle%info, corank => coarray_handle%info%corank)
       if (corank == 1) then ! common-case optimization
@@ -79,16 +79,17 @@ contains
     end associate
   end procedure
 
-  subroutine image_index_helper(coarray_handle, sub, num_images, image_index)
+  subroutine image_index_helper(coarray_handle, sub, team, image_index)
     implicit none
     type(prif_coarray_handle), intent(in) :: coarray_handle
     integer(c_int64_t), intent(in) :: sub(:)
-    integer(c_int), intent(in) :: num_images
+    type(prif_team_type), intent(in) :: team
     integer(c_int), intent(out) :: image_index
 
     integer :: dim
 
     call_assert(coarray_handle_check(coarray_handle))
+    call_assert(team_check(team))
 
     associate (info => coarray_handle%info, corank => coarray_handle%info%corank) 
       call_assert(size(sub) == corank)
@@ -108,24 +109,25 @@ contains
        end do
     end associate
 
-    if (image_index .gt. num_images) then
+    if (image_index .gt. team%info%num_images) then
        image_index = 0
     end if
   end subroutine
 
   module procedure prif_image_index
-    call image_index_helper(coarray_handle, sub, current_team%info%num_images, image_index)
+    call image_index_helper(coarray_handle, sub, current_team, image_index)
   end procedure
 
   module procedure prif_image_index_with_team
-    call image_index_helper(coarray_handle, sub, team%info%num_images, image_index)
+    call image_index_helper(coarray_handle, sub, team, image_index)
   end procedure
 
   module procedure prif_image_index_with_team_number
+    call_assert(team_check(current_team))
     if (team_number == -1) then
-      call image_index_helper(coarray_handle, sub, initial_team%num_images, image_index)
+      call image_index_helper(coarray_handle, sub, prif_team_type(initial_team), image_index)
     else if (team_number == current_team%info%team_number) then
-      call image_index_helper(coarray_handle, sub, current_team%info%num_images, image_index)
+      call image_index_helper(coarray_handle, sub, current_team, image_index)
     else
       call unimplemented("prif_image_index_with_team_number: no support for sibling teams")
     end if 
@@ -143,6 +145,7 @@ contains
     integer :: dim
     integer(c_int) :: image_index
 
+    call_assert(team_check(team))
     call_assert(coarray_handle_check(coarray_handle))
 
     associate (info => coarray_handle%info, corank => coarray_handle%info%corank)

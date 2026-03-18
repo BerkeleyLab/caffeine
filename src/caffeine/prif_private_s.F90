@@ -352,6 +352,15 @@ submodule(prif) prif_private_s
       integer(c_int), intent(in), value :: new_index
      end subroutine
 
+    ! ______________ Misc helpers  __________________
+     function caf_c_funloc_deref(funloc) result(res) bind(C)
+       !! funloc_t caf_c_funloc_deref(funloc_t funloc)
+       import c_funptr
+       implicit none
+       type(c_funptr), value :: funloc
+       type(c_funptr) :: res
+     end function
+
   end interface
 
   interface num_to_str
@@ -509,6 +518,89 @@ contains
       call compute_coshape_epp(info%lcobounds(1:corank),info%ucobounds(1:corank-1),epp(1:corank))
       call assert_always(all(info%coshape_epp(1:corank) == epp(1:corank)), &
                          "invalid coshape_epp in prif_coarray_handle")
+    end associate
+
+    result_ = .true.
+  end function
+
+  ! verify state invariants for a team
+  ! Note this function validates invariants with deliberately UNconditional assertions
+  ! Suggested caller usage for conditional validation is: 
+  !   call_assert(team_check(current_team))
+  recursive function team_check(team, known_active, cycle_check) result(result_)
+    implicit none
+    type(prif_team_type), intent(in) :: team
+    logical, optional, intent(in) :: known_active ! is this known to be the current team or an ancestor team?
+    type(prif_team_type), optional, intent(in) :: cycle_check(:)
+    type(prif_team_type), allocatable :: cycle_check_(:)
+    logical :: result_, known_active_
+    integer :: i
+
+    call assert_always(associated(team%info), "unassociated info pointer in prif_team_type")
+
+    ! check for invalid cycles in the team hierarchy
+    if (.not. present(cycle_check)) then ! initial call
+      cycle_check_ = [ team ]
+    else ! recursive call should never encounter a matching team as an ancestor
+      call assert_always(.not. any( [(associated(team%info, cycle_check(i)%info), i = 1, size(cycle_check))] ), &
+           "Invalid cycle detected in team ancestor hierarchy")
+      cycle_check_ = [ cycle_check, team ]
+    end if
+
+    associate(info => team%info, ch_info => team%info%child_heap_info)
+      call assert_always(c_associated(info%gex_team), "invalid gex_team in team descriptor")
+
+      if (associated(team%info, initial_team)) then ! initial team
+        call assert_always(info%team_number == -1, "invalid team_number in initial team descriptor")
+        call assert_always(.not. associated(info%parent_team), "invalid parent_team in initial team descriptor")
+      else ! non-initial team, have parent team
+        call assert_always(info%team_number > 0, "invalid team_number in initial team descriptor")
+        call assert_always(associated(info%parent_team), "invalid parent_team in team descriptor")
+      end if
+
+      call assert_always(info%this_image == caf_this_image(info%gex_team), "invalid this_image in team descriptor")
+      call assert_always(info%num_images == caf_num_images(info%gex_team), "invalid num_images in team descriptor")
+
+      ! determine activity of this team (is it the current team or an ancestor of current)
+      if (present(known_active)) then 
+        known_active_ = known_active
+      else
+        known_active_ = .false.
+      end if
+      if (.not. known_active_) then
+        if (associated(team%info, initial_team)) then
+          known_active_ = .true.
+        else if (associated(current_team%info)) then
+          if (associated(team%info, current_team%info) .or. &
+              associated(team%info, current_team%info%parent_team)) then
+            known_active_ = .true.
+          end if
+        end if
+      end if 
+
+      if (known_active_) then
+        call assert_always(info%heap_start /= 0, "invalid heap_start in an active team descriptor")
+        call assert_always(info%heap_size > 0, "invalid heap_size in an active team descriptor")
+        if (info%this_image == 1) then
+          call assert_always(c_associated(info%heap_mspace), "invalid heap_mspace in an active team descriptor")
+        end if
+      end if
+
+      if (associated(info%child_heap_info)) then ! have child teams
+        if (info%this_image == 1) then
+          call assert_always(c_associated(ch_info%allocated_memory), &
+                            "invalid child_heap_info%allocated_memory in team descriptor")
+          call assert_always(ch_info%offset == as_int(ch_info%allocated_memory) - info%heap_start, &
+                            "invalid child_heap_info%offset in team descriptor")
+        end if
+        call assert_always(ch_info%size > 0, "invalid child_heap_info%size in team descriptor")
+        call assert_always(ch_info%offset + ch_info%size <= info%heap_size, &
+                          "invalid child_heap_info bounds in team descriptor")
+      end if
+
+      if (associated(info%parent_team)) then ! recurse up the team tree
+        result_ = team_check(prif_team_type(info%parent_team), known_active_, cycle_check_)
+      end if
     end associate
 
     result_ = .true.

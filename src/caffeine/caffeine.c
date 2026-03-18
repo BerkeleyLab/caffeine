@@ -106,14 +106,14 @@ int caf_num_images(gex_TM_t tm) {
 // Given team and corresponding image_num, return image number in the initial team
 int caf_image_to_initial(gex_TM_t tm, int image_num) {
   assert(image_num >= 1);
-  assert(image_num <= gex_TM_QuerySize(tm));
+  assert(image_num <= (int)gex_TM_QuerySize(tm));
   gex_Rank_t proc = gex_TM_TranslateRankToJobrank(tm, image_num-1);
   return proc + 1;
 }
 // Given image number in the initial team, return image number corresponding to given team
 int caf_image_from_initial(gex_TM_t tm, int image_num) {
   assert(image_num >= 1);
-  assert(image_num <= numprocs);
+  assert(image_num <= (int)numprocs);
   gex_Rank_t proc = gex_TM_TranslateJobrankToRank(tm, image_num-1);
   // GEX_RANK_INVALID indicates the provided image_num in initial team is not part of tm
   assert(proc != GEX_RANK_INVALID); 
@@ -485,7 +485,7 @@ static void atomic_init(void) {
 void caf_atomic_int(int opcode, int image, void* addr, int64_t *result, int64_t op1, int64_t op2) {
   assert(atomic_AD != GEX_AD_INVALID);
   assert(addr);
-  assert(opcode >= 0 && opcode < sizeof(op_map)/sizeof(op_map[0]));
+  assert(opcode >= 0 && opcode < (int)(sizeof(op_map)/sizeof(op_map[0])));
 
   gex_OP_t op = op_map[opcode];
   gex_Event_Wait(
@@ -508,6 +508,13 @@ void caf_atomic_logical(int opcode, int image, void* addr, int64_t *result, int6
 }
 
 //-------------------------------------------------------------------
+// gfortran 13.2 .. 15 : c_funloc is non-compliant
+// it erroneously generates a non-callable pointer to a pointer to the subroutine
+// This helper is used to undo that incorrect extra level of indirection
+typedef void (*funloc_t)(void);
+funloc_t caf_c_funloc_deref(funloc_t funloc) {
+  return *(funloc_t *)funloc;
+}
 
 void caf_co_reduce(
   CFI_cdesc_t* a_desc, int result_image, size_t num_elements, gex_Coll_ReduceFn_t user_op, void* client_data, gex_TM_t team
@@ -516,12 +523,7 @@ void caf_co_reduce(
   assert(result_image >= 0);
   assert(num_elements > 0);
   assert(user_op);
-#if PLATFORM_COMPILER_GNU
-  // gfortran 13.2 & 14 - c_funloc is non-compliant
-  // it erroneously generates a non-callable pointer to a pointer to the subroutine
-  // Here we undo that incorrect extra level of indirection
-  user_op = *(gex_Coll_ReduceFn_t *)user_op; 
-#endif
+
   char* a_address = (char*) a_desc->base_addr;
   size_t c_sizeof_a = a_desc->elem_len;
   gex_Event_t ev;
@@ -630,7 +632,7 @@ static int64_t *widen_from_array(CFI_cdesc_t* a_desc, size_t num_elements) {
   } else if (a_desc->elem_len == 2) {
     int16_t *src = a_desc->base_addr;
     for (size_t i=0; i < num_elements; i++) res[i] = src[i];
-  } else gasnett_fatalerror("Logic error in widen_from_array: %i", a_desc->elem_len);
+  } else gasnett_fatalerror("Logic error in widen_from_array: %i", (int)a_desc->elem_len);
   return res;
 }
 
@@ -644,7 +646,7 @@ static void narrow_to_array(CFI_cdesc_t* a_desc, int64_t *src, size_t num_elemen
   } else if (a_desc->elem_len == 2) {
     int16_t *dst = a_desc->base_addr;
     for (size_t i=0; i < num_elements; i++) dst[i] = src[i];
-  } else gasnett_fatalerror("Logic error in narrow_to_array: %i", a_desc->elem_len);
+  } else gasnett_fatalerror("Logic error in narrow_to_array: %i", (int)a_desc->elem_len);
   free(src);
 }
 

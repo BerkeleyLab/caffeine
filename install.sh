@@ -395,7 +395,7 @@ if ! $PKG_CONFIG $pkg ; then
   ask_package_permission "GASNet-EX" "PKG_CONFIG_PATH"
   exit_if_user_declines "GASNet-EX"
 
-  GASNET_TAR_FILE="GASNet-$GASNET_VERSION.tar.gz"
+  GASNET_TAR_FILE="$DEPENDENCIES_DIR/GASNet-$GASNET_VERSION.tar.gz"
   GASNET_SOURCE_URL="https://bitbucket.org/berkeleylab/gasnet/downloads/GASNet-$GASNET_VERSION.tar.gz"
   if [ ! -d $DEPENDENCIES_DIR ]; then
     mkdir -pv $DEPENDENCIES_DIR
@@ -406,7 +406,8 @@ if ! $PKG_CONFIG $pkg ; then
     rm -Rf $GASNET_DIR
   fi
   
-  curl -L $GASNET_SOURCE_URL | tar xvzf - -C $DEPENDENCIES_DIR
+  curl -L $VERBOSE --retry 10 --retry-all-errors --fail $GASNET_SOURCE_URL -o $GASNET_TAR_FILE
+  tar xvzf $GASNET_TAR_FILE -C $DEPENDENCIES_DIR
   
   ( 
       cd $GASNET_DIR

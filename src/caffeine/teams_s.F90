@@ -2,6 +2,7 @@
 ! Terms of use are as specified in LICENSE.txt
 
 #include "version.h"
+#include "assert_macros.h"
 
 submodule(prif:prif_private_s) teams_s
   ! DO NOT ADD USE STATEMENTS HERE
@@ -10,9 +11,14 @@ submodule(prif:prif_private_s) teams_s
 contains
 
   module procedure prif_change_team
+    call_assert(team_check(current_team))
+    call_assert(team_check(team))
+    call_assert_describe(associated(team%info%parent_team) .and. associated(team%info%parent_team, current_team%info), "Invalid CHANGE TEAM. New team was not created by FORM TEAM within current team.")
+    call_assert(associated(current_team%info%child_heap_info))
+
     team%info%heap_start = current_team%info%child_heap_info%offset + current_team%info%heap_start
     team%info%heap_size = current_team%info%child_heap_info%size
-    if (caf_this_image(team%info%gex_team) == 1) then ! need to setup the heap for the team
+    if (team%info%this_image == 1) then ! need to setup the heap for the team
       call caf_establish_mspace( &
           team%info%heap_mspace, &
           as_c_ptr(team%info%heap_start), &
@@ -22,6 +28,7 @@ contains
     if (caf_have_child_teams()) then ! need to establish heap for child teams
       call caf_establish_child_heap
     end if
+    call_assert(team_check(current_team))
     call prif_sync_all ! child team sync required by F23 11.1.5.2
 
     if (present(stat)) stat = 0
@@ -31,6 +38,9 @@ contains
     type(prif_coarray_handle), allocatable :: teams_coarrays(:)
     integer :: num_coarrays_in_team, i
     type(prif_coarray_descriptor), pointer :: tmp_data
+
+    call_assert(team_check(current_team))
+    call_assert_describe(associated(current_team%info%parent_team), "Invalid END TEAM from the initial team.")
 
     ! deallocate the teams coarrays
     ! Currently we work to batch together all the deallocations into a single call
@@ -63,11 +73,14 @@ contains
 
     ! set the current team back to the parent team
     current_team%info => current_team%info%parent_team
+    call_assert(team_check(current_team))
 
     if (present(stat)) stat = 0
   end procedure
 
   module procedure prif_form_team
+    call_assert(team_check(current_team))
+
     call prif_sync_memory
 
     ! indicates this is the first time we're creating a child team
@@ -97,11 +110,15 @@ contains
       team%info%num_images = caf_num_images(team%info%gex_team)
     end block
 
+    call_assert(team_check(team))
+
     if (present(stat)) stat = 0
   end procedure
 
   module procedure prif_get_team
-    if (.not. present(level)) then
+    call_assert(team_check(current_team))
+
+    if (.not. present(level) .or. associated(current_team%info,initial_team)) then
       team = current_team
     else if (level == PRIF_CURRENT_TEAM) then
       team = current_team
@@ -112,12 +129,16 @@ contains
     else
       call prif_error_stop(.false._c_bool, stop_code_char="prif_get_team: invalid level")
     endif
+
+    call_assert(team_check(team))
   end procedure
 
   module procedure prif_team_number
     if (present(team)) then
+      call_assert(team_check(team))
       team_number = team%info%team_number
     else
+      call_assert(team_check(current_team))
       team_number = current_team%info%team_number
     endif
   end procedure

@@ -1,5 +1,8 @@
 ! Copyright (c), The Regents of the University of California
 ! Terms of use are as specified in LICENSE.txt
+
+#include "assert_macros.h"
+
 submodule(prif:prif_private_s) program_startup_s
   ! DO NOT ADD USE STATEMENTS HERE
   ! All use statements belong in prif_private_s.F90
@@ -21,11 +24,13 @@ contains
           initial_team%gex_team)
        call assert_init()
        current_team%info => initial_team
-       initial_team%parent_team => initial_team
+       nullify(initial_team%parent_team)
        initial_team%team_number = -1
        initial_team%this_image = caf_this_image(initial_team%gex_team)
        initial_team%num_images = caf_num_images(initial_team%gex_team)
        non_symmetric_heap_size = total_heap_size - initial_team%heap_size
+
+       call_assert(team_check(current_team))
 
        call sync_init()
 

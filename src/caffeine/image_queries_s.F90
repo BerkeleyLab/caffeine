@@ -11,14 +11,17 @@ submodule(prif:prif_private_s) image_queries_s
 contains
 
   module procedure prif_num_images
+    call_assert(team_check(current_team))
     num_images = current_team%info%num_images
   end procedure
 
   module procedure prif_num_images_with_team
+    call_assert(team_check(team))
     num_images = team%info%num_images
   end procedure
 
   module procedure prif_num_images_with_team_number
+    call_assert(team_check(current_team))
     if (team_number == -1) then
       num_images = initial_team%num_images 
     else if (team_number == current_team%info%team_number) then
@@ -30,8 +33,10 @@ contains
 
   module procedure prif_this_image_no_coarray
     if (present(team)) then
+      call_assert(team_check(team))
       this_image = team%info%this_image
     else
+      call_assert(team_check(current_team))
       this_image = current_team%info%this_image
     endif
   end procedure
@@ -44,8 +49,10 @@ contains
     call_assert(size(cosubscripts) == coarray_handle%info%corank)
 
     if (present(team)) then
+      call_assert(team_check(team))
       offset = team%info%this_image - 1
     else
+      call_assert(team_check(current_team))
       offset = current_team%info%this_image - 1
     endif
 
@@ -90,16 +97,34 @@ contains
   end procedure
 
   module procedure prif_failed_images
+    if (present(team)) then
+      call_assert(team_check(team))
+    else
+      call_assert(team_check(current_team))
+    endif
+
     ! no current support for detecting image failure
     allocate(failed_images(0))
   end procedure
 
   module procedure prif_stopped_images
+    if (present(team)) then
+      call_assert(team_check(team))
+    else
+      call_assert(team_check(current_team))
+    endif
+
     ! no current support for detecting image stops
     allocate(stopped_images(0))
   end procedure
 
   module procedure prif_image_status
+    if (present(team)) then
+      call_assert(team_check(team))
+    else
+      call_assert(team_check(current_team))
+    endif
+
     ! no current support for detecting image failure/stops
     image_status = 0
   end procedure
