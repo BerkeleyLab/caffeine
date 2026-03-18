@@ -301,27 +301,27 @@ submodule(prif) prif_private_s
        type(c_ptr), value :: team
      end subroutine
 
-     subroutine caf_co_reduce(a, result_image, num_elements, Coll_ReduceSub, client_data, team) bind(C)
-       !! void caf_co_reduce(CFI_cdesc_t* a_desc, int result_image, size_t num_elements, gex_Coll_ReduceFn_t user_op, void* client_data, gex_TM_t team)
+     subroutine caf_co_reduce(a, result_image, num_elements, op_wrapper, client_data, team) bind(C)
+       !! void caf_co_reduce(CFI_cdesc_t* a_desc, int result_image, size_t num_elements, gex_Coll_ReduceFn_t op_wrapper, void* client_data, gex_TM_t team)
        import c_int, c_ptr, c_size_t, c_funptr
        implicit none
        type(*) a(..)
        integer(c_int), value :: result_image
        integer(c_size_t), value :: num_elements
-       type(c_funptr), value :: Coll_ReduceSub
+       type(c_funptr), value :: op_wrapper
        type(c_ptr), value :: client_data
        type(c_ptr), value :: team
      end subroutine
 
-     subroutine caf_co_reduce_cptr(a_ptr, result_image, num_elements, element_size, Coll_ReduceSub, client_data, team) bind(C)
-       !! void caf_co_reduce_cptr(void *a_ptr, int result_image, size_t num_elements, size_t element_size, gex_Coll_ReduceFn_t user_op, void* client_data, gex_TM_t team)
+     subroutine caf_co_reduce_cptr(a_ptr, result_image, num_elements, element_size, op_wrapper, client_data, team) bind(C)
+       !! void caf_co_reduce_cptr(void *a_ptr, int result_image, size_t num_elements, size_t element_size, gex_Coll_ReduceFn_t op_wrapper, void* client_data, gex_TM_t team)
        import c_int, c_ptr, c_size_t, c_funptr
        implicit none
        type(c_ptr), value :: a_ptr
        integer(c_int), value :: result_image
        integer(c_size_t), value :: num_elements
        integer(c_size_t), value :: element_size
-       type(c_funptr), value :: Coll_ReduceSub
+       type(c_funptr), value :: op_wrapper
        type(c_ptr), value :: client_data
        type(c_ptr), value :: team
      end subroutine
