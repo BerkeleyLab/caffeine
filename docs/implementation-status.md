@@ -194,6 +194,7 @@ selected constant values from `ISO_FORTRAN_ENV` of the hosting compiler.
 | `prif_co_min_character` | **YES** |  |
 | `prif_co_sum`           | **YES** |  |
 | `prif_co_reduce`        | **YES** |  |
+| `prif_co_reduce_cptr`   | **YES** | expected in PRIF 0.8 |
 
 ---
 

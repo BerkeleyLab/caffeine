@@ -2,8 +2,8 @@
 #include "julienne-assert-macros.h"
 
 module prif_co_reduce_test_m
-  use iso_c_binding, only: c_ptr, c_funptr, c_size_t, c_f_pointer, c_f_procpointer, c_funloc, c_loc, c_null_ptr, c_associated
-  use prif, only : prif_co_reduce, prif_num_images, prif_this_image_no_coarray, prif_operation_wrapper_interface
+  use iso_c_binding, only: c_ptr, c_funptr, c_size_t, c_f_pointer, c_f_procpointer, c_funloc, c_loc, c_null_ptr, c_associated, c_int8_t
+  use prif, only : prif_co_reduce, prif_co_reduce_cptr, prif_num_images, prif_this_image_no_coarray, prif_operation_wrapper_interface
   use julienne_m, only : &
      call_julienne_assert_ &
     ,operator(.all.) &
@@ -122,6 +122,8 @@ contains
     procedure(prif_operation_wrapper_interface), pointer :: op
     real, parameter :: tolerance = 0D0
 
+    diag = .true.
+
     op => pair_adder
     call prif_this_image_no_coarray(this_image=me)
     call prif_num_images(ni)
@@ -145,8 +147,23 @@ contains
 #else
     expected = reduce(tmp, add_pair, dim=2)
 #endif
-    diag = .all. (my_val%fst .equalsExpected. expected%fst) &
-      .also. (.all. ( my_val%snd .approximates. expected%snd .within. tolerance))
+    ALSO(.all. (my_val%fst .equalsExpected. expected%fst))
+    ALSO(.all. (my_val%snd .approximates. expected%snd .within. tolerance))
+
+    ! now repeat the same test using the prif_co_reduce_cptr variant:
+    my_val = values(:, mod(me-1, size(values,2))+1)
+    block
+      integer(c_size_t) :: element_size, element_count
+      integer(c_int8_t), allocatable, target :: bytes(:)
+      element_size = storage_size(my_val(1))/8
+      element_count = size(my_val)
+      bytes = transfer(my_val, bytes)
+      call prif_co_reduce_cptr(c_loc(bytes), element_size, element_count, op, c_loc(dummy))
+      my_val = transfer(bytes, my_val, element_count)
+    end block
+    ALSO(.all. (my_val%fst .equalsExpected. expected%fst))
+    ALSO(.all. (my_val%snd .approximates. expected%snd .within. tolerance))
+
   end function
 
   pure function add_pair(lhs, rhs) result(total)
@@ -175,11 +192,10 @@ contains
   end subroutine
 
 #if HAVE_PARAM_DERIVED
-! As of LLVM20, flang does not implement the types used by this test:
+! As of LLVM21, flang does not implement the types used by this test:
 ! flang/lib/Lower/ConvertType.cpp:482: not yet implemented: parameterized derived types
-! error: Actual argument associated with TYPE(*) dummy argument 'a=' may not have a parameterized derived type
 
-! Gfortran 14.2 also lacks the type support for this test:
+! Gfortran 14.2..15.2 also lack the type support for this test:
 ! Error: Derived type 'pdtarray' at (1) is being used before it is defined
 
   function check_type_parameter_reduction() result(diag)
@@ -196,17 +212,42 @@ contains
     procedure(prif_operation_wrapper_interface), pointer :: op
     type(reduction_context_data), target :: context
 
+    diag = .true.
+
     op => array_wrapper
     context%user_op = c_funloc(add_array)
-    context%length = values%length
+    context%length = values(1,1)%length
     call prif_this_image_no_coarray(this_image=me)
     call prif_num_images(ni)
 
     my_val = values(:, mod(me-1, size(values,2))+1)
-    call prif_co_reduce(my_val, op, c_loc(context))
+
+#  if ALLOW_ASSUMED_TYPE_PDT
+    ! Ideally here we'd directly pass the user data `my_val` to prif_co_reduce as follows:
+      call prif_co_reduce(my_val, op, c_loc(context))
+    ! Unfortunately the code above is not strictly standards-conformant, because Fortran forbids
+    ! passing an actual argument of derived type with type parameters to a procedure where the
+    ! corresponding dummy argument has assumed type (the first argument to `prif_co_reduce`).
+    ! Example errors from gfortran and flang:
+    ! error: Actual argument associated with TYPE(*) dummy argument 'a=' may not have a parameterized derived type
+    ! Error: Actual argument at (1) to assumed-type dummy has type parameters or is of derived type with type-bound or FINAL procedures
+#  else
+    ! So instead, we stage the data through an type-erased buffer and call the _cptr variant
+    block
+      integer(c_size_t) :: element_size, element_count
+      integer(c_int8_t), allocatable, target :: bytes(:)
+      element_size = storage_size(my_val(1))/8
+      element_count = size(my_val)
+      bytes = transfer(my_val, bytes)
+      call prif_co_reduce_cptr(c_loc(bytes), element_size, element_count, op, c_loc(context))
+      my_val = transfer(bytes, my_val, element_count)
+    end block
+#  endif
 
     expected = reduce(reshape([(values(:, mod(i-1,size(values,2))+1), i = 1, ni)], [size(values,1),ni]), add_array, dim=2)
-    diag = .all. (my_val%elements .equalsExpected. expected%elements)
+    do i = 1, size(my_val)
+      ALSO(.all. (my_val(i)%elements .equalsExpected. expected(i)%elements))
+    end do
   end function
 
   pure function add_array(lhs, rhs) result(total)
