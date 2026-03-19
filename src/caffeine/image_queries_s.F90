@@ -42,12 +42,12 @@ contains
   end procedure
 
   module procedure prif_this_image_with_coarray
-    type(prif_coarray_descriptor), pointer :: dp
+    type(prif_coarray_descriptor), pointer :: cdp
     integer(c_int) :: offset, doff, dsz
     integer :: dim
 
     call_assert(coarray_handle_check(coarray_handle))
-    dp => handle_to_dp(coarray_handle)
+    cdp => handle_to_cdp(coarray_handle)
 
     if (present(team)) then
       call_assert(team_check(team))
@@ -58,15 +58,15 @@ contains
     endif
 
     associate (corank => size(cosubscripts))
-      call_assert(corank == dp%corank)
+      call_assert(corank == cdp%corank)
       do dim = 1, corank-1
-        dsz = INT(dp%ucobounds(dim) - dp%lcobounds(dim) + 1, c_int)
+        dsz = INT(cdp%ucobounds(dim) - cdp%lcobounds(dim) + 1, c_int)
         doff = mod(offset, dsz)
-        cosubscripts(dim) = doff + dp%lcobounds(dim)
-        call_assert(cosubscripts(dim) <= dp%ucobounds(dim))
+        cosubscripts(dim) = doff + cdp%lcobounds(dim)
+        call_assert(cosubscripts(dim) <= cdp%ucobounds(dim))
         offset = offset / dsz
       end do
-      cosubscripts(corank) = offset + dp%lcobounds(corank)
+      cosubscripts(corank) = offset + cdp%lcobounds(corank)
     end associate
 
 #   if ASSERTIONS
@@ -84,15 +84,15 @@ contains
   end procedure
 
   module procedure prif_this_image_with_dim
-    type(prif_coarray_descriptor), pointer :: dp
+    type(prif_coarray_descriptor), pointer :: cdp
 
     call_assert(coarray_handle_check(coarray_handle))
-    dp => handle_to_dp(coarray_handle)
+    cdp => handle_to_cdp(coarray_handle)
 
     block
-      integer(c_int64_t) :: cosubscripts(dp%corank)
+      integer(c_int64_t) :: cosubscripts(cdp%corank)
 
-      call_assert(dim >= 1 .and. dim <= dp%corank)
+      call_assert(dim >= 1 .and. dim <= cdp%corank)
 
       call prif_this_image_with_coarray(coarray_handle, team, cosubscripts)
 
