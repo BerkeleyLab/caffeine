@@ -36,7 +36,7 @@ contains
     type(c_ptr) :: whole_block
     integer(c_ptrdiff_t) :: block_offset
     integer(c_int) :: corank
-    type(prif_coarray_descriptor), pointer :: dp
+    type(prif_coarray_descriptor), pointer :: cdp
 
     call_assert(team_check(current_team))
 
@@ -88,39 +88,39 @@ contains
     if (me /= 1) whole_block = as_c_ptr(current_team%info%heap_start + block_offset)
 
     coarray_handle%info = whole_block ! descriptor comes first in memory
-    dp => handle_to_dp(coarray_handle)
+    cdp => handle_to_cdp(coarray_handle)
     block
       type(prif_coarray_descriptor), pointer :: unused2(:)
       call c_f_pointer(whole_block, unused2, [2])
-      dp%coarray_data = c_loc(unused2(2)) ! element data comes after descriptor
+      cdp%coarray_data = c_loc(unused2(2)) ! element data comes after descriptor
     end block
-    dp%corank = corank
-    dp%coarray_size = size_in_bytes
+    cdp%corank = corank
+    cdp%coarray_size = size_in_bytes
 #   if CAF_PRIF_VERSION >= 8
       if (associated(final_func)) then
-        dp%final_func = CAF_C_FUNLOC_PROCPTR(final_func)
+        cdp%final_func = CAF_C_FUNLOC_PROCPTR(final_func)
       else
-        dp%final_func = c_null_funptr
+        cdp%final_func = c_null_funptr
       end if
 #   else
-      dp%final_func = final_func
+      cdp%final_func = final_func
 #   endif
-    dp%lcobounds(1:corank) = lcobounds
-    dp%ucobounds(1:corank-1) = ucobounds(1:corank-1)
-    call compute_coshape_epp(lcobounds, ucobounds, dp%coshape_epp(1:corank))
+    cdp%lcobounds(1:corank) = lcobounds
+    cdp%ucobounds(1:corank-1) = ucobounds(1:corank-1)
+    call compute_coshape_epp(lcobounds, ucobounds, cdp%coshape_epp(1:corank))
 #   if ASSERTIONS
       ! The following entries are dead, but initialize them to help detect defects
-      dp%lcobounds(corank+1:15) = huge(0_c_int64_t)
-      dp%ucobounds(corank:14) = -huge(0_c_int64_t)
-      dp%coshape_epp(corank+1:15) = 0
+      cdp%lcobounds(corank+1:15) = huge(0_c_int64_t)
+      cdp%ucobounds(corank:14) = -huge(0_c_int64_t)
+      cdp%coshape_epp(corank+1:15) = 0
 #   endif
-    dp%previous_handle = c_null_ptr
-    dp%next_handle = c_null_ptr
+    cdp%previous_handle = c_null_ptr
+    cdp%next_handle = c_null_ptr
     call add_to_team_list(coarray_handle)
-    dp%reserved = c_null_ptr ! reserved holds the value of the context data
-    dp%p_context_data = c_loc(dp%reserved)
+    cdp%reserved = c_null_ptr ! reserved holds the value of the context data
+    cdp%p_context_data = c_loc(cdp%reserved)
 
-    allocated_memory = dp%coarray_data
+    allocated_memory = cdp%coarray_data
     if (caf_have_child_teams()) then
       call caf_establish_child_heap
     end if
@@ -185,7 +185,7 @@ contains
 #endif
     integer :: i, num_handles
     type(prif_coarray_handle), target :: coarray_handle
-    type(prif_coarray_descriptor), pointer :: dp
+    type(prif_coarray_descriptor), pointer :: cdp
 #   if CAF_PRIF_VERSION >= 8
       procedure(prif_coarray_cleanup_interface), pointer :: coarray_cleanup
 #   else
@@ -216,9 +216,9 @@ contains
     ! invoke finalizers from coarray_handles(:)%final_func
     do i = 1, num_handles
       coarray_handle = coarray_handles(i) ! Add target attribute
-      dp => handle_to_dp(coarray_handle)
-      if (c_associated(dp%final_func)) then
-        call c_f_procpointer(dp%final_func, coarray_cleanup)
+      cdp => handle_to_cdp(coarray_handle)
+      if (c_associated(cdp%final_func)) then
+        call c_f_procpointer(cdp%final_func, coarray_cleanup)
 #     if CAF_PRIF_VERSION >= 8
         call coarray_cleanup(coarray_handle)
 #     else
@@ -259,43 +259,43 @@ contains
 
   subroutine add_to_team_list(coarray_handle)
     type(prif_coarray_handle), intent(in) :: coarray_handle
-    type(prif_coarray_descriptor), pointer :: dp
+    type(prif_coarray_descriptor), pointer :: cdp
 
-    dp => handle_to_dp(coarray_handle)
+    cdp => handle_to_cdp(coarray_handle)
 
-    call_assert(.not.c_associated(dp%previous_handle))
-    call_assert(.not.c_associated(dp%next_handle))
+    call_assert(.not.c_associated(cdp%previous_handle))
+    call_assert(.not.c_associated(cdp%next_handle))
 
     if (associated(current_team%info%coarrays)) then
       current_team%info%coarrays%previous_handle = coarray_handle%info
-      dp%next_handle = c_loc(current_team%info%coarrays)
+      cdp%next_handle = c_loc(current_team%info%coarrays)
     end if
-    current_team%info%coarrays => dp
+    current_team%info%coarrays => cdp
   end subroutine
 
   subroutine remove_from_team_list(coarray_handle)
     type(prif_coarray_handle), intent(in) :: coarray_handle
 
-    type(prif_coarray_descriptor), pointer :: nbr_dp, dp
+    type(prif_coarray_descriptor), pointer :: nbr_cdp, cdp
 
     call_assert(associated(current_team%info%coarrays))
-    dp => handle_to_dp(coarray_handle)
+    cdp => handle_to_cdp(coarray_handle)
 
-    if (c_associated(dp%previous_handle)) then ! have a predecessor
-      call c_f_pointer(dp%previous_handle, nbr_dp)
-      nbr_dp%next_handle = dp%next_handle
+    if (c_associated(cdp%previous_handle)) then ! have a predecessor
+      call c_f_pointer(cdp%previous_handle, nbr_cdp)
+      nbr_cdp%next_handle = cdp%next_handle
     else ! head of list
-      call_assert(associated(current_team%info%coarrays, dp))
-      if (c_associated(dp%next_handle)) then ! have a successor
-        call c_f_pointer(dp%next_handle, current_team%info%coarrays)
+      call_assert(associated(current_team%info%coarrays, cdp))
+      if (c_associated(cdp%next_handle)) then ! have a successor
+        call c_f_pointer(cdp%next_handle, current_team%info%coarrays)
       else ! sole element
         nullify(current_team%info%coarrays)
         return
       end if
     end if
-    if (c_associated(dp%next_handle)) then ! have a successor
-      call c_f_pointer(dp%next_handle, nbr_dp)
-      nbr_dp%previous_handle = dp%previous_handle
+    if (c_associated(cdp%next_handle)) then ! have a successor
+      call c_f_pointer(cdp%next_handle, nbr_cdp)
+      nbr_cdp%previous_handle = cdp%previous_handle
     end if
   end subroutine
 

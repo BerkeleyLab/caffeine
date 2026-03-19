@@ -11,46 +11,46 @@ submodule(prif:prif_private_s) coarray_queries_s
 contains
 
   module procedure prif_lcobound_with_dim
-    type(prif_coarray_descriptor), pointer :: dp
+    type(prif_coarray_descriptor), pointer :: cdp
 
     call_assert(coarray_handle_check(coarray_handle))
-    dp => handle_to_dp(coarray_handle)
-    call_assert(dim >= 1 .and. dim <= dp%corank)
+    cdp => handle_to_cdp(coarray_handle)
+    call_assert(dim >= 1 .and. dim <= cdp%corank)
 
-    lcobound = dp%lcobounds(dim)
+    lcobound = cdp%lcobounds(dim)
   end procedure
 
   module procedure prif_lcobound_no_dim
-    type(prif_coarray_descriptor), pointer :: dp
+    type(prif_coarray_descriptor), pointer :: cdp
 
     call_assert(coarray_handle_check(coarray_handle))
-    dp => handle_to_dp(coarray_handle)
-    call_assert(size(lcobounds) == dp%corank)
+    cdp => handle_to_cdp(coarray_handle)
+    call_assert(size(lcobounds) == cdp%corank)
 
-    lcobounds = dp%lcobounds(1:size(lcobounds))
+    lcobounds = cdp%lcobounds(1:size(lcobounds))
   end procedure
 
   module procedure prif_ucobound_with_dim
-    type(prif_coarray_descriptor), pointer :: dp
+    type(prif_coarray_descriptor), pointer :: cdp
 
     call_assert(coarray_handle_check(coarray_handle))
     call_assert(team_check(current_team))
 
-    dp => handle_to_dp(coarray_handle)
-    associate (corank => dp%corank) 
+    cdp => handle_to_cdp(coarray_handle)
+    associate (corank => cdp%corank) 
       call_assert(dim >= 1 .and. dim <= corank)
 
       if (corank == 1) then ! common-case optimization
-        ucobound = dp%lcobounds(1) + current_team%info%num_images - 1
+        ucobound = cdp%lcobounds(1) + current_team%info%num_images - 1
       elseif (dim < corank) then
-        ucobound = dp%ucobounds(dim)
+        ucobound = cdp%ucobounds(dim)
       else ! compute trailing ucobound, based on current team size
         call_assert(dim == corank)
-        associate (epp => dp%coshape_epp(corank), num_imgs => current_team%info%num_images)
+        associate (epp => cdp%coshape_epp(corank), num_imgs => current_team%info%num_images)
           if (epp >= num_imgs) then ! optimization to skip a divide
-            ucobound = dp%lcobounds(corank)
+            ucobound = cdp%lcobounds(corank)
           else
-            ucobound = dp%lcobounds(corank) + (num_imgs + epp - 1) / epp - 1
+            ucobound = cdp%lcobounds(corank) + (num_imgs + epp - 1) / epp - 1
           end if
         end associate
       end if
@@ -58,33 +58,33 @@ contains
   end procedure
 
   module procedure prif_ucobound_no_dim
-    type(prif_coarray_descriptor), pointer :: dp
+    type(prif_coarray_descriptor), pointer :: cdp
 
     call_assert(coarray_handle_check(coarray_handle))
 
-    dp => handle_to_dp(coarray_handle)
+    cdp => handle_to_cdp(coarray_handle)
     associate (corank => size(ucobounds)) 
-      call_assert(corank == dp%corank)
-      ucobounds(1:corank-1) = dp%ucobounds(1:corank-1)
+      call_assert(corank == cdp%corank)
+      ucobounds(1:corank-1) = cdp%ucobounds(1:corank-1)
       call prif_ucobound_with_dim(coarray_handle, corank, ucobounds(corank))
     end associate
   end procedure
 
   module procedure prif_coshape
-    type(prif_coarray_descriptor), pointer :: dp
+    type(prif_coarray_descriptor), pointer :: cdp
     integer :: corank
 
     call_assert(coarray_handle_check(coarray_handle))
     call_assert(team_check(current_team))
 
-    dp => handle_to_dp(coarray_handle)
+    cdp => handle_to_cdp(coarray_handle)
     corank = size(sizes)
-    call_assert(corank == dp%corank)
+    call_assert(corank == cdp%corank)
     if (corank == 1) then ! common-case optimization
       sizes(1) = current_team%info%num_images
     else
-      sizes(1:corank-1) = dp%ucobounds(1:corank-1) - dp%lcobounds(1:corank-1) + 1
-      associate (epp => dp%coshape_epp(corank), num_imgs => current_team%info%num_images)
+      sizes(1:corank-1) = cdp%ucobounds(1:corank-1) - cdp%lcobounds(1:corank-1) + 1
+      associate (epp => cdp%coshape_epp(corank), num_imgs => current_team%info%num_images)
         if (epp >= num_imgs) then ! optimization to skip a divide
           sizes(corank) = 1
         else
@@ -101,29 +101,29 @@ contains
     type(prif_team_type), intent(in) :: team
     integer(c_int), intent(out) :: image_index
 
-    type(prif_coarray_descriptor), pointer :: dp
+    type(prif_coarray_descriptor), pointer :: cdp
     integer :: dim
 
     call_assert(coarray_handle_check(coarray_handle))
     call_assert(team_check(team))
 
-    dp => handle_to_dp(coarray_handle)
+    cdp => handle_to_cdp(coarray_handle)
 
     associate (corank => size(sub)) 
-      call_assert(corank == dp%corank)
-      if (sub(1) .lt. dp%lcobounds(1) .or. &
-          (corank > 1 .and. sub(1) .gt. dp%ucobounds(1))) then
+      call_assert(corank == cdp%corank)
+      if (sub(1) .lt. cdp%lcobounds(1) .or. &
+          (corank > 1 .and. sub(1) .gt. cdp%ucobounds(1))) then
         image_index = 0
         return
       end if
-      image_index = 1 + INT(sub(1) - dp%lcobounds(1), c_int)
+      image_index = 1 + INT(sub(1) - cdp%lcobounds(1), c_int)
       do dim = 2, size(sub)
-        if (sub(dim) .lt. dp%lcobounds(dim) .or. &
-            (dim < corank .and. sub(dim) .gt. dp%ucobounds(dim))) then
+        if (sub(dim) .lt. cdp%lcobounds(dim) .or. &
+            (dim < corank .and. sub(dim) .gt. cdp%ucobounds(dim))) then
           image_index = 0
           return
         end if
-        image_index = image_index + INT(sub(dim) - dp%lcobounds(dim), c_int) * dp%coshape_epp(dim)
+        image_index = image_index + INT(sub(dim) - cdp%lcobounds(dim), c_int) * cdp%coshape_epp(dim)
        end do
     end associate
 
@@ -160,21 +160,21 @@ contains
     type(prif_team_type), intent(in) :: team
     integer(c_int), intent(out) :: initial_team_index
 
-    type(prif_coarray_descriptor), pointer :: dp
+    type(prif_coarray_descriptor), pointer :: cdp
     integer :: dim
     integer(c_int) :: image_index
 
     call_assert(team_check(team))
     call_assert(coarray_handle_check(coarray_handle))
 
-    dp => handle_to_dp(coarray_handle)
+    cdp => handle_to_cdp(coarray_handle)
     associate (corank => size(sub)) 
-      call_assert(corank == dp%corank)
-      call_assert(sub(1) .ge. dp%lcobounds(1) .and. (corank == 1 .or. sub(1) .le. dp%ucobounds(1)))
-      image_index = 1 + INT(sub(1) - dp%lcobounds(1), c_int)
+      call_assert(corank == cdp%corank)
+      call_assert(sub(1) .ge. cdp%lcobounds(1) .and. (corank == 1 .or. sub(1) .le. cdp%ucobounds(1)))
+      image_index = 1 + INT(sub(1) - cdp%lcobounds(1), c_int)
       do dim = 2, size(sub)
-        call_assert(sub(dim) .ge. dp%lcobounds(dim) .and. (dim == corank .or. sub(dim) .le. dp%ucobounds(dim)))
-        image_index = image_index + INT(sub(dim) - dp%lcobounds(dim), c_int) * dp%coshape_epp(dim)
+        call_assert(sub(dim) .ge. cdp%lcobounds(dim) .and. (dim == corank .or. sub(dim) .le. cdp%ucobounds(dim)))
+        image_index = image_index + INT(sub(dim) - cdp%lcobounds(dim), c_int) * cdp%coshape_epp(dim)
        end do
     end associate
 
@@ -210,43 +210,43 @@ contains
   !---------------------------------------------------------------------
 
   module procedure prif_local_data_pointer
-    type(prif_coarray_descriptor), pointer :: dp
+    type(prif_coarray_descriptor), pointer :: cdp
 
     call_assert(coarray_handle_check(coarray_handle))
-    dp => handle_to_dp(coarray_handle)
+    cdp => handle_to_cdp(coarray_handle)
 
-    local_data = dp%coarray_data
+    local_data = cdp%coarray_data
   end procedure
 
   module procedure prif_set_context_data
     type(c_ptr), pointer :: array_context_data
-    type(prif_coarray_descriptor), pointer :: dp
+    type(prif_coarray_descriptor), pointer :: cdp
 
     call_assert(coarray_handle_check(coarray_handle))
-    dp => handle_to_dp(coarray_handle)
+    cdp => handle_to_cdp(coarray_handle)
 
-    call c_f_pointer(dp%p_context_data, array_context_data)
+    call c_f_pointer(cdp%p_context_data, array_context_data)
     array_context_data = context_data
   end procedure
 
   module procedure prif_get_context_data
     type(c_ptr), pointer :: array_context_data
-    type(prif_coarray_descriptor), pointer :: dp
+    type(prif_coarray_descriptor), pointer :: cdp
 
     call_assert(coarray_handle_check(coarray_handle))
-    dp => handle_to_dp(coarray_handle)
+    cdp => handle_to_cdp(coarray_handle)
 
-    call c_f_pointer(dp%p_context_data, array_context_data)
+    call c_f_pointer(cdp%p_context_data, array_context_data)
     context_data = array_context_data
   end procedure
 
   module procedure prif_size_bytes
-    type(prif_coarray_descriptor), pointer :: dp
+    type(prif_coarray_descriptor), pointer :: cdp
 
     call_assert(coarray_handle_check(coarray_handle))
-    dp => handle_to_dp(coarray_handle)
+    cdp => handle_to_cdp(coarray_handle)
 
-    data_size = dp%coarray_size
+    data_size = cdp%coarray_size
   end procedure
 
 end submodule coarray_queries_s
