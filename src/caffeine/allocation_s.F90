@@ -24,6 +24,8 @@ contains
     type(prif_coarray_descriptor) :: unused
     type(prif_coarray_descriptor), pointer :: unused2(:)
 
+    call_assert(team_check(current_team))
+
     corank = size(lcobounds)
     call_assert(corank > 0)
     if (size(ucobounds) == corank) then
@@ -95,6 +97,7 @@ contains
     end if
 
     call_assert(coarray_handle_check(coarray_handle))
+    call_assert(team_check(current_team))
   end procedure
 
   module procedure prif_allocate
@@ -176,7 +179,7 @@ contains
       return
     end if
     call_assert(all(coarray_handle_check(coarray_handles)))
-
+    call_assert(team_check(current_team))
 
     ! invoke finalizers from coarray_handles(:)%info%final_func
     do i = 1, num_handles
@@ -213,6 +216,7 @@ contains
       end if
       call caf_establish_child_heap
     end if
+    call_assert(team_check(current_team))
   end procedure
 
   module procedure prif_deallocate
