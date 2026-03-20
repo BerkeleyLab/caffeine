@@ -611,6 +611,24 @@ contains
                           "invalid child_heap_info bounds in team descriptor")
       end if
 
+      if (associated(info%coarrays)) then ! have coarrays
+      block
+        type(prif_coarray_descriptor), pointer :: cdp, cdp_next
+
+        cdp => info%coarrays
+        call assert_always(.not.c_associated(cdp%previous_handle), &
+                           "invalid coarray head-of-list in team descriptor")
+        do while (c_associated(cdp%next_handle))
+          call c_f_pointer(cdp%next_handle, cdp_next)
+          call assert_always(c_associated(cdp_next%previous_handle), &
+                           "null coarray list linkage in team descriptor")
+          call assert_always(c_associated(cdp_next%previous_handle, c_loc(cdp)), &
+                           "invalid coarray list linkage in team descriptor")
+          cdp => cdp_next
+        end do
+      end block
+      end if
+
       if (associated(info%parent_team)) then ! recurse up the team tree
         result_ = team_check(prif_team_type(info%parent_team), known_active_, cycle_check_)
       end if
