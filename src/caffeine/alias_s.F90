@@ -20,6 +20,7 @@ contains
     call_assert(coarray_handle_check(source_handle))
     corank = size(alias_lcobounds)
     call_assert(corank > 0)
+    call_assert(corank <= 15)
     if (size(alias_ucobounds) == corank) then
       call_assert(all(alias_lcobounds <= alias_ucobounds))
       call_assert(product(alias_ucobounds - alias_lcobounds + 1) >= current_team%info%num_images)
