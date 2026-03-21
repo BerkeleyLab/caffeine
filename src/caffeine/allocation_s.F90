@@ -42,6 +42,7 @@ contains
 
     corank = size(lcobounds)
     call_assert(corank > 0)
+    call_assert(corank <= 15)
     if (size(ucobounds) == corank) then
       call_assert(all(lcobounds <= ucobounds))
       call_assert(product(ucobounds - lcobounds + 1) >= current_team%info%num_images)
