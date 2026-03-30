@@ -568,13 +568,18 @@ RUN_FPM_SH="run-fpm.sh"
 cat << EOF > $RUN_FPM_SH
 #!/bin/sh
 #-- DO NOT EDIT -- created by caffeine/install.sh
-fpm="${FPM}"
+FPM="${FPM}"
+FC="`$PKG_CONFIG caffeine --variable=CAFFEINE_FPM_FC`"
+CC="`$PKG_CONFIG caffeine --variable=CAFFEINE_FPM_CC`"
+FFLAGS="$compiler_flag"
+CFLAGS="`$PKG_CONFIG caffeine --variable=CAFFEINE_FPM_CFLAGS`"
+LDFLAGS="`$PKG_CONFIG caffeine --variable=CAFFEINE_FPM_LDFLAGS`"
 FPM_DRIVER=\${FPM_DRIVER:-\`realpath \$0\`}
 export FPM_DRIVER
 fpm_sub_cmd=\$1; shift
 if echo "--help -help --version -version --list -list new update list clean publish" | grep -w -q -e "\$fpm_sub_cmd" ; then
   set -x
-  exec \$fpm "\$fpm_sub_cmd" "\$@"
+  exec "\$FPM" "\$fpm_sub_cmd" "\$@"
 elif echo "build test run install" | grep -w -q -e "\$fpm_sub_cmd" ; then
   sed -i.bak 's/^link = .*\$/$FPM_TOML_LINK_ENTRY/' $FPM_TOML
   rm -f $FPM_TOML.bak # issue 282: this is the only portable way to use sed -i
@@ -582,17 +587,17 @@ elif echo "build test run install" | grep -w -q -e "\$fpm_sub_cmd" ; then
     set -- "--runner=$GASNET_RUNNER_ARG" "\$@"
   fi
   set -x
-  exec \$fpm "\$fpm_sub_cmd" \\
+  exec "\$FPM" "\$fpm_sub_cmd" \\
   --profile debug \\
-  --flag "$compiler_flag" \\
-  --compiler "`$PKG_CONFIG caffeine --variable=CAFFEINE_FPM_FC`"   \\
-  --c-compiler "`$PKG_CONFIG caffeine --variable=CAFFEINE_FPM_CC`" \\
-  --c-flag "`$PKG_CONFIG caffeine --variable=CAFFEINE_FPM_CFLAGS`" \\
-  --link-flag "`$PKG_CONFIG caffeine --variable=CAFFEINE_FPM_LDFLAGS`" \\
+  --compiler "\$FC" \\
+  --flag "\$FFLAGS" \\
+  --c-compiler "\$CC" \\
+  --c-flag "\$CFLAGS" \\
+  --link-flag "\$LDFLAGS" \\
   "\$@"
 else
   echo "ERROR: Unrecognized fpm subcommand \$fpm_sub_cmd"
-  \$fpm list
+  \$FPM list
   exit 1
 fi
 EOF
