@@ -595,6 +595,57 @@ elif echo "build test run install" | grep -w -q -e "\$fpm_sub_cmd" ; then
   --c-flag "\$CFLAGS" \\
   --link-flag "\$LDFLAGS" \\
   "\$@"
+elif echo "info" | grep -w -q -e "\$fpm_sub_cmd" ; then
+  LINE=--------------------------------------------------
+  SRCDIR=\$(dirname \$FPM_DRIVER)
+  GASNETDIR="$GASNET_PREFIX"
+  GASNETCONFIG="\$GASNETDIR/include/gasnet_config.h"
+  echo \$LINE
+  echo Version info:
+  echo Caffeine \$(grep version \$SRCDIR/fpm.toml)
+  if test -d \$SRCDIR/.git ; then
+    GITVER=\$( ( cd \$SRCDIR && git describe --long --dirty --always ) 2> /dev/null)
+    if test -n "\$GITVER"; then
+      echo "  git describe: \$GITVER"
+    fi
+  fi
+  if test -r "\$GASNETCONFIG"; then
+    echo GASNet version \$(grep GASNETI_RELEASE_VERSION \$GASNETCONFIG | cut -d' ' -f3-)
+  fi
+  grep -e assert -e julienne \$SRCDIR/fpm.toml
+  echo \$LINE
+  echo Platform info:
+  uname -a
+  if test -r /etc/os-release ; then grep -e NAME -e VERSION /etc/os-release  ; fi
+  if test -x /usr/bin/sw_vers ; then /usr/bin/sw_vers ; fi
+  echo \$LINE
+  echo Install settings:
+  echo ID="\$(date) \$(whoami)"
+  echo PREFIX=$PREFIX
+  echo FPM=\$FPM
+  echo FC=\$FC
+  echo CC=\$CC
+  echo FFLAGS=\$FFLAGS
+  echo CFLAGS=\$FFLAGS
+  echo LDFLAGS=\$LDFLAGS
+  grep -e link \$SRCDIR/fpm.toml
+  echo GASNET=\$GASNETDIR
+  echo GASNET_CONDUIT=$GASNET_CONDUIT
+  echo GASNET_THREADMODE=$GASNET_THREADMODE
+  if test -r "\$GASNETCONFIG"; then
+    grep -e GASNETI_BUILD_ID -e GASNETI_CONFIGURE_ARGS \$GASNETCONFIG | cut -d' ' -f2-
+  fi
+  for tool in FPM FC CC ; do
+    echo \$LINE
+    eval toolval="\\$\$tool"
+    echo \$tool : \$toolval
+    # strip off any arguments that might be embedded:
+    toolval=\$(echo \$toolval | cut -d' ' -f1)
+    eval /bin/ls -al \$toolval
+    eval /bin/ls -alhL \$toolval
+    \$toolval --version
+  done
+  echo \$LINE
 else
   echo "ERROR: Unrecognized fpm subcommand \$fpm_sub_cmd"
   \$FPM list
