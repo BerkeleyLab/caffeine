@@ -179,6 +179,10 @@ jobs:
         echo "FC=gfortran-${COMPILER_VERSION}" >> "$GITHUB_ENV"
         echo "CC=gcc-${COMPILER_VERSION}" >> "$GITHUB_ENV"
         echo "CXX=g++-${COMPILER_VERSION}" >> "$GITHUB_ENV"
+        # XCode 26 / gfortran bug workaround
+        if test ${{ matrix.os }} = 'macos-26' ; then \
+          echo "GASNET_CONFIGURE_ARGS=$GASNET_CONFIGURE_ARGS --enable-force-posix-realtime" >> "$GITHUB_ENV" ; \
+        fi
 
     - name: Set flang variables
       if: ${{ matrix.compiler == 'flang' && !matrix.brew_via_install }}
@@ -205,7 +209,6 @@ jobs:
         if (( ${{ matrix.native_multi_image }} )); then \
           echo "FFLAGS=$FFLAGS -DHAVE_MULTI_IMAGE -DHAVE_MULTI_IMAGE_SUPPORT" >> "$GITHUB_ENV" ; \
         fi
-
 
     - name: Checkout code
       uses: actions/checkout@v1
@@ -292,7 +295,7 @@ jobs:
 
     - name: Build Caffeine (install.sh)
       run: |
-        for var in FC CC CXX FFLAGS CPPFLAGS CFLAGS LDFLAGS LIBS GASNET_CONFIGURE_ARGS ; do \
+        for var in FC CC CXX FFLAGS CPPFLAGS CFLAGS CXXFLAGS LDFLAGS LIBS GASNET_CONFIGURE_ARGS ; do \
             eval echo "$var=\$$var"; done
         set -x
         ./install.sh --prefix=${PREFIX} --network=${{ matrix.network }} --verbose
