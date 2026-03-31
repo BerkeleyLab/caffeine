@@ -671,6 +671,9 @@ else
   ln -sf "$LIBCAFFEINE_DST" "$PREFIX/lib/libcaffeine.a"
 fi
 
+mkdir -p "$PREFIX/share/caffeine"
+./$RUN_FPM_SH info > "$PREFIX/share/caffeine/caffeine-info-$GASNET_CONDUIT-$GASNET_THREADMODE.txt"
+
 cat << EOF
 
 ________________ Caffeine has been dispensed! ________________
