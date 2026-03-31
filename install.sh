@@ -656,7 +656,16 @@ chmod u+x $RUN_FPM_SH
 # for backwards-compatibility of instructions/scripting:
 ( cd build && ln -f -s ../$RUN_FPM_SH run-fpm.sh )
 
-./$RUN_FPM_SH build $VERBOSE
+./$RUN_FPM_SH build $VERBOSE || \
+( set +x
+  echo "Defect reporting information:"
+  ./$RUN_FPM_SH info
+  echo
+  echo Oh no, the Caffeine build appears to have failed!
+  echo Please paste the ENTIRE output above into a new issue here:
+  echo "   https://github.com/berkeleylab/caffeine/issues"
+  exit 1
+)
 
 LIBCAFFEINE_DST=libcaffeine-$GASNET_CONDUIT-$GASNET_THREADMODE.a
 LIBCAFFEINE_SRC=$(./$RUN_FPM_SH install --list 2>/dev/null | grep libcaffeine | cut -d' ' -f2)
