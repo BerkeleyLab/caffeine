@@ -2,6 +2,7 @@
 ! Terms of use are as specified in LICENSE.txt
 
 #include "assert_macros.h"
+#include "language-support.F90"
 
 submodule(prif:prif_private_s) co_reduce_s
   ! DO NOT ADD USE STATEMENTS HERE
@@ -37,12 +38,7 @@ contains
     if (present(stat)) stat=0
 
     call_assert(associated(operation_wrapper))
-#   if __GFORTRAN__
-      ! Gfortran 13..15 bug workaround
-      funptr = caf_c_funloc_deref(c_funloc(operation_wrapper))
-#   else
-      funptr = c_funloc(operation_wrapper)
-#   endif
+    funptr = CAF_C_FUNLOC_PROCPTR(operation_wrapper)
 
     call_assert(c_associated(funptr))
 
@@ -70,12 +66,7 @@ contains
     if (present(stat)) stat=0
 
     call_assert(associated(operation_wrapper))
-#   if __GFORTRAN__
-      ! Gfortran 13..15 bug workaround
-      funptr = caf_c_funloc_deref(c_funloc(operation_wrapper))
-#   else
-      funptr = c_funloc(operation_wrapper)
-#   endif
+    funptr = CAF_C_FUNLOC_PROCPTR(operation_wrapper)
     call_assert(c_associated(funptr))
 
     call caf_co_reduce_cptr( &
