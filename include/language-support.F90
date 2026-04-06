@@ -43,6 +43,21 @@
 # endif
 #endif
 
+#ifndef NEED_C_FUNLOC_WORKAROUND
+# if __GFORTRAN__ && HAVE_GCC_VERSION <= 150200
+  ! Gfortran 13..15.2 bug workaround, believed to be fixed in 15.3 and 16.x:
+  !   https://gcc.gnu.org/bugzilla/show_bug.cgi?id=124652
+#   define NEED_C_FUNLOC_WORKAROUND 1
+# else
+#   define NEED_C_FUNLOC_WORKAROUND 0
+# endif
+#endif
+#if NEED_C_FUNLOC_WORKAROUND
+# define CAF_C_FUNLOC_PROCPTR(p) caf_c_funloc_deref(c_funloc(p))
+#else
+# define CAF_C_FUNLOC_PROCPTR(p) c_funloc(p)
+#endif
+
 ! ISO_FORTRAN_ENV constant value control:
 ! The following knobs influence Caffeine's choice of value for the named constants 
 ! specified by PRIF for ISO_FORTRAN_ENV:

@@ -508,7 +508,8 @@ void caf_atomic_logical(int opcode, int image, void* addr, int64_t *result, int6
 }
 
 //-------------------------------------------------------------------
-// gfortran 13.2 .. 15 : c_funloc is non-compliant
+// gfortran 13.2 .. 15.2 : c_funloc is non-compliant:
+//   https://gcc.gnu.org/bugzilla/show_bug.cgi?id=124652
 // it erroneously generates a non-callable pointer to a pointer to the subroutine
 // This helper is used to undo that incorrect extra level of indirection
 typedef void (*funloc_t)(void);
