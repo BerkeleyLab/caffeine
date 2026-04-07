@@ -65,7 +65,7 @@ jobs:
             network: smp
             native_multi_image: 1
             FFLAGS: -fcoarray
-            container: phhargrove/llvm-flang:22.1.0-latest
+            container: phhargrove/llvm-flang:22.1.3-latest
           - os: ubuntu-24.04
             compiler: flang
             version: 21
