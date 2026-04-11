@@ -13,7 +13,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ macos-14, macos-15, macos-15-intel, macos-26, ubuntu-24.04 ]
+        os: [ macos-14, macos-15, macos-15-intel, macos-26, macos-26-intel, ubuntu-24.04 ]
         compiler: [ gfortran ]
         version: [ 13, 14, 15 ]
         network: [ smp ]
@@ -42,6 +42,13 @@ jobs:
             native_multi_image: 1
             FFLAGS: -fcoarray
           - os: macos-26
+            compiler: flang
+            version: 22
+            network: smp
+            brew_via_install: 1
+            native_multi_image: 1
+            FFLAGS: -fcoarray
+          - os: macos-26-intel
             compiler: flang
             version: 22
             network: smp
@@ -126,6 +133,12 @@ jobs:
             network: udp
             native_multi_image: 1
             FFLAGS: -fcoarray
+          - os: macos-26-intel
+            compiler: flang
+            version: 22
+            network: udp
+            native_multi_image: 1
+            FFLAGS: -fcoarray
           - os: macos-26
             compiler: flang
             version: 22
@@ -180,7 +193,7 @@ jobs:
         echo "CC=gcc-${COMPILER_VERSION}" >> "$GITHUB_ENV"
         echo "CXX=g++-${COMPILER_VERSION}" >> "$GITHUB_ENV"
         # XCode 26 / gfortran bug workaround
-        if test ${{ matrix.os }} = 'macos-26' ; then \
+        if [[ ${{ matrix.os }} =~ macos-26 ]] ; then \
           echo "GASNET_CONFIGURE_ARGS=$GASNET_CONFIGURE_ARGS --enable-force-posix-realtime" >> "$GITHUB_ENV" ; \
         fi
 
