@@ -56,6 +56,15 @@ jobs:
             native_multi_image: 1
             FFLAGS: -fcoarray
 
+          - os: ubuntu-24.04
+            compiler: flang
+            version: 22
+            network: smp
+            label: Homebrew
+            brew_via_install: 1
+            native_multi_image: 1
+            FFLAGS: -fcoarray
+
           # https://hub.docker.com/r/snowstep/llvm/tags
           - os: ubuntu-24.04
             compiler: flang
@@ -227,7 +236,7 @@ jobs:
       uses: actions/checkout@v1
 
     - name: Install Ubuntu Native Dependencies
-      if: ${{ contains(matrix.os, 'ubuntu') && matrix.container == '' }}
+      if: ${{ contains(matrix.os, 'ubuntu') && matrix.container == '' && !matrix.brew_via_install }}
       run: |
         set -x
         sudo apt update
