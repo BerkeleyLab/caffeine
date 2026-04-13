@@ -316,7 +316,7 @@ contains
         integer(c_intptr_t) :: base_addr_int, base_addr_logical
         integer(PRIF_ATOMIC_INT_KIND), parameter :: zero = 0, plus_one = 1, minus_one = -1
         integer(PRIF_ATOMIC_INT_KIND) :: value_int, expect_int, tmp_int, my_bit
-        logical(PRIF_ATOMIC_LOGICAL_KIND) :: false = .false.
+        logical(PRIF_ATOMIC_LOGICAL_KIND), parameter :: false = .false.
         logical(PRIF_ATOMIC_LOGICAL_KIND) :: value_logical, expect_logical, tmp_logical
         character(len=:),allocatable :: desc
 
