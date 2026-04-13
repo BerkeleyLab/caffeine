@@ -521,7 +521,7 @@ if [[ $compiler_version =~ 'flang' ]]; then
 elif [[ $compiler_version =~ 'GNU Fortran' ]]; then
   compiler_flag="-g -O3 -ffree-line-length-0 -Wno-unused-dummy-argument"
 elif [[ $compiler_version =~ 'LFortran' ]]; then
-  compiler_flag="-g -O3 --cpp"
+  compiler_flag="-O3 --cpp --realloc-lhs-arrays --separate-compilation --no-style-suggestions --implicit-argument-casting"
 else # unknown compiler
   compiler_flag="-g -O2"
   echo "WARNING: Failed to detect a recognized Fortran compiler"
