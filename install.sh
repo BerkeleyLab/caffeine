@@ -53,6 +53,7 @@ GASNET_CONDUIT="${GASNET_CONDUIT:-smp}"
 GASNET_THREADMODE="${GASNET_THREADMODE:-seq}"
 YES=false
 APPEND_CFLAGS=""
+APPEND_LDFLAGS=""
 
 list_prerequisites()
 {
@@ -370,10 +371,16 @@ if [[ $FPM_FC == *flang* ]]; then
 fi
 FPM_CC="$($REALPATH $(command -v $CC))"
 
-# workaround issue #228: clang cannot find Homebrew flang's C header
 if [ "${BREW_PREFIX:-unset}" != unset ] ; then
+  # fixups necessitated by using Brew flang:
   if [[ $FPM_FC =~ flang ]] && [[ $FPM_FC =~ $BREW_PREFIX ]] ; then
+    # workaround issue #228: clang cannot find Homebrew flang's C header
     APPEND_CFLAGS="-I$(dirname $(find "$BREW_PREFIX/Cellar/flang" -name ISO_Fortran_binding.h | head -1))"
+
+    if [ $(uname) = "Linux" ]; then
+      # workaround brew's libflang_rt.runtime.so missing from default linker path on Linux
+      APPEND_LDFLAGS="-Wl,-rpath=$(dirname $(find "$BREW_PREFIX/Cellar/flang" -name libflang_rt.runtime.so | head -1))"
+    fi
   fi
 fi
 
@@ -494,7 +501,7 @@ echo "${FPM_TOML_LINK_ENTRY}" >> $FPM_TOML
 
 CAFFEINE_PC="$PREFIX/lib/pkgconfig/caffeine.pc"
 cat << EOF > $CAFFEINE_PC
-CAFFEINE_FPM_LDFLAGS=$GASNET_LDFLAGS $GASNET_LIB_LOCATIONS
+CAFFEINE_FPM_LDFLAGS=$GASNET_LDFLAGS $GASNET_LIB_LOCATIONS $APPEND_LDFLAGS
 CAFFEINE_FPM_FC=$FPM_FC
 CAFFEINE_FPM_CC=$GASNET_CC
 CAFFEINE_FPM_CFLAGS=$GASNET_CFLAGS $GASNET_CPPFLAGS $APPEND_CFLAGS
