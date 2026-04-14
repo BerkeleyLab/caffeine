@@ -8,7 +8,7 @@ defaults:
 
 jobs:
   build:
-    name: ${{ matrix.compiler }}-${{ matrix.version }} ${{ matrix.network }} (${{ matrix.os }}) ${{ matrix.label }}
+    name: ${{ matrix.compiler }}-${{ matrix.version }} ${{ matrix.network || '' }} (${{ matrix.os }}) ${{ matrix.label }}
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -16,42 +16,36 @@ jobs:
         os: [ macos-14, macos-15, macos-15-intel, macos-26, macos-26-intel, ubuntu-24.04 ]
         compiler: [ gfortran ]
         version: [ 13, 14, 15 ]
-        network: [ smp ]
         include:
 
         # --- flang coverage ---
           - os: macos-14
             compiler: flang
             version: 22
-            network: smp
             native_multi_image: 1
             brew_via_install: 1
             FFLAGS: -fcoarray
           - os: macos-15
             compiler: flang
             version: 22
-            network: smp
             brew_via_install: 1
             native_multi_image: 1
             FFLAGS: -fcoarray
           - os: macos-15-intel
             compiler: flang
             version: 22
-            network: smp
             brew_via_install: 1
             native_multi_image: 1
             FFLAGS: -fcoarray
           - os: macos-26
             compiler: flang
             version: 22
-            network: smp
             brew_via_install: 1
             native_multi_image: 1
             FFLAGS: -fcoarray
           - os: macos-26-intel
             compiler: flang
             version: 22
-            network: smp
             brew_via_install: 1
             native_multi_image: 1
             FFLAGS: -fcoarray
@@ -59,7 +53,6 @@ jobs:
           - os: ubuntu-24.04
             compiler: flang
             version: 22
-            network: smp
             label: Homebrew
             brew_via_install: 1
             native_multi_image: 1
@@ -69,7 +62,6 @@ jobs:
           - os: ubuntu-24.04
             compiler: flang
             version: latest
-            network: smp
             native_multi_image: 1
             FFLAGS: -fcoarray
             container: snowstep/llvm:ubuntu-24.04-latest
@@ -78,24 +70,20 @@ jobs:
           - os: ubuntu-24.04
             compiler: flang
             version: 22
-            network: smp
             native_multi_image: 1
             FFLAGS: -fcoarray
             container: phhargrove/llvm-flang:22.1.3-latest
           - os: ubuntu-24.04
             compiler: flang
             version: 21
-            network: smp
             container: phhargrove/llvm-flang:21.1.0-latest
           - os: ubuntu-24.04
             compiler: flang
             version: 20
-            network: smp
             container: phhargrove/llvm-flang:20.1.0-latest
           - os: ubuntu-24.04
             compiler: flang
             version: 19
-            network: smp
             FFLAGS: -mmlir -allow-assumed-rank
             container: phhargrove/llvm-flang:19.1.1-latest
 
@@ -103,14 +91,12 @@ jobs:
           - os: ubuntu-24.04
             compiler: flang
             version: 21
-            network: smp
             label: PRIF-0.5
             FFLAGS: -DFORCE_PRIF_0_5
             container: phhargrove/llvm-flang:21.1.0-latest
           - os: ubuntu-24.04
             compiler: flang
             version: 21
-            network: smp
             label: PRIF-0.6
             FFLAGS: -DFORCE_PRIF_0_6
             container: phhargrove/llvm-flang:21.1.0-latest
@@ -187,6 +173,7 @@ jobs:
       COMPILER_VERSION: ${{ matrix.version }}
       FFLAGS: ${{ matrix.FFLAGS }}
       PREFIX: install
+      NETWORK_ARG: ${{ matrix.network && format('--network={0}',matrix.network) || '' }}
       GASNET_CONFIGURE_ARGS: --enable-rpath --enable-debug
       GASNET_SPAWN_VERBOSE: 1
       GASNET_SPAWNFN: L
@@ -320,7 +307,7 @@ jobs:
         for var in FC CC CXX FFLAGS CPPFLAGS CFLAGS CXXFLAGS LDFLAGS LIBS GASNET_CONFIGURE_ARGS ; do \
             eval echo "$var=\$$var"; done
         set -x
-        ./install.sh --prefix=${PREFIX} --network=${{ matrix.network }} --verbose
+        ./install.sh --prefix=${PREFIX} ${NETWORK_ARG} --verbose
 
     - name: Run examples
       run: |
@@ -380,6 +367,6 @@ jobs:
         for var in FC CC CXX FFLAGS CPPFLAGS CFLAGS LDFLAGS LIBS GASNET_CONFIGURE_ARGS ; do \
             eval echo "$var=\$$var"; done
         set -x
-        ./install.sh --prefix=${PREFIX} --network=${{ matrix.network }} --enable-threads --verbose
+        ./install.sh --prefix=${PREFIX} ${NETWORK_ARG} --enable-threads --verbose
         ./run-fpm.sh test --verbose --
 
