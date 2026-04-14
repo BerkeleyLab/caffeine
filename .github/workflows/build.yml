@@ -33,51 +33,35 @@ jobs:
         # --- flang coverage ---
           - os: macos-14
             compiler: flang
-            native_multi_image: 1
             brew_via_install: 1
-            FFLAGS: -fcoarray
           - os: macos-15
             compiler: flang
             brew_via_install: 1
-            native_multi_image: 1
-            FFLAGS: -fcoarray
           - os: macos-15-intel
             compiler: flang
             brew_via_install: 1
-            native_multi_image: 1
-            FFLAGS: -fcoarray
           - os: macos-26
             compiler: flang
             brew_via_install: 1
-            native_multi_image: 1
-            FFLAGS: -fcoarray
           - os: macos-26-intel
             compiler: flang
             brew_via_install: 1
-            native_multi_image: 1
-            FFLAGS: -fcoarray
 
           - os: ubuntu-24.04
             compiler: flang
             label: Homebrew
             brew_via_install: 1
-            native_multi_image: 1
-            FFLAGS: -fcoarray
 
           # https://hub.docker.com/r/snowstep/llvm/tags
           - os: ubuntu-24.04
             compiler: flang
             version: latest
-            native_multi_image: 1
-            FFLAGS: -fcoarray
             container: snowstep/llvm:ubuntu-24.04-latest
 
           # https://hub.docker.com/r/phhargrove/llvm-flang/tags
           - os: ubuntu-24.04
             compiler: flang
             version: 22
-            native_multi_image: 1
-            FFLAGS: -fcoarray
             container: phhargrove/llvm-flang:22.1.3-latest
           - os: ubuntu-24.04
             compiler: flang
@@ -125,23 +109,15 @@ jobs:
           - os: macos-15-intel
             compiler: flang
             network: udp
-            native_multi_image: 1
-            FFLAGS: -fcoarray
           - os: macos-15
             compiler: flang
             network: udp
-            native_multi_image: 1
-            FFLAGS: -fcoarray
           - os: macos-26-intel
             compiler: flang
             network: udp
-            native_multi_image: 1
-            FFLAGS: -fcoarray
           - os: macos-26
             compiler: flang
             network: udp
-            native_multi_image: 1
-            FFLAGS: -fcoarray
 
           - os: ubuntu-24.04
             compiler: flang
@@ -157,15 +133,11 @@ jobs:
             compiler: flang
             version: 22
             network: udp
-            native_multi_image: 1
-            FFLAGS: -fcoarray
             container: phhargrove/llvm-flang:22.1.0-latest
           - os: ubuntu-24.04
             compiler: flang
             version: latest
             network: udp
-            native_multi_image: 1
-            FFLAGS: -fcoarray
             container: snowstep/llvm:ubuntu-24.04-latest
 
     container:
@@ -173,6 +145,9 @@ jobs:
 
     env:
       COMPILER_VERSION: ${{ matrix.version || needs.setup.outputs.BREW_FLANG_VERSION }}
+      NATIVE_MULTI_IMAGE: ${{ matrix.native_multi_image || 
+          ( matrix.compiler == 'flang' && ( ! matrix.version || matrix.version >= 22 || matrix.version == 'latest' ) ) 
+        }}
       FFLAGS: ${{ matrix.FFLAGS }}
       PREFIX: install
       NETWORK_ARG: ${{ matrix.network && format('--network={0}',matrix.network) || '' }}
@@ -196,12 +171,17 @@ jobs:
         fi
 
     - name: Set flang variables
-      if: ${{ matrix.compiler == 'flang' && !matrix.brew_via_install }}
+      if: ${{ matrix.compiler == 'flang' }}
       run: |
         set -x
-        echo "FC=flang-new" >> "$GITHUB_ENV" 
-        echo "CC=clang" >> "$GITHUB_ENV"
-        echo "CXX=clang++" >> "$GITHUB_ENV"
+        if [ -z "${{ matrix.brew_via_install }}" ] ; then
+          echo "FC=flang-new" >> "$GITHUB_ENV" 
+          echo "CC=clang" >> "$GITHUB_ENV"
+          echo "CXX=clang++" >> "$GITHUB_ENV"
+        fi
+        if [ "${NATIVE_MULTI_IMAGE}" == true ] ; then
+          echo "FFLAGS=$FFLAGS -fcoarray" >> "$GITHUB_ENV"
+        fi
 
     - name: Set Caffeine variables
       run: |
@@ -217,7 +197,7 @@ jobs:
         # Turn some knobs for a compiler that natively uses PRIF for multi-image features:
         # HAVE_MULTI_IMAGE : controls app/native-multi-image and prif_init testing
         # HAVE_MULTI_IMAGE_SUPPORT : force-enable Julienne's multi-image support
-        if (( ${{ matrix.native_multi_image }} )); then \
+        if [ "${NATIVE_MULTI_IMAGE}" == true ] ; then
           echo "FFLAGS=$FFLAGS -DHAVE_MULTI_IMAGE -DHAVE_MULTI_IMAGE_SUPPORT" >> "$GITHUB_ENV" ; \
         fi
 
@@ -318,7 +298,7 @@ jobs:
         ./run-fpm.sh run --verbose --example hello
 
     - name: Run native multi-image test
-      if: ${{ matrix.native_multi_image }}
+      if: ${{ env.NATIVE_MULTI_IMAGE == 'true' }}
       run: |
         set -x ; ./run-fpm.sh run --verbose 2>&1 | tee output ; \
           test ${PIPESTATUS[0]} = 0 && \
