@@ -7,8 +7,20 @@ defaults:
     shell: bash
 
 jobs:
+  setup: # establish default configuration values, independent of repo/org
+    name: Setup
+    runs-on: ubuntu-latest
+    outputs: 
+      # The LLVM Flang version on Homebrew : https://formulae.brew.sh/formula/flang
+      BREW_FLANG_VERSION: ${{ steps.vars.outputs.BREW_FLANG_VERSION }}
+    steps:
+      - name: Set default configuration variables
+        id: vars
+        run: echo "BREW_FLANG_VERSION=22" >> $GITHUB_OUTPUT
+
   build:
-    name: ${{ matrix.compiler }}-${{ matrix.version }} ${{ matrix.network || '' }} (${{ matrix.os }}) ${{ matrix.label }}
+    name: ${{ matrix.compiler }}-${{ matrix.version || needs.setup.outputs.BREW_FLANG_VERSION }} ${{ matrix.network || '' }} (${{ matrix.os }}) ${{ matrix.label }}
+    needs: setup
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -21,38 +33,32 @@ jobs:
         # --- flang coverage ---
           - os: macos-14
             compiler: flang
-            version: 22
             native_multi_image: 1
             brew_via_install: 1
             FFLAGS: -fcoarray
           - os: macos-15
             compiler: flang
-            version: 22
             brew_via_install: 1
             native_multi_image: 1
             FFLAGS: -fcoarray
           - os: macos-15-intel
             compiler: flang
-            version: 22
             brew_via_install: 1
             native_multi_image: 1
             FFLAGS: -fcoarray
           - os: macos-26
             compiler: flang
-            version: 22
             brew_via_install: 1
             native_multi_image: 1
             FFLAGS: -fcoarray
           - os: macos-26-intel
             compiler: flang
-            version: 22
             brew_via_install: 1
             native_multi_image: 1
             FFLAGS: -fcoarray
 
           - os: ubuntu-24.04
             compiler: flang
-            version: 22
             label: Homebrew
             brew_via_install: 1
             native_multi_image: 1
@@ -118,25 +124,21 @@ jobs:
 
           - os: macos-15-intel
             compiler: flang
-            version: 22
             network: udp
             native_multi_image: 1
             FFLAGS: -fcoarray
           - os: macos-15
             compiler: flang
-            version: 22
             network: udp
             native_multi_image: 1
             FFLAGS: -fcoarray
           - os: macos-26-intel
             compiler: flang
-            version: 22
             network: udp
             native_multi_image: 1
             FFLAGS: -fcoarray
           - os: macos-26
             compiler: flang
-            version: 22
             network: udp
             native_multi_image: 1
             FFLAGS: -fcoarray
@@ -170,7 +172,7 @@ jobs:
       image: ${{ matrix.container }}
 
     env:
-      COMPILER_VERSION: ${{ matrix.version }}
+      COMPILER_VERSION: ${{ matrix.version || needs.setup.outputs.BREW_FLANG_VERSION }}
       FFLAGS: ${{ matrix.FFLAGS }}
       PREFIX: install
       NETWORK_ARG: ${{ matrix.network && format('--network={0}',matrix.network) || '' }}
