@@ -178,12 +178,76 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v1
 
+    ##########################################################################
+    # Establish Dependencies
+
     - name: Install Ubuntu Container Dependencies
       if: ${{ contains(matrix.os, 'ubuntu') && matrix.container != '' && !contains(matrix.container, 'phhargrove') }}
       run: |
         set -x
         apt update
         apt install -y build-essential pkg-config make git curl
+
+    - name: Install Ubuntu Native Dependencies
+      if: ${{ contains(matrix.os, 'ubuntu') && matrix.container == '' && !matrix.brew_via_install }}
+      run: |
+        set -x
+        sudo apt update
+        sudo apt install -y build-essential pkg-config make
+        if [[ ${COMPILER_VERSION} < 15 ]] ; then \
+          sudo apt install -y gfortran-${COMPILER_VERSION} g++-${COMPILER_VERSION} ; \
+        else \
+          curl $CURL_OPTIONS https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh -o install-homebrew.sh ; \
+          chmod +x install-homebrew.sh ; \
+          env CI=1 ./install-homebrew.sh ; \
+          HOMEBREW_PREFIX="/home/linuxbrew/.linuxbrew" ; \
+          ${HOMEBREW_PREFIX}/bin/brew install -v gcc@${COMPILER_VERSION} binutils ; \
+          ls -al ${HOMEBREW_PREFIX}/bin ; \
+          echo "PATH=${HOMEBREW_PREFIX}/bin:${PATH}" >> "$GITHUB_ENV" ; \
+          : Homebrew GCC@15 needs binutils 2.44+ ; \
+          HOMEBREW_BINUTILS=$(ls -d ${HOMEBREW_PREFIX}/Cellar/binutils/2.*/bin ) ; \
+          ls -al ${HOMEBREW_BINUTILS} ; \
+          echo "FFLAGS=${FFLAGS:+"$FFLAGS" }-B ${HOMEBREW_BINUTILS}" >> "$GITHUB_ENV" ; \
+          echo "CFLAGS=${CFLAGS:+"$CFLAGS" }-B ${HOMEBREW_BINUTILS}" >> "$GITHUB_ENV" ; \
+          echo "CXXFLAGS=${CXXFLAGS:+"$CXXFLAGS" }-B ${HOMEBREW_BINUTILS}" >> "$GITHUB_ENV" ; \
+          echo "LDFLAGS=${LDFLAGS:+"$LDFLAGS" }-B ${HOMEBREW_BINUTILS}" >> "$GITHUB_ENV" ; \
+        fi
+
+    - name: Install macOS Dependencies
+      if: ${{ contains(matrix.os, 'macos') && !matrix.brew_via_install }}
+      run: |
+        set -x
+        brew update
+        # fpm binary distribution for macOS requires gfortran shared libraries from gcc@12
+        brew install gcc@12
+
+    - name: Install LLVM flang on macOS
+      if: ${{ contains(matrix.os, 'macos') && matrix.compiler == 'flang' && !matrix.brew_via_install }}
+      run: |
+        set -x
+        brew install llvm@${COMPILER_VERSION} flang
+        # Prepend homebrew clang to PATH:
+        echo "PATH=$(brew --prefix)/opt/llvm/bin:${PATH}" >> "$GITHUB_ENV"
+
+    - name: Setup FPM
+      if: ${{ !matrix.brew_via_install }}
+      uses: fortran-lang/setup-fpm@main
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        fpm-version: latest
+
+    - name: Build FPM
+      if: false
+      run: |
+        set -x
+        export FPM_VERSION=0.12.0
+        curl --retry 5 -LOsS https://github.com/fortran-lang/fpm/releases/download/v$FPM_VERSION/fpm-$FPM_VERSION.F90
+        mkdir fpm-temp
+        gfortran-14 -o fpm-temp/fpm fpm-$FPM_VERSION.F90
+        echo "PATH=${PWD}/fpm-temp:${PATH}" >> "$GITHUB_ENV"
+
+    ##########################################################################
+    # Set Install Variables
 
     - name: Set gfortran variables
       if: matrix.compiler == 'gfortran'
@@ -253,63 +317,8 @@ jobs:
           echo "FFLAGS=$FFLAGS -DHAVE_MULTI_IMAGE -DHAVE_MULTI_IMAGE_SUPPORT" >> "$GITHUB_ENV" ; \
         fi
 
-    - name: Install Ubuntu Native Dependencies
-      if: ${{ contains(matrix.os, 'ubuntu') && matrix.container == '' && !matrix.brew_via_install }}
-      run: |
-        set -x
-        sudo apt update
-        sudo apt install -y build-essential pkg-config make
-        if [[ ${COMPILER_VERSION} < 15 ]] ; then \
-          sudo apt install -y gfortran-${COMPILER_VERSION} g++-${COMPILER_VERSION} ; \
-        else \
-          curl $CURL_OPTIONS https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh -o install-homebrew.sh ; \
-          chmod +x install-homebrew.sh ; \
-          env CI=1 ./install-homebrew.sh ; \
-          HOMEBREW_PREFIX="/home/linuxbrew/.linuxbrew" ; \
-          ${HOMEBREW_PREFIX}/bin/brew install -v gcc@${COMPILER_VERSION} binutils ; \
-          ls -al ${HOMEBREW_PREFIX}/bin ; \
-          echo "PATH=${HOMEBREW_PREFIX}/bin:${PATH}" >> "$GITHUB_ENV" ; \
-          : Homebrew GCC@15 needs binutils 2.44+ ; \
-          HOMEBREW_BINUTILS=$(ls -d ${HOMEBREW_PREFIX}/Cellar/binutils/2.*/bin ) ; \
-          ls -al ${HOMEBREW_BINUTILS} ; \
-          echo "FFLAGS=${FFLAGS:+"$FFLAGS" }-B ${HOMEBREW_BINUTILS}" >> "$GITHUB_ENV" ; \
-          echo "CFLAGS=${CFLAGS:+"$CFLAGS" }-B ${HOMEBREW_BINUTILS}" >> "$GITHUB_ENV" ; \
-          echo "CXXFLAGS=${CXXFLAGS:+"$CXXFLAGS" }-B ${HOMEBREW_BINUTILS}" >> "$GITHUB_ENV" ; \
-          echo "LDFLAGS=${LDFLAGS:+"$LDFLAGS" }-B ${HOMEBREW_BINUTILS}" >> "$GITHUB_ENV" ; \
-        fi
-
-    - name: Install macOS Dependencies
-      if: ${{ contains(matrix.os, 'macos') && !matrix.brew_via_install }}
-      run: |
-        set -x
-        brew update
-        # fpm binary distribution for macOS requires gfortran shared libraries from gcc@12
-        brew install gcc@12
-
-    - name: Install LLVM flang on macOS
-      if: ${{ contains(matrix.os, 'macos') && matrix.compiler == 'flang' && !matrix.brew_via_install }}
-      run: |
-        set -x
-        brew install llvm@${COMPILER_VERSION} flang
-        # Prepend homebrew clang to PATH:
-        echo "PATH=$(brew --prefix)/opt/llvm/bin:${PATH}" >> "$GITHUB_ENV"
-
-    - name: Setup FPM
-      if: ${{ !matrix.brew_via_install }}
-      uses: fortran-lang/setup-fpm@main
-      with:
-        github-token: ${{ secrets.GITHUB_TOKEN }}
-        fpm-version: latest
-
-    - name: Build FPM
-      if: false
-      run: |
-        set -x
-        export FPM_VERSION=0.12.0
-        curl --retry 5 -LOsS https://github.com/fortran-lang/fpm/releases/download/v$FPM_VERSION/fpm-$FPM_VERSION.F90
-        mkdir fpm-temp
-        gfortran-14 -o fpm-temp/fpm fpm-$FPM_VERSION.F90
-        echo "PATH=${PWD}/fpm-temp:${PATH}" >> "$GITHUB_ENV"
+    ##########################################################################
+    # Caffeine Install
 
     - name: Version info
       run: |
@@ -332,6 +341,9 @@ jobs:
             eval echo "$var=\$$var"; done
         set -x
         ./install.sh --prefix=${PREFIX} ${NETWORK_ARG} --verbose
+
+    ##########################################################################
+    # Caffeine Testing
 
     - name: Run examples
       run: |
