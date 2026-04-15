@@ -83,15 +83,12 @@ jobs:
           - os: ubuntu-22.04
             compiler: lfortran
             version: latest
-            network: smp
             container: ghcr.io/lfortran/lfortran:latest
-            iso_fortran_header: https://raw.githubusercontent.com/lfortran/lfortran/refs/tags/v0.62.0/src/libasr/runtime/ISO_Fortran_binding.h
 
           # https://hub.docker.com/r/phhargrove/lfortran/tags
           - os: ubuntu-24.04
             compiler: lfortran
             version: 0.62
-            network: smp
             container: phhargrove/lfortran:0.62.0-1
             # workaround LFortran issue #11079
             iso_fortran_header: https://raw.githubusercontent.com/lfortran/lfortran/refs/tags/v0.62.0/src/libasr/runtime/ISO_Fortran_binding.h
@@ -181,6 +178,13 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v1
 
+    - name: Install Ubuntu Container Dependencies
+      if: ${{ contains(matrix.os, 'ubuntu') && matrix.container != '' && !contains(matrix.container, 'phhargrove') }}
+      run: |
+        set -x
+        apt update
+        apt install -y build-essential pkg-config make git curl
+
     - name: Set gfortran variables
       if: matrix.compiler == 'gfortran'
       run: |
@@ -211,17 +215,25 @@ jobs:
       run: |
         set -x
         apt update
-        apt install -y llvm clang curl
+        apt install -y llvm clang
+        if [ ${{ contains(matrix.container, 'ghcr.io/lfortran') }} = true ]; then
+          ls -alR /app 
+          # Add container lfortran to PATH:
+          PATH="/app/bin:$PATH"
+          echo "/app/bin" >> "$GITHUB_PATH" 
+        fi
         echo "FC=lfortran" >> "$GITHUB_ENV" 
         echo "CC=clang" >> "$GITHUB_ENV"
         echo "CXX=clang++" >> "$GITHUB_ENV"
+        HEADER_NAME=ISO_Fortran_binding.h
+        HEADER_TARGET=include/$HEADER_NAME
         if [ -n "${{ matrix.iso_fortran_header }}" ]; then
-          pwd
-          TARGET=include/ISO_Fortran_binding.h
-          curl $CURL_OPTIONS "${{ matrix.iso_fortran_header }}" -o $TARGET
-          ls -al $TARGET
-          find / -name ISO_Fortran_binding.h -print -exec md5sum {} \; ; \
+          curl $CURL_OPTIONS "${{ matrix.iso_fortran_header }}" -o $HEADER_TARGET
+        else
+          HEADER_SOURCE=$(lfortran --print-c-include-dir)/$HEADER_NAME 
+          echo "#include <$HEADER_SOURCE>" > $HEADER_TARGET
         fi
+        find / -name $HEADER_NAME -exec ls -al {} \; -exec md5sum {} \; -exec head {} \; -exec echo --- \;
 
     - name: Set Caffeine variables
       run: |
@@ -264,18 +276,6 @@ jobs:
           echo "CFLAGS=${CFLAGS:+"$CFLAGS" }-B ${HOMEBREW_BINUTILS}" >> "$GITHUB_ENV" ; \
           echo "CXXFLAGS=${CXXFLAGS:+"$CXXFLAGS" }-B ${HOMEBREW_BINUTILS}" >> "$GITHUB_ENV" ; \
           echo "LDFLAGS=${LDFLAGS:+"$LDFLAGS" }-B ${HOMEBREW_BINUTILS}" >> "$GITHUB_ENV" ; \
-        fi
-
-    - name: Install Ubuntu Container Dependencies
-      if: ${{ contains(matrix.os, 'ubuntu') && matrix.container != '' && !contains(matrix.container, 'phhargrove') }}
-      run: |
-        set -x
-        apt update
-        apt install -y build-essential pkg-config make git curl
-        # Add container lfortran to PATH:
-        if test "$FC" = "lfortran"; then \
-          ls -alR /app ; \
-          echo "/app/bin" >> "$GITHUB_PATH" ; \
         fi
 
     - name: Install macOS Dependencies
