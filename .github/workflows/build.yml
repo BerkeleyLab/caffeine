@@ -7,8 +7,20 @@ defaults:
     shell: bash
 
 jobs:
+  setup: # establish default configuration values, independent of repo/org
+    name: Setup
+    runs-on: ubuntu-latest
+    outputs: 
+      # The LLVM Flang version on Homebrew : https://formulae.brew.sh/formula/flang
+      BREW_FLANG_VERSION: ${{ steps.vars.outputs.BREW_FLANG_VERSION }}
+    steps:
+      - name: Set default configuration variables
+        id: vars
+        run: echo "BREW_FLANG_VERSION=22" >> $GITHUB_OUTPUT
+
   build:
-    name: ${{ matrix.compiler }}-${{ matrix.version }} ${{ matrix.network }} (${{ matrix.os }}) ${{ matrix.label }}
+    name: ${{ matrix.compiler }}-${{ matrix.version || needs.setup.outputs.BREW_FLANG_VERSION }} ${{ matrix.network || '' }} (${{ matrix.os }}) ${{ matrix.label }}
+    needs: setup
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -16,101 +28,81 @@ jobs:
         os: [ macos-14, macos-15, macos-15-intel, macos-26, macos-26-intel, ubuntu-24.04 ]
         compiler: [ gfortran ]
         version: [ 13, 14, 15 ]
-        network: [ smp ]
         include:
 
         # --- flang coverage ---
           - os: macos-14
             compiler: flang
-            version: 22
-            network: smp
-            native_multi_image: 1
             brew_via_install: 1
-            FFLAGS: -fcoarray
           - os: macos-15
             compiler: flang
-            version: 22
-            network: smp
             brew_via_install: 1
-            native_multi_image: 1
-            FFLAGS: -fcoarray
           - os: macos-15-intel
             compiler: flang
-            version: 22
-            network: smp
             brew_via_install: 1
-            native_multi_image: 1
-            FFLAGS: -fcoarray
           - os: macos-26
             compiler: flang
-            version: 22
-            network: smp
             brew_via_install: 1
-            native_multi_image: 1
-            FFLAGS: -fcoarray
           - os: macos-26-intel
             compiler: flang
-            version: 22
-            network: smp
             brew_via_install: 1
-            native_multi_image: 1
-            FFLAGS: -fcoarray
 
           - os: ubuntu-24.04
             compiler: flang
-            version: 22
-            network: smp
             label: Homebrew
             brew_via_install: 1
-            native_multi_image: 1
-            FFLAGS: -fcoarray
 
           # https://hub.docker.com/r/snowstep/llvm/tags
           - os: ubuntu-24.04
             compiler: flang
             version: latest
-            network: smp
-            native_multi_image: 1
-            FFLAGS: -fcoarray
             container: snowstep/llvm:ubuntu-24.04-latest
 
           # https://hub.docker.com/r/phhargrove/llvm-flang/tags
           - os: ubuntu-24.04
             compiler: flang
             version: 22
-            network: smp
-            native_multi_image: 1
-            FFLAGS: -fcoarray
             container: phhargrove/llvm-flang:22.1.3-latest
           - os: ubuntu-24.04
             compiler: flang
             version: 21
-            network: smp
             container: phhargrove/llvm-flang:21.1.0-latest
           - os: ubuntu-24.04
             compiler: flang
             version: 20
-            network: smp
             container: phhargrove/llvm-flang:20.1.0-latest
           - os: ubuntu-24.04
             compiler: flang
             version: 19
-            network: smp
             FFLAGS: -mmlir -allow-assumed-rank
             container: phhargrove/llvm-flang:19.1.1-latest
+
+        # --- lfortran coverage ---
+
+          # https://github.com/lfortran/lfortran/pkgs/container/lfortran
+          - os: ubuntu-22.04
+            compiler: lfortran
+            version: latest
+            container: ghcr.io/lfortran/lfortran:latest
+
+          # https://hub.docker.com/r/phhargrove/lfortran/tags
+          - os: ubuntu-24.04
+            compiler: lfortran
+            version: 0.62
+            container: phhargrove/lfortran:0.62.0-1
+            # workaround LFortran issue #11079
+            iso_fortran_header: https://raw.githubusercontent.com/lfortran/lfortran/refs/tags/v0.62.0/src/libasr/runtime/ISO_Fortran_binding.h
 
         # --- PRIF-old coverage ---
           - os: ubuntu-24.04
             compiler: flang
             version: 21
-            network: smp
             label: PRIF-0.5
             FFLAGS: -DFORCE_PRIF_0_5
             container: phhargrove/llvm-flang:21.1.0-latest
           - os: ubuntu-24.04
             compiler: flang
             version: 21
-            network: smp
             label: PRIF-0.6
             FFLAGS: -DFORCE_PRIF_0_6
             container: phhargrove/llvm-flang:21.1.0-latest
@@ -132,28 +124,16 @@ jobs:
 
           - os: macos-15-intel
             compiler: flang
-            version: 22
             network: udp
-            native_multi_image: 1
-            FFLAGS: -fcoarray
           - os: macos-15
             compiler: flang
-            version: 22
             network: udp
-            native_multi_image: 1
-            FFLAGS: -fcoarray
           - os: macos-26-intel
             compiler: flang
-            version: 22
             network: udp
-            native_multi_image: 1
-            FFLAGS: -fcoarray
           - os: macos-26
             compiler: flang
-            version: 22
             network: udp
-            native_multi_image: 1
-            FFLAGS: -fcoarray
 
           - os: ubuntu-24.04
             compiler: flang
@@ -169,24 +149,25 @@ jobs:
             compiler: flang
             version: 22
             network: udp
-            native_multi_image: 1
-            FFLAGS: -fcoarray
             container: phhargrove/llvm-flang:22.1.0-latest
           - os: ubuntu-24.04
             compiler: flang
             version: latest
             network: udp
-            native_multi_image: 1
-            FFLAGS: -fcoarray
             container: snowstep/llvm:ubuntu-24.04-latest
 
     container:
       image: ${{ matrix.container }}
 
     env:
-      COMPILER_VERSION: ${{ matrix.version }}
+      COMPILER_VERSION: ${{ matrix.version || needs.setup.outputs.BREW_FLANG_VERSION }}
+      NATIVE_MULTI_IMAGE: ${{ matrix.native_multi_image || 
+          ( matrix.compiler == 'flang' && ( ! matrix.version || matrix.version >= 22 || matrix.version == 'latest' ) ) 
+        }}
       FFLAGS: ${{ matrix.FFLAGS }}
       PREFIX: install
+      NETWORK_ARG: ${{ matrix.network && format('--network={0}',matrix.network) || '' }}
+      CURL_OPTIONS: -L --retry 10 --retry-all-errors --fail 
       GASNET_CONFIGURE_ARGS: --enable-rpath --enable-debug
       GASNET_SPAWN_VERBOSE: 1
       GASNET_SPAWNFN: L
@@ -194,46 +175,18 @@ jobs:
       CAF_IMAGES: 8
 
     steps:
-    - name: Set gfortran variables
-      if: matrix.compiler == 'gfortran'
-      run: |
-        set -x
-        echo "FC=gfortran-${COMPILER_VERSION}" >> "$GITHUB_ENV"
-        echo "CC=gcc-${COMPILER_VERSION}" >> "$GITHUB_ENV"
-        echo "CXX=g++-${COMPILER_VERSION}" >> "$GITHUB_ENV"
-        # XCode 26 / gfortran bug workaround
-        if [[ ${{ matrix.os }} =~ macos-26 ]] ; then \
-          echo "GASNET_CONFIGURE_ARGS=$GASNET_CONFIGURE_ARGS --enable-force-posix-realtime" >> "$GITHUB_ENV" ; \
-        fi
-
-    - name: Set flang variables
-      if: ${{ matrix.compiler == 'flang' && !matrix.brew_via_install }}
-      run: |
-        set -x
-        echo "FC=flang-new" >> "$GITHUB_ENV" 
-        echo "CC=clang" >> "$GITHUB_ENV"
-        echo "CXX=clang++" >> "$GITHUB_ENV"
-
-    - name: Set Caffeine variables
-      run: |
-        set -x
-        # docker instances cannot handle high levels of subjob parallelism
-        if test -n "${{ matrix.container }}"; then \
-          echo "SUBJOB_PREFIX=CAF_IMAGES=2" >> "$GITHUB_ENV" ; \
-        fi
-        # disable shared-memory bypass with network=udp to simulate multi-node runs
-        if test "${{ matrix.network }}" = "udp"; then \
-          echo "GASNET_SUPERNODE_MAXSIZE=1" >> "$GITHUB_ENV" ; \
-        fi
-        # Turn some knobs for a compiler that natively uses PRIF for multi-image features:
-        # HAVE_MULTI_IMAGE : controls app/native-multi-image and prif_init testing
-        # HAVE_MULTI_IMAGE_SUPPORT : force-enable Julienne's multi-image support
-        if (( ${{ matrix.native_multi_image }} )); then \
-          echo "FFLAGS=$FFLAGS -DHAVE_MULTI_IMAGE -DHAVE_MULTI_IMAGE_SUPPORT" >> "$GITHUB_ENV" ; \
-        fi
-
     - name: Checkout code
       uses: actions/checkout@v1
+
+    ##########################################################################
+    # Establish Dependencies
+
+    - name: Install Ubuntu Container Dependencies
+      if: ${{ contains(matrix.os, 'ubuntu') && matrix.container != '' && !contains(matrix.container, 'phhargrove') }}
+      run: |
+        set -x
+        apt update
+        apt install -y build-essential pkg-config make git curl
 
     - name: Install Ubuntu Native Dependencies
       if: ${{ contains(matrix.os, 'ubuntu') && matrix.container == '' && !matrix.brew_via_install }}
@@ -244,7 +197,7 @@ jobs:
         if [[ ${COMPILER_VERSION} < 15 ]] ; then \
           sudo apt install -y gfortran-${COMPILER_VERSION} g++-${COMPILER_VERSION} ; \
         else \
-          curl -L https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh -o install-homebrew.sh ; \
+          curl $CURL_OPTIONS https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh -o install-homebrew.sh ; \
           chmod +x install-homebrew.sh ; \
           env CI=1 ./install-homebrew.sh ; \
           HOMEBREW_PREFIX="/home/linuxbrew/.linuxbrew" ; \
@@ -259,13 +212,6 @@ jobs:
           echo "CXXFLAGS=${CXXFLAGS:+"$CXXFLAGS" }-B ${HOMEBREW_BINUTILS}" >> "$GITHUB_ENV" ; \
           echo "LDFLAGS=${LDFLAGS:+"$LDFLAGS" }-B ${HOMEBREW_BINUTILS}" >> "$GITHUB_ENV" ; \
         fi
-
-    - name: Install Ubuntu Container Dependencies
-      if: ${{ contains(matrix.os, 'ubuntu') && matrix.container != '' && !contains(matrix.container, 'phhargrove') }}
-      run: |
-        set -x
-        apt update
-        apt install -y build-essential pkg-config make git curl
 
     - name: Install macOS Dependencies
       if: ${{ contains(matrix.os, 'macos') && !matrix.brew_via_install }}
@@ -300,6 +246,80 @@ jobs:
         gfortran-14 -o fpm-temp/fpm fpm-$FPM_VERSION.F90
         echo "PATH=${PWD}/fpm-temp:${PATH}" >> "$GITHUB_ENV"
 
+    ##########################################################################
+    # Set Install Variables
+
+    - name: Set gfortran variables
+      if: matrix.compiler == 'gfortran'
+      run: |
+        set -x
+        echo "FC=gfortran-${COMPILER_VERSION}" >> "$GITHUB_ENV"
+        echo "CC=gcc-${COMPILER_VERSION}" >> "$GITHUB_ENV"
+        echo "CXX=g++-${COMPILER_VERSION}" >> "$GITHUB_ENV"
+        # XCode 26 / gfortran bug workaround
+        if [[ ${{ matrix.os }} =~ macos-26 ]] ; then \
+          echo "GASNET_CONFIGURE_ARGS=$GASNET_CONFIGURE_ARGS --enable-force-posix-realtime" >> "$GITHUB_ENV" ; \
+        fi
+
+    - name: Set flang variables
+      if: ${{ matrix.compiler == 'flang' }}
+      run: |
+        set -x
+        if [ -z "${{ matrix.brew_via_install }}" ] ; then
+          echo "FC=flang-new" >> "$GITHUB_ENV" 
+          echo "CC=clang" >> "$GITHUB_ENV"
+          echo "CXX=clang++" >> "$GITHUB_ENV"
+        fi
+        if [ "${NATIVE_MULTI_IMAGE}" == true ] ; then
+          echo "FFLAGS=$FFLAGS -fcoarray" >> "$GITHUB_ENV"
+        fi
+
+    - name: Setup lfortran dependencies and variables
+      if: ${{ matrix.compiler == 'lfortran' }}
+      run: |
+        set -x
+        apt update
+        apt install -y llvm clang
+        if [ ${{ contains(matrix.container, 'ghcr.io/lfortran') }} = true ]; then
+          ls -alR /app 
+          # Add container lfortran to PATH:
+          PATH="/app/bin:$PATH"
+          echo "/app/bin" >> "$GITHUB_PATH" 
+        fi
+        echo "FC=lfortran" >> "$GITHUB_ENV" 
+        echo "CC=clang" >> "$GITHUB_ENV"
+        echo "CXX=clang++" >> "$GITHUB_ENV"
+        HEADER_NAME=ISO_Fortran_binding.h
+        HEADER_TARGET=include/$HEADER_NAME
+        if [ -n "${{ matrix.iso_fortran_header }}" ]; then
+          curl $CURL_OPTIONS "${{ matrix.iso_fortran_header }}" -o $HEADER_TARGET
+        else
+          HEADER_SOURCE=$(lfortran --print-c-include-dir)/$HEADER_NAME 
+          echo "#include <$HEADER_SOURCE>" > $HEADER_TARGET
+        fi
+        find / -name $HEADER_NAME -exec ls -al {} \; -exec md5sum {} \; -exec head {} \; -exec echo --- \;
+
+    - name: Set Caffeine variables
+      run: |
+        set -x
+        # docker instances cannot handle high levels of subjob parallelism
+        if test -n "${{ matrix.container }}"; then \
+          echo "SUBJOB_PREFIX=CAF_IMAGES=2" >> "$GITHUB_ENV" ; \
+        fi
+        # disable shared-memory bypass with network=udp to simulate multi-node runs
+        if test "${{ matrix.network }}" = "udp"; then \
+          echo "GASNET_SUPERNODE_MAXSIZE=1" >> "$GITHUB_ENV" ; \
+        fi
+        # Turn some knobs for a compiler that natively uses PRIF for multi-image features:
+        # HAVE_MULTI_IMAGE : controls app/native-multi-image and prif_init testing
+        # HAVE_MULTI_IMAGE_SUPPORT : force-enable Julienne's multi-image support
+        if [ "${NATIVE_MULTI_IMAGE}" == true ] ; then
+          echo "FFLAGS=$FFLAGS -DHAVE_MULTI_IMAGE -DHAVE_MULTI_IMAGE_SUPPORT" >> "$GITHUB_ENV" ; \
+        fi
+
+    ##########################################################################
+    # Caffeine Install
+
     - name: Version info
       run: |
         echo == TOOL VERSIONS ==
@@ -320,7 +340,10 @@ jobs:
         for var in FC CC CXX FFLAGS CPPFLAGS CFLAGS CXXFLAGS LDFLAGS LIBS GASNET_CONFIGURE_ARGS ; do \
             eval echo "$var=\$$var"; done
         set -x
-        ./install.sh --prefix=${PREFIX} --network=${{ matrix.network }} --verbose
+        ./install.sh --prefix=${PREFIX} ${NETWORK_ARG} --verbose
+
+    ##########################################################################
+    # Caffeine Testing
 
     - name: Run examples
       run: |
@@ -329,7 +352,7 @@ jobs:
         ./run-fpm.sh run --verbose --example hello
 
     - name: Run native multi-image test
-      if: ${{ matrix.native_multi_image }}
+      if: ${{ env.NATIVE_MULTI_IMAGE == 'true' }}
       run: |
         set -x ; ./run-fpm.sh run --verbose 2>&1 | tee output ; \
           test ${PIPESTATUS[0]} = 0 && \
@@ -380,6 +403,6 @@ jobs:
         for var in FC CC CXX FFLAGS CPPFLAGS CFLAGS LDFLAGS LIBS GASNET_CONFIGURE_ARGS ; do \
             eval echo "$var=\$$var"; done
         set -x
-        ./install.sh --prefix=${PREFIX} --network=${{ matrix.network }} --enable-threads --verbose
+        ./install.sh --prefix=${PREFIX} ${NETWORK_ARG} --enable-threads --verbose
         ./run-fpm.sh test --verbose --
 

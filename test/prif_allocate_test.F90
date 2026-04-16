@@ -213,7 +213,7 @@ contains
     type(c_ptr) :: allocated_memory
     integer(c_int), pointer :: local_slice
 
-    call prif_allocate(sizeof(local_slice), allocated_memory)
+    call prif_allocate(c_sizeof(local_slice), allocated_memory)
     call c_f_pointer(allocated_memory, local_slice)
 
     local_slice = 42

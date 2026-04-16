@@ -36,7 +36,7 @@ contains
     integer(c_int64_t) :: threshold
 
     if (present(until_count)) then
-      threshold = MAX(until_count, 1)
+      threshold = MAX(until_count, 1_c_int64_t)
     else
       threshold = 1
     endif
@@ -56,7 +56,7 @@ contains
     integer(c_int64_t) :: threshold
 
     if (present(until_count)) then
-      threshold = MAX(until_count, 1)
+      threshold = MAX(until_count, 1_c_int64_t)
     else
       threshold = 1
     endif
