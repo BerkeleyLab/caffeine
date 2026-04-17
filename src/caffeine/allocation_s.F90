@@ -61,9 +61,8 @@ contains
     if (me == 1) then
     block
       type(prif_coarray_descriptor) :: unused
-      integer(c_size_t), parameter :: descriptor_size = c_sizeof(unused)
       integer(c_size_t) :: total_size
-      total_size = descriptor_size + size_in_bytes
+      total_size = c_sizeof(unused) + size_in_bytes
       whole_block = caf_allocate(current_team%info%heap_mspace, total_size)
       if (.not. c_associated(whole_block)) then
         block_offset = -1 ! out of memory
