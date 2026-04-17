@@ -27,8 +27,10 @@ module prif_allocate_test_m
   integer(kind=c_int), bind(c), target :: ff_count
   type(prif_coarray_handle) :: ff_handle
   type(test_diagnosis_t) :: ff_diag
+#if CAF_PRIF_VERSION < 8
   logical :: ff_force_fail = .false.
   character(len=*), parameter :: ff_err = "test error message"
+#endif
 
 #if CAF_PRIF_VERSION >= 8
   interface
@@ -123,10 +125,7 @@ contains
     integer :: num_imgs, me
     integer(c_int) :: dummy_element
     type(c_ptr) :: allocated_memory
-    integer(c_size_t) :: data_size, query_size
-    integer(c_int) :: stat
-    character(len=len(ff_err)) :: errmsg
-    character(len=:), allocatable :: errmsg_alloc
+    integer(c_size_t) :: data_size
     integer(c_int), pointer :: local_slice
 
     diag = .true.
@@ -164,7 +163,12 @@ contains
     call prif_deallocate_coarray(ff_handle)
     ALSO(ff_count .equalsExpected. 3)
     
-#else 
+# else 
+  block
+    integer(c_int) :: stat
+    character(len=len(ff_err)) :: errmsg
+    character(len=:), allocatable :: errmsg_alloc
+    
     ! CAF_PRIF_VERSION < 8
     ! final_func that errors on first three deallocations
     ff_count = 0
@@ -199,6 +203,7 @@ contains
     ALSO(ff_count .equalsExpected. 4)
     ALSO(stat .equalsExpected. 0)
     ALSO(.not. allocated(errmsg_alloc))
+  end block
 # endif
     retdiag = diag
   end function

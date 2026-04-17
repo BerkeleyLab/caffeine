@@ -41,9 +41,10 @@ contains
     type(prif_event_type) :: dummy_event
     type(c_ptr) :: allocated_memory
 #   if CAF_PRIF_VERSION >= 8
-      procedure(prif_coarray_cleanup_interface), pointer :: null_final_func => NULL()
+      procedure(prif_coarray_cleanup_interface), pointer :: null_final_func
+      null_final_func => NULL()
 #   else
-      type(c_funptr) :: null_final_func = c_null_funptr
+      type(c_funptr), parameter :: null_final_func = c_null_funptr
 #   endif
 
     associate(num_imgs => initial_team%num_images) 
