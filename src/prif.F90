@@ -216,13 +216,18 @@ module prif
     end subroutine
 
     module subroutine prif_allocate_coarray( &
-        lcobounds, ucobounds, size_in_bytes, final_func, coarray_handle, &
-        allocated_memory, stat, errmsg, errmsg_alloc)
+        lcobounds, ucobounds, size_in_bytes, &
+#   if CAF_PRIF_VERSION >= 8
+        final_proc, &
+#   else
+        final_func, &
+#   endif
+        coarray_handle, allocated_memory, stat, errmsg, errmsg_alloc)
       implicit none
       integer(c_int64_t), dimension(:), intent(in) :: lcobounds, ucobounds
       integer(c_size_t), intent(in) :: size_in_bytes
 #   if CAF_PRIF_VERSION >= 8
-      procedure(prif_coarray_cleanup_interface), pointer, intent(in) :: final_func
+      procedure(prif_coarray_cleanup_interface), pointer, intent(in) :: final_proc
 #   else
       type(c_funptr), intent(in) :: final_func
 #   endif
@@ -1206,7 +1211,7 @@ module prif
     type(c_ptr) :: coarray_data
     integer(c_int) :: corank
     integer(c_size_t) :: coarray_size
-    type(c_funptr) :: final_func
+    type(c_funptr) :: final_proc
     type(c_ptr) :: previous_handle = c_null_ptr, next_handle = c_null_ptr
     integer(c_int64_t) :: lcobounds(15), ucobounds(14)
     integer(c_int) :: coshape_epp(15)

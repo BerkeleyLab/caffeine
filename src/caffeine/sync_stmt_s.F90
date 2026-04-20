@@ -41,10 +41,10 @@ contains
     type(prif_event_type) :: dummy_event
     type(c_ptr) :: allocated_memory
 #   if CAF_PRIF_VERSION >= 8
-      procedure(prif_coarray_cleanup_interface), pointer :: null_final_func
-      null_final_func => NULL()
+      procedure(prif_coarray_cleanup_interface), pointer :: null_final_proc
+      null_final_proc => NULL()
 #   else
-      type(c_funptr), parameter :: null_final_func = c_null_funptr
+      type(c_funptr), parameter :: null_final_proc = c_null_funptr
 #   endif
 
     associate(num_imgs => initial_team%num_images) 
@@ -52,10 +52,9 @@ contains
       sizeof_event = int(storage_size(dummy_event)/8, c_size_t)
 
       call prif_allocate_coarray( &
-            lcobounds = [1_c_int64_t], &
-            ucobounds = [int(num_imgs,c_int64_t)], &
-            size_in_bytes = sizeof_event * num_imgs, &
-            final_func = null_final_func, &
+            [1_c_int64_t], [int(num_imgs,c_int64_t)], &
+            sizeof_event * num_imgs, &
+            null_final_proc, &
             coarray_handle = si_coarray_handle, &
             allocated_memory = allocated_memory)
       call c_f_pointer(allocated_memory, si_evt, [num_imgs])

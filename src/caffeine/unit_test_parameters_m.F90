@@ -21,15 +21,15 @@ module unit_test_parameters_m
   character(len=:), allocatable :: fpm_driver
 
 #if CAF_PRIF_VERSION >= 8
-  procedure(prif_coarray_cleanup_interface), pointer :: null_final_func => NULL()
+  procedure(prif_coarray_cleanup_interface), pointer :: null_final_proc => NULL()
 #else
-  type(c_funptr) :: null_final_func = c_null_funptr
+  type(c_funptr) :: null_final_proc = c_null_funptr
 #endif
 
 contains
 
 #if CAF_PRIF_VERSION >= 8
-  function final_func_usher(fp) result(res)
+  function final_proc_usher(fp) result(res)
     procedure(prif_coarray_cleanup_interface) :: fp
     procedure(prif_coarray_cleanup_interface), pointer :: res
     res => fp

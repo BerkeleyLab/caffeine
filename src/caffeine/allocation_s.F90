@@ -12,14 +12,19 @@ submodule(prif:prif_private_s) allocation_s
 
 contains
 
-  module subroutine prif_allocate_coarray(lcobounds, ucobounds, size_in_bytes, final_func, coarray_handle, &
-        allocated_memory, stat, errmsg, errmsg_alloc)
+  module subroutine prif_allocate_coarray(lcobounds, ucobounds, size_in_bytes, &
+#   if CAF_PRIF_VERSION >= 8
+        final_proc, &
+#   else
+        final_func, &
+#   endif
+        coarray_handle, allocated_memory, stat, errmsg, errmsg_alloc)
       implicit none
       ! redundant redeclaration of arguments here is a GCC 13..15 bug workaround:
       integer(c_int64_t), dimension(:), intent(in) :: lcobounds, ucobounds
       integer(c_size_t), intent(in) :: size_in_bytes
 #   if CAF_PRIF_VERSION >= 8
-      procedure(prif_coarray_cleanup_interface), pointer, intent(in) :: final_func
+      procedure(prif_coarray_cleanup_interface), pointer, intent(in) :: final_proc
 #   else
       type(c_funptr), intent(in) :: final_func
 #   endif
@@ -97,13 +102,13 @@ contains
     cdp%corank = corank
     cdp%coarray_size = size_in_bytes
 #   if CAF_PRIF_VERSION >= 8
-      if (associated(final_func)) then
-        cdp%final_func = CAF_C_FUNLOC_PROCPTR(final_func)
+      if (associated(final_proc)) then
+        cdp%final_proc = CAF_C_FUNLOC_PROCPTR(final_proc)
       else
-        cdp%final_func = c_null_funptr
+        cdp%final_proc = c_null_funptr
       end if
 #   else
-      cdp%final_func = final_func
+      cdp%final_proc = final_func
 #   endif
     cdp%lcobounds(1:corank) = lcobounds
     cdp%ucobounds(1:corank-1) = ucobounds(1:corank-1)
@@ -213,12 +218,12 @@ contains
     call_assert(all(coarray_handle_check(coarray_handles)))
     call_assert(team_check(current_team))
 
-    ! invoke finalizers from coarray_handles(:)%final_func
+    ! invoke finalizers from coarray_handles(:)%final_proc
     do i = 1, num_handles
       coarray_handle = coarray_handles(i) ! Add target attribute
       cdp => handle_to_cdp(coarray_handle)
-      if (c_associated(cdp%final_func)) then
-        call c_f_procpointer(cdp%final_func, coarray_cleanup)
+      if (c_associated(cdp%final_proc)) then
+        call c_f_procpointer(cdp%final_proc, coarray_cleanup)
 #     if CAF_PRIF_VERSION >= 8
         call coarray_cleanup(coarray_handle)
 #     else

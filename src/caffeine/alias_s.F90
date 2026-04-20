@@ -55,7 +55,7 @@ contains
     alias_cdp%reserved = c_null_ptr 
     alias_cdp%previous_handle = c_null_ptr
     alias_cdp%next_handle = c_null_ptr
-    alias_cdp%final_func = c_null_funptr
+    alias_cdp%final_proc = c_null_funptr
 
     alias_handle = cdp_to_handle(alias_cdp)
     call_assert(coarray_handle_check(alias_handle))
@@ -70,7 +70,7 @@ contains
     call_assert(.not. c_associated(cdp%reserved))
     call_assert(.not. c_associated(cdp%previous_handle))
     call_assert(.not. c_associated(cdp%next_handle))
-    call_assert(.not. c_associated(cdp%final_func))
+    call_assert(.not. c_associated(cdp%final_proc))
 
     deallocate(cdp)
   end procedure
