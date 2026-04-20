@@ -63,10 +63,10 @@ selected constant values from `ISO_FORTRAN_ENV` of the hosting compiler.
 
 | Procedure | Status | Notes |
 |-----------|--------|-------|
-| `prif_allocate_coarray`    | **YES** | includes ucobound relaxation expected in PRIF 0.8 |
+| `prif_allocate_coarray`    | **YES** | includes ucobound relaxation and `final_func` argument rename expected in PRIF 0.8 |
 | `prif_allocate`            | **YES** |  |
-| `prif_deallocate_coarray`  | **YES** | `final_func` support requires flang 20+ |
-| `prif_deallocate_coarrays` | **YES** | `final_func` support requires flang 20+ |
+| `prif_deallocate_coarray`  | **YES** |  |
+| `prif_deallocate_coarrays` | **YES** |  |
 | `prif_deallocate`          | **YES** |  |
 | `prif_alias_create`        | **YES** | includes ucobound relaxation expected in PRIF 0.8 |
 | `prif_alias_destroy`       | **YES** |  |
