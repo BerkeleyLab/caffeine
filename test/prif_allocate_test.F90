@@ -60,7 +60,7 @@ contains
       ,test_description_t("allocating, using and deallocating memory non-symmetrically", &
          usher(check_allocate_non_symmetric)) &
       ,test_description_t("allocating and deallocating coarrays with finalizers" &
-         , usher(check_final_func) &
+         , usher(check_final_proc) &
        ) &
       ,test_description_t("reporting out-of-memory errors", &
          usher(check_allocation_oom)) &
@@ -87,7 +87,7 @@ contains
 
     data_size = storage_size(dummy_element)/8
     call prif_allocate_coarray( &
-      [integer(c_int64_t) :: 1], [integer(c_int64_t) :: ], data_size, null_final_func, &
+      [integer(c_int64_t) :: 1], [integer(c_int64_t) :: ], data_size, null_final_proc, &
       coarray_handle, allocated_memory)
 
     call c_f_pointer(allocated_memory, local_slice)
@@ -115,7 +115,7 @@ contains
 
   end function
 
-  function check_final_func() result(retdiag)
+  function check_final_proc() result(retdiag)
     type(test_diagnosis_t) retdiag
 
     ! this function shares several global vars with finalizers, see ff_* above
@@ -134,11 +134,11 @@ contains
     call prif_this_image_no_coarray(this_image=me)
     data_size = storage_size(dummy_element)/8
 
-    ! simple final_func case
+    ! simple final_proc case
     ff_count = 0
     call prif_allocate_coarray( &
       [integer(c_int64_t) :: 1], [integer(c_int64_t) :: ], &
-      data_size, final_func(coarray_cleanup_simple), &
+      data_size, final_proc(coarray_cleanup_simple), &
       ff_handle, allocated_memory)
     ALSO(ff_count .equalsExpected. 0)
 
@@ -146,10 +146,10 @@ contains
     ALSO(ff_count .equalsExpected. 1)
 
 # if CAF_PRIF_VERSION >= 8
-    ! final_func written in C
+    ! final_proc written in C
     call prif_allocate_coarray( &
       [integer(c_int64_t) :: 1], [integer(c_int64_t) :: ], &
-      data_size, final_func(coarray_cleanup_simple_c), &
+      data_size, final_proc(coarray_cleanup_simple_c), &
       ff_handle, allocated_memory)
     ALSO(ff_count .equalsExpected. 1)
 
@@ -174,7 +174,7 @@ contains
     ff_count = 0
     call prif_allocate_coarray( &
       [integer(c_int64_t) :: 1], [integer(c_int64_t) :: ], &
-      data_size, final_func(coarray_cleanup_first_error), &
+      data_size, final_proc(coarray_cleanup_first_error), &
       ff_handle, allocated_memory)
     ALSO(ff_count .equalsExpected. 0)
 
@@ -339,7 +339,7 @@ contains
 
     data_size = 10*storage_size(dummy_element)/8
     call prif_allocate_coarray( &
-      [integer(c_int64_t) :: 1,1], [integer(c_int64_t) :: 4], data_size, null_final_func, &
+      [integer(c_int64_t) :: 1,1], [integer(c_int64_t) :: 4], data_size, null_final_proc, &
       coarray_handle, allocated_memory)
 
     call prif_size_bytes(coarray_handle, data_size=query_size)
@@ -432,7 +432,7 @@ contains
     deallocate(errmsg)
 
     call prif_allocate_coarray( &
-      [integer(c_int64_t) :: 1], [integer(c_int64_t) :: ], size_in_bytes, null_final_func, &
+      [integer(c_int64_t) :: 1], [integer(c_int64_t) :: ], size_in_bytes, null_final_proc, &
       coarray_handle, allocated_memory, stat, errmsg_alloc=errmsg)
     ALSO(stat .equalsExpected. PRIF_STAT_OUT_OF_MEMORY)
     ALSO(allocated(errmsg))

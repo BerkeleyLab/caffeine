@@ -28,16 +28,16 @@ use prif, only : &
 #endif
 
   ! final func support
-  use unit_test_parameters_m, only: null_final_func
+  use unit_test_parameters_m, only: null_final_proc
 #if !defined(CAF_PRIF_VERSION) || CAF_PRIF_VERSION >= 8
-  use unit_test_parameters_m, only: final_func_usher
+  use unit_test_parameters_m, only: final_proc_usher
 #  if HAVE_PROCEDURE_ACTUAL_FOR_POINTER_DUMMY
-#    define final_func(proc) proc
+#    define final_proc(proc) proc
 #  else
-#    define final_func(proc) final_func_usher(proc)
+#    define final_proc(proc) final_proc_usher(proc)
 #  endif
 #else
-#  define final_func(proc) c_funloc(proc)
+#  define final_proc(proc) c_funloc(proc)
 #endif
 
   use iso_c_binding, only: &

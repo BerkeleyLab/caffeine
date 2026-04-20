@@ -91,20 +91,18 @@ contains
 
         ! integer(PRIF_ATOMIC_INT_KIND) :: atomic_int[*]
         call prif_allocate_coarray( &
-                lcobounds = [1_c_int64_t], &
-                ucobounds = [integer(c_int64_t)::], &
-                size_in_bytes = sizeof_atomic_int, &
-                final_func = null_final_func, &
+                [1_c_int64_t], [integer(c_int64_t)::], &
+                sizeof_atomic_int, &
+                null_final_proc, &
                 coarray_handle = coarray_handle_int, &
                 allocated_memory = c_ptr_int)
         base_addr_int = transfer(c_ptr_int, base_addr_int)
 
         ! logical(PRIF_ATOMIC_LOGICAL_KIND) :: atomic_logical[*]
         call prif_allocate_coarray( &
-                lcobounds = [1_c_int64_t], &
-                ucobounds = [integer(c_int64_t)::], &
-                size_in_bytes = sizeof_atomic_logical, &
-                final_func = null_final_func, &
+                [1_c_int64_t], [integer(c_int64_t)::], &
+                sizeof_atomic_logical, &
+                null_final_proc, &
                 coarray_handle = coarray_handle_logical, &
                 allocated_memory = c_ptr_logical)
         base_addr_logical = transfer(c_ptr_logical, base_addr_logical)

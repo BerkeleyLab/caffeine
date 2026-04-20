@@ -97,10 +97,9 @@ contains
           
         element_size = int(storage_size(dummy_element)/8, c_size_t)
         call prif_allocate_coarray( &
-            lcobounds = [1_c_int64_t], &
-            ucobounds = [integer(c_int64_t)::], &
-            size_in_bytes = element_size, &
-            final_func = null_final_func, &
+            [1_c_int64_t], [integer(c_int64_t)::], &
+            element_size, &
+            null_final_proc, &
             coarray_handle = initial_coarray, &
             allocated_memory = allocated_memory)
         n = 0 ! clear outputs
@@ -180,10 +179,9 @@ contains
             ALSO(cleanup_count .equalsExpected. 0)
             do i = 1, num_coarrays
                 call prif_allocate_coarray( &
-                    lcobounds = [1_c_int64_t], &
-                    ucobounds = [integer(c_int64_t)::], &
-                    size_in_bytes = element_size, &
-                    final_func = final_func(coarray_cleanup), &
+                    [1_c_int64_t], [integer(c_int64_t)::], &
+                    element_size, &
+                    final_proc(coarray_cleanup), &
                     coarray_handle = coarrays(i), &
                     allocated_memory = allocated_memory)
             end do
