@@ -320,7 +320,7 @@ jobs:
     ##########################################################################
     # Caffeine Install
 
-    - name: Version info
+    - name: Version info (pre-build)
       run: |
         echo == TOOL VERSIONS ==
         echo Platform version info:
@@ -344,6 +344,10 @@ jobs:
 
     ##########################################################################
     # Caffeine Testing
+
+    - name: Version info (run-fpm)
+      run: |
+        ./run-fpm.sh info
 
     - name: Run examples
       run: |

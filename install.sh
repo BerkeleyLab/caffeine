@@ -568,13 +568,18 @@ RUN_FPM_SH="run-fpm.sh"
 cat << EOF > $RUN_FPM_SH
 #!/bin/sh
 #-- DO NOT EDIT -- created by caffeine/install.sh
-fpm="${FPM}"
+FPM="${FPM}"
+FC="`$PKG_CONFIG caffeine --variable=CAFFEINE_FPM_FC`"
+CC="`$PKG_CONFIG caffeine --variable=CAFFEINE_FPM_CC`"
+FFLAGS="$compiler_flag"
+CFLAGS="`$PKG_CONFIG caffeine --variable=CAFFEINE_FPM_CFLAGS`"
+LDFLAGS="`$PKG_CONFIG caffeine --variable=CAFFEINE_FPM_LDFLAGS`"
 FPM_DRIVER=\${FPM_DRIVER:-\`realpath \$0\`}
 export FPM_DRIVER
 fpm_sub_cmd=\$1; shift
 if echo "--help -help --version -version --list -list new update list clean publish" | grep -w -q -e "\$fpm_sub_cmd" ; then
   set -x
-  exec \$fpm "\$fpm_sub_cmd" "\$@"
+  exec "\$FPM" "\$fpm_sub_cmd" "\$@"
 elif echo "build test run install" | grep -w -q -e "\$fpm_sub_cmd" ; then
   sed -i.bak 's/^link = .*\$/$FPM_TOML_LINK_ENTRY/' $FPM_TOML
   rm -f $FPM_TOML.bak # issue 282: this is the only portable way to use sed -i
@@ -582,17 +587,68 @@ elif echo "build test run install" | grep -w -q -e "\$fpm_sub_cmd" ; then
     set -- "--runner=$GASNET_RUNNER_ARG" "\$@"
   fi
   set -x
-  exec \$fpm "\$fpm_sub_cmd" \\
+  exec "\$FPM" "\$fpm_sub_cmd" \\
   --profile debug \\
-  --flag "$compiler_flag" \\
-  --compiler "`$PKG_CONFIG caffeine --variable=CAFFEINE_FPM_FC`"   \\
-  --c-compiler "`$PKG_CONFIG caffeine --variable=CAFFEINE_FPM_CC`" \\
-  --c-flag "`$PKG_CONFIG caffeine --variable=CAFFEINE_FPM_CFLAGS`" \\
-  --link-flag "`$PKG_CONFIG caffeine --variable=CAFFEINE_FPM_LDFLAGS`" \\
+  --compiler "\$FC" \\
+  --flag "\$FFLAGS" \\
+  --c-compiler "\$CC" \\
+  --c-flag "\$CFLAGS" \\
+  --link-flag "\$LDFLAGS" \\
   "\$@"
+elif echo "info" | grep -w -q -e "\$fpm_sub_cmd" ; then
+  LINE=--------------------------------------------------
+  SRCDIR=\$(dirname \$FPM_DRIVER)
+  GASNETDIR="$GASNET_PREFIX"
+  GASNETCONFIG="\$GASNETDIR/include/gasnet_config.h"
+  echo \$LINE
+  echo Version info:
+  echo Caffeine \$(grep version \$SRCDIR/fpm.toml)
+  if test -d \$SRCDIR/.git ; then
+    GITVER=\$( ( cd \$SRCDIR && git describe --long --dirty --always ) 2> /dev/null)
+    if test -n "\$GITVER"; then
+      echo "  git describe: \$GITVER"
+    fi
+  fi
+  if test -r "\$GASNETCONFIG"; then
+    echo GASNet version \$(grep GASNETI_RELEASE_VERSION \$GASNETCONFIG | cut -d' ' -f3-)
+  fi
+  grep -e assert -e julienne \$SRCDIR/fpm.toml
+  echo \$LINE
+  echo Platform info:
+  uname -a
+  if test -r /etc/os-release ; then grep -e NAME -e VERSION /etc/os-release  ; fi
+  if test -x /usr/bin/sw_vers ; then /usr/bin/sw_vers ; fi
+  echo \$LINE
+  echo Install settings:
+  echo ID="\$(date) \$(whoami)"
+  echo PREFIX=$PREFIX
+  echo FPM=\$FPM
+  echo FC=\$FC
+  echo CC=\$CC
+  echo FFLAGS=\$FFLAGS
+  echo CFLAGS=\$FFLAGS
+  echo LDFLAGS=\$LDFLAGS
+  grep -e link \$SRCDIR/fpm.toml
+  echo GASNET=\$GASNETDIR
+  echo GASNET_CONDUIT=$GASNET_CONDUIT
+  echo GASNET_THREADMODE=$GASNET_THREADMODE
+  if test -r "\$GASNETCONFIG"; then
+    grep -e GASNETI_BUILD_ID -e GASNETI_CONFIGURE_ARGS \$GASNETCONFIG | cut -d' ' -f2-
+  fi
+  for tool in FPM FC CC ; do
+    echo \$LINE
+    eval toolval="\\$\$tool"
+    echo \$tool : \$toolval
+    # strip off any arguments that might be embedded:
+    toolval=\$(echo \$toolval | cut -d' ' -f1)
+    eval /bin/ls -al \$toolval
+    eval /bin/ls -alhL \$toolval
+    \$toolval --version
+  done
+  echo \$LINE
 else
   echo "ERROR: Unrecognized fpm subcommand \$fpm_sub_cmd"
-  \$fpm list
+  \$FPM list
   exit 1
 fi
 EOF
@@ -600,7 +656,16 @@ chmod u+x $RUN_FPM_SH
 # for backwards-compatibility of instructions/scripting:
 ( cd build && ln -f -s ../$RUN_FPM_SH run-fpm.sh )
 
-./$RUN_FPM_SH build $VERBOSE
+./$RUN_FPM_SH build $VERBOSE || \
+( set +x
+  echo "Defect reporting information:"
+  ./$RUN_FPM_SH info
+  echo
+  echo Oh no, the Caffeine build appears to have failed!
+  echo Please paste the ENTIRE output above into a new issue here:
+  echo "   https://github.com/berkeleylab/caffeine/issues"
+  exit 1
+)
 
 LIBCAFFEINE_DST=libcaffeine-$GASNET_CONDUIT-$GASNET_THREADMODE.a
 LIBCAFFEINE_SRC=$(./$RUN_FPM_SH install --list 2>/dev/null | grep libcaffeine | cut -d' ' -f2)
@@ -614,6 +679,9 @@ else
   ln -sf "$LIBCAFFEINE_DST" "$PREFIX/lib/libcaffeine-$GASNET_CONDUIT.a"
   ln -sf "$LIBCAFFEINE_DST" "$PREFIX/lib/libcaffeine.a"
 fi
+
+mkdir -p "$PREFIX/share/caffeine"
+./$RUN_FPM_SH info > "$PREFIX/share/caffeine/caffeine-info-$GASNET_CONDUIT-$GASNET_THREADMODE.txt"
 
 cat << EOF
 
