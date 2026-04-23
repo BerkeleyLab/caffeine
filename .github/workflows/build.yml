@@ -85,13 +85,16 @@ jobs:
             version: latest
             container: ghcr.io/lfortran/lfortran:latest
 
+          - os: ubuntu-22.04
+            compiler: lfortran
+            version: 0.63
+            container: ghcr.io/lfortran/lfortran:v0.63.0
+
           # https://hub.docker.com/r/phhargrove/lfortran/tags
           - os: ubuntu-24.04
             compiler: lfortran
-            version: 0.62
-            container: phhargrove/lfortran:0.62.0-1
-            # workaround LFortran issue #11079
-            iso_fortran_header: https://raw.githubusercontent.com/lfortran/lfortran/refs/tags/v0.62.0/src/libasr/runtime/ISO_Fortran_binding.h
+            version: 0.63
+            container: phhargrove/lfortran:0.63.0-1
 
         # --- PRIF-old coverage ---
           - os: ubuntu-24.04
@@ -291,12 +294,8 @@ jobs:
         echo "CXX=clang++" >> "$GITHUB_ENV"
         HEADER_NAME=ISO_Fortran_binding.h
         HEADER_TARGET=include/$HEADER_NAME
-        if [ -n "${{ matrix.iso_fortran_header }}" ]; then
-          curl $CURL_OPTIONS "${{ matrix.iso_fortran_header }}" -o $HEADER_TARGET
-        else
-          HEADER_SOURCE=$(lfortran --print-c-include-dir)/$HEADER_NAME 
-          echo "#include <$HEADER_SOURCE>" > $HEADER_TARGET
-        fi
+        HEADER_SOURCE=$(lfortran --print-c-include-dir)/$HEADER_NAME 
+        echo "#include <$HEADER_SOURCE>" > $HEADER_TARGET
         find / -name $HEADER_NAME -exec ls -al {} \; -exec md5sum {} \; -exec head {} \; -exec echo --- \;
 
     - name: Set Caffeine variables
