@@ -1,6 +1,18 @@
 name: Build
 
-on: [push, pull_request]
+on:
+  push:
+    paths-ignore: &paths_ignore
+      - 'docs/**'
+      - '**.txt'
+      - '**.md'
+  pull_request:
+    paths-ignore: *paths_ignore
+
+concurrency:
+  # De-duplicate concurrent workflow runs on the same branch/ref
+  group: ${{ github.workflow }}-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
 
 defaults:
   run:
