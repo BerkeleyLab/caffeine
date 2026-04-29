@@ -49,7 +49,14 @@ contains
 
     allocate(test_results, source = prif_co_broadcast_test%run([ &
        test_description_t("broadcasting a default integer scalar with no optional arguments present", usher(broadcast_default_integer_scalar)) &
-      ,test_description_t("broadcasting a derived type scalar with no allocatable components", usher(broadcast_derived_type)) &
+      ,test_description_t("prif_co_broadcast of a derived type scalar with no allocatable components", usher(broadcast_derived_type)) &
+      ,test_description_t("prif_co_broadcast_cptr of a derived type scalar with no allocatable components" &
+#   if __LFORTRAN__ && __LFORTRAN_MAJOR__ == 0 && __LFORTRAN_MINOR__ <= 63
+       ! test disabled for LFortran issue 11191
+#   else
+        , usher(broadcast_derived_type_cptr) &
+#   endif
+      ) &
     ]))
   end function
 
@@ -83,7 +90,7 @@ contains
 
   function broadcast_derived_type() result(diag)
     type(test_diagnosis_t) :: diag
-    type(object_t), target :: object
+    type(object_t) :: object
     integer me, ni
 
     diag = .true.
@@ -96,14 +103,23 @@ contains
     associate(expected_object => object_t(ni, .false., "gooey", ni*(1.,0.)))
       ALSO2(object == expected_object, "co_broadcast derived type")
     end associate
+  end function
+
+  function broadcast_derived_type_cptr() result(diag)
+    type(test_diagnosis_t) :: diag
+    type(object_t), target :: object
+    integer me, ni
+
+    diag = .true.
+
+    call prif_this_image_no_coarray(this_image=me)
+    call prif_num_images(num_images=ni)
 
     object = object_t(me, .true., "hooey", me*(10.,0.))
     call prif_co_broadcast_cptr(c_loc(object), storage_size(object,c_size_t)/8, source_image=ni)
     associate(expected_object => object_t(ni, .true., "hooey", ni*(10.,0.)))
       ALSO2(object == expected_object, "co_broadcast_cptr derived type")
     end associate
-
-
   end function
 
 end module prif_co_broadcast_test_m
