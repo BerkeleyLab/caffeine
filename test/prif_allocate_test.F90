@@ -183,7 +183,7 @@ contains
     integer(c_int), intent(out) :: stat
     character(len=:), intent(out), allocatable :: errmsg
 
-    ALSO(assert_aliased(handle, ff_handle, 0))
+    ALSO(assert_aliased(handle, ff_handle))
 
     ff_count = ff_count + 1
     stat = 0
@@ -194,7 +194,7 @@ contains
     integer(c_int), intent(out) :: stat
     character(len=:), intent(out), allocatable :: errmsg
 
-    ALSO(assert_aliased(handle, ff_handle, 0))
+    ALSO(assert_aliased(handle, ff_handle))
 
     ff_count = ff_count + 1
     errmsg = ff_err
