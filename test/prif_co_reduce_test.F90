@@ -30,12 +30,14 @@ module prif_co_reduce_test_m
   end type
 
   type :: pair
+    sequence ! guarantee components reside in flat linear storage
     integer :: fst
     real :: snd
   end type
 
 #if HAVE_PARAM_DERIVED
   type :: array(length)
+    sequence
     integer, len :: length = 2
     integer :: elements(length)
   end type

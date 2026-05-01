@@ -26,6 +26,7 @@ module prif_co_broadcast_test_m
   end type
 
   type object_t
+    sequence  ! guarantee components reside in flat linear storage
     integer i
     logical fallacy
     character(len=len("fooey")) actor
