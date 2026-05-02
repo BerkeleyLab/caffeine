@@ -62,7 +62,7 @@ jobs:
       matrix:
         os: [ macos-14, macos-15, macos-15-intel, macos-26, macos-26-intel, ubuntu-24.04 ]
         compiler: [ gfortran ]
-        version: [ 13, 14, 15 ]
+        version: [ 13, 14, 15, 16 ]
         include:
 
         # --- flang coverage ---
@@ -157,6 +157,10 @@ jobs:
             container: phhargrove/llvm-flang:21.1.0-latest
 
         # --- udp coverage for selected configs ---
+          - os: macos-26
+            compiler: gfortran
+            version: 16
+            network: udp
           - os: macos-15
             compiler: gfortran
             version: 14
@@ -164,7 +168,7 @@ jobs:
 
           - os: ubuntu-24.04
             compiler: gfortran
-            version: 15
+            version: 16
             network: udp
           - os: ubuntu-24.04
             compiler: gfortran
@@ -245,7 +249,7 @@ jobs:
       run: |
         sudo apt update
         sudo apt install -y build-essential pkg-config make
-        if [[ ${COMPILER_VERSION} < 15 ]] ; then
+        if [[ ${COMPILER_VERSION} -lt 15 ]] ; then
           sudo apt install -y gfortran-${COMPILER_VERSION} g++-${COMPILER_VERSION}
         else
           curl $CURL_OPTIONS https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh -o install-homebrew.sh
@@ -270,6 +274,9 @@ jobs:
         brew update
         # fpm binary distribution for macOS requires gfortran shared libraries from gcc@12
         brew install gcc@12
+        if [[ ${{ matrix.compiler }} == 'gfortran' && ${COMPILER_VERSION} -gt 15 ]] ; then
+          brew install gcc@${COMPILER_VERSION}
+        fi
 
     - name: Install LLVM flang on macOS
       if: ${{ contains(matrix.os, 'macos') && matrix.compiler == 'flang' && !matrix.brew_via_install }}
@@ -298,7 +305,7 @@ jobs:
     # Set Install Variables
 
     - name: Set gfortran variables
-      if: matrix.compiler == 'gfortran'
+      if: ${{ matrix.compiler == 'gfortran' }}
       run: |
         echo "FC=gfortran-${COMPILER_VERSION}" >> "$GITHUB_ENV"
         echo "CC=gcc-${COMPILER_VERSION}" >> "$GITHUB_ENV"
