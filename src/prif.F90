@@ -32,6 +32,9 @@ module prif
   public :: prif_register_stop_callback, prif_stop_callback_interface
   public :: prif_stop, prif_error_stop, prif_fail_image
   public :: prif_allocate_coarray, prif_allocate, prif_deallocate
+#if CAF_PRIF_VERSION >= 8
+  public :: prif_coarray_cleanup_interface
+#endif
 #if CAF_PRIF_VERSION <= 6
   public :: prif_deallocate_coarray
 #else
@@ -145,9 +148,9 @@ module prif
     integer(PRIF_ATOMIC_INT_KIND) :: counter = 0
   end type
 
-  type, public :: prif_coarray_handle
+  type, public, bind(C) :: prif_coarray_handle
     private
-    type(prif_coarray_descriptor), pointer :: info
+    type(c_ptr) :: info
   end type
 
   type, public :: prif_team_type
@@ -172,6 +175,14 @@ module prif
       integer(c_size_t), intent(in), value :: count
       type(c_ptr), intent(in), value :: cdata
     end subroutine
+
+#  if CAF_PRIF_VERSION >= 8
+    subroutine prif_coarray_cleanup_interface(handle) bind(C)
+      import :: prif_coarray_handle
+      implicit none
+      type(prif_coarray_handle), value, intent(in) :: handle
+    end subroutine
+#  endif
   end interface
 
   interface
@@ -205,12 +216,21 @@ module prif
     end subroutine
 
     module subroutine prif_allocate_coarray( &
-        lcobounds, ucobounds, size_in_bytes, final_func, coarray_handle, &
-        allocated_memory, stat, errmsg, errmsg_alloc)
+        lcobounds, ucobounds, size_in_bytes, &
+#   if CAF_PRIF_VERSION >= 8
+        final_proc, &
+#   else
+        final_func, &
+#   endif
+        coarray_handle, allocated_memory, stat, errmsg, errmsg_alloc)
       implicit none
       integer(c_int64_t), dimension(:), intent(in) :: lcobounds, ucobounds
       integer(c_size_t), intent(in) :: size_in_bytes
+#   if CAF_PRIF_VERSION >= 8
+      procedure(prif_coarray_cleanup_interface), pointer, intent(in) :: final_proc
+#   else
       type(c_funptr), intent(in) :: final_func
+#   endif
       type(prif_coarray_handle), intent(out) :: coarray_handle
       type(c_ptr), intent(out) :: allocated_memory
       integer(c_int), intent(out), optional :: stat
@@ -663,26 +683,26 @@ module prif
       integer(c_int), intent(out) :: image_status
     end subroutine
 
-    module subroutine prif_local_data_pointer(coarray_handle, local_data)
-      type(prif_coarray_handle), intent(in) :: coarray_handle
+    module subroutine prif_local_data_pointer(coarray_handle, local_data) bind(C)
+      type(prif_coarray_handle), value, intent(in) :: coarray_handle
       type(c_ptr), intent(out) :: local_data
     end subroutine
 
-    module subroutine prif_set_context_data(coarray_handle, context_data)
+    module subroutine prif_set_context_data(coarray_handle, context_data) bind(C)
       implicit none
-      type(prif_coarray_handle), intent(in) :: coarray_handle
-      type(c_ptr), intent(in) :: context_data
+      type(prif_coarray_handle), value, intent(in) :: coarray_handle
+      type(c_ptr), value, intent(in) :: context_data
     end subroutine
 
-    module subroutine prif_get_context_data(coarray_handle, context_data)
+    module subroutine prif_get_context_data(coarray_handle, context_data) bind(C)
       implicit none
-      type(prif_coarray_handle), intent(in) :: coarray_handle
+      type(prif_coarray_handle), value, intent(in) :: coarray_handle
       type(c_ptr), intent(out) :: context_data
     end subroutine
 
-    module subroutine prif_size_bytes(coarray_handle, data_size)
+    module subroutine prif_size_bytes(coarray_handle, data_size) bind(C)
       implicit none
-      type(prif_coarray_handle), intent(in) :: coarray_handle
+      type(prif_coarray_handle), value, intent(in) :: coarray_handle
       integer(c_size_t), intent(out) :: data_size
     end subroutine
 
@@ -1191,7 +1211,7 @@ module prif
     type(c_ptr) :: coarray_data
     integer(c_int) :: corank
     integer(c_size_t) :: coarray_size
-    type(c_funptr) :: final_func
+    type(c_funptr) :: final_proc
     type(c_ptr) :: previous_handle = c_null_ptr, next_handle = c_null_ptr
     integer(c_int64_t) :: lcobounds(15), ucobounds(14)
     integer(c_int) :: coshape_epp(15)

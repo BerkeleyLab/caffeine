@@ -60,7 +60,7 @@ contains
               [integer(c_int64_t):: 1], &
               [integer(c_int64_t)::], &
               int(storage_size(dummy_element)/8, c_size_t), &
-              c_null_funptr, &
+              null_final_proc, &
               coarray_handle, &
               allocation_ptr)
       call prif_local_data_pointer(coarray_handle, local_ptr)
@@ -100,10 +100,10 @@ contains
 
     if (omit_trailing) then
       leading_ucobounds = ucobounds(1:corank-1)
-      call prif_allocate_coarray( lcobounds, leading_ucobounds, data_size, c_null_funptr, &
+      call prif_allocate_coarray( lcobounds, leading_ucobounds, data_size, null_final_proc, &
         coarray_handle, allocated_memory)
     else
-      call prif_allocate_coarray( lcobounds, ucobounds, data_size, c_null_funptr, &
+      call prif_allocate_coarray( lcobounds, ucobounds, data_size, null_final_proc, &
         coarray_handle, allocated_memory)
     end if
 

@@ -1,8 +1,9 @@
 #include "test-utils.F90"
-#include "language-support.F90"
+#include "version.h"
 
 module prif_teams_test_m
 # include "test-uses-alloc.F90"
+    use iso_c_binding, only: c_char
     use prif
     use julienne_m, only: test_description_t, test_diagnosis_t, test_result_t, test_t, string_t, usher &
       ,operator(.also.), operator(.isAtLeast.), operator(.isAtMost.), operator(.equalsExpected.), operator(//)
@@ -96,10 +97,9 @@ contains
           
         element_size = int(storage_size(dummy_element)/8, c_size_t)
         call prif_allocate_coarray( &
-            lcobounds = [1_c_int64_t], &
-            ucobounds = [integer(c_int64_t)::], &
-            size_in_bytes = element_size, &
-            final_func = c_null_funptr, &
+            [1_c_int64_t], [integer(c_int64_t)::], &
+            element_size, &
+            null_final_proc, &
             coarray_handle = initial_coarray, &
             allocated_memory = allocated_memory)
         n = 0 ! clear outputs
@@ -179,19 +179,13 @@ contains
             ALSO(cleanup_count .equalsExpected. 0)
             do i = 1, num_coarrays
                 call prif_allocate_coarray( &
-                    lcobounds = [1_c_int64_t], &
-                    ucobounds = [integer(c_int64_t)::], &
-                    size_in_bytes = element_size, &
-#if HAVE_FINAL_FUNC_SUPPORT
-                    final_func = c_funloc(coarray_cleanup), &
-#  define CHECK_COUNT(n) ALSO(cleanup_count .equalsExpected. n)
-#else
-                    final_func = c_null_funptr, &
-#  define CHECK_COUNT(n) 
-#endif
+                    [1_c_int64_t], [integer(c_int64_t)::], &
+                    element_size, &
+                    final_proc(coarray_cleanup), &
                     coarray_handle = coarrays(i), &
                     allocated_memory = allocated_memory)
             end do
+#  define CHECK_COUNT(n) ALSO(cleanup_count .equalsExpected. n)
             CHECK_COUNT(0)
             call prif_deallocate_coarrays(coarrays(4:4))
             call prif_deallocate_coarrays(coarrays(2:2))
@@ -246,14 +240,21 @@ contains
 
     end function
 
-#if HAVE_FINAL_FUNC_SUPPORT
+# if CAF_PRIF_VERSION < 8
     subroutine coarray_cleanup(handle, stat, errmsg) bind(C)
-      type(prif_coarray_handle), pointer, intent(in) :: handle
+      type(prif_coarray_handle), value, intent(in) :: handle
       integer(c_int), intent(out) :: stat
-      character(len=:), intent(out), allocatable :: errmsg
+      character(kind=c_char, len=:), intent(out), allocatable :: errmsg
 
       cleanup_count = cleanup_count + 1
       stat = 0
     end subroutine
-#endif
+# else
+    subroutine coarray_cleanup(handle) bind(C)
+      type(prif_coarray_handle), value, intent(in) :: handle
+
+      cleanup_count = cleanup_count + 1
+    end subroutine
+# endif
+
 end module prif_teams_test_m

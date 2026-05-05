@@ -1,9 +1,9 @@
 #include "test-utils.F90"
 #include "version.h"
-#include "language-support.F90"
 
 module prif_allocate_test_m
 # include "test-uses-alloc.F90"
+  use iso_c_binding, only: c_char
   use prif, only : &
       prif_num_images, prif_size_bytes, &
       prif_set_context_data, prif_get_context_data, prif_local_data_pointer, &
@@ -23,13 +23,22 @@ module prif_allocate_test_m
     procedure, nopass, non_overridable :: results
   end type
 
-#if HAVE_FINAL_FUNC_SUPPORT
   ! Global state used to coordinate with finalizers
-  integer :: ff_count
+  integer(kind=c_int), bind(c), target :: ff_count
   type(prif_coarray_handle) :: ff_handle
   type(test_diagnosis_t) :: ff_diag
+#if CAF_PRIF_VERSION < 8
   logical :: ff_force_fail = .false.
   character(len=*), parameter :: ff_err = "test error message"
+#endif
+
+#if CAF_PRIF_VERSION >= 8
+  interface
+    subroutine coarray_cleanup_simple_c(handle) bind(C)
+      import c_int, c_char, prif_coarray_handle
+      type(prif_coarray_handle), value, intent(in) :: handle
+    end subroutine
+  end interface
 #endif
 
 contains
@@ -51,9 +60,7 @@ contains
       ,test_description_t("allocating, using and deallocating memory non-symmetrically", &
          usher(check_allocate_non_symmetric)) &
       ,test_description_t("allocating and deallocating coarrays with finalizers" &
-#      if HAVE_FINAL_FUNC_SUPPORT
-         , usher(check_final_func) &
-#      endif
+         , usher(check_final_proc) &
        ) &
       ,test_description_t("reporting out-of-memory errors", &
          usher(check_allocation_oom)) &
@@ -80,7 +87,7 @@ contains
 
     data_size = storage_size(dummy_element)/8
     call prif_allocate_coarray( &
-      [integer(c_int64_t) :: 1], [integer(c_int64_t) :: ], data_size, c_null_funptr, &
+      [integer(c_int64_t) :: 1], [integer(c_int64_t) :: ], data_size, null_final_proc, &
       coarray_handle, allocated_memory)
 
     call c_f_pointer(allocated_memory, local_slice)
@@ -108,21 +115,18 @@ contains
 
   end function
 
-#if HAVE_FINAL_FUNC_SUPPORT
-  function check_final_func() result(retdiag)
+  function check_final_proc() result(retdiag)
     type(test_diagnosis_t) retdiag
 
     ! this function shares several global vars with finalizers, see ff_* above
     ! globalize diag for ALSO:
 #   define diag ff_diag
 
-    integer :: num_imgs, me, dummy_element
+    integer :: num_imgs, me
+    integer(c_int) :: dummy_element
     type(c_ptr) :: allocated_memory
-    integer, pointer :: local_slice
-    integer(c_size_t) :: data_size, query_size
-    integer(c_int) :: stat
-    character(len=len(ff_err)) :: errmsg
-    character(len=:), allocatable :: errmsg_alloc
+    integer(c_size_t) :: data_size
+    integer(c_int), pointer :: local_slice
 
     diag = .true.
 
@@ -130,22 +134,47 @@ contains
     call prif_this_image_no_coarray(this_image=me)
     data_size = storage_size(dummy_element)/8
 
-    ! simple final_func case
+    ! simple final_proc case
     ff_count = 0
     call prif_allocate_coarray( &
       [integer(c_int64_t) :: 1], [integer(c_int64_t) :: ], &
-      data_size, c_funloc(coarray_cleanup_simple), &
+      data_size, final_proc(coarray_cleanup_simple), &
       ff_handle, allocated_memory)
     ALSO(ff_count .equalsExpected. 0)
 
     call prif_deallocate_coarray(ff_handle)
     ALSO(ff_count .equalsExpected. 1)
+
+# if CAF_PRIF_VERSION >= 8
+    ! final_proc written in C
+    call prif_allocate_coarray( &
+      [integer(c_int64_t) :: 1], [integer(c_int64_t) :: ], &
+      data_size, final_proc(coarray_cleanup_simple_c), &
+      ff_handle, allocated_memory)
+    ALSO(ff_count .equalsExpected. 1)
+
+    ! set-up some values to be checked from C
+    call c_f_pointer(allocated_memory, local_slice)
+    ALSO(associated(local_slice))
+    local_slice = 42
+    ALSO(local_slice .equalsExpected. 42)
+    call prif_set_context_data(ff_handle, c_loc(ff_count))
+
+    call prif_deallocate_coarray(ff_handle)
+    ALSO(ff_count .equalsExpected. 3)
     
+# else 
+  block
+    integer(c_int) :: stat
+    character(len=len(ff_err)) :: errmsg
+    character(len=:), allocatable :: errmsg_alloc
+    
+    ! CAF_PRIF_VERSION < 8
     ! final_func that errors on first three deallocations
     ff_count = 0
     call prif_allocate_coarray( &
       [integer(c_int64_t) :: 1], [integer(c_int64_t) :: ], &
-      data_size, c_funloc(coarray_cleanup_first_error), &
+      data_size, final_proc(coarray_cleanup_first_error), &
       ff_handle, allocated_memory)
     ALSO(ff_count .equalsExpected. 0)
 
@@ -174,27 +203,36 @@ contains
     ALSO(ff_count .equalsExpected. 4)
     ALSO(stat .equalsExpected. 0)
     ALSO(.not. allocated(errmsg_alloc))
-
+  end block
+# endif
     retdiag = diag
   end function
 
+#if CAF_PRIF_VERSION < 8
   subroutine coarray_cleanup_simple(handle , stat, errmsg) bind(C)
-    type(prif_coarray_handle), pointer , intent(in) :: handle
+    type(prif_coarray_handle), value, intent(in) :: handle
     integer(c_int), intent(out) :: stat
-    character(len=:), intent(out), allocatable :: errmsg
+    character(kind=c_char,len=:), intent(out), allocatable :: errmsg
+#else
+  subroutine coarray_cleanup_simple(handle) bind(C)
+    type(prif_coarray_handle), value, intent(in) :: handle
+#endif
 
-    ALSO(assert_aliased(handle, ff_handle, 0))
+    ALSO(assert_aliased(handle, ff_handle))
 
     ff_count = ff_count + 1
+#  if CAF_PRIF_VERSION < 8
     stat = 0
+#  endif
   end subroutine
 
+#if CAF_PRIF_VERSION < 8
   subroutine coarray_cleanup_first_error(handle , stat, errmsg) bind(C)
-    type(prif_coarray_handle), pointer , intent(in) :: handle
+    type(prif_coarray_handle), value, intent(in) :: handle
     integer(c_int), intent(out) :: stat
-    character(len=:), intent(out), allocatable :: errmsg
+    character(kind=c_char,len=:), intent(out), allocatable :: errmsg
 
-    ALSO(assert_aliased(handle, ff_handle, 0))
+    ALSO(assert_aliased(handle, ff_handle))
 
     ff_count = ff_count + 1
     errmsg = ff_err
@@ -204,8 +242,8 @@ contains
       stat = 0
     end if
   end subroutine
-# undef diag
 #endif
+# undef diag
 
   function check_allocate_non_symmetric() result(diag)
     type(test_diagnosis_t) diag 
@@ -301,7 +339,7 @@ contains
 
     data_size = 10*storage_size(dummy_element)/8
     call prif_allocate_coarray( &
-      [integer(c_int64_t) :: 1,1], [integer(c_int64_t) :: 4], data_size, c_null_funptr, &
+      [integer(c_int64_t) :: 1,1], [integer(c_int64_t) :: 4], data_size, null_final_proc, &
       coarray_handle, allocated_memory)
 
     call prif_size_bytes(coarray_handle, data_size=query_size)
@@ -394,7 +432,7 @@ contains
     deallocate(errmsg)
 
     call prif_allocate_coarray( &
-      [integer(c_int64_t) :: 1], [integer(c_int64_t) :: ], size_in_bytes, c_null_funptr, &
+      [integer(c_int64_t) :: 1], [integer(c_int64_t) :: ], size_in_bytes, null_final_proc, &
       coarray_handle, allocated_memory, stat, errmsg_alloc=errmsg)
     ALSO(stat .equalsExpected. PRIF_STAT_OUT_OF_MEMORY)
     ALSO(allocated(errmsg))

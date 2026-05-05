@@ -34,7 +34,6 @@ static gex_TM_t myworldteam;
 static mspace* non_symmetric_heap;
 static gasnett_mutex_t non_symmetric_heap_lock = GASNETT_MUTEX_INITIALIZER;
 
-typedef void(*final_func_ptr)(void*, size_t) ;
 typedef uint8_t byte;
 
 static void event_init(void);

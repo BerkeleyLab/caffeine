@@ -126,10 +126,9 @@ contains
 
         ! type(notify_type) :: evt[*]
         call prif_allocate_coarray( &
-                lcobounds = [1_c_int64_t], &
-                ucobounds = [integer(c_int64_t)::], &
-                size_in_bytes = sizeof_notify, &
-                final_func = c_null_funptr, &
+                [1_c_int64_t], [integer(c_int64_t)::], &
+                sizeof_notify, &
+                null_final_proc, &
                 coarray_handle = coarray_handle_evt, &
                 allocated_memory = allocated_memory)
         call c_f_pointer(allocated_memory, local_evt)
@@ -137,10 +136,9 @@ contains
 
         ! integer :: ctr[*]
         call prif_allocate_coarray( &
-                lcobounds = [1_c_int64_t], &
-                ucobounds = [integer(c_int64_t)::], &
-                size_in_bytes = sizeof_int, &
-                final_func = c_null_funptr, &
+                [1_c_int64_t], [integer(c_int64_t)::], &
+                sizeof_int, &
+                null_final_proc, &
                 coarray_handle = coarray_handle_ctr, &
                 allocated_memory = allocated_memory)
         call c_f_pointer(allocated_memory, local_ctr)

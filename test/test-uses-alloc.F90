@@ -6,6 +6,7 @@
 #define CAF_INCLUDED_TEST_USES_ALLOC
 
 #include "version.h"
+#include "language-support.F90"
 
 use prif, only : &
     prif_allocate_coarray, &
@@ -24,6 +25,19 @@ use prif, only : &
 # define prif_deallocate_coarrays(arr)        prif_deallocate_coarray_(arr)
 # define prif_deallocate_coarray3(h,a2,a3)    prif_deallocate_coarray_([h],a2,a3)
 # define prif_deallocate_coarrays3(arr,a2,a3) prif_deallocate_coarray_(arr,a2,a3)
+#endif
+
+  ! final func support
+  use unit_test_parameters_m, only: null_final_proc
+#if !defined(CAF_PRIF_VERSION) || CAF_PRIF_VERSION >= 8
+  use unit_test_parameters_m, only: final_proc_usher
+#  if HAVE_PROCEDURE_ACTUAL_FOR_POINTER_DUMMY
+#    define final_proc(proc) proc
+#  else
+#    define final_proc(proc) final_proc_usher(proc)
+#  endif
+#else
+#  define final_proc(proc) c_funloc(proc)
 #endif
 
   use iso_c_binding, only: &
