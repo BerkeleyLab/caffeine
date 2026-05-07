@@ -413,6 +413,16 @@ jobs:
          ) ; \
         done
 
+    - name: Add Linux Brew to PATH
+      if: ${{ contains(matrix.os, 'ubuntu') && matrix.brew_via_install }}
+      run: |
+        set -x
+        # the first install.sh command established Linux Brew, so add it to the
+        # PATH to prevent pointless overwrites in the second install.sh below
+        HOMEBREW_PREFIX="/home/linuxbrew/.linuxbrew"
+        ( set +e ; ls -al ${HOMEBREW_PREFIX}/bin ; exit 0 )
+        echo "PATH=${HOMEBREW_PREFIX}/bin:${PATH}" >> "$GITHUB_ENV"
+
     - name: Build and Test Caffeine (thread-safe)
       run: |
         for var in FC CC CXX FFLAGS CPPFLAGS CFLAGS LDFLAGS LIBS GASNET_CONFIGURE_ARGS ; do \
