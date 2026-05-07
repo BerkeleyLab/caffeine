@@ -345,6 +345,18 @@ jobs:
             ( echo ; set -x ; w=$(which $tool) ; ls -al $w ; ls -alhL $w ; $tool --version )
           fi
         done
+        if [[ ${{ matrix.compiler }} == flang ]] && false ; then
+          # Report any libflang_rt appearing in common places:
+          echo
+          if [ -n "${FC}" ] ; then
+            RDIR="$(${FC} -print-resource-dir)"
+          fi
+          if command -v brew ; then
+            BDIR="$(brew --prefix)"
+          fi
+          set -x
+          find $RDIR $BDIR /usr/lib/ -name '*flang_rt*' -exec ls -al {} \; | sort | uniq
+        fi
 
     - name: Build Caffeine (install.sh)
       run: |
