@@ -207,23 +207,23 @@ jobs:
       run: |
         sudo apt update
         sudo apt install -y build-essential pkg-config make
-        if [[ ${COMPILER_VERSION} < 15 ]] ; then \
-          sudo apt install -y gfortran-${COMPILER_VERSION} g++-${COMPILER_VERSION} ; \
-        else \
-          curl $CURL_OPTIONS https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh -o install-homebrew.sh ; \
-          chmod +x install-homebrew.sh ; \
-          env CI=1 ./install-homebrew.sh ; \
-          HOMEBREW_PREFIX="/home/linuxbrew/.linuxbrew" ; \
-          ${HOMEBREW_PREFIX}/bin/brew install -v gcc@${COMPILER_VERSION} binutils ; \
-          ls -al ${HOMEBREW_PREFIX}/bin ; \
-          echo "PATH=${HOMEBREW_PREFIX}/bin:${PATH}" >> "$GITHUB_ENV" ; \
-          : Homebrew GCC@15 needs binutils 2.44+ ; \
-          HOMEBREW_BINUTILS=$(ls -d ${HOMEBREW_PREFIX}/Cellar/binutils/2.*/bin ) ; \
-          ls -al ${HOMEBREW_BINUTILS} ; \
-          echo "FFLAGS=${FFLAGS:+"$FFLAGS" }-B ${HOMEBREW_BINUTILS}" >> "$GITHUB_ENV" ; \
-          echo "CFLAGS=${CFLAGS:+"$CFLAGS" }-B ${HOMEBREW_BINUTILS}" >> "$GITHUB_ENV" ; \
-          echo "CXXFLAGS=${CXXFLAGS:+"$CXXFLAGS" }-B ${HOMEBREW_BINUTILS}" >> "$GITHUB_ENV" ; \
-          echo "LDFLAGS=${LDFLAGS:+"$LDFLAGS" }-B ${HOMEBREW_BINUTILS}" >> "$GITHUB_ENV" ; \
+        if [[ ${COMPILER_VERSION} < 15 ]] ; then
+          sudo apt install -y gfortran-${COMPILER_VERSION} g++-${COMPILER_VERSION}
+        else
+          curl $CURL_OPTIONS https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh -o install-homebrew.sh
+          chmod +x install-homebrew.sh
+          env CI=1 ./install-homebrew.sh
+          HOMEBREW_PREFIX="/home/linuxbrew/.linuxbrew"
+          ${HOMEBREW_PREFIX}/bin/brew install -v gcc@${COMPILER_VERSION} binutils
+          ls -al ${HOMEBREW_PREFIX}/bin
+          echo "PATH=${HOMEBREW_PREFIX}/bin:${PATH}" >> "$GITHUB_ENV"
+          : Homebrew GCC@15 needs binutils 2.44+
+          HOMEBREW_BINUTILS=$(ls -d ${HOMEBREW_PREFIX}/Cellar/binutils/2.*/bin )
+          ls -al ${HOMEBREW_BINUTILS}
+          echo "FFLAGS=${FFLAGS:+"$FFLAGS" }-B ${HOMEBREW_BINUTILS}" >> "$GITHUB_ENV"
+          echo "CFLAGS=${CFLAGS:+"$CFLAGS" }-B ${HOMEBREW_BINUTILS}" >> "$GITHUB_ENV"
+          echo "CXXFLAGS=${CXXFLAGS:+"$CXXFLAGS" }-B ${HOMEBREW_BINUTILS}" >> "$GITHUB_ENV"
+          echo "LDFLAGS=${LDFLAGS:+"$LDFLAGS" }-B ${HOMEBREW_BINUTILS}" >> "$GITHUB_ENV"
         fi
 
     - name: Install macOS Dependencies
@@ -266,8 +266,8 @@ jobs:
         echo "CC=gcc-${COMPILER_VERSION}" >> "$GITHUB_ENV"
         echo "CXX=g++-${COMPILER_VERSION}" >> "$GITHUB_ENV"
         # XCode 26 / gfortran bug workaround
-        if [[ ${{ matrix.os }} =~ macos-26 ]] ; then \
-          echo "GASNET_CONFIGURE_ARGS=$GASNET_CONFIGURE_ARGS --enable-force-posix-realtime" >> "$GITHUB_ENV" ; \
+        if [[ ${{ matrix.os }} =~ macos-26 ]] ; then
+          echo "GASNET_CONFIGURE_ARGS=$GASNET_CONFIGURE_ARGS --enable-force-posix-realtime" >> "$GITHUB_ENV"
         fi
 
     - name: Set flang variables
@@ -305,18 +305,18 @@ jobs:
     - name: Set Caffeine variables
       run: |
         # docker instances cannot handle high levels of subjob parallelism
-        if test -n "${{ matrix.container }}"; then \
-          echo "SUBJOB_PREFIX=CAF_IMAGES=2" >> "$GITHUB_ENV" ; \
+        if test -n "${{ matrix.container }}"; then
+          echo "SUBJOB_PREFIX=CAF_IMAGES=2" >> "$GITHUB_ENV"
         fi
         # disable shared-memory bypass with network=udp to simulate multi-node runs
-        if test "${{ matrix.network }}" = "udp"; then \
-          echo "GASNET_SUPERNODE_MAXSIZE=1" >> "$GITHUB_ENV" ; \
+        if test "${{ matrix.network }}" = "udp"; then
+          echo "GASNET_SUPERNODE_MAXSIZE=1" >> "$GITHUB_ENV"
         fi
         # Turn some knobs for a compiler that natively uses PRIF for multi-image features:
         # HAVE_MULTI_IMAGE : controls app/native-multi-image and prif_init testing
         # HAVE_MULTI_IMAGE_SUPPORT : force-enable Julienne's multi-image support
         if [ "${NATIVE_MULTI_IMAGE}" == true ] ; then
-          echo "FFLAGS=$FFLAGS -DHAVE_MULTI_IMAGE -DHAVE_MULTI_IMAGE_SUPPORT" >> "$GITHUB_ENV" ; \
+          echo "FFLAGS=$FFLAGS -DHAVE_MULTI_IMAGE -DHAVE_MULTI_IMAGE_SUPPORT" >> "$GITHUB_ENV"
         fi
 
     ##########################################################################
@@ -352,7 +352,7 @@ jobs:
 
     - name: Build Caffeine (install.sh)
       run: |
-        for var in FC CC CXX FFLAGS CPPFLAGS CFLAGS CXXFLAGS LDFLAGS LIBS GASNET_CONFIGURE_ARGS ; do \
+        for var in FC CC CXX FFLAGS CPPFLAGS CFLAGS CXXFLAGS LDFLAGS LIBS GASNET_CONFIGURE_ARGS ; do
             eval echo "$var=\$$var"; done
         ./install.sh --prefix=${PREFIX} ${NETWORK_ARG} --verbose
 
@@ -371,17 +371,16 @@ jobs:
     - name: Run native multi-image test
       if: ${{ env.NATIVE_MULTI_IMAGE == 'true' }}
       run: |
-        ./run-fpm.sh run --verbose 2>&1 | tee output ; \
-          test ${PIPESTATUS[0]} = 0 && \
-               ! grep -q "IEEE arithmetic exceptions signaled" output
+        ./run-fpm.sh run --verbose 2>&1 | tee output
+        ! grep -q "IEEE arithmetic exceptions signaled" output
 
     - name: Run unit tests
       run: |
-        while (( CAF_IMAGES > 0 )); do \
-          echo CAF_IMAGES=${CAF_IMAGES} ; \
-          ./run-fpm.sh test --verbose -- ; \
-          sleep 1 ; \
-          CAF_IMAGES=$(( CAF_IMAGES / 2 )) ; \
+        while (( CAF_IMAGES > 0 )); do
+          echo CAF_IMAGES=${CAF_IMAGES}
+          ./run-fpm.sh test --verbose --
+          sleep 1
+          CAF_IMAGES=$(( CAF_IMAGES / 2 ))
         done
 
     - name: Run exit/failure tests
@@ -390,27 +389,27 @@ jobs:
         ./run-fpm.sh run --verbose --example stop_with_no_code
         ( set +e ; ./run-fpm.sh run --verbose --example stop_with_integer_code ; test $? = 99 )
         ( set +e ; ./run-fpm.sh run --verbose --example error_stop_with_integer_code ; test $? = 100 )
-        ( set +e ; \
-          export CAF_IMAGES=1; \
-          ./run-fpm.sh run --verbose --example fail_image 2>&1 | tee output ; \
-          test ${PIPESTATUS[0]} > 0 && grep -q "FAIL IMAGE" output \
+        ( set +e
+          export CAF_IMAGES=1
+          ./run-fpm.sh run --verbose --example fail_image 2>&1 | tee output
+            test ${PIPESTATUS[0]} > 0 && grep -q "FAIL IMAGE" output
         )
-        ( set +e ; \
-          ./run-fpm.sh run --verbose --example out_of_memory 2>&1 | tee output ; \
-          test ${PIPESTATUS[0]} > 0 && grep -q "out of memory" output \
+        ( set +e
+          ./run-fpm.sh run --verbose --example out_of_memory 2>&1 | tee output
+            test ${PIPESTATUS[0]} > 0 && grep -q "out of memory" output
         )
-        ( set +e ; \
-          ./run-fpm.sh run --verbose --example out_of_memory -- --coarray 2>&1 | tee output ; \
-          test ${PIPESTATUS[0]} > 0 && grep -q "out of memory" output \
+        ( set +e
+          ./run-fpm.sh run --verbose --example out_of_memory -- --coarray 2>&1 | tee output
+            test ${PIPESTATUS[0]} > 0 && grep -q "out of memory" output
         )
         unset GASNET_SPAWN_VERBOSE
-        for ((i=1; i<=4; i++)); do \
-         (set +e ; \
-          ./run-fpm.sh run --verbose --example exit_case -- $i 2>&1 | tee output ; \
-          test ${PIPESTATUS[0]} = $((i + 100)) \
-            && grep -q "stdout from image $CAF_IMAGES" output \
-            && grep -q "stderr from image $CAF_IMAGES" output \
-         ) ; \
+        for ((i=1; i<=4; i++)); do
+         (set +e
+          ./run-fpm.sh run --verbose --example exit_case -- $i 2>&1 | tee output
+            test ${PIPESTATUS[0]} = $((i + 100))
+            grep -q "stdout from image $CAF_IMAGES" output
+            grep -q "stderr from image $CAF_IMAGES" output
+         )
         done
 
     - name: Add Linux Brew to PATH
@@ -424,7 +423,7 @@ jobs:
 
     - name: Build and Test Caffeine (thread-safe)
       run: |
-        for var in FC CC CXX FFLAGS CPPFLAGS CFLAGS LDFLAGS LIBS GASNET_CONFIGURE_ARGS ; do \
+        for var in FC CC CXX FFLAGS CPPFLAGS CFLAGS LDFLAGS LIBS GASNET_CONFIGURE_ARGS ; do
             eval echo "$var=\$$var"; done
         ./install.sh --prefix=${PREFIX} ${NETWORK_ARG} --enable-threads --verbose
         ./run-fpm.sh test --verbose --
