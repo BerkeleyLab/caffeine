@@ -16,7 +16,7 @@ concurrency:
 
 defaults:
   run:
-    shell: bash
+    shell: bash --noprofile --norc -e -x -o pipefail {0}
 
 jobs:
   setup: # establish default configuration values, independent of repo/org
@@ -199,14 +199,12 @@ jobs:
     - name: Install Ubuntu Container Dependencies
       if: ${{ contains(matrix.os, 'ubuntu') && matrix.container != '' && !contains(matrix.container, 'phhargrove') }}
       run: |
-        set -x
         apt update
         apt install -y build-essential pkg-config make git curl
 
     - name: Install Ubuntu Native Dependencies
       if: ${{ contains(matrix.os, 'ubuntu') && matrix.container == '' && !matrix.brew_via_install }}
       run: |
-        set -x
         sudo apt update
         sudo apt install -y build-essential pkg-config make
         if [[ ${COMPILER_VERSION} < 15 ]] ; then \
@@ -231,7 +229,6 @@ jobs:
     - name: Install macOS Dependencies
       if: ${{ contains(matrix.os, 'macos') && !matrix.brew_via_install }}
       run: |
-        set -x
         brew update
         # fpm binary distribution for macOS requires gfortran shared libraries from gcc@12
         brew install gcc@12
@@ -239,7 +236,6 @@ jobs:
     - name: Install LLVM flang on macOS
       if: ${{ contains(matrix.os, 'macos') && matrix.compiler == 'flang' && !matrix.brew_via_install }}
       run: |
-        set -x
         brew install llvm@${COMPILER_VERSION} flang
         # Prepend homebrew clang to PATH:
         echo "PATH=$(brew --prefix)/opt/llvm/bin:${PATH}" >> "$GITHUB_ENV"
@@ -254,7 +250,6 @@ jobs:
     - name: Build FPM
       if: false
       run: |
-        set -x
         export FPM_VERSION=0.12.0
         curl --retry 5 -LOsS https://github.com/fortran-lang/fpm/releases/download/v$FPM_VERSION/fpm-$FPM_VERSION.F90
         mkdir fpm-temp
@@ -267,7 +262,6 @@ jobs:
     - name: Set gfortran variables
       if: matrix.compiler == 'gfortran'
       run: |
-        set -x
         echo "FC=gfortran-${COMPILER_VERSION}" >> "$GITHUB_ENV"
         echo "CC=gcc-${COMPILER_VERSION}" >> "$GITHUB_ENV"
         echo "CXX=g++-${COMPILER_VERSION}" >> "$GITHUB_ENV"
@@ -279,7 +273,6 @@ jobs:
     - name: Set flang variables
       if: ${{ matrix.compiler == 'flang' }}
       run: |
-        set -x
         if [ -z "${{ matrix.brew_via_install }}" ] ; then
           echo "FC=flang-new" >> "$GITHUB_ENV" 
           echo "CC=clang" >> "$GITHUB_ENV"
@@ -292,7 +285,6 @@ jobs:
     - name: Setup lfortran dependencies and variables
       if: ${{ matrix.compiler == 'lfortran' }}
       run: |
-        set -x
         apt update
         apt install -y llvm clang
         if [ ${{ contains(matrix.container, 'ghcr.io/lfortran') }} = true ]; then
@@ -312,7 +304,6 @@ jobs:
 
     - name: Set Caffeine variables
       run: |
-        set -x
         # docker instances cannot handle high levels of subjob parallelism
         if test -n "${{ matrix.container }}"; then \
           echo "SUBJOB_PREFIX=CAF_IMAGES=2" >> "$GITHUB_ENV" ; \
@@ -333,6 +324,7 @@ jobs:
 
     - name: Version info (pre-build)
       run: |
+        set +x
         echo == TOOL VERSIONS ==
         echo Platform version info:
         uname -a
@@ -362,7 +354,6 @@ jobs:
       run: |
         for var in FC CC CXX FFLAGS CPPFLAGS CFLAGS CXXFLAGS LDFLAGS LIBS GASNET_CONFIGURE_ARGS ; do \
             eval echo "$var=\$$var"; done
-        set -x
         ./install.sh --prefix=${PREFIX} ${NETWORK_ARG} --verbose
 
     ##########################################################################
@@ -375,22 +366,20 @@ jobs:
     - name: Run examples
       run: |
         echo CAF_IMAGES=${CAF_IMAGES}
-        set -x
         ./run-fpm.sh run --verbose --example hello
 
     - name: Run native multi-image test
       if: ${{ env.NATIVE_MULTI_IMAGE == 'true' }}
       run: |
-        set -x ; ./run-fpm.sh run --verbose 2>&1 | tee output ; \
+        ./run-fpm.sh run --verbose 2>&1 | tee output ; \
           test ${PIPESTATUS[0]} = 0 && \
                ! grep -q "IEEE arithmetic exceptions signaled" output
 
     - name: Run unit tests
       run: |
-        echo SUBJOB_PREFIX=${SUBJOB_PREFIX}
         while (( CAF_IMAGES > 0 )); do \
           echo CAF_IMAGES=${CAF_IMAGES} ; \
-          ( set -x ; ./run-fpm.sh test --verbose -- ) ; \
+          ./run-fpm.sh test --verbose -- ; \
           sleep 1 ; \
           CAF_IMAGES=$(( CAF_IMAGES / 2 )) ; \
         done
@@ -398,7 +387,6 @@ jobs:
     - name: Run exit/failure tests
       run: |
         echo CAF_IMAGES=${CAF_IMAGES}
-        set -x
         ./run-fpm.sh run --verbose --example stop_with_no_code
         ( set +e ; ./run-fpm.sh run --verbose --example stop_with_integer_code ; test $? = 99 )
         ( set +e ; ./run-fpm.sh run --verbose --example error_stop_with_integer_code ; test $? = 100 )
@@ -428,7 +416,6 @@ jobs:
     - name: Add Linux Brew to PATH
       if: ${{ contains(matrix.os, 'ubuntu') && matrix.brew_via_install }}
       run: |
-        set -x
         # the first install.sh command established Linux Brew, so add it to the
         # PATH to prevent pointless overwrites in the second install.sh below
         HOMEBREW_PREFIX="/home/linuxbrew/.linuxbrew"
@@ -439,7 +426,6 @@ jobs:
       run: |
         for var in FC CC CXX FFLAGS CPPFLAGS CFLAGS LDFLAGS LIBS GASNET_CONFIGURE_ARGS ; do \
             eval echo "$var=\$$var"; done
-        set -x
         ./install.sh --prefix=${PREFIX} ${NETWORK_ARG} --enable-threads --verbose
         ./run-fpm.sh test --verbose --
 
