@@ -8,10 +8,33 @@ on:
       - '**.md'
   pull_request:
     paths-ignore: *paths_ignore
+  workflow_dispatch:
+    inputs:
+      fflags:
+        description: 'Additional FFLAGS'
+        type: string
+        required: false
+      cflags:
+        description: 'Additional CFLAGS'
+        type: string
+        required: false
+      install_args:
+        description: 'Additional install/configure args'
+        type: string
+        required: false
+      julienne_args:
+        description: 'Additional Julienne driver args'
+        type: string
+        required: false
+      env_vars:
+        description: 'Environment variable settings'
+        type: string
+        default: 'GASNET_VERBOSEENV=1 CAF_HEAP_SIZE=128MB'
+        required: false
 
 concurrency:
   # De-duplicate concurrent workflow runs on the same branch/ref
-  group: ${{ github.workflow }}-${{ github.head_ref || github.ref_name }}
+  group: ${{ github.workflow }}-${{ github.head_ref || github.ref_name }}-${{ ( github.event_name == 'workflow_dispatch' && github.run_id ) || 'auto' }}
   cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
 
 defaults:
@@ -179,7 +202,8 @@ jobs:
       NATIVE_MULTI_IMAGE: ${{ matrix.native_multi_image || 
           ( matrix.compiler == 'flang' && ( ! matrix.version || matrix.version >= 22 || matrix.version == 'latest' ) ) 
         }}
-      FFLAGS: ${{ matrix.FFLAGS }}
+      FFLAGS: ${{ matrix.FFLAGS }} ${{ inputs.fflags }}
+      CFLAGS: ${{ matrix.CFLAGS }} ${{ inputs.cflags }}
       PREFIX: install
       NETWORK_ARG: ${{ matrix.network && format('--network={0}',matrix.network) || '' }}
       CURL_OPTIONS: -L --retry 10 --retry-all-errors --fail 
@@ -319,6 +343,13 @@ jobs:
           echo "FFLAGS=$FFLAGS -DHAVE_MULTI_IMAGE -DHAVE_MULTI_IMAGE_SUPPORT" >> "$GITHUB_ENV"
         fi
 
+    - name: Set Workflow Dispatch Environment
+      if: github.event_name == 'workflow_dispatch'
+      run: |
+        for setting in ${{ inputs.env_vars }}; do
+          echo $setting >> "$GITHUB_ENV"
+        done
+
     ##########################################################################
     # Caffeine Install
 
@@ -354,7 +385,7 @@ jobs:
       run: |
         for var in FC CC CXX FFLAGS CPPFLAGS CFLAGS CXXFLAGS LDFLAGS LIBS GASNET_CONFIGURE_ARGS ; do
             eval echo "$var=\$$var"; done
-        ./install.sh --prefix=${PREFIX} ${NETWORK_ARG} --verbose
+        ./install.sh --prefix=${PREFIX} ${NETWORK_ARG} --verbose ${{ inputs.install_args }}
 
     ##########################################################################
     # Caffeine Testing
@@ -378,7 +409,7 @@ jobs:
       run: |
         while (( CAF_IMAGES > 0 )); do
           echo CAF_IMAGES=${CAF_IMAGES}
-          ./run-fpm.sh test --verbose --
+          ./run-fpm.sh test --verbose -- ${{ inputs.julienne_args }}
           sleep 1
           CAF_IMAGES=$(( CAF_IMAGES / 2 ))
         done
@@ -426,5 +457,5 @@ jobs:
         for var in FC CC CXX FFLAGS CPPFLAGS CFLAGS LDFLAGS LIBS GASNET_CONFIGURE_ARGS ; do
             eval echo "$var=\$$var"; done
         ./install.sh --prefix=${PREFIX} ${NETWORK_ARG} --enable-threads --verbose
-        ./run-fpm.sh test --verbose --
+        ./run-fpm.sh test --verbose -- ${{ inputs.julienne_args }}
 
