@@ -28,4 +28,9 @@ contains
       ! and eliminate the calculation of num_elements*sizeof(a) in caffeine.c.
   end subroutine
 
+  module procedure prif_co_broadcast_cptr
+    call_assert(source_image >= 1 .and. source_image <= current_team%info%num_images)
+    if (present(stat)) stat=0
+    call caf_co_broadcast_cptr(a_ptr, source_image, size_in_bytes, current_team%info%gex_team)
+  end procedure
 end submodule co_broadcast_s

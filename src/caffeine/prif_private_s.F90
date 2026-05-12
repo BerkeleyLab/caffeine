@@ -301,6 +301,16 @@ submodule(prif) prif_private_s
        type(c_ptr), value :: team
      end subroutine
 
+     subroutine caf_co_broadcast_cptr(a_ptr, source_image, nbytes, team) bind(C)
+       !! void caf_co_broadcast_cptr(void *a_ptr, int source_image, size_t nbytes, gex_TM_t team)
+       import c_int, c_ptr, c_size_t
+       implicit none
+       type(c_ptr), value :: a_ptr
+       integer(c_int), value :: source_image
+       integer(c_size_t), value :: nbytes
+       type(c_ptr), value :: team
+     end subroutine
+
      subroutine caf_co_reduce(a, result_image, num_elements, op_wrapper, client_data, team) bind(C)
        !! void caf_co_reduce(CFI_cdesc_t* a_desc, int result_image, size_t num_elements, gex_Coll_ReduceFn_t op_wrapper, void* client_data, gex_TM_t team)
        import c_int, c_ptr, c_size_t, c_funptr
