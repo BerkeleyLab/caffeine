@@ -8,15 +8,38 @@ on:
       - '**.md'
   pull_request:
     paths-ignore: *paths_ignore
+  workflow_dispatch:
+    inputs:
+      fflags:
+        description: 'Additional FFLAGS'
+        type: string
+        required: false
+      cflags:
+        description: 'Additional CFLAGS'
+        type: string
+        required: false
+      install_args:
+        description: 'Additional install/configure args'
+        type: string
+        required: false
+      julienne_args:
+        description: 'Additional Julienne driver args'
+        type: string
+        required: false
+      env_vars:
+        description: 'Environment variable settings'
+        type: string
+        default: 'GASNET_VERBOSEENV=1 CAF_HEAP_SIZE=128MB'
+        required: false
 
 concurrency:
   # De-duplicate concurrent workflow runs on the same branch/ref
-  group: ${{ github.workflow }}-${{ github.head_ref || github.ref_name }}
+  group: ${{ github.workflow }}-${{ github.head_ref || github.ref_name }}-${{ ( github.event_name == 'workflow_dispatch' && github.run_id ) || 'auto' }}
   cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
 
 defaults:
   run:
-    shell: bash
+    shell: bash --noprofile --norc -e -x -o pipefail {0}
 
 jobs:
   setup: # establish default configuration values, independent of repo/org
@@ -179,7 +202,8 @@ jobs:
       NATIVE_MULTI_IMAGE: ${{ matrix.native_multi_image || 
           ( matrix.compiler == 'flang' && ( ! matrix.version || matrix.version >= 22 || matrix.version == 'latest' ) ) 
         }}
-      FFLAGS: ${{ matrix.FFLAGS }}
+      FFLAGS: ${{ matrix.FFLAGS }} ${{ inputs.fflags }}
+      CFLAGS: ${{ matrix.CFLAGS }} ${{ inputs.cflags }}
       PREFIX: install
       NETWORK_ARG: ${{ matrix.network && format('--network={0}',matrix.network) || '' }}
       CURL_OPTIONS: -L --retry 10 --retry-all-errors --fail 
@@ -199,39 +223,36 @@ jobs:
     - name: Install Ubuntu Container Dependencies
       if: ${{ contains(matrix.os, 'ubuntu') && matrix.container != '' && !contains(matrix.container, 'phhargrove') }}
       run: |
-        set -x
         apt update
         apt install -y build-essential pkg-config make git curl
 
     - name: Install Ubuntu Native Dependencies
       if: ${{ contains(matrix.os, 'ubuntu') && matrix.container == '' && !matrix.brew_via_install }}
       run: |
-        set -x
         sudo apt update
         sudo apt install -y build-essential pkg-config make
-        if [[ ${COMPILER_VERSION} < 15 ]] ; then \
-          sudo apt install -y gfortran-${COMPILER_VERSION} g++-${COMPILER_VERSION} ; \
-        else \
-          curl $CURL_OPTIONS https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh -o install-homebrew.sh ; \
-          chmod +x install-homebrew.sh ; \
-          env CI=1 ./install-homebrew.sh ; \
-          HOMEBREW_PREFIX="/home/linuxbrew/.linuxbrew" ; \
-          ${HOMEBREW_PREFIX}/bin/brew install -v gcc@${COMPILER_VERSION} binutils ; \
-          ls -al ${HOMEBREW_PREFIX}/bin ; \
-          echo "PATH=${HOMEBREW_PREFIX}/bin:${PATH}" >> "$GITHUB_ENV" ; \
-          : Homebrew GCC@15 needs binutils 2.44+ ; \
-          HOMEBREW_BINUTILS=$(ls -d ${HOMEBREW_PREFIX}/Cellar/binutils/2.*/bin ) ; \
-          ls -al ${HOMEBREW_BINUTILS} ; \
-          echo "FFLAGS=${FFLAGS:+"$FFLAGS" }-B ${HOMEBREW_BINUTILS}" >> "$GITHUB_ENV" ; \
-          echo "CFLAGS=${CFLAGS:+"$CFLAGS" }-B ${HOMEBREW_BINUTILS}" >> "$GITHUB_ENV" ; \
-          echo "CXXFLAGS=${CXXFLAGS:+"$CXXFLAGS" }-B ${HOMEBREW_BINUTILS}" >> "$GITHUB_ENV" ; \
-          echo "LDFLAGS=${LDFLAGS:+"$LDFLAGS" }-B ${HOMEBREW_BINUTILS}" >> "$GITHUB_ENV" ; \
+        if [[ ${COMPILER_VERSION} < 15 ]] ; then
+          sudo apt install -y gfortran-${COMPILER_VERSION} g++-${COMPILER_VERSION}
+        else
+          curl $CURL_OPTIONS https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh -o install-homebrew.sh
+          chmod +x install-homebrew.sh
+          env CI=1 ./install-homebrew.sh
+          HOMEBREW_PREFIX="/home/linuxbrew/.linuxbrew"
+          ${HOMEBREW_PREFIX}/bin/brew install -v gcc@${COMPILER_VERSION} binutils
+          ls -al ${HOMEBREW_PREFIX}/bin
+          echo "PATH=${HOMEBREW_PREFIX}/bin:${PATH}" >> "$GITHUB_ENV"
+          : Homebrew GCC@15 needs binutils 2.44+
+          HOMEBREW_BINUTILS=$(ls -d ${HOMEBREW_PREFIX}/Cellar/binutils/2.*/bin )
+          ls -al ${HOMEBREW_BINUTILS}
+          echo "FFLAGS=${FFLAGS:+"$FFLAGS" }-B ${HOMEBREW_BINUTILS}" >> "$GITHUB_ENV"
+          echo "CFLAGS=${CFLAGS:+"$CFLAGS" }-B ${HOMEBREW_BINUTILS}" >> "$GITHUB_ENV"
+          echo "CXXFLAGS=${CXXFLAGS:+"$CXXFLAGS" }-B ${HOMEBREW_BINUTILS}" >> "$GITHUB_ENV"
+          echo "LDFLAGS=${LDFLAGS:+"$LDFLAGS" }-B ${HOMEBREW_BINUTILS}" >> "$GITHUB_ENV"
         fi
 
     - name: Install macOS Dependencies
       if: ${{ contains(matrix.os, 'macos') && !matrix.brew_via_install }}
       run: |
-        set -x
         brew update
         # fpm binary distribution for macOS requires gfortran shared libraries from gcc@12
         brew install gcc@12
@@ -239,7 +260,6 @@ jobs:
     - name: Install LLVM flang on macOS
       if: ${{ contains(matrix.os, 'macos') && matrix.compiler == 'flang' && !matrix.brew_via_install }}
       run: |
-        set -x
         brew install llvm@${COMPILER_VERSION} flang
         # Prepend homebrew clang to PATH:
         echo "PATH=$(brew --prefix)/opt/llvm/bin:${PATH}" >> "$GITHUB_ENV"
@@ -254,7 +274,6 @@ jobs:
     - name: Build FPM
       if: false
       run: |
-        set -x
         export FPM_VERSION=0.12.0
         curl --retry 5 -LOsS https://github.com/fortran-lang/fpm/releases/download/v$FPM_VERSION/fpm-$FPM_VERSION.F90
         mkdir fpm-temp
@@ -267,19 +286,17 @@ jobs:
     - name: Set gfortran variables
       if: matrix.compiler == 'gfortran'
       run: |
-        set -x
         echo "FC=gfortran-${COMPILER_VERSION}" >> "$GITHUB_ENV"
         echo "CC=gcc-${COMPILER_VERSION}" >> "$GITHUB_ENV"
         echo "CXX=g++-${COMPILER_VERSION}" >> "$GITHUB_ENV"
         # XCode 26 / gfortran bug workaround
-        if [[ ${{ matrix.os }} =~ macos-26 ]] ; then \
-          echo "GASNET_CONFIGURE_ARGS=$GASNET_CONFIGURE_ARGS --enable-force-posix-realtime" >> "$GITHUB_ENV" ; \
+        if [[ ${{ matrix.os }} =~ macos-26 ]] ; then
+          echo "GASNET_CONFIGURE_ARGS=$GASNET_CONFIGURE_ARGS --enable-force-posix-realtime" >> "$GITHUB_ENV"
         fi
 
     - name: Set flang variables
       if: ${{ matrix.compiler == 'flang' }}
       run: |
-        set -x
         if [ -z "${{ matrix.brew_via_install }}" ] ; then
           echo "FC=flang-new" >> "$GITHUB_ENV" 
           echo "CC=clang" >> "$GITHUB_ENV"
@@ -292,7 +309,6 @@ jobs:
     - name: Setup lfortran dependencies and variables
       if: ${{ matrix.compiler == 'lfortran' }}
       run: |
-        set -x
         apt update
         apt install -y llvm clang
         if [ ${{ contains(matrix.container, 'ghcr.io/lfortran') }} = true ]; then
@@ -312,27 +328,34 @@ jobs:
 
     - name: Set Caffeine variables
       run: |
-        set -x
         # docker instances cannot handle high levels of subjob parallelism
-        if test -n "${{ matrix.container }}"; then \
-          echo "SUBJOB_PREFIX=CAF_IMAGES=2" >> "$GITHUB_ENV" ; \
+        if test -n "${{ matrix.container }}"; then
+          echo "SUBJOB_PREFIX=CAF_IMAGES=2" >> "$GITHUB_ENV"
         fi
         # disable shared-memory bypass with network=udp to simulate multi-node runs
-        if test "${{ matrix.network }}" = "udp"; then \
-          echo "GASNET_SUPERNODE_MAXSIZE=1" >> "$GITHUB_ENV" ; \
+        if test "${{ matrix.network }}" = "udp"; then
+          echo "GASNET_SUPERNODE_MAXSIZE=1" >> "$GITHUB_ENV"
         fi
         # Turn some knobs for a compiler that natively uses PRIF for multi-image features:
         # HAVE_MULTI_IMAGE : controls app/native-multi-image and prif_init testing
         # HAVE_MULTI_IMAGE_SUPPORT : force-enable Julienne's multi-image support
         if [ "${NATIVE_MULTI_IMAGE}" == true ] ; then
-          echo "FFLAGS=$FFLAGS -DHAVE_MULTI_IMAGE -DHAVE_MULTI_IMAGE_SUPPORT" >> "$GITHUB_ENV" ; \
+          echo "FFLAGS=$FFLAGS -DHAVE_MULTI_IMAGE -DHAVE_MULTI_IMAGE_SUPPORT" >> "$GITHUB_ENV"
         fi
+
+    - name: Set Workflow Dispatch Environment
+      if: github.event_name == 'workflow_dispatch'
+      run: |
+        for setting in ${{ inputs.env_vars }}; do
+          echo $setting >> "$GITHUB_ENV"
+        done
 
     ##########################################################################
     # Caffeine Install
 
     - name: Version info (pre-build)
       run: |
+        set +x
         echo == TOOL VERSIONS ==
         echo Platform version info:
         uname -a
@@ -360,10 +383,9 @@ jobs:
 
     - name: Build Caffeine (install.sh)
       run: |
-        for var in FC CC CXX FFLAGS CPPFLAGS CFLAGS CXXFLAGS LDFLAGS LIBS GASNET_CONFIGURE_ARGS ; do \
+        for var in FC CC CXX FFLAGS CPPFLAGS CFLAGS CXXFLAGS LDFLAGS LIBS GASNET_CONFIGURE_ARGS ; do
             eval echo "$var=\$$var"; done
-        set -x
-        ./install.sh --prefix=${PREFIX} ${NETWORK_ARG} --verbose
+        ./install.sh --prefix=${PREFIX} ${NETWORK_ARG} --verbose ${{ inputs.install_args }}
 
     ##########################################################################
     # Caffeine Testing
@@ -375,60 +397,55 @@ jobs:
     - name: Run examples
       run: |
         echo CAF_IMAGES=${CAF_IMAGES}
-        set -x
         ./run-fpm.sh run --verbose --example hello
 
     - name: Run native multi-image test
       if: ${{ env.NATIVE_MULTI_IMAGE == 'true' }}
       run: |
-        set -x ; ./run-fpm.sh run --verbose 2>&1 | tee output ; \
-          test ${PIPESTATUS[0]} = 0 && \
-               ! grep -q "IEEE arithmetic exceptions signaled" output
+        ./run-fpm.sh run --verbose 2>&1 | tee output
+        ! grep -q "IEEE arithmetic exceptions signaled" output
 
     - name: Run unit tests
       run: |
-        echo SUBJOB_PREFIX=${SUBJOB_PREFIX}
-        while (( CAF_IMAGES > 0 )); do \
-          echo CAF_IMAGES=${CAF_IMAGES} ; \
-          ( set -x ; ./run-fpm.sh test --verbose -- ) ; \
-          sleep 1 ; \
-          CAF_IMAGES=$(( CAF_IMAGES / 2 )) ; \
+        while (( CAF_IMAGES > 0 )); do
+          echo CAF_IMAGES=${CAF_IMAGES}
+          ./run-fpm.sh test --verbose -- ${{ inputs.julienne_args }}
+          sleep 1
+          CAF_IMAGES=$(( CAF_IMAGES / 2 ))
         done
 
     - name: Run exit/failure tests
       run: |
         echo CAF_IMAGES=${CAF_IMAGES}
-        set -x
         ./run-fpm.sh run --verbose --example stop_with_no_code
         ( set +e ; ./run-fpm.sh run --verbose --example stop_with_integer_code ; test $? = 99 )
         ( set +e ; ./run-fpm.sh run --verbose --example error_stop_with_integer_code ; test $? = 100 )
-        ( set +e ; \
-          export CAF_IMAGES=1; \
-          ./run-fpm.sh run --verbose --example fail_image 2>&1 | tee output ; \
-          test ${PIPESTATUS[0]} > 0 && grep -q "FAIL IMAGE" output \
+        ( set +e
+          export CAF_IMAGES=1
+          ./run-fpm.sh run --verbose --example fail_image 2>&1 | tee output
+            test ${PIPESTATUS[0]} > 0 && grep -q "FAIL IMAGE" output
         )
-        ( set +e ; \
-          ./run-fpm.sh run --verbose --example out_of_memory 2>&1 | tee output ; \
-          test ${PIPESTATUS[0]} > 0 && grep -q "out of memory" output \
+        ( set +e
+          ./run-fpm.sh run --verbose --example out_of_memory 2>&1 | tee output
+            test ${PIPESTATUS[0]} > 0 && grep -q "out of memory" output
         )
-        ( set +e ; \
-          ./run-fpm.sh run --verbose --example out_of_memory -- --coarray 2>&1 | tee output ; \
-          test ${PIPESTATUS[0]} > 0 && grep -q "out of memory" output \
+        ( set +e
+          ./run-fpm.sh run --verbose --example out_of_memory -- --coarray 2>&1 | tee output
+            test ${PIPESTATUS[0]} > 0 && grep -q "out of memory" output
         )
         unset GASNET_SPAWN_VERBOSE
-        for ((i=1; i<=4; i++)); do \
-         (set +e ; \
-          ./run-fpm.sh run --verbose --example exit_case -- $i 2>&1 | tee output ; \
-          test ${PIPESTATUS[0]} = $((i + 100)) \
-            && grep -q "stdout from image $CAF_IMAGES" output \
-            && grep -q "stderr from image $CAF_IMAGES" output \
-         ) ; \
+        for ((i=1; i<=4; i++)); do
+         (set +e
+          ./run-fpm.sh run --verbose --example exit_case -- $i 2>&1 | tee output
+            test ${PIPESTATUS[0]} = $((i + 100))
+            grep -q "stdout from image $CAF_IMAGES" output
+            grep -q "stderr from image $CAF_IMAGES" output
+         )
         done
 
     - name: Add Linux Brew to PATH
       if: ${{ contains(matrix.os, 'ubuntu') && matrix.brew_via_install }}
       run: |
-        set -x
         # the first install.sh command established Linux Brew, so add it to the
         # PATH to prevent pointless overwrites in the second install.sh below
         HOMEBREW_PREFIX="/home/linuxbrew/.linuxbrew"
@@ -437,9 +454,8 @@ jobs:
 
     - name: Build and Test Caffeine (thread-safe)
       run: |
-        for var in FC CC CXX FFLAGS CPPFLAGS CFLAGS LDFLAGS LIBS GASNET_CONFIGURE_ARGS ; do \
+        for var in FC CC CXX FFLAGS CPPFLAGS CFLAGS LDFLAGS LIBS GASNET_CONFIGURE_ARGS ; do
             eval echo "$var=\$$var"; done
-        set -x
         ./install.sh --prefix=${PREFIX} ${NETWORK_ARG} --enable-threads --verbose
-        ./run-fpm.sh test --verbose --
+        ./run-fpm.sh test --verbose -- ${{ inputs.julienne_args }}
 
