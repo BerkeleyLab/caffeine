@@ -210,7 +210,7 @@ contains
 
 #if CAF_PRIF_VERSION < 8
   subroutine coarray_cleanup_simple(handle , stat, errmsg) bind(C)
-    type(prif_coarray_handle), value, intent(in) :: handle
+    type(prif_coarray_handle), pointer, intent(in) :: handle
     integer(c_int), intent(out) :: stat
     character(kind=c_char,len=:), intent(out), allocatable :: errmsg
 #else
@@ -228,7 +228,7 @@ contains
 
 #if CAF_PRIF_VERSION < 8
   subroutine coarray_cleanup_first_error(handle , stat, errmsg) bind(C)
-    type(prif_coarray_handle), value, intent(in) :: handle
+    type(prif_coarray_handle), pointer, intent(in) :: handle
     integer(c_int), intent(out) :: stat
     character(kind=c_char,len=:), intent(out), allocatable :: errmsg
 
