@@ -27,9 +27,9 @@ on:
         type: string
         required: false
       env_vars:
-        description: 'Environment variable settings'
+        description: 'Environment vars: k1=v1 k2=v2'
         type: string
-        default: 'GASNET_VERBOSEENV=1 CAF_HEAP_SIZE=128MB'
+        default: ''
         required: false
 
 concurrency:
