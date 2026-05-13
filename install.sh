@@ -403,7 +403,7 @@ if ! $PKG_CONFIG $pkg ; then
   exit_if_user_declines "GASNet-EX"
 
   GASNET_TAR_FILE="$DEPENDENCIES_DIR/GASNet-$GASNET_VERSION.tar.gz"
-  GASNET_SOURCE_URL="https://bitbucket.org/berkeleylab/gasnet/downloads/GASNet-$GASNET_VERSION.tar.gz"
+  GASNET_SOURCE_URL="https://github.com/BerkeleyLab/gasnet/releases/download/gex-$GASNET_VERSION/GASNet-$GASNET_VERSION.tar.gz"
   if [ ! -d $DEPENDENCIES_DIR ]; then
     mkdir -pv $DEPENDENCIES_DIR
   fi
