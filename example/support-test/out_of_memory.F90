@@ -1,5 +1,4 @@
 program out_of_memory
-# include "../../test/test-uses-alloc.F90"
   use unit_test_parameters_m, only: null_final_proc
   use iso_c_binding, only: c_bool, c_size_t, c_ptr, c_int64_t
   use prif

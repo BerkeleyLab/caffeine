@@ -35,7 +35,7 @@ module prif_allocate_test_m
 #if CAF_PRIF_VERSION >= 8
   interface
     subroutine coarray_cleanup_simple_c(handle) bind(C)
-      import c_int, c_char, prif_coarray_handle
+      import prif_coarray_handle
       type(prif_coarray_handle), value, intent(in) :: handle
     end subroutine
   end interface
