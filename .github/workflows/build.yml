@@ -27,9 +27,9 @@ on:
         type: string
         required: false
       env_vars:
-        description: 'Environment variable settings'
+        description: 'Environment vars: k1=v1 k2=v2'
         type: string
-        default: 'GASNET_VERBOSEENV=1 CAF_HEAP_SIZE=128MB'
+        default: ''
         required: false
 
 concurrency:
@@ -196,6 +196,7 @@ jobs:
 
     container:
       image: ${{ matrix.container }}
+      options: --shm-size=2gb
 
     env:
       COMPILER_VERSION: ${{ matrix.version || needs.setup.outputs.BREW_FLANG_VERSION }}
@@ -361,6 +362,7 @@ jobs:
         uname -a
         if test -r /etc/os-release ; then grep -e NAME -e VERSION /etc/os-release  ; fi
         if test -x /usr/bin/sw_vers ; then /usr/bin/sw_vers ; fi
+        if test -d /dev/shm ; then df -h /dev/shm ; fi
         echo
         echo PATH="$PATH"
         for tool in ${FC} ${CC} ${CXX} fpm ; do
