@@ -37,7 +37,7 @@ contains
   module procedure prif_end_team
     type(prif_coarray_handle), allocatable :: teams_coarrays(:)
     integer :: num_coarrays_in_team, i
-    type(prif_coarray_descriptor), pointer :: tmp_data
+    type(prif_coarray_descriptor), pointer :: cdp
 
     call_assert(team_check(current_team))
     call_assert_describe(associated(current_team%info%parent_team), "Invalid END TEAM from the initial team.")
@@ -46,18 +46,23 @@ contains
     ! Currently we work to batch together all the deallocations into a single call
     ! to prif_deallocate_coarray(), in the hope it can amortize some costs
     num_coarrays_in_team = 0
-    tmp_data => current_team%info%coarrays
-    do while (associated(tmp_data))
+    cdp => current_team%info%coarrays
+    do while (associated(cdp))
       num_coarrays_in_team = num_coarrays_in_team + 1
-      call c_f_pointer(tmp_data%next_handle, tmp_data)
+      if (c_associated(cdp%next_handle)) then
+        call c_f_pointer(cdp%next_handle, cdp)
+      else
+        exit
+      end if
     end do
     if (num_coarrays_in_team > 0) then
       allocate(teams_coarrays(num_coarrays_in_team))
-      tmp_data => current_team%info%coarrays
-      do i = 1, num_coarrays_in_team
-        teams_coarrays(i)%info => tmp_data
-        call c_f_pointer(tmp_data%next_handle, tmp_data)
+      cdp => current_team%info%coarrays
+      do i = 1, num_coarrays_in_team-1
+        teams_coarrays(i)%info = c_loc(cdp)
+        call c_f_pointer(cdp%next_handle, cdp)
       end do
+      teams_coarrays(num_coarrays_in_team)%info = c_loc(cdp)
 #if CAF_PRIF_VERSION <= 6
       call prif_deallocate_coarray &
 #else

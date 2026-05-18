@@ -2,7 +2,8 @@
 
 module prif_types_test_m
     use iso_fortran_env, only: int8
-    use prif, only: prif_team_type, prif_event_type, prif_notify_type, prif_lock_type, prif_critical_type
+    use iso_c_binding, only: c_ptr
+    use prif, only: prif_team_type, prif_event_type, prif_notify_type, prif_lock_type, prif_critical_type, prif_coarray_handle
     use julienne_m, only: test_description_t, test_diagnosis_t, test_result_t, test_t, string_t, usher &
        ,operator(.all.), operator(.also.), operator(.equalsExpected.), operator(.greaterThan.), operator(.isAtMost.), operator(//)
 
@@ -28,6 +29,11 @@ module prif_types_test_m
       type(dummy_t), pointer :: info => null()
     end type
 
+    type :: cptr_wrapper_t
+      private
+      type(c_ptr) :: info
+    end type
+
 contains
     pure function subject()
       character(len=:), allocatable :: subject
@@ -44,6 +50,7 @@ contains
           , test_description_t("having a compliant prif_lock_type representation", usher(check_lock_type)) &
           , test_description_t("having a compliant prif_notify_type representation", usher(check_notify_type)) &
           , test_description_t("having a compliant prif_critical_type representation", usher(check_critical_type)) &
+          , test_description_t("having a compliant prif_coarray_handle representation", usher(check_coarray_handle)) &
       ]))
     end function
 
@@ -138,6 +145,17 @@ contains
         allocate(bytes(64))
         bytes = transfer(critical, bytes)
         ALSO2(.all.(int(bytes) .equalsExpected. 0), "default initialization to zero")
+    end function
+
+    function check_coarray_handle() result(diag)
+        type(test_diagnosis_t) :: diag
+        type(prif_coarray_handle) :: handle
+        type(cptr_wrapper_t) :: cptr_wrap
+
+        diag = .true.
+
+        ! size check
+        ALSO(storage_size(handle) .equalsExpected. storage_size(cptr_wrap))
     end function
 
 end module prif_types_test_m

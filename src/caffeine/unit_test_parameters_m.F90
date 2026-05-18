@@ -1,8 +1,14 @@
 ! Copyright (c), The Regents of the University
 ! Terms of use are as specified in LICENSE.txt
+
+#include "version.h"
+
 module unit_test_parameters_m
-  use iso_c_binding, only: c_int
+  use iso_c_binding, only: c_int, c_funptr, c_null_funptr
   use prif, only: prif_sync_all, prif_this_image_no_coarray
+#if CAF_PRIF_VERSION >= 8
+  use prif, only: prif_coarray_cleanup_interface
+#endif
   !! Define values and utilities for consistent use throughout the test suite
   implicit none
 
@@ -14,7 +20,21 @@ module unit_test_parameters_m
   character(len=:), allocatable :: subjob_prefix
   character(len=:), allocatable :: fpm_driver
 
+#if CAF_PRIF_VERSION >= 8
+  procedure(prif_coarray_cleanup_interface), pointer :: null_final_proc => NULL()
+#else
+  type(c_funptr) :: null_final_proc = c_null_funptr
+#endif
+
 contains
+
+#if CAF_PRIF_VERSION >= 8
+  function final_proc_usher(fp) result(res)
+    procedure(prif_coarray_cleanup_interface) :: fp
+    procedure(prif_coarray_cleanup_interface), pointer :: res
+    res => fp
+  end function
+#endif
 
   ! Retrieve an environment parameter or its default value
   subroutine getenv_withdefault(key, default, result)
