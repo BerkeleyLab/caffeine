@@ -3,6 +3,35 @@
 
 #include "assert_macros.h"
 
+module prif_co_min_helper
+  !! F23 C1807: bind(c) callbacks written in Fortran must appear in a top-level module
+  use iso_c_binding, only: c_ptr, c_size_t, c_char, c_f_pointer
+  implicit none
+
+contains
+
+  subroutine char_min_wrapper(arg1, arg2_and_out, count, cdata) bind(C)
+    type(c_ptr), intent(in), value :: arg1, arg2_and_out
+    integer(c_size_t), intent(in), value :: count
+    type(c_ptr), intent(in), value :: cdata
+
+    integer(c_size_t), pointer :: char_len
+    integer(c_size_t) :: i
+
+    if (count == 0) return
+    call c_f_pointer(cdata, char_len)
+    block
+      character(len=char_len,kind=c_char), pointer :: lhs(:), rhs_and_result(:)
+      call c_f_pointer(arg1, lhs, [count])
+      call c_f_pointer(arg2_and_out, rhs_and_result, [count])
+      do i = 1, count
+        if (lhs(i) <= rhs_and_result(i)) rhs_and_result(i) = lhs(i)
+      end do
+    end block
+  end subroutine
+
+end module
+
 submodule(prif:prif_private_s) co_min_s
   ! DO NOT ADD USE STATEMENTS HERE
   ! All use statements belong in prif_private_s.F90
@@ -34,27 +63,8 @@ contains
           current_team%info%gex_team)
   end subroutine
 
-  subroutine char_min_wrapper(arg1, arg2_and_out, count, cdata) bind(C)
-    type(c_ptr), intent(in), value :: arg1, arg2_and_out
-    integer(c_size_t), intent(in), value :: count
-    type(c_ptr), intent(in), value :: cdata
-
-    integer(c_size_t), pointer :: char_len
-    integer(c_size_t) :: i
-
-    if (count == 0) return
-    call c_f_pointer(cdata, char_len)
-    block
-      character(len=char_len,kind=c_char), pointer :: lhs(:), rhs_and_result(:)
-      call c_f_pointer(arg1, lhs, [count])
-      call c_f_pointer(arg2_and_out, rhs_and_result, [count])
-      do i = 1, count
-        if (lhs(i) <= rhs_and_result(i)) rhs_and_result(i) = lhs(i)
-      end do
-    end block
-  end subroutine
-
   module procedure prif_co_min_character
+    use prif_co_min_helper
     integer(c_size_t), target :: char_len
     procedure(prif_operation_wrapper_interface), pointer :: op
 
