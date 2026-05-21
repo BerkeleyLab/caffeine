@@ -20,6 +20,7 @@ program native_multi_image
 #ifndef HAVE_SYNC_IMAGES
 #define HAVE_SYNC_IMAGES HAVE_SYNC
 #endif
+
 #ifndef HAVE_COLLECTIVES
 #define HAVE_COLLECTIVES 1
 #endif
@@ -35,8 +36,19 @@ program native_multi_image
 #ifndef HAVE_CO_BROADCAST
 #define HAVE_CO_BROADCAST HAVE_COLLECTIVES
 #endif
+
 #ifndef HAVE_TEAM
 #define HAVE_TEAM 1
+#endif
+
+#ifndef HAVE_COARRAY
+#define HAVE_COARRAY 0
+#endif
+#ifndef HAVE_MAIN_COARRAY
+#define HAVE_MAIN_COARRAY HAVE_COARRAY
+#endif
+#ifndef HAVE_ALLOC_COARRAY
+#define HAVE_ALLOC_COARRAY HAVE_COARRAY
 #endif
 
   USE, INTRINSIC :: ISO_FORTRAN_ENV
@@ -45,6 +57,11 @@ program native_multi_image
 # if HAVE_TEAM
   integer :: team_id
   type(TEAM_TYPE) :: subteam, res
+# endif
+# if HAVE_MAIN_COARRAY
+  integer :: sca_int_1[*]
+  integer :: sca_int_2[2,*]
+  integer :: sca_int_3[2,3,*]
 # endif
 
   me = THIS_IMAGE()
@@ -127,6 +144,10 @@ program native_multi_image
 # endif
 
   call sync_all
+  call test_allocatable_coarray
+  call test_allocatable_coarray
+
+  call sync_all
   write(*,'(A,I1,A,I1,A)') "Goodbye from image ", me, " of ", ni, " images"
 
   ! explicit flush for now until we have multi-image stop support
@@ -151,6 +172,24 @@ program native_multi_image
       if (THIS_IMAGE() == 1) write(*,*) str
       call flush_all
       call sync_all
+    end subroutine
+
+    subroutine test_allocatable_coarray()
+#   if HAVE_ALLOC_COARRAY
+      logical, save :: once = .true.
+      integer, allocatable :: aca_int_1[:]
+      integer, allocatable :: aca_int_2[:,:]
+      integer, save, allocatable :: aca_int_3[:,:,:]
+      if (once) then
+        once = .false.
+        call status("Testing ALLOCATABLE coarrays...")
+        print *, ALLOCATED(aca_int_1), ALLOCATED(aca_int_2), ALLOCATED(aca_int_3)
+        ALLOCATE(aca_int_1[*])
+        ALLOCATE(aca_int_2[2,*])
+        ALLOCATE(aca_int_3[2,3,*])
+      end if
+      print *, ALLOCATED(aca_int_1), ALLOCATED(aca_int_2), ALLOCATED(aca_int_3) 
+#   endif
     end subroutine
 
 #else
