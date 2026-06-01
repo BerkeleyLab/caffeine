@@ -91,7 +91,9 @@ jobs:
           - os: ubuntu-24.04
             compiler: flang
             version: latest
-            container: snowstep/llvm:ubuntu-24.04-latest
+            # pinned to old build due to https://github.com/kei-g/docker-llvm/issues/78
+            #container: snowstep/llvm:ubuntu-24.04-latest
+            container: snowstep/llvm:ubuntu-24.04-20260517082025
 
           # https://hub.docker.com/r/phhargrove/llvm-flang/tags
           - os: ubuntu-24.04
@@ -199,7 +201,9 @@ jobs:
             compiler: flang
             version: latest
             network: udp
-            container: snowstep/llvm:ubuntu-24.04-latest
+            # pinned to old build due to https://github.com/kei-g/docker-llvm/issues/78
+            #container: snowstep/llvm:ubuntu-24.04-latest
+            container: snowstep/llvm:ubuntu-24.04-20260517082025
 
     container:
       image: ${{ matrix.container }}
