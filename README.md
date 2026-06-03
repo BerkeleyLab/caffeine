@@ -199,9 +199,9 @@ Paper: <https://doi.org/10.25344/S4N017>
 ### PRIF Specification:
 
 PRIF Committee.    
-"[**Parallel Runtime Interface for Fortran (PRIF) Specification, Revision 0.7**](https://github.com/BerkeleyLab/caffeine/wiki/pubs/PRIF_0.7.pdf)",     
-Lawrence Berkeley National Laboratory Technical Report (LBNL-2001721), Dec 2025.    
-<https://doi.org/10.25344/S46S3W>
+"[**Parallel Runtime Interface for Fortran (PRIF) Specification, Revision 0.8**](https://github.com/BerkeleyLab/caffeine/wiki/pubs/PRIF_0.8.pdf)",     
+Lawrence Berkeley National Laboratory Technical Report (LBNL-2001760), May 2026.    
+<https://doi.org/10.25344/S4Z88F>
 
 ### Additional Publications:
 

@@ -2,10 +2,11 @@
 
 Caffeine is an implementation of the Parallel Runtime Interface for Fortran (PRIF). This document
 outlines the implementation status in Caffeine of the features defined in the
-[latest PRIF specification, revision 0.7](https://doi.org/10.25344/S46S3W). Caffeine contains interfaces for all
-of the PRIF procedures (except when stated otherwise below) and the symbols are linkable and callable, but some procedures will fail at runtime with an unimplemented error. For
-more details about the implementation of the various PRIF features, please see the
-following sections:
+[latest PRIF specification, revision 0.8](https://doi.org/10.25344/S4Z88F). 
+Caffeine contains interfaces for all of the PRIF procedures (except when stated
+otherwise below) and the symbols are linkable and callable, but a few
+procedures may fail at runtime with an unimplemented error. 
+For more details about the implementation of the various PRIF features, please see the following sections:
 
 - [Named Constants](#Named-Constants)
 - [Program Startup and Shutdown](#Program-Startup-and-Shutdown)
@@ -63,12 +64,12 @@ selected constant values from `ISO_FORTRAN_ENV` of the hosting compiler.
 
 | Procedure | Status | Notes |
 |-----------|--------|-------|
-| `prif_allocate_coarray`    | **YES** | includes ucobound relaxation and `final_func` argument rename expected in PRIF 0.8 |
+| `prif_allocate_coarray`    | **YES** | includes ucobound relaxation and `final_func` argument rename in PRIF 0.8 |
 | `prif_allocate`            | **YES** |  |
 | `prif_deallocate_coarray`  | **YES** |  |
 | `prif_deallocate_coarrays` | **YES** |  |
 | `prif_deallocate`          | **YES** |  |
-| `prif_alias_create`        | **YES** | includes ucobound relaxation expected in PRIF 0.8 |
+| `prif_alias_create`        | **YES** | includes ucobound relaxation added in PRIF 0.8 |
 | `prif_alias_destroy`       | **YES** |  |
 
 ---
@@ -188,14 +189,14 @@ selected constant values from `ISO_FORTRAN_ENV` of the hosting compiler.
 | Procedure | Status | Notes |
 |-----------|--------|-------|
 | `prif_co_broadcast`     | **YES** |  |
-| `prif_co_broadcast_cptr`| **YES** | expected in PRIF 0.8 |
+| `prif_co_broadcast_cptr`| **YES** | New in PRIF 0.8 |
 | `prif_co_max`           | **YES** |  |
 | `prif_co_max_character` | **YES** |  |
 | `prif_co_min`           | **YES** |  |
 | `prif_co_min_character` | **YES** |  |
 | `prif_co_sum`           | **YES** |  |
 | `prif_co_reduce`        | **YES** |  |
-| `prif_co_reduce_cptr`   | **YES** | expected in PRIF 0.8 |
+| `prif_co_reduce_cptr`   | **YES** | New in PRIF 0.8 |
 
 ---
 
