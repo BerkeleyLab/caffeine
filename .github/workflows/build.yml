@@ -121,6 +121,8 @@ jobs:
             compiler: lfortran
             version: latest
             container: ghcr.io/lfortran/lfortran:latest
+            native_multi_image: true
+            FFLAGS: --coarray=true -DHAVE_SYNC=0 -DHAVE_COLLECTIVES=0 -DHAVE_TEAM=0
 
           - os: ubuntu-22.04
             compiler: lfortran
