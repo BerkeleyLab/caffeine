@@ -40,6 +40,22 @@ program native_multi_image
 #ifndef HAVE_TEAM
 #define HAVE_TEAM 1
 #endif
+#ifndef HAVE_TEAM_TYPE
+#define HAVE_TEAM_TYPE HAVE_TEAM
+#endif
+#ifndef HAVE_EVENT_TYPE
+#define HAVE_EVENT_TYPE 1
+#endif
+#ifndef HAVE_LOCK_TYPE
+#define HAVE_LOCK_TYPE 1
+#endif
+#ifndef HAVE_NOTIFY_TYPE
+#define HAVE_NOTIFY_TYPE 1
+#endif
+! TYPES_IMPORT_PRIF: compiler imports the real PRIF definition of ISO_FORTRAN_ENV types
+#ifndef TYPES_IMPORT_PRIF
+#define TYPES_IMPORT_PRIF 0
+#endif
 
 #ifndef HAVE_COARRAY
 #define HAVE_COARRAY 0
@@ -51,17 +67,45 @@ program native_multi_image
 #define HAVE_ALLOC_COARRAY HAVE_COARRAY
 #endif
 
+! Helper macros
+#define CHECK_TYPE_COMPLIANCE(subject_type, subject, is_team, min_size) \
+  BLOCK ; \
+    integer(c_int8_t), allocatable, target :: bytes(:) ; \
+    bytes = transfer(subject, bytes) ; \
+    call check_type(#subject_type, is_team, min_size, \
+                    storage_size(subject)/8, bytes); \
+  END BLOCK
+
+! Main program
   USE, INTRINSIC :: ISO_FORTRAN_ENV
-  integer :: me, ni, peer, tmp
+  USE, INTRINSIC :: ISO_C_BINDING, only: c_int8_t
+
+  type :: dummy_team_descriptor
+  end type
+  type :: dummy_team_type
+    type(dummy_team_descriptor), pointer :: info => null()
+  end type
+
+  integer :: me, ni, peer, tmp, fail_count = 0
   character(len=5) :: c
 # if HAVE_TEAM
   integer :: team_id
   type(TEAM_TYPE) :: subteam, res
+  type(TEAM_TYPE) :: default_team
 # endif
 # if HAVE_MAIN_COARRAY
   integer :: sca_int_1[*]
   integer :: sca_int_2[2,*]
   integer :: sca_int_3[2,3,*]
+# endif
+# if HAVE_EVENT_TYPE
+      type(event_type), target :: default_event[*]
+# endif
+# if HAVE_NOTIFY_TYPE
+      type(notify_type), target :: default_notify[*]
+# endif
+# if HAVE_LOCK_TYPE
+      type(lock_type), target :: default_lock[*]
 # endif
 
   me = THIS_IMAGE()
@@ -126,6 +170,9 @@ program native_multi_image
 # endif
 
 # if HAVE_TEAM
+#   if HAVE_TEAM_TYPE
+      CHECK_TYPE_COMPLIANCE(TEAM_TYPE, default_team, .true., 0)
+#   endif
   call status("Testing TEAMS...")
   res = GET_TEAM(CURRENT_TEAM)
   res = GET_TEAM(INITIAL_TEAM)
@@ -143,6 +190,18 @@ program native_multi_image
   write(*,'(A,I3)') "After END TEAM statement, TEAM_NUMBER() is ", TEAM_NUMBER()
 # endif
 
+# if HAVE_EVENT_TYPE
+  CHECK_TYPE_COMPLIANCE(EVENT_TYPE, default_event, .false., 64)
+# endif
+
+# if HAVE_LOCK_TYPE
+  CHECK_TYPE_COMPLIANCE(LOCK_TYPE, default_lock, .false., 64)
+# endif
+
+# if HAVE_NOTIFY_TYPE
+  CHECK_TYPE_COMPLIANCE(NOTIFY_TYPE, default_notify, .false., 64)
+# endif
+
   call sync_all
   call test_allocatable_coarray
   call test_allocatable_coarray
@@ -153,7 +212,16 @@ program native_multi_image
   ! explicit flush for now until we have multi-image stop support
   call flush_all
   call sync_all
-  stop
+  if (fail_count > 0) then
+    call status("ERROR: "//tostring(fail_count)//" tests FAILED.")
+  else
+    call status("All tests passed.")
+  end if
+#if IGNORE_FAILURES
+  call status("WARNING: Ignoring "//tostring(IGNORE_FAILURES)//" failures.")
+  fail_count = MAX(0, fail_count - IGNORE_FAILURES)
+#endif
+  stop fail_count
 
   contains
     subroutine sync_all
@@ -169,7 +237,7 @@ program native_multi_image
       character(len=*) :: str
       call flush_all
       call sync_all
-      if (THIS_IMAGE() == 1) write(*,*) str
+      if (THIS_IMAGE() == 1) write(*,'(A)') str
       call flush_all
       call sync_all
     end subroutine
@@ -190,6 +258,85 @@ program native_multi_image
       end if
       print *, ALLOCATED(aca_int_1), ALLOCATED(aca_int_2), ALLOCATED(aca_int_3) 
 #   endif
+    end subroutine
+
+    function tostring(int) result(res)
+      integer :: int
+      character(len=128) :: str
+      character(len=:), allocatable :: res
+      write(str, *) int
+      res = trim(adjustl(str))
+    end function
+
+    function hexdump(arr) result(res)
+      integer(c_int8_t), intent(in) :: arr(:)
+      character(len=:), allocatable :: res
+      character(len=4096) :: buf
+      write(buf, '(*(Z2, 1X))') arr
+      res = trim(buf)
+    end function
+
+    subroutine check_type(type_name, is_team, min_size, subject_size, default_bytes)
+      character(len=*), intent(in) :: type_name
+      logical, intent(in) :: is_team
+      integer, intent(in) :: min_size, subject_size
+      integer(c_int8_t), target, intent(in) :: default_bytes(:)
+      character(len=:), allocatable :: diag
+#   if HAVE_TEAM
+      type(TEAM_TYPE) :: team_var
+      type(dummy_team_type) :: dummy_team_type_var
+      integer, parameter :: reference_size = storage_size(dummy_team_type_var)/8
+#   endif
+
+      call status("Testing " // type_name // "...")
+
+      if (subject_size /= size(default_bytes)) ERROR STOP "INTERNAL ERROR: representation size mismatch"
+
+      if (is_team) then
+#     if HAVE_TEAM
+        ! check size, should be an exact match
+        if (subject_size == reference_size) then
+          diag = "pass"
+        else
+          diag = "FAIL (should be exactly " // tostring(reference_size) // " bytes)"
+          fail_count = fail_count + 1
+        end if
+        call status("  Size of " // type_name // ": " // tostring(subject_size) // " bytes ==> " // diag)
+
+        ! check default initialization
+        dummy_team_type_var = transfer(team_var, dummy_team_type_var)
+        if (.not. associated(dummy_team_type_var%info)) then
+          diag = "pass"
+        else
+          diag = "FAIL (not default-initialized to null(): " // hexdump(default_bytes)// ")"
+          fail_count = fail_count + 1
+        end if
+        call status("  Default init of " // type_name // " ==> " // diag)
+#     endif
+      else
+#     if TYPES_IMPORT_PRIF
+        diag = "(validation skipped)"
+#     else
+        ! check size, should not be less than min_size
+        if (subject_size >= min_size) then
+          diag = "pass"
+        else
+          diag = "FAIL (should be >= " // tostring(min_size) // " bytes)"
+          fail_count = fail_count + 1
+        end if
+#     endif
+        call status("  Size of " // type_name // ": " // tostring(subject_size) // " bytes ==> " // diag)
+
+        ! check default initialization
+        if (all(default_bytes == 0)) then
+          diag = "pass"
+        else
+          diag = "FAIL (non-zero value at byte " // tostring((findloc(default_bytes /= 0, .true., dim=1))) // ": " // &
+                 hexdump(default_bytes) // ")"
+          fail_count = fail_count + 1
+        end if
+        call status("  Default init of " // type_name // " ==> " // diag)
+      end if
     end subroutine
 
 #else
