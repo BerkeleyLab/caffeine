@@ -94,7 +94,6 @@ jobs:
             # pinned to old build due to https://github.com/kei-g/docker-llvm/issues/78
             #container: snowstep/llvm:ubuntu-24.04-latest
             container: snowstep/llvm:ubuntu-24.04-20260517082025
-            FFLAGS: -DHAVE_COARRAY
 
           # https://hub.docker.com/r/phhargrove/llvm-flang/tags
           - os: ubuntu-24.04
@@ -207,7 +206,6 @@ jobs:
             # pinned to old build due to https://github.com/kei-g/docker-llvm/issues/78
             #container: snowstep/llvm:ubuntu-24.04-latest
             container: snowstep/llvm:ubuntu-24.04-20260517082025
-            FFLAGS: -DHAVE_COARRAY
 
     container:
       image: ${{ matrix.container }}
@@ -319,7 +317,11 @@ jobs:
           echo "CXX=clang++" >> "$GITHUB_ENV"
         fi
         if [ "${NATIVE_MULTI_IMAGE}" == true ] ; then
-          echo "FFLAGS=$FFLAGS -fcoarray -DIGNORE_FAILURES=8" >> "$GITHUB_ENV"
+          if [[ $COMPILER_VERSION == latest ]] ; then
+            echo "FFLAGS=$FFLAGS -fcoarray -DHAVE_COARRAY -DIGNORE_FAILURES=11" >> "$GITHUB_ENV"
+          else
+            echo "FFLAGS=$FFLAGS -fcoarray -DIGNORE_FAILURES=8" >> "$GITHUB_ENV"
+          fi
         fi
 
     - name: Setup lfortran dependencies and variables

@@ -244,19 +244,30 @@ program native_multi_image
 
     subroutine test_allocatable_coarray()
 #   if HAVE_ALLOC_COARRAY
+#   define CHECK_ALLOC(coarray, expect) \
+      if (ALLOCATED(coarray) .neqv. expect) then ; \
+        if (THIS_IMAGE() == 1) write(*,'(A)') __FILE__//":"//tostring(__LINE__)//": ERROR: " // \
+           " ALLOCATED(" // #coarray // ") = " // MERGE("true ","false",ALLOCATED(coarray)) ; \
+        fail_count = fail_count + 1 ; \
+      end if
+
       logical, save :: once = .true.
       integer, allocatable :: aca_int_1[:]
       integer, allocatable :: aca_int_2[:,:]
       integer, save, allocatable :: aca_int_3[:,:,:]
+      CHECK_ALLOC(aca_int_1, .false.)
+      CHECK_ALLOC(aca_int_2, .false.)
+      CHECK_ALLOC(aca_int_3, .false.)
       if (once) then
         once = .false.
         call status("Testing ALLOCATABLE coarrays...")
-        print *, ALLOCATED(aca_int_1), ALLOCATED(aca_int_2), ALLOCATED(aca_int_3)
         ALLOCATE(aca_int_1[*])
         ALLOCATE(aca_int_2[2,*])
         ALLOCATE(aca_int_3[2,3,*])
+        CHECK_ALLOC(aca_int_1, .true.)
+        CHECK_ALLOC(aca_int_2, .true.)
+        CHECK_ALLOC(aca_int_3, .true.)
       end if
-      print *, ALLOCATED(aca_int_1), ALLOCATED(aca_int_2), ALLOCATED(aca_int_3) 
 #   endif
     end subroutine
 
