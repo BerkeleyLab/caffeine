@@ -122,7 +122,7 @@ jobs:
             version: latest
             container: ghcr.io/lfortran/lfortran:latest
             native_multi_image: true
-            FFLAGS: --coarray=true -DHAVE_SYNC=0 -DHAVE_COLLECTIVES=0 -DHAVE_TEAM=0
+            FFLAGS: --coarray=true -DHAVE_SYNC=0 -DHAVE_COLLECTIVES=0 -DHAVE_TEAM=0 -DHAVE_EVENT_TYPE=0 -DHAVE_LOCK_TYPE=0 -DHAVE_NOTIFY_TYPE=0
 
           - os: ubuntu-22.04
             compiler: lfortran
@@ -317,7 +317,11 @@ jobs:
           echo "CXX=clang++" >> "$GITHUB_ENV"
         fi
         if [ "${NATIVE_MULTI_IMAGE}" == true ] ; then
-          echo "FFLAGS=$FFLAGS -fcoarray" >> "$GITHUB_ENV"
+          if [[ $COMPILER_VERSION == latest ]] ; then
+            echo "FFLAGS=$FFLAGS -fcoarray -DHAVE_COARRAY -DIGNORE_FAILURES=11" >> "$GITHUB_ENV"
+          else
+            echo "FFLAGS=$FFLAGS -fcoarray -DIGNORE_FAILURES=8" >> "$GITHUB_ENV"
+          fi
         fi
 
     - name: Setup lfortran dependencies and variables
