@@ -86,6 +86,7 @@ jobs:
             compiler: flang
             label: Homebrew
             brew_via_install: 1
+            install_filter: 2>&1 | grep -v 'Sandbox unavailable'
 
           # https://hub.docker.com/r/snowstep/llvm/tags
           - os: ubuntu-24.04
@@ -256,6 +257,7 @@ jobs:
           chmod +x install-homebrew.sh
           env CI=1 ./install-homebrew.sh
           HOMEBREW_PREFIX="/home/linuxbrew/.linuxbrew"
+          sudo ${HOMEBREW_PREFIX}/bin/brew setup-sandbox
           ${HOMEBREW_PREFIX}/bin/brew install -v gcc@${COMPILER_VERSION} binutils
           ls -al ${HOMEBREW_PREFIX}/bin
           echo "PATH=${HOMEBREW_PREFIX}/bin:${PATH}" >> "$GITHUB_ENV"
@@ -267,6 +269,12 @@ jobs:
           echo "CXXFLAGS=${CXXFLAGS:+"$CXXFLAGS" }-B ${HOMEBREW_BINUTILS}" >> "$GITHUB_ENV"
           echo "LDFLAGS=${LDFLAGS:+"$LDFLAGS" }-B ${HOMEBREW_BINUTILS}" >> "$GITHUB_ENV"
         fi
+
+    - name: Fix macOS Homebrew Configuration
+      if: ${{ contains(matrix.os, 'macos') }}
+      run: |
+        # silence Homebrew tap trust warnings:
+        (set +e ; brew untap -f aws/tap hashicorp/tap 2>&1 | perl -pe 's/#*.warning./warn: /' ; brew trust azure/bicep )
 
     - name: Install macOS Dependencies
       if: ${{ contains(matrix.os, 'macos') && !matrix.brew_via_install }}
@@ -411,7 +419,8 @@ jobs:
       run: |
         for var in FC CC CXX FFLAGS CPPFLAGS CFLAGS CXXFLAGS LDFLAGS LIBS GASNET_CONFIGURE_ARGS ; do
             eval echo "$var=\$$var"; done
-        ./install.sh --prefix=${PREFIX} ${NETWORK_ARG} --verbose ${{ inputs.install_args }}
+        ./install.sh --prefix=${PREFIX} ${NETWORK_ARG} --verbose \
+                     ${{ inputs.install_args }} ${{ matrix.install_filter }}
 
     ##########################################################################
     # Caffeine Testing
@@ -482,6 +491,7 @@ jobs:
       run: |
         for var in FC CC CXX FFLAGS CPPFLAGS CFLAGS LDFLAGS LIBS GASNET_CONFIGURE_ARGS ; do
             eval echo "$var=\$$var"; done
-        ./install.sh --prefix=${PREFIX} ${NETWORK_ARG} --enable-threads --verbose
+        ./install.sh --prefix=${PREFIX} ${NETWORK_ARG} --enable-threads --verbose \
+                     ${{ inputs.install_args }} ${{ matrix.install_filter }}
         ./run-fpm.sh test --verbose -- ${{ inputs.julienne_args }}
 
