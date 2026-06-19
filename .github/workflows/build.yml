@@ -54,7 +54,7 @@ jobs:
         run: echo "BREW_FLANG_VERSION=22" >> $GITHUB_OUTPUT
 
   build:
-    name: ${{ matrix.compiler }}-${{ matrix.version || needs.setup.outputs.BREW_FLANG_VERSION }} ${{ matrix.network || '' }} (${{ matrix.os }}) ${{ matrix.label }}
+    name: ${{ matrix.compiler }}-${{ matrix.version || needs.setup.outputs.BREW_FLANG_VERSION }} ${{ ( matrix.network != 'smp' && matrix.network ) || '' }} (${{ matrix.os }}) ${{ matrix.label }}
     needs: setup
     runs-on: ${{ matrix.os }}
     strategy:
@@ -62,7 +62,8 @@ jobs:
       matrix:
         os: [ macos-14, macos-15, macos-15-intel, macos-26, macos-26-intel, ubuntu-24.04 ]
         compiler: [ gfortran ]
-        version: [ 13, 14, 15 ]
+        version: [ 13, 14, 15, 16 ]
+        network: [ smp ]
         include:
 
         # --- flang coverage ---
@@ -86,6 +87,7 @@ jobs:
             compiler: flang
             label: Homebrew
             brew_via_install: 1
+            install_filter: 2>&1 | grep -v 'Sandbox unavailable'
 
           # https://hub.docker.com/r/snowstep/llvm/tags
           - os: ubuntu-24.04
@@ -151,12 +153,15 @@ jobs:
           - os: ubuntu-24.04
             compiler: flang
             version: 21
-            network: smp
             label: PRIF-0.7
             FFLAGS: -DFORCE_PRIF_0_7
             container: phhargrove/llvm-flang:21.1.0-latest
 
         # --- udp coverage for selected configs ---
+          - os: macos-26
+            compiler: gfortran
+            version: 16
+            network: udp
           - os: macos-15
             compiler: gfortran
             version: 14
@@ -164,7 +169,7 @@ jobs:
 
           - os: ubuntu-24.04
             compiler: gfortran
-            version: 15
+            version: 16
             network: udp
           - os: ubuntu-24.04
             compiler: gfortran
@@ -245,13 +250,14 @@ jobs:
       run: |
         sudo apt update
         sudo apt install -y build-essential pkg-config make
-        if [[ ${COMPILER_VERSION} < 15 ]] ; then
+        if [[ ${COMPILER_VERSION} -lt 15 ]] ; then
           sudo apt install -y gfortran-${COMPILER_VERSION} g++-${COMPILER_VERSION}
         else
           curl $CURL_OPTIONS https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh -o install-homebrew.sh
           chmod +x install-homebrew.sh
           env CI=1 ./install-homebrew.sh
           HOMEBREW_PREFIX="/home/linuxbrew/.linuxbrew"
+          sudo ${HOMEBREW_PREFIX}/bin/brew setup-sandbox
           ${HOMEBREW_PREFIX}/bin/brew install -v gcc@${COMPILER_VERSION} binutils
           ls -al ${HOMEBREW_PREFIX}/bin
           echo "PATH=${HOMEBREW_PREFIX}/bin:${PATH}" >> "$GITHUB_ENV"
@@ -264,12 +270,21 @@ jobs:
           echo "LDFLAGS=${LDFLAGS:+"$LDFLAGS" }-B ${HOMEBREW_BINUTILS}" >> "$GITHUB_ENV"
         fi
 
+    - name: Fix macOS Homebrew Configuration
+      if: ${{ contains(matrix.os, 'macos') }}
+      run: |
+        # silence Homebrew tap trust warnings:
+        (set +e ; brew untap -f aws/tap hashicorp/tap 2>&1 | perl -pe 's/#*.warning./warn: /' ; brew trust azure/bicep )
+
     - name: Install macOS Dependencies
       if: ${{ contains(matrix.os, 'macos') && !matrix.brew_via_install }}
       run: |
         brew update
         # fpm binary distribution for macOS requires gfortran shared libraries from gcc@12
         brew install gcc@12
+        if [[ ${{ matrix.compiler }} == 'gfortran' && ${COMPILER_VERSION} -gt 15 ]] ; then
+          brew install gcc@${COMPILER_VERSION}
+        fi
 
     - name: Install LLVM flang on macOS
       if: ${{ contains(matrix.os, 'macos') && matrix.compiler == 'flang' && !matrix.brew_via_install }}
@@ -298,7 +313,7 @@ jobs:
     # Set Install Variables
 
     - name: Set gfortran variables
-      if: matrix.compiler == 'gfortran'
+      if: ${{ matrix.compiler == 'gfortran' }}
       run: |
         echo "FC=gfortran-${COMPILER_VERSION}" >> "$GITHUB_ENV"
         echo "CC=gcc-${COMPILER_VERSION}" >> "$GITHUB_ENV"
@@ -404,7 +419,8 @@ jobs:
       run: |
         for var in FC CC CXX FFLAGS CPPFLAGS CFLAGS CXXFLAGS LDFLAGS LIBS GASNET_CONFIGURE_ARGS ; do
             eval echo "$var=\$$var"; done
-        ./install.sh --prefix=${PREFIX} ${NETWORK_ARG} --verbose ${{ inputs.install_args }}
+        ./install.sh --prefix=${PREFIX} ${NETWORK_ARG} --verbose \
+                     ${{ inputs.install_args }} ${{ matrix.install_filter }}
 
     ##########################################################################
     # Caffeine Testing
@@ -475,6 +491,7 @@ jobs:
       run: |
         for var in FC CC CXX FFLAGS CPPFLAGS CFLAGS LDFLAGS LIBS GASNET_CONFIGURE_ARGS ; do
             eval echo "$var=\$$var"; done
-        ./install.sh --prefix=${PREFIX} ${NETWORK_ARG} --enable-threads --verbose
+        ./install.sh --prefix=${PREFIX} ${NETWORK_ARG} --enable-threads --verbose \
+                     ${{ inputs.install_args }} ${{ matrix.install_filter }}
         ./run-fpm.sh test --verbose -- ${{ inputs.julienne_args }}
 
