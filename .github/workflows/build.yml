@@ -54,7 +54,7 @@ jobs:
         run: echo "BREW_FLANG_VERSION=22" >> $GITHUB_OUTPUT
 
   build:
-    name: ${{ matrix.compiler }}-${{ matrix.version || needs.setup.outputs.BREW_FLANG_VERSION }} ${{ matrix.network || '' }} (${{ matrix.os }}) ${{ matrix.label }}
+    name: ${{ matrix.compiler }}-${{ matrix.version || needs.setup.outputs.BREW_FLANG_VERSION }} ${{ ( matrix.network != 'smp' && matrix.network ) || '' }} (${{ matrix.os }}) ${{ matrix.label }}
     needs: setup
     runs-on: ${{ matrix.os }}
     strategy:
@@ -63,6 +63,7 @@ jobs:
         os: [ macos-14, macos-15, macos-15-intel, macos-26, macos-26-intel, ubuntu-24.04 ]
         compiler: [ gfortran ]
         version: [ 13, 14, 15, 16 ]
+        network: [ smp ]
         include:
 
         # --- flang coverage ---
