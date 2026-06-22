@@ -124,7 +124,7 @@ jobs:
             version: latest
             container: ghcr.io/lfortran/lfortran:latest
             native_multi_image: true
-            FFLAGS: --coarray=true -DHAVE_SYNC=0 -DHAVE_COLLECTIVES=0 -DHAVE_TEAM=0 -DHAVE_EVENT_TYPE=0 -DHAVE_LOCK_TYPE=0 -DHAVE_NOTIFY_TYPE=0
+            FFLAGS: --coarray=true -DHAVE_SYNC=0 -DHAVE_COLLECTIVES=0 -DHAVE_TEAM=0 -DHAVE_EVENT_TYPE=0 -DHAVE_LOCK_TYPE=0 -DHAVE_NOTIFY_TYPE=0 -DHAVE_CO_SUM -DHAVE_SYNC_ALL -DHAVE_MAIN_COARRAY
 
           - os: ubuntu-22.04
             compiler: lfortran
