@@ -329,7 +329,7 @@ jobs:
         fi
         if [ "${NATIVE_MULTI_IMAGE}" == true ] ; then
           if [[ $COMPILER_VERSION == latest ]] ; then
-            echo "FFLAGS=$FFLAGS -fcoarray -DHAVE_COARRAY -DIGNORE_FAILURES=11" >> "$GITHUB_ENV"
+            echo "FFLAGS=$FFLAGS -fcoarray -DHAVE_COARRAY -DIGNORE_FAILURES=9" >> "$GITHUB_ENV"
           else
             echo "FFLAGS=$FFLAGS -fcoarray -DIGNORE_FAILURES=8" >> "$GITHUB_ENV"
           fi
