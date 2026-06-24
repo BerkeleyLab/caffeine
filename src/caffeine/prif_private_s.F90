@@ -596,7 +596,7 @@ contains
         call assert_always(info%team_number == -1, "invalid team_number in initial team descriptor")
         call assert_always(.not. associated(info%parent_team), "invalid parent_team in initial team descriptor")
       else ! non-initial team, have parent team
-        call assert_always(info%team_number > 0, "invalid team_number in initial team descriptor")
+        call assert_always(info%team_number > 0, "invalid team_number in non-initial team descriptor")
         call assert_always(associated(info%parent_team), "invalid parent_team in team descriptor")
       end if
 
