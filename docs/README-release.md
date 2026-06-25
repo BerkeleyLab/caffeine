@@ -31,7 +31,7 @@ Release Procedure for Caffeine
 6. Tag a release candidate. For example `git tag #.#.#-rc1`, then `git push origin #.#.#-rc1`
 7. Compel several people to manually validate the release candidate on systems of interest
    and with compilers and compiler versions listed in README
-    1. When possible, test both on shared and distributed memory systems.
+    1. When possible, test both on shared and distributed memory systems, and include some test with compiler optimization.
     2. When testing on Perlmutter, use the following steps:
         1. Build source and tests on the login node using the desired compiler
         2. Get a dedicated node: `salloc -t 10 -N 2 -n 8 -q interactive -A PROJECT_ID -C cpu`
@@ -45,4 +45,5 @@ Release Procedure for Caffeine
        [manifest/fpm.toml.template](../manifest/fpm.toml.template), [install.sh](../install.sh), [version.h](../include/version.h)
        Update to an odd number to indicate that the `main` branch is currently a snapshot of something
        that is beyond the offical release
-    3. Update the release procedure with any new steps or changes
+    3. PR a version bump to the Caffeine version in [LFortran third-party CI](https://github.com/lfortran/lfortran/blob/main/ci/test_third_party_codes.sh) and the [LFortran end-to-end tests](https://github.com/lfortran/lfortran/blob/main/ci/test_caffeine.sh)
+    4. Update the release procedure with any new steps or changes
