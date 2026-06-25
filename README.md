@@ -37,7 +37,7 @@ and [LFortran](https://github.com/lfortran/lfortran), currently
 lack complete support for multi-image parallel execution. These features are a mandatory
 part of Fortran, and thus are an important part of reaching full compliance with
 the 2008, 2018, or 2023 revisions of the Fortran standard.
-The latest LLVM Flang 22 release adds experimental support for a 
+The LLVM Flang 22 release adds experimental support for a 
 [meaningful subset](https://flang.llvm.org/docs/FortranStandardsSupport.html#fortran-2018)
 of multi-image Fortran features using PRIF and Caffeine. 
 For more details, see [LLVM-HPC2025 paper](#Additional-Publications) below.
