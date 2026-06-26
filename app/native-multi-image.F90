@@ -58,13 +58,30 @@ program native_multi_image
 #endif
 
 #ifndef HAVE_COARRAY
-#define HAVE_COARRAY 0
+#define HAVE_COARRAY 1
 #endif
 #ifndef HAVE_MAIN_COARRAY
 #define HAVE_MAIN_COARRAY HAVE_COARRAY
 #endif
 #ifndef HAVE_ALLOC_COARRAY
 #define HAVE_ALLOC_COARRAY HAVE_COARRAY
+#endif
+
+! coarray query intrinsics
+#ifndef HAVE_COARRAY_QUERY
+#define HAVE_COARRAY_QUERY HAVE_COARRAY
+#endif
+#ifndef HAVE_COBOUND
+#define HAVE_COBOUND HAVE_COARRAY_QUERY
+#endif
+#ifndef HAVE_COSHAPE
+#define HAVE_COSHAPE HAVE_COARRAY_QUERY
+#endif
+#ifndef HAVE_IMAGE_INDEX
+#define HAVE_IMAGE_INDEX HAVE_COARRAY_QUERY
+#endif
+#ifndef HAVE_THIS_IMAGE_COARRAY
+#define HAVE_THIS_IMAGE_COARRAY HAVE_COARRAY_QUERY
 #endif
 
 ! Helper macros
@@ -188,6 +205,44 @@ program native_multi_image
   END TEAM
   call sync_all
   write(*,'(A,I3)') "After END TEAM statement, TEAM_NUMBER() is ", TEAM_NUMBER()
+# endif
+
+# if HAVE_MAIN_COARRAY
+#   if HAVE_COBOUND
+    call status("Testing LCOBOUND/UCOBOUND...")
+    write(*,'(A,2I3)') "lcobound(sca_int_2) = ", LCOBOUND(sca_int_2)
+    write(*,'(A,2I3)') "ucobound(sca_int_2) = ", UCOBOUND(sca_int_2)
+    write(*,'(A,3I3)') "lcobound(sca_int_3) = ", LCOBOUND(sca_int_3)
+    write(*,'(A,3I3)') "ucobound(sca_int_3) = ", UCOBOUND(sca_int_3)
+    write(*,'(A,I3)')  "lcobound(sca_int_3, dim=2) = ", LCOBOUND(sca_int_3, dim=2)
+    write(*,'(A,I3)')  "ucobound(sca_int_3, dim=2) = ", UCOBOUND(sca_int_3, dim=2)
+    write(*,'(A,I3)')  "lcobound(sca_int_3, dim=2, kind=8) = ", LCOBOUND(sca_int_3, dim=2, kind=8)
+    write(*,'(A,I3)')  "ucobound(sca_int_3, dim=2, kind=8) = ", UCOBOUND(sca_int_3, dim=2, kind=8)
+#   endif
+#   if HAVE_COSHAPE
+    call status("Testing COSHAPE...")
+    write(*,'(A,3I3)') "coshape(sca_int_3) = ", COSHAPE(sca_int_3)
+    write(*,'(A,3I3)') "coshape(sca_int_3, kind=8) = ", COSHAPE(sca_int_3, kind=8)
+#   endif
+#   if HAVE_IMAGE_INDEX
+    call status("Testing IMAGE_INDEX...")
+    write(*,'(A,I3)') "image_index(sca_int_1, [1]) = ", IMAGE_INDEX(sca_int_1, [1])
+    write(*,'(A,I3)') "image_index(sca_int_2, [1,1]) = ", IMAGE_INDEX(sca_int_2, [1,1])
+    write(*,'(A,I3)') "image_index(sca_int_3, [1,1,1]) = ", IMAGE_INDEX(sca_int_3, [1,1,1])
+#     if HAVE_TEAM
+!    write(*,'(A,I3)') "image_index(sca_int_1, [1], get_team()) = ", IMAGE_INDEX(sca_int_1, [1], GET_TEAM())
+    write(*,'(A,I3)') "image_index(sca_int_1, [1], team_number=-1) = ", IMAGE_INDEX(sca_int_1, [1], TEAM_NUMBER=-1)
+!    write(*,'(A,I3)') "image_index(sca_int_3, [1,1,1], get_team()) = ", IMAGE_INDEX(sca_int_3, [1,1,1], GET_TEAM())
+    write(*,'(A,I3)') "image_index(sca_int_3, [1,1,1], team_number=-1) = ", IMAGE_INDEX(sca_int_3, [1,1,1], TEAM_NUMBER=-1)
+#     endif
+#   endif
+#   if HAVE_THIS_IMAGE_COARRAY
+    call status("Testing THIS_IMAGE(coarray)...")
+    write(*,'(A,I3)')  "this_image(sca_int_1) = ", THIS_IMAGE(sca_int_1)
+    write(*,'(A,2I3)') "this_image(sca_int_2) = ", THIS_IMAGE(sca_int_2)
+    write(*,'(A,3I3)') "this_image(sca_int_3) = ", THIS_IMAGE(sca_int_3)
+    write(*,'(A,I3)')  "this_image(sca_int_3, dim=2) = ", THIS_IMAGE(sca_int_3, dim=2)
+#   endif
 # endif
 
 # if HAVE_EVENT_TYPE
