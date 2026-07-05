@@ -4,8 +4,6 @@
 ! This program is NOT designed to evaluate runtime correctness, just to exercise
 ! some basic calls to the features.
 
-program native_multi_image
-
 #if HAVE_MULTI_IMAGE
 ! feature control:
 #ifndef HAVE_SYNC
@@ -76,9 +74,53 @@ program native_multi_image
                     storage_size(subject)/8, bytes); \
   END BLOCK
 
-! Main program
+module helpers
   USE, INTRINSIC :: ISO_FORTRAN_ENV
   USE, INTRINSIC :: ISO_C_BINDING, only: c_int8_t
+  implicit none
+  public
+    integer :: fail_count = 0 
+  contains
+    function tostring(int) result(res)
+      integer :: int
+      character(len=128) :: str
+      character(len=:), allocatable :: res
+      write(str, *) int
+      res = trim(adjustl(str))
+    end function
+
+    function hexdump(arr) result(res)
+      integer(c_int8_t), intent(in) :: arr(:)
+      character(len=:), allocatable :: res
+      character(len=4096) :: buf
+      write(buf, '(*(Z2, 1X))') arr
+      res = trim(buf)
+    end function
+    subroutine sync_all
+#   if HAVE_SYNC_ALL
+      SYNC ALL
+#   endif
+    end subroutine
+    subroutine flush_all
+      flush output_unit
+      flush error_unit
+    end subroutine
+    subroutine status(str)
+      character(len=*) :: str
+      call flush_all
+      call sync_all
+      if (THIS_IMAGE() == 1) write(*,'(A)') str
+      call flush_all
+      call sync_all
+    end subroutine
+
+end module ! helpers
+
+program native_multi_image
+  USE, INTRINSIC :: ISO_FORTRAN_ENV
+  USE, INTRINSIC :: ISO_C_BINDING, only: c_int8_t
+  use helpers
+  implicit none
 
   type :: dummy_team_descriptor
   end type
@@ -86,7 +128,7 @@ program native_multi_image
     type(dummy_team_descriptor), pointer :: info => null()
   end type
 
-  integer :: me, ni, peer, tmp, fail_count = 0
+  integer :: me, ni, peer, tmp
   character(len=5) :: c
 # if HAVE_TEAM
   integer :: team_id
@@ -224,24 +266,6 @@ program native_multi_image
   stop fail_count
 
   contains
-    subroutine sync_all
-#   if HAVE_SYNC_ALL
-      SYNC ALL
-#   endif
-    end subroutine
-    subroutine flush_all
-      flush output_unit
-      flush error_unit
-    end subroutine
-    subroutine status(str)
-      character(len=*) :: str
-      call flush_all
-      call sync_all
-      if (THIS_IMAGE() == 1) write(*,'(A)') str
-      call flush_all
-      call sync_all
-    end subroutine
-
     subroutine test_allocatable_coarray()
 #   if HAVE_ALLOC_COARRAY
 #   define CHECK_ALLOC(coarray, expect) \
@@ -251,6 +275,7 @@ program native_multi_image
         fail_count = fail_count + 1 ; \
       end if
 
+      implicit none
       logical, save :: once = .true.
       integer, allocatable :: aca_int_1[:]
       integer, allocatable :: aca_int_2[:,:]
@@ -270,22 +295,6 @@ program native_multi_image
       end if
 #   endif
     end subroutine
-
-    function tostring(int) result(res)
-      integer :: int
-      character(len=128) :: str
-      character(len=:), allocatable :: res
-      write(str, *) int
-      res = trim(adjustl(str))
-    end function
-
-    function hexdump(arr) result(res)
-      integer(c_int8_t), intent(in) :: arr(:)
-      character(len=:), allocatable :: res
-      character(len=4096) :: buf
-      write(buf, '(*(Z2, 1X))') arr
-      res = trim(buf)
-    end function
 
     subroutine check_type(type_name, is_team, min_size, subject_size, default_bytes)
       character(len=*), intent(in) :: type_name
@@ -349,8 +358,9 @@ program native_multi_image
         call status("  Default init of " // type_name // " ==> " // diag)
       end if
     end subroutine
-
-#else
-  stop "Native multi-image test disabled"
-#endif
 end program
+#else
+program native_multi_image
+  stop "Native multi-image test disabled"
+end program
+#endif
