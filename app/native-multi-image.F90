@@ -64,6 +64,9 @@
 #ifndef HAVE_ALLOC_COARRAY
 #define HAVE_ALLOC_COARRAY HAVE_COARRAY
 #endif
+#ifndef HAVE_SAVE_COARRAY
+#define HAVE_SAVE_COARRAY HAVE_COARRAY
+#endif
 
 ! Helper macros
 #define CHECK_TYPE_COMPLIANCE(subject_type, subject, is_team, min_size) \
@@ -72,6 +75,17 @@
     bytes = transfer(subject, bytes) ; \
     call check_type(#subject_type, is_team, min_size, \
                     storage_size(subject)/8, bytes); \
+  END BLOCK
+#define CHECK_VALI(expr, expect) \
+  BLOCK ; \
+    use helpers ; \
+    integer :: cvi_tmp ; \
+    cvi_tmp = (expr) ; \
+    if (cvi_tmp /= (expect)) then ; \
+      if (THIS_IMAGE() == 1) write(*,'(A,I)') __FILE__//":"//tostring(__LINE__)//": ERROR: " // \
+         #expr // " = ", cvi_tmp ; \
+      fail_count = fail_count + 1 ; \
+    end if ; \
   END BLOCK
 
 module helpers
@@ -115,6 +129,29 @@ module helpers
     end subroutine
 
 end module ! helpers
+
+subroutine test_save_extern_coarray()
+#if HAVE_SAVE_COARRAY
+  use helpers
+  implicit none
+  logical, save :: once = .true.
+  integer, save :: esc_int_1[*]
+  integer, save :: esc_int_2[2,*]
+  integer, save :: esc_int_3[2:3,4:5,*]
+
+  if (once) then
+    once = .false.
+    call status("Testing external SAVE coarrays...")
+    esc_int_1 = 1
+    esc_int_2 = 2
+    esc_int_3 = 3
+  else
+    CHECK_VALI(esc_int_1, 1)
+    CHECK_VALI(esc_int_2, 2)
+    CHECK_VALI(esc_int_3, 3)
+  end if
+#endif
+end subroutine
 
 program native_multi_image
   USE, INTRINSIC :: ISO_FORTRAN_ENV
@@ -261,6 +298,10 @@ program native_multi_image
   call sync_all
   call test_allocatable_coarray
   call test_allocatable_coarray
+
+  call sync_all
+  call test_save_extern_coarray
+  call test_save_extern_coarray
 
   call sync_all
   write(*,'(A,I1,A,I1,A)') "Goodbye from image ", me, " of ", ni, " images"
