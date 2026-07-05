@@ -67,6 +67,9 @@
 #ifndef HAVE_SAVE_COARRAY
 #define HAVE_SAVE_COARRAY HAVE_COARRAY
 #endif
+#ifndef HAVE_MODULE_COARRAY
+#define HAVE_MODULE_COARRAY HAVE_COARRAY
+#endif
 
 ! Helper macros
 #define CHECK_TYPE_COMPLIANCE(subject_type, subject, is_team, min_size) \
@@ -153,10 +156,41 @@ subroutine test_save_extern_coarray()
 #endif
 end subroutine
 
+module coarrays
+  use helpers
+  implicit none
+# if HAVE_MODULE_COARRAY
+  integer :: msc_int_1[*]
+  integer :: msc_int_2[2,*]
+  integer :: msc_int_3[2:3,4:5,*]
+# endif
+  public
+  contains
+  subroutine test_module_coarray()
+# if HAVE_MODULE_COARRAY
+    implicit none
+    logical, save :: once = .true.
+
+    if (once) then
+      once = .false.
+      call status("Testing module SAVE coarrays...")
+      msc_int_1 = 1
+      msc_int_2 = 2
+      msc_int_3 = 3
+    else
+      CHECK_VALI(msc_int_1, 1)
+      CHECK_VALI(msc_int_2, 2)
+      CHECK_VALI(msc_int_3, 3)
+    end if
+#  endif
+  end subroutine
+end module
+
 program native_multi_image
   USE, INTRINSIC :: ISO_FORTRAN_ENV
   USE, INTRINSIC :: ISO_C_BINDING, only: c_int8_t
   use helpers
+  use coarrays
   implicit none
 
   type :: dummy_team_descriptor
@@ -302,6 +336,10 @@ program native_multi_image
   call sync_all
   call test_save_extern_coarray
   call test_save_extern_coarray
+
+  call sync_all
+  call test_module_coarray
+  call test_module_coarray
 
   call sync_all
   write(*,'(A,I1,A,I1,A)') "Goodbye from image ", me, " of ", ni, " images"
