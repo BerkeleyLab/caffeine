@@ -362,23 +362,35 @@ program native_multi_image
     subroutine test_allocatable_coarray()
 #   if HAVE_ALLOC_COARRAY
 #   define CHECK_ALLOC(coarray, expect) \
-      if (ALLOCATED(coarray) .neqv. expect) then ; \
-        if (THIS_IMAGE() == 1) write(*,'(A)') __FILE__//":"//tostring(__LINE__)//": ERROR: " // \
-           " ALLOCATED(" // #coarray // ") = " // MERGE("true ","false",ALLOCATED(coarray)) ; \
-        fail_count = fail_count + 1 ; \
-      end if
+      BLOCK ; \
+        logical :: ca_a, ca_e ; \
+        ca_a = ALLOCATED(coarray) ; \
+        ca_e = (expect) ; \
+        if (ca_a .neqv. ca_e) then ; \
+          if (THIS_IMAGE() == 1) write(*,'(A)') __FILE__//":"//tostring(__LINE__)//": ERROR: " // \
+             " ALLOCATED(" // #coarray // ") = " // MERGE("true ","false",ca_a) // \
+             ", expected = " // MERGE("true ","false",ca_e) ; \
+          fail_count = fail_count + 1 ; \
+        end if ; \
+      END BLOCK
 
       implicit none
-      logical, save :: once = .true.
+      logical, volatile, save :: once = .true.  ! volatile is workaround for flang optimizer bug
       integer, allocatable :: aca_int_1[:]
       integer, allocatable :: aca_int_2[:,:]
       integer, save, allocatable :: aca_int_3[:,:,:]
+      if (once) then
+        call status("Testing ALLOCATABLE coarrays...")
+      end if
+#   if VERBOSE
+      if (THIS_IMAGE() == 1) &
+        write (*,*) once, "ENTRY:", ALLOCATED(aca_int_1), ALLOCATED(aca_int_2), ALLOCATED(aca_int_3)
+#   endif
       CHECK_ALLOC(aca_int_1, .false.)
       CHECK_ALLOC(aca_int_2, .false.)
-      CHECK_ALLOC(aca_int_3, .false.)
+      CHECK_ALLOC(aca_int_3, .not. once)
+
       if (once) then
-        once = .false.
-        call status("Testing ALLOCATABLE coarrays...")
         ALLOCATE(aca_int_1[*])
         ALLOCATE(aca_int_2[2,*])
         ALLOCATE(aca_int_3[2,3,*])
@@ -386,6 +398,11 @@ program native_multi_image
         CHECK_ALLOC(aca_int_2, .true.)
         CHECK_ALLOC(aca_int_3, .true.)
       end if
+#   if VERBOSE
+      if (THIS_IMAGE() == 1) &
+        write (*,*) once, "EXIT: ", ALLOCATED(aca_int_1), ALLOCATED(aca_int_2), ALLOCATED(aca_int_3)
+#   endif
+      once = .false.
 #   endif
     end subroutine
 
