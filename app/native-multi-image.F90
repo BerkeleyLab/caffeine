@@ -56,7 +56,7 @@
 #endif
 
 #ifndef HAVE_COARRAY
-#define HAVE_COARRAY 1
+#define HAVE_COARRAY 0
 #endif
 #ifndef HAVE_MAIN_COARRAY
 #define HAVE_MAIN_COARRAY HAVE_COARRAY
@@ -337,38 +337,49 @@ program native_multi_image
 # if HAVE_MAIN_COARRAY
 #   if HAVE_COBOUND
     call status("Testing LCOBOUND/UCOBOUND...")
-    write(*,'(A,2I3)') "lcobound(sca_int_2) = ", LCOBOUND(sca_int_2)
-    write(*,'(A,2I3)') "ucobound(sca_int_2) = ", UCOBOUND(sca_int_2)
-    write(*,'(A,3I3)') "lcobound(sca_int_3) = ", LCOBOUND(sca_int_3)
-    write(*,'(A,3I3)') "ucobound(sca_int_3) = ", UCOBOUND(sca_int_3)
-    write(*,'(A,I3)')  "lcobound(sca_int_3, dim=2) = ", LCOBOUND(sca_int_3, dim=2)
-    write(*,'(A,I3)')  "ucobound(sca_int_3, dim=2) = ", UCOBOUND(sca_int_3, dim=2)
-    write(*,'(A,I3)')  "lcobound(sca_int_3, dim=2, kind=8) = ", LCOBOUND(sca_int_3, dim=2, kind=8)
-    write(*,'(A,I3)')  "ucobound(sca_int_3, dim=2, kind=8) = ", UCOBOUND(sca_int_3, dim=2, kind=8)
+    if (THIS_IMAGE() == 1) then
+      ! Note output is affected by llvm-project issue #207858
+      write(*,'(A,2I3)') "lcobound(sca_int_2) = ", LCOBOUND(sca_int_2)
+      write(*,'(A,2I3)') "ucobound(sca_int_2) = ", UCOBOUND(sca_int_2)
+      write(*,'(A,3I3)') "lcobound(sca_int_3) = ", LCOBOUND(sca_int_3)
+      write(*,'(A,3I3)') "ucobound(sca_int_3) = ", UCOBOUND(sca_int_3)
+      write(*,'(A,I3)')  "lcobound(sca_int_3, dim=2) = ", LCOBOUND(sca_int_3, dim=2)
+      write(*,'(A,I3)')  "ucobound(sca_int_3, dim=2) = ", UCOBOUND(sca_int_3, dim=2)
+      write(*,'(A,I3)')  "lcobound(sca_int_3, dim=2, kind=8) = ", LCOBOUND(sca_int_3, dim=2, kind=8)
+      write(*,'(A,I3)')  "ucobound(sca_int_3, dim=2, kind=8) = ", UCOBOUND(sca_int_3, dim=2, kind=8)
+    end if
 #   endif
 #   if HAVE_COSHAPE
     call status("Testing COSHAPE...")
-    write(*,'(A,3I3)') "coshape(sca_int_3) = ", COSHAPE(sca_int_3)
-    write(*,'(A,3I3)') "coshape(sca_int_3, kind=8) = ", COSHAPE(sca_int_3, kind=8)
+    if (THIS_IMAGE() == 1) then
+      ! Note output is affected by llvm-project issue #207858
+      write(*,'(A,3I3)') "coshape(sca_int_3) = ", COSHAPE(sca_int_3)
+      write(*,'(A,3I3)') "coshape(sca_int_3, kind=8) = ", COSHAPE(sca_int_3, kind=8)
+    end if
 #   endif
 #   if HAVE_IMAGE_INDEX
     call status("Testing IMAGE_INDEX...")
-    write(*,'(A,I3)') "image_index(sca_int_1, [1]) = ", IMAGE_INDEX(sca_int_1, [1])
-    write(*,'(A,I3)') "image_index(sca_int_2, [1,1]) = ", IMAGE_INDEX(sca_int_2, [1,1])
-    write(*,'(A,I3)') "image_index(sca_int_3, [1,1,1]) = ", IMAGE_INDEX(sca_int_3, [1,1,1])
+    if (THIS_IMAGE() == 1) then
+      write(*,'(A,I3)') "image_index(sca_int_1, [1]) = ", IMAGE_INDEX(sca_int_1, [1])
+      write(*,'(A,I3)') "image_index(sca_int_2, [1,1]) = ", IMAGE_INDEX(sca_int_2, [1,1])
+      write(*,'(A,I3)') "image_index(sca_int_3, [1,1,1]) = ", IMAGE_INDEX(sca_int_3, [1,1,1])
 #     if HAVE_TEAM
-!    write(*,'(A,I3)') "image_index(sca_int_1, [1], get_team()) = ", IMAGE_INDEX(sca_int_1, [1], GET_TEAM())
-    write(*,'(A,I3)') "image_index(sca_int_1, [1], team_number=-1) = ", IMAGE_INDEX(sca_int_1, [1], TEAM_NUMBER=-1)
-!    write(*,'(A,I3)') "image_index(sca_int_3, [1,1,1], get_team()) = ", IMAGE_INDEX(sca_int_3, [1,1,1], GET_TEAM())
-    write(*,'(A,I3)') "image_index(sca_int_3, [1,1,1], team_number=-1) = ", IMAGE_INDEX(sca_int_3, [1,1,1], TEAM_NUMBER=-1)
+        write(*,'(A,I3)') "image_index(sca_int_1, [1], team_number=-1) = ", IMAGE_INDEX(sca_int_1, [1], TEAM_NUMBER=-1)
+        write(*,'(A,I3)') "image_index(sca_int_3, [1,1,1], team_number=-1) = ", IMAGE_INDEX(sca_int_3, [1,1,1], TEAM_NUMBER=-1)
+        ! disabled for llvm-project issue #205953
+        !write(*,'(A,I3)') "image_index(sca_int_1, [1], get_team()) = ", IMAGE_INDEX(sca_int_1, [1], GET_TEAM())
+        !write(*,'(A,I3)') "image_index(sca_int_3, [1,1,1], get_team()) = ", IMAGE_INDEX(sca_int_3, [1,1,1], GET_TEAM())
 #     endif
+    end if
 #   endif
 #   if HAVE_THIS_IMAGE_COARRAY
     call status("Testing THIS_IMAGE(coarray)...")
-    write(*,'(A,I3)')  "this_image(sca_int_1) = ", THIS_IMAGE(sca_int_1)
-    write(*,'(A,2I3)') "this_image(sca_int_2) = ", THIS_IMAGE(sca_int_2)
-    write(*,'(A,3I3)') "this_image(sca_int_3) = ", THIS_IMAGE(sca_int_3)
-    write(*,'(A,I3)')  "this_image(sca_int_3, dim=2) = ", THIS_IMAGE(sca_int_3, dim=2)
+    if (THIS_IMAGE() == NUM_IMAGES()) then
+      write(*,'(A,I3)')  "this_image(sca_int_1) = ", THIS_IMAGE(sca_int_1)
+      write(*,'(A,2I3)') "this_image(sca_int_2) = ", THIS_IMAGE(sca_int_2)
+      write(*,'(A,3I3)') "this_image(sca_int_3) = ", THIS_IMAGE(sca_int_3)
+      write(*,'(A,I3)')  "this_image(sca_int_3, dim=2) = ", THIS_IMAGE(sca_int_3, dim=2)
+    end if
 #   endif
 # endif
 
