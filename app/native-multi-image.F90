@@ -128,8 +128,8 @@ program native_multi_image
     type(dummy_team_descriptor), pointer :: info => null()
   end type
 
-  integer :: me, ni, peer, tmp
-  character(len=5) :: c
+  integer :: me, ni, peer, i, ia(3)
+  character(len=5) :: c, ca(3)
 # if HAVE_TEAM
   integer :: team_id
   type(TEAM_TYPE) :: subteam, res
@@ -184,31 +184,45 @@ program native_multi_image
     if (me /= peer) SYNC IMAGES([me, peer])
 #endif
 
-  tmp = me
+  i = me
+  ia = me
   c = "hello"
+  ca = c
 # if HAVE_CO_SUM
     call status("Testing CO_SUM...")
-    call CO_SUM(tmp)
-    call CO_SUM(tmp,1)
+    call CO_SUM(i)
+    call CO_SUM(i,1)
+    call CO_SUM(ia)
+    call CO_SUM(ia,1)
 # endif
 # if HAVE_CO_MIN
     call status("Testing CO_MIN...")
-    call CO_MIN(tmp)
-    call CO_MIN(tmp,1)
+    call CO_MIN(i)
+    call CO_MIN(i,1)
+    call CO_MIN(ia)
+    call CO_MIN(ia,1)
     call CO_MIN(c)
     call CO_MIN(c,1)
+    call CO_MIN(ca)
+    call CO_MIN(ca,1)
 # endif
 # if HAVE_CO_MAX
     call status("Testing CO_MAX...")
-    call CO_MAX(tmp)
-    call CO_MAX(tmp,1)
+    call CO_MAX(i)
+    call CO_MAX(i,1)
+    call CO_MAX(ia)
+    call CO_MAX(ia,1)
     call CO_MAX(c)
     call CO_MAX(c,1)
+    call CO_MAX(ca)
+    call CO_MAX(ca,1)
 # endif
 # if HAVE_CO_BROADCAST
     call status("Testing CO_BROADCAST...")
-    call CO_BROADCAST(tmp,1)
+    call CO_BROADCAST(i,1)
+    call CO_BROADCAST(ia,1)
     call CO_BROADCAST(c,1)
+    call CO_BROADCAST(ca,1)
 # endif
 
 # if HAVE_TEAM
