@@ -434,7 +434,10 @@ jobs:
       if: ${{ env.NATIVE_MULTI_IMAGE == 'true' }}
       run: |
         ./run-fpm.sh run --verbose 2>&1 | tee output
-        ! grep -q "IEEE arithmetic exceptions signaled" output
+        if [[ "${{ matrix.network }}" != "udp" ]] ; then
+          # ignore intermittent INEXACT exceptions from AMUDP at exit time
+          ! grep -q "IEEE arithmetic exceptions signaled" output
+        fi
 
     - name: Run unit tests
       run: |
