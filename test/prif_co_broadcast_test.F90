@@ -52,7 +52,7 @@ contains
        test_description_t("broadcasting a default integer scalar with no optional arguments present", usher(broadcast_default_integer_scalar)) &
       ,test_description_t("prif_co_broadcast of a derived type scalar with no allocatable components", usher(broadcast_derived_type)) &
       ,test_description_t("prif_co_broadcast_cptr of a derived type scalar with no allocatable components" &
-#   if __LFORTRAN__ && __LFORTRAN_MAJOR__ == 0 && __LFORTRAN_MINOR__ <= 63
+#   if __LFORTRAN__
        ! test disabled for LFortran issue 11191
 #   else
         , usher(broadcast_derived_type_cptr) &
