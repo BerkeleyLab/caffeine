@@ -70,6 +70,9 @@
 #ifndef HAVE_MODULE_COARRAY
 #define HAVE_MODULE_COARRAY HAVE_COARRAY
 #endif
+#ifndef HAVE_COARRAY_INIT
+#define HAVE_COARRAY_INIT HAVE_COARRAY
+#endif
 
 ! coarray query intrinsics
 #ifndef HAVE_COARRAY_QUERY
@@ -107,6 +110,13 @@
       fail_count = fail_count + 1 ; \
     end if ; \
   END BLOCK
+
+#define COARRAY_INT_INIT_VALUE 123456789
+#if HAVE_COARRAY_INIT
+#  define COARRAY_INT_INIT = COARRAY_INT_INIT_VALUE
+#else
+#  define COARRAY_INT_INIT
+#endif
 
 module helpers
   USE, INTRINSIC :: ISO_FORTRAN_ENV
@@ -155,13 +165,18 @@ subroutine test_save_extern_coarray()
   use helpers
   implicit none
   logical, save :: once = .true.
-  integer, save :: esc_int_1[*]
-  integer, save :: esc_int_2[2,*]
-  integer, save :: esc_int_3[2:3,4:5,*]
+  integer, save :: esc_int_1[*]         COARRAY_INT_INIT
+  integer, save :: esc_int_2[2,*]       COARRAY_INT_INIT
+  integer, save :: esc_int_3[2:3,4:5,*] COARRAY_INT_INIT
 
   if (once) then
     once = .false.
     call status("Testing external SAVE coarrays...")
+#   if HAVE_COARRAY_INIT
+      CHECK_VALI(esc_int_1, COARRAY_INT_INIT_VALUE)
+      CHECK_VALI(esc_int_2, COARRAY_INT_INIT_VALUE)
+      CHECK_VALI(esc_int_3, COARRAY_INT_INIT_VALUE)
+#   endif
     esc_int_1 = 1
     esc_int_2 = 2
     esc_int_3 = 3
@@ -178,9 +193,9 @@ module coarrays
   implicit none
   
 # if HAVE_MODULE_COARRAY
-  integer :: msc_int_1[*]
-  integer :: msc_int_2[2,*]
-  integer :: msc_int_3[2:3,4:5,*]
+  integer :: msc_int_1[*]         ! COARRAY_INT_INIT
+  integer :: msc_int_2[2,*]       ! COARRAY_INT_INIT
+  integer :: msc_int_3[2:3,4:5,*] ! COARRAY_INT_INIT
 # endif
 
   public
@@ -194,6 +209,11 @@ module coarrays
     if (once) then
       once = .false.
       call status("Testing module SAVE coarrays...")
+#     if HAVE_COARRAY_INIT && 0 /* disabled pending LFortran issue #12163 */
+        CHECK_VALI(msc_int_1, COARRAY_INT_INIT_VALUE)
+        CHECK_VALI(msc_int_2, COARRAY_INT_INIT_VALUE)
+        CHECK_VALI(msc_int_3, COARRAY_INT_INIT_VALUE)
+#     endif
       msc_int_1 = 1
       msc_int_2 = 2
       msc_int_3 = 3
@@ -227,9 +247,9 @@ program native_multi_image
   type(TEAM_TYPE) :: default_team
 # endif
 # if HAVE_MAIN_COARRAY
-  integer :: sca_int_1[*]
-  integer :: sca_int_2[2,*]
-  integer :: sca_int_3[2,3,*]
+  integer :: sca_int_1[*]     COARRAY_INT_INIT
+  integer :: sca_int_2[2,*]   COARRAY_INT_INIT
+  integer :: sca_int_3[2,3,*] COARRAY_INT_INIT
 # endif
 # if HAVE_EVENT_TYPE
       type(event_type), target :: default_event[*]
@@ -338,6 +358,12 @@ program native_multi_image
 # endif
 
 # if HAVE_MAIN_COARRAY
+#   if HAVE_COARRAY_INIT
+    call status("Testing main program coarray initialization...")
+    CHECK_VALI(sca_int_1, COARRAY_INT_INIT_VALUE)
+    CHECK_VALI(sca_int_2, COARRAY_INT_INIT_VALUE)
+    CHECK_VALI(sca_int_3, COARRAY_INT_INIT_VALUE)
+#   endif
 #   if HAVE_COBOUND
     call status("Testing LCOBOUND/UCOBOUND...")
     if (THIS_IMAGE() == 1) then
