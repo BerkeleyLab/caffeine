@@ -27,6 +27,7 @@ submodule(prif) prif_private_s
   type(prif_team_descriptor), target :: initial_team
   type(prif_team_type) :: current_team
   integer(c_intptr_t) :: total_heap_size, non_symmetric_heap_size
+  logical, save :: prif_init_called_previously = .false.
 
   interface
 
@@ -548,6 +549,8 @@ contains
     integer(c_int) :: i, epp(15)
     type(prif_coarray_descriptor), pointer :: cdp
 
+    call assert_always(prif_init_called_previously, "Invalid call to a PRIF subroutine before prif::prif_init")
+
     call assert_always(c_associated(coarray_handle%info), "unassociated info pointer in prif_coarray_handle")
     cdp => handle_to_cdp(coarray_handle)
     associate(corank => cdp%corank)
@@ -578,6 +581,7 @@ contains
     logical :: result_, known_active_
     integer :: i
 
+    call assert_always(prif_init_called_previously, "Invalid call to a PRIF subroutine before prif::prif_init")
     call assert_always(associated(team%info), "unassociated info pointer in prif_team_type")
 
     ! check for invalid cycles in the team hierarchy

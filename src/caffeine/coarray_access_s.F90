@@ -26,6 +26,7 @@ contains
   end procedure
 
   module procedure prif_put_indirect
+    call_assert(prif_init_called_previously)
     call_assert_describe(image_num > 0 .and. image_num <= initial_team%num_images, "image_num not within valid range")
 
     call caf_put( &
@@ -87,6 +88,7 @@ contains
   end procedure
 
   module procedure prif_put_indirect_with_notify_indirect
+    call_assert(prif_init_called_previously)
     call_assert_describe(image_num > 0 .and. image_num <= initial_team%num_images, "image_num not within valid range")
 
     call caf_put( &
@@ -118,6 +120,7 @@ contains
   end procedure
 
   module procedure prif_get_indirect
+    call_assert(prif_init_called_previously)
     call_assert_describe(image_num > 0 .and. image_num <= initial_team%num_images, "image_num not within valid range")
 
     call caf_get( &
@@ -183,6 +186,7 @@ contains
   end procedure
 
   module procedure prif_get_strided_indirect
+    call_assert(prif_init_called_previously)
     call get_strided_helper( &
         image_num = image_num, &
         remote_ptr = remote_ptr, &
@@ -248,6 +252,7 @@ contains
   end procedure
 
   module procedure prif_put_strided_indirect
+    call_assert(prif_init_called_previously)
     call put_strided_helper( &
         image_num = image_num, &
         remote_ptr = remote_ptr, &
@@ -320,6 +325,7 @@ contains
   end procedure
 
   module procedure prif_put_strided_indirect_with_notify_indirect
+    call_assert(prif_init_called_previously)
     call put_strided_helper( &
         image_num = image_num, &
         remote_ptr = remote_ptr, &

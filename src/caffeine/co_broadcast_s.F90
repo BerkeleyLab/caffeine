@@ -11,6 +11,7 @@ submodule(prif:prif_private_s)  co_broadcast_s
 contains
 
   module procedure prif_co_broadcast
+    call_assert(prif_init_called_previously)
     call_assert(source_image >= 1 .and. source_image <= current_team%info%num_images)
     call contiguous_co_broadcast(a, source_image, stat, errmsg, errmsg_alloc)
   end procedure
@@ -29,6 +30,7 @@ contains
   end subroutine
 
   module procedure prif_co_broadcast_cptr
+    call_assert(prif_init_called_previously)
     call_assert(source_image >= 1 .and. source_image <= current_team%info%num_images)
     if (present(stat)) stat=0
     call caf_co_broadcast_cptr(a_ptr, source_image, size_in_bytes, current_team%info%gex_team)

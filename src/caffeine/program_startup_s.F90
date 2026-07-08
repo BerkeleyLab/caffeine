@@ -11,7 +11,9 @@ contains
 
   module procedure prif_init
     use ieee_arithmetic, only: ieee_inexact, ieee_set_flag
-    logical, save :: prif_init_called_previously = .false.
+    logical, save :: shadow_init = .false.
+
+    call_assert(shadow_init .eqv. prif_init_called_previously)
 
     if (prif_init_called_previously) then
        stat = PRIF_STAT_ALREADY_INIT
@@ -30,6 +32,9 @@ contains
        initial_team%num_images = caf_num_images(initial_team%gex_team)
        non_symmetric_heap_size = total_heap_size - initial_team%heap_size
 
+       prif_init_called_previously = .true.
+       shadow_init = .true.
+
        call_assert(team_check(current_team))
 
        call sync_init()
@@ -38,7 +43,6 @@ contains
        ! signalled from within the C-based initialization code above
        call ieee_set_flag(ieee_inexact, .false.)
 
-       prif_init_called_previously = .true.
        stat = 0
     end if
   end procedure

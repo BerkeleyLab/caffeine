@@ -29,6 +29,7 @@ contains
   end procedure
 
   module procedure prif_sync_memory
+    call_assert(prif_init_called_previously)
     call caf_sync_memory
     if (present(stat)) stat = 0
   end procedure

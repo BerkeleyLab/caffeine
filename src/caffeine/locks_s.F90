@@ -1,5 +1,8 @@
 ! Copyright (c), The Regents of the University of California
 ! Terms of use are as specified in LICENSE.txt
+
+#include "assert_macros.h"
+
 submodule(prif:prif_private_s) locks_s
   ! DO NOT ADD USE STATEMENTS HERE
   ! All use statements belong in prif_private_s.F90
@@ -14,6 +17,7 @@ contains
   end procedure
 
   module procedure prif_lock_indirect
+    call_assert(prif_init_called_previously)
     call unimplemented("prif_lock_indirect")
 
     if (present(stat)) stat = 0
@@ -26,6 +30,7 @@ contains
   end procedure
 
   module procedure prif_unlock_indirect
+    call_assert(prif_init_called_previously)
     call unimplemented("prif_unlock_indirect")
 
     if (present(stat)) stat = 0

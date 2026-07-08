@@ -11,6 +11,7 @@ submodule(prif:prif_private_s) co_sum_s
 contains
 
   module procedure prif_co_sum
+    call_assert(prif_init_called_previously)
     if (present(result_image)) then
       call_assert(result_image >= 1 .and. result_image <= current_team%info%num_images)
     endif

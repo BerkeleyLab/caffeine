@@ -18,6 +18,7 @@ contains
     integer(c_int), intent(out), optional :: stat
     character(len=*), intent(inout), optional :: errmsg
     character(len=:), intent(inout), allocatable, optional :: errmsg_alloc
+    call_assert(prif_init_called_previously)
     if (present(result_image)) then
       call_assert(result_image >= 1 .and. result_image <= current_team%info%num_images)
     endif
@@ -63,6 +64,7 @@ contains
     character(len=:), intent(inout), allocatable, optional :: errmsg_alloc
     type(c_funptr) :: funptr 
 
+    call_assert(prif_init_called_previously)
     if (present(stat)) stat=0
 
     call_assert(associated(operation_wrapper))

@@ -24,6 +24,7 @@ contains
   end procedure
 
   module procedure prif_event_post_indirect
+    call_assert(prif_init_called_previously)
     call_assert_describe(image_num > 0 .and. image_num <= initial_team%num_images, "image_num not within valid range")
 
     call caf_event_post(image_num, event_var_ptr, &
@@ -35,6 +36,7 @@ contains
   module procedure prif_event_wait
     integer(c_int64_t) :: threshold
 
+    call_assert(prif_init_called_previously)
     if (present(until_count)) then
       threshold = MAX(until_count, 1_c_int64_t)
     else
@@ -47,6 +49,7 @@ contains
   end procedure
 
   module procedure prif_event_query
+    call_assert(prif_init_called_previously)
     call caf_event_query(event_var_ptr, count) 
 
     if (present(stat)) stat = 0
@@ -55,6 +58,7 @@ contains
   module procedure prif_notify_wait
     integer(c_int64_t) :: threshold
 
+    call_assert(prif_init_called_previously)
     if (present(until_count)) then
       threshold = MAX(until_count, 1_c_int64_t)
     else

@@ -40,6 +40,7 @@ submodule(prif:prif_private_s) co_max_s
 contains
 
   module procedure prif_co_max
+    call_assert(prif_init_called_previously)
     if (present(result_image)) then
       call_assert(result_image >= 1 .and. result_image <= current_team%info%num_images)
     endif
@@ -68,6 +69,7 @@ contains
     integer(c_size_t), target :: char_len
     procedure(prif_operation_wrapper_interface), pointer :: op
 
+    call_assert(prif_init_called_previously)
     char_len = len(a)
     op => caf_char_max_wrapper
 #if defined(__GFORTRAN__) && 0
