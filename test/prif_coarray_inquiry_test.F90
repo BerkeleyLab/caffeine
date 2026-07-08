@@ -1,9 +1,10 @@
+#include "julienne-assert-macros.h"
 #include "test-utils.F90"
 
 module prif_coarray_inquiry_test_m
 # include "test-uses-alloc.F90"
   use prif, only : &
-      prif_coarray_handle, prif_num_images, &
+      prif_coarray_handle, prif_this_image_no_coarray, prif_num_images, &
       prif_local_data_pointer, prif_size_bytes, &
       prif_lcobound_no_dim, prif_lcobound_with_dim, &
       prif_ucobound_no_dim, prif_ucobound_with_dim, &
@@ -14,6 +15,7 @@ module prif_coarray_inquiry_test_m
     ,operator(.all.) &
     ,operator(.also.) &
     ,operator(.equalsExpected.) &
+    ,call_julienne_assert_ &
     ,usher &
     ,string_t &
     ,test_description_t &
@@ -68,46 +70,41 @@ contains
       call prif_deallocate_coarray(coarray_handle)
   end function
 
-  impure elemental function check_cobound(corank, omit_trailing) result(diag)
-    type(test_diagnosis_t) :: diag
-    integer(c_int), intent(in) :: corank
+  function check_cobound(lcobounds, ucobounds, omit_trailing) result(diag)
+    !! Allocate a coarray with given cobounds and test some queries on it
+    integer(kind=c_int64_t), intent(in) :: lcobounds(:), ucobounds(:)
     logical, intent(in) :: omit_trailing
 
-    ! Allocate memory for an integer scalar coarray with given corank
-    ! and then test some queries on it
-
-    integer :: num_imgs, i
-    integer(kind=c_int64_t), dimension(corank) :: lcobounds, ucobounds, tmp_bounds
-    integer(kind=c_int64_t), dimension(corank-1) :: leading_ucobounds
+    integer(kind=c_int64_t) :: tmp_bounds(size(lcobounds)), actual_ucobounds(size(lcobounds)), leading_ucobounds(size(lcobounds)-1)
     integer(kind=c_int64_t) :: tmp_bound
-    integer(kind=c_size_t), dimension(corank)  :: sizes
+    integer(kind=c_size_t)  :: sizes(size(lcobounds))
     type(prif_coarray_handle) :: coarray_handle
     type(c_ptr) :: allocated_memory
     integer(c_size_t) :: data_size, query_size
+    integer :: i, corank, num_imgs
+    type(test_diagnosis_t) :: diag
 
     diag = .true.
 
+    call_julienne_assert(size(lcobounds) == size(ucobounds))
+    corank = size(lcobounds)
     call prif_num_images(num_images=num_imgs)
-    lcobounds(1) = 1
-    ucobounds(1) = num_imgs
-    do i = 2,corank
-      lcobounds(i) = i
-      ucobounds(i) = i + merge(1,0,mod(i,2)==0)
-    end do
+
+    ! compute trailing ucobound
+    actual_ucobounds = ucobounds
+    tmp_bound = product(ucobounds(1:corank-1) - lcobounds(1:corank-1) + 1) 
+    actual_ucobounds(corank) = lcobounds(corank) + (num_imgs + tmp_bound - 1) / tmp_bound - 1
 
     allocated_memory = c_null_ptr
     data_size = 64 * corank
-
     if (omit_trailing) then
       leading_ucobounds = ucobounds(1:corank-1)
       call prif_allocate_coarray( lcobounds, leading_ucobounds, data_size, null_final_proc, &
         coarray_handle, allocated_memory)
     else
-      call prif_allocate_coarray( lcobounds, ucobounds, data_size, null_final_proc, &
+      call prif_allocate_coarray( lcobounds, actual_ucobounds, data_size, null_final_proc, &
         coarray_handle, allocated_memory)
     end if
-
-    if (corank > 1) ucobounds(corank) = lcobounds(corank) ! trailing ucobound gets rounded down
 
     ALSO(c_associated(allocated_memory))
 
@@ -118,20 +115,52 @@ contains
     ALSO2(.all. (tmp_bounds .equalsExpected. lcobounds), "prif_lcobound_no_dim is valid")
 
     call prif_ucobound_no_dim(coarray_handle, tmp_bounds)
-    ALSO2(.all. (tmp_bounds .equalsExpected. ucobounds), "prif_ucobound_no_dim is valid")
+    ALSO2(.all. (tmp_bounds .equalsExpected. actual_ucobounds), "prif_ucobound_no_dim is valid")
 
     do i = 1, corank
       call prif_lcobound_with_dim(coarray_handle, i, tmp_bound)
       ALSO2(tmp_bound .equalsExpected. lcobounds(i), "prif_lcobound_with_dim is valid")
 
       call prif_ucobound_with_dim(coarray_handle, i, tmp_bound)
-      ALSO2(tmp_bound .equalsExpected. ucobounds(i), "prif_ucobound_with_dim is valid")
+      ALSO2(tmp_bound .equalsExpected. actual_ucobounds(i), "prif_ucobound_with_dim is valid")
     end do
 
     call prif_coshape(coarray_handle, sizes)
-    ALSO2(.all. ((ucobounds - lcobounds + 1) .equalsExpected. sizes), "prif_coshape is valid")
+    ALSO2(.all. ((actual_ucobounds - lcobounds + 1) .equalsExpected. sizes), "prif_coshape is valid")
+
+#   if VERBOSE
+    block
+      integer :: me
+      call prif_this_image_no_coarray(this_image=me)
+      if (me == 1) then
+        write(*,'(A,*(I4))') "lcobounds=" , lcobounds
+        write(*,'(A,*(I4))') "ucobounds=" , actual_ucobounds
+        write(*,'(A,*(I4))') "sizes=    " , sizes
+      end if
+    end block
+#   endif
 
     call prif_deallocate_coarray(coarray_handle)
+  end function
+
+  impure elemental function check_corank(corank, omit_trailing) result(diag)
+    !! Allocate a coarray with given corank and test some queries on it
+    type(test_diagnosis_t) :: diag
+    integer(c_int), intent(in) :: corank
+    logical, intent(in) :: omit_trailing
+
+    integer :: i
+    integer(kind=c_int64_t), dimension(corank) :: lcobounds, ucobounds
+
+    lcobounds(1) = 10
+    ucobounds(1) = 11
+    do i = 2,corank
+      lcobounds(i) = 10*i
+      ucobounds(i) = 10*i + merge(1,0,mod(i,2)==0)
+    end do
+
+    diag = check_cobound(lcobounds, ucobounds, omit_trailing)
+
   end function
 
   function check_cobounds() result(diag)
@@ -140,8 +169,18 @@ contains
 
     diag = .true.
 
-    ALSO(.all. check_cobound([(corank, corank = 1_c_int, 15_c_int)], .false.))
-    ALSO(.all. check_cobound([(corank, corank = 1_c_int, 15_c_int)], .true.))
+    ! check some simple cases
+    ALSO(check_cobound([integer(c_int64_t) :: 1], [integer(c_int64_t) :: 0], .true.))
+
+    ALSO(check_cobound([integer(c_int64_t) :: 1, 1], [integer(c_int64_t) :: 2, 0], .true.))
+
+    ALSO(check_cobound([integer(c_int64_t) :: 1, 1, 1], [integer(c_int64_t) :: 2, 3, 0], .true.))
+
+    ALSO(check_cobound([integer(c_int64_t) :: 101, 101, 101], [integer(c_int64_t) :: 104, 102, 0], .true.))
+
+    ! cover all the possible coranks
+    ALSO(.all. check_corank([(corank, corank = 1_c_int, 15_c_int)], .false.))
+    ALSO(.all. check_corank([(corank, corank = 1_c_int, 15_c_int)], .true.))
   end function
 
 end module prif_coarray_inquiry_test_m

@@ -4,8 +4,6 @@
 ! This program is NOT designed to evaluate runtime correctness, just to exercise
 ! some basic calls to the features.
 
-program native_multi_image
-
 #if HAVE_MULTI_IMAGE
 ! feature control:
 #ifndef HAVE_SYNC
@@ -66,6 +64,29 @@ program native_multi_image
 #ifndef HAVE_ALLOC_COARRAY
 #define HAVE_ALLOC_COARRAY HAVE_COARRAY
 #endif
+#ifndef HAVE_SAVE_COARRAY
+#define HAVE_SAVE_COARRAY HAVE_COARRAY
+#endif
+#ifndef HAVE_MODULE_COARRAY
+#define HAVE_MODULE_COARRAY HAVE_COARRAY
+#endif
+
+! coarray query intrinsics
+#ifndef HAVE_COARRAY_QUERY
+#define HAVE_COARRAY_QUERY HAVE_COARRAY
+#endif
+#ifndef HAVE_COBOUND
+#define HAVE_COBOUND HAVE_COARRAY_QUERY
+#endif
+#ifndef HAVE_COSHAPE
+#define HAVE_COSHAPE HAVE_COARRAY_QUERY
+#endif
+#ifndef HAVE_IMAGE_INDEX
+#define HAVE_IMAGE_INDEX HAVE_COARRAY_QUERY
+#endif
+#ifndef HAVE_THIS_IMAGE_COARRAY
+#define HAVE_THIS_IMAGE_COARRAY HAVE_COARRAY_QUERY
+#endif
 
 ! Helper macros
 #define CHECK_TYPE_COMPLIANCE(subject_type, subject, is_team, min_size) \
@@ -75,10 +96,122 @@ program native_multi_image
     call check_type(#subject_type, is_team, min_size, \
                     storage_size(subject)/8, bytes); \
   END BLOCK
+#define CHECK_VALI(expr, expect) \
+  BLOCK ; \
+    use helpers ; \
+    integer :: cvi_tmp ; \
+    cvi_tmp = (expr) ; \
+    if (cvi_tmp /= (expect)) then ; \
+      if (THIS_IMAGE() == 1) write(*,'(A,I)') __FILE__//":"//tostring(__LINE__)//": ERROR: " // \
+         #expr // " = ", cvi_tmp ; \
+      fail_count = fail_count + 1 ; \
+    end if ; \
+  END BLOCK
 
-! Main program
+module helpers
   USE, INTRINSIC :: ISO_FORTRAN_ENV
   USE, INTRINSIC :: ISO_C_BINDING, only: c_int8_t
+  implicit none
+  public
+    integer :: fail_count = 0 
+  contains
+    function tostring(int) result(res)
+      integer :: int
+      character(len=128) :: str
+      character(len=:), allocatable :: res
+      write(str, *) int
+      res = trim(adjustl(str))
+    end function
+
+    function hexdump(arr) result(res)
+      integer(c_int8_t), intent(in) :: arr(:)
+      character(len=:), allocatable :: res
+      character(len=4096) :: buf
+      write(buf, '(*(Z2, 1X))') arr
+      res = trim(buf)
+    end function
+    subroutine sync_all
+#   if HAVE_SYNC_ALL
+      SYNC ALL
+#   endif
+    end subroutine
+    subroutine flush_all
+      flush output_unit
+      flush error_unit
+    end subroutine
+    subroutine status(str)
+      character(len=*) :: str
+      call flush_all
+      call sync_all
+      if (THIS_IMAGE() == 1) write(*,'(A)') str
+      call flush_all
+      call sync_all
+    end subroutine
+
+end module ! helpers
+
+subroutine test_save_extern_coarray()
+#if HAVE_SAVE_COARRAY
+  use helpers
+  implicit none
+  logical, save :: once = .true.
+  integer, save :: esc_int_1[*]
+  integer, save :: esc_int_2[2,*]
+  integer, save :: esc_int_3[2:3,4:5,*]
+
+  if (once) then
+    once = .false.
+    call status("Testing external SAVE coarrays...")
+    esc_int_1 = 1
+    esc_int_2 = 2
+    esc_int_3 = 3
+  else
+    CHECK_VALI(esc_int_1, 1)
+    CHECK_VALI(esc_int_2, 2)
+    CHECK_VALI(esc_int_3, 3)
+  end if
+#endif
+end subroutine
+
+module coarrays
+  use helpers
+  implicit none
+  
+# if HAVE_MODULE_COARRAY
+  integer :: msc_int_1[*]
+  integer :: msc_int_2[2,*]
+  integer :: msc_int_3[2:3,4:5,*]
+# endif
+
+  public
+  
+  contains
+  subroutine test_module_coarray()
+# if HAVE_MODULE_COARRAY
+    implicit none
+    logical, save :: once = .true.
+
+    if (once) then
+      once = .false.
+      call status("Testing module SAVE coarrays...")
+      msc_int_1 = 1
+      msc_int_2 = 2
+      msc_int_3 = 3
+    else
+      CHECK_VALI(msc_int_1, 1)
+      CHECK_VALI(msc_int_2, 2)
+      CHECK_VALI(msc_int_3, 3)
+    end if
+#  endif
+  end subroutine
+end module
+
+program native_multi_image
+  USE, INTRINSIC :: ISO_FORTRAN_ENV
+  USE, INTRINSIC :: ISO_C_BINDING, only: c_int8_t
+  use helpers
+  use coarrays
+  implicit none
 
   type :: dummy_team_descriptor
   end type
@@ -86,8 +219,8 @@ program native_multi_image
     type(dummy_team_descriptor), pointer :: info => null()
   end type
 
-  integer :: me, ni, peer, tmp, fail_count = 0
-  character(len=5) :: c
+  integer :: me, ni, peer, i, ia(3)
+  character(len=5) :: c, ca(3)
 # if HAVE_TEAM
   integer :: team_id
   type(TEAM_TYPE) :: subteam, res
@@ -142,31 +275,45 @@ program native_multi_image
     if (me /= peer) SYNC IMAGES([me, peer])
 #endif
 
-  tmp = me
+  i = me
+  ia = me
   c = "hello"
+  ca = c
 # if HAVE_CO_SUM
     call status("Testing CO_SUM...")
-    call CO_SUM(tmp)
-    call CO_SUM(tmp,1)
+    call CO_SUM(i)
+    call CO_SUM(i,1)
+    call CO_SUM(ia)
+    call CO_SUM(ia,1)
 # endif
 # if HAVE_CO_MIN
     call status("Testing CO_MIN...")
-    call CO_MIN(tmp)
-    call CO_MIN(tmp,1)
+    call CO_MIN(i)
+    call CO_MIN(i,1)
+    call CO_MIN(ia)
+    call CO_MIN(ia,1)
     call CO_MIN(c)
     call CO_MIN(c,1)
+    call CO_MIN(ca)
+    call CO_MIN(ca,1)
 # endif
 # if HAVE_CO_MAX
     call status("Testing CO_MAX...")
-    call CO_MAX(tmp)
-    call CO_MAX(tmp,1)
+    call CO_MAX(i)
+    call CO_MAX(i,1)
+    call CO_MAX(ia)
+    call CO_MAX(ia,1)
     call CO_MAX(c)
     call CO_MAX(c,1)
+    call CO_MAX(ca)
+    call CO_MAX(ca,1)
 # endif
 # if HAVE_CO_BROADCAST
     call status("Testing CO_BROADCAST...")
-    call CO_BROADCAST(tmp,1)
+    call CO_BROADCAST(i,1)
+    call CO_BROADCAST(ia,1)
     call CO_BROADCAST(c,1)
+    call CO_BROADCAST(ca,1)
 # endif
 
 # if HAVE_TEAM
@@ -190,6 +337,55 @@ program native_multi_image
   write(*,'(A,I3)') "After END TEAM statement, TEAM_NUMBER() is ", TEAM_NUMBER()
 # endif
 
+# if HAVE_MAIN_COARRAY
+#   if HAVE_COBOUND
+    call status("Testing LCOBOUND/UCOBOUND...")
+    if (THIS_IMAGE() == 1) then
+      ! Note output is affected by llvm-project issue #207858
+      write(*,'(A,2I3)') "lcobound(sca_int_2) = ", LCOBOUND(sca_int_2)
+      write(*,'(A,2I3)') "ucobound(sca_int_2) = ", UCOBOUND(sca_int_2)
+      write(*,'(A,3I3)') "lcobound(sca_int_3) = ", LCOBOUND(sca_int_3)
+      write(*,'(A,3I3)') "ucobound(sca_int_3) = ", UCOBOUND(sca_int_3)
+      write(*,'(A,I3)')  "lcobound(sca_int_3, dim=2) = ", LCOBOUND(sca_int_3, dim=2)
+      write(*,'(A,I3)')  "ucobound(sca_int_3, dim=2) = ", UCOBOUND(sca_int_3, dim=2)
+      write(*,'(A,I3)')  "lcobound(sca_int_3, dim=2, kind=8) = ", LCOBOUND(sca_int_3, dim=2, kind=8)
+      write(*,'(A,I3)')  "ucobound(sca_int_3, dim=2, kind=8) = ", UCOBOUND(sca_int_3, dim=2, kind=8)
+    end if
+#   endif
+#   if HAVE_COSHAPE
+    call status("Testing COSHAPE...")
+    if (THIS_IMAGE() == 1) then
+      ! Note output is affected by llvm-project issue #207858
+      write(*,'(A,3I3)') "coshape(sca_int_3) = ", COSHAPE(sca_int_3)
+      write(*,'(A,3I3)') "coshape(sca_int_3, kind=8) = ", COSHAPE(sca_int_3, kind=8)
+    end if
+#   endif
+#   if HAVE_IMAGE_INDEX
+    call status("Testing IMAGE_INDEX...")
+    if (THIS_IMAGE() == 1) then
+      write(*,'(A,I3)') "image_index(sca_int_1, [1]) = ", IMAGE_INDEX(sca_int_1, [1])
+      write(*,'(A,I3)') "image_index(sca_int_2, [1,1]) = ", IMAGE_INDEX(sca_int_2, [1,1])
+      write(*,'(A,I3)') "image_index(sca_int_3, [1,1,1]) = ", IMAGE_INDEX(sca_int_3, [1,1,1])
+#     if HAVE_TEAM
+        write(*,'(A,I3)') "image_index(sca_int_1, [1], team_number=-1) = ", IMAGE_INDEX(sca_int_1, [1], TEAM_NUMBER=-1)
+        write(*,'(A,I3)') "image_index(sca_int_3, [1,1,1], team_number=-1) = ", IMAGE_INDEX(sca_int_3, [1,1,1], TEAM_NUMBER=-1)
+        ! disabled for llvm-project issue #205953
+        !write(*,'(A,I3)') "image_index(sca_int_1, [1], get_team()) = ", IMAGE_INDEX(sca_int_1, [1], GET_TEAM())
+        !write(*,'(A,I3)') "image_index(sca_int_3, [1,1,1], get_team()) = ", IMAGE_INDEX(sca_int_3, [1,1,1], GET_TEAM())
+#     endif
+    end if
+#   endif
+#   if HAVE_THIS_IMAGE_COARRAY
+    call status("Testing THIS_IMAGE(coarray)...")
+    if (THIS_IMAGE() == NUM_IMAGES()) then
+      write(*,'(A,I3)')  "this_image(sca_int_1) = ", THIS_IMAGE(sca_int_1)
+      write(*,'(A,2I3)') "this_image(sca_int_2) = ", THIS_IMAGE(sca_int_2)
+      write(*,'(A,3I3)') "this_image(sca_int_3) = ", THIS_IMAGE(sca_int_3)
+      write(*,'(A,I3)')  "this_image(sca_int_3, dim=2) = ", THIS_IMAGE(sca_int_3, dim=2)
+    end if
+#   endif
+# endif
+
 # if HAVE_EVENT_TYPE
   CHECK_TYPE_COMPLIANCE(EVENT_TYPE, default_event, .false., 64)
 # endif
@@ -205,6 +401,18 @@ program native_multi_image
   call sync_all
   call test_allocatable_coarray
   call test_allocatable_coarray
+
+  call sync_all
+  if (MOD(THIS_IMAGE(),2) == 1) then
+    call test_save_extern_coarray
+    call test_save_extern_coarray
+  end if
+
+  call sync_all
+  if (MOD(THIS_IMAGE(),2) == 1) then
+    call test_module_coarray
+    call test_module_coarray
+  end if
 
   call sync_all
   write(*,'(A,I1,A,I1,A)') "Goodbye from image ", me, " of ", ni, " images"
@@ -224,43 +432,38 @@ program native_multi_image
   stop fail_count
 
   contains
-    subroutine sync_all
-#   if HAVE_SYNC_ALL
-      SYNC ALL
-#   endif
-    end subroutine
-    subroutine flush_all
-      flush output_unit
-      flush error_unit
-    end subroutine
-    subroutine status(str)
-      character(len=*) :: str
-      call flush_all
-      call sync_all
-      if (THIS_IMAGE() == 1) write(*,'(A)') str
-      call flush_all
-      call sync_all
-    end subroutine
-
     subroutine test_allocatable_coarray()
 #   if HAVE_ALLOC_COARRAY
 #   define CHECK_ALLOC(coarray, expect) \
-      if (ALLOCATED(coarray) .neqv. expect) then ; \
-        if (THIS_IMAGE() == 1) write(*,'(A)') __FILE__//":"//tostring(__LINE__)//": ERROR: " // \
-           " ALLOCATED(" // #coarray // ") = " // MERGE("true ","false",ALLOCATED(coarray)) ; \
-        fail_count = fail_count + 1 ; \
-      end if
+      BLOCK ; \
+        logical :: ca_a, ca_e ; \
+        ca_a = ALLOCATED(coarray) ; \
+        ca_e = (expect) ; \
+        if (ca_a .neqv. ca_e) then ; \
+          if (THIS_IMAGE() == 1) write(*,'(A)') __FILE__//":"//tostring(__LINE__)//": ERROR: " // \
+             " ALLOCATED(" // #coarray // ") = " // MERGE("true ","false",ca_a) // \
+             ", expected = " // MERGE("true ","false",ca_e) ; \
+          fail_count = fail_count + 1 ; \
+        end if ; \
+      END BLOCK
 
-      logical, save :: once = .true.
+      implicit none
+      logical, volatile, save :: once = .true.  ! volatile is workaround for flang optimizer bug
       integer, allocatable :: aca_int_1[:]
       integer, allocatable :: aca_int_2[:,:]
       integer, save, allocatable :: aca_int_3[:,:,:]
+      if (once) then
+        call status("Testing ALLOCATABLE coarrays...")
+      end if
+#   if VERBOSE
+      if (THIS_IMAGE() == 1) &
+        write (*,*) once, "ENTRY:", ALLOCATED(aca_int_1), ALLOCATED(aca_int_2), ALLOCATED(aca_int_3)
+#   endif
       CHECK_ALLOC(aca_int_1, .false.)
       CHECK_ALLOC(aca_int_2, .false.)
-      CHECK_ALLOC(aca_int_3, .false.)
+      CHECK_ALLOC(aca_int_3, .not. once)
+
       if (once) then
-        once = .false.
-        call status("Testing ALLOCATABLE coarrays...")
         ALLOCATE(aca_int_1[*])
         ALLOCATE(aca_int_2[2,*])
         ALLOCATE(aca_int_3[2,3,*])
@@ -268,24 +471,13 @@ program native_multi_image
         CHECK_ALLOC(aca_int_2, .true.)
         CHECK_ALLOC(aca_int_3, .true.)
       end if
+#   if VERBOSE
+      if (THIS_IMAGE() == 1) &
+        write (*,*) once, "EXIT: ", ALLOCATED(aca_int_1), ALLOCATED(aca_int_2), ALLOCATED(aca_int_3)
+#   endif
+      once = .false.
 #   endif
     end subroutine
-
-    function tostring(int) result(res)
-      integer :: int
-      character(len=128) :: str
-      character(len=:), allocatable :: res
-      write(str, *) int
-      res = trim(adjustl(str))
-    end function
-
-    function hexdump(arr) result(res)
-      integer(c_int8_t), intent(in) :: arr(:)
-      character(len=:), allocatable :: res
-      character(len=4096) :: buf
-      write(buf, '(*(Z2, 1X))') arr
-      res = trim(buf)
-    end function
 
     subroutine check_type(type_name, is_team, min_size, subject_size, default_bytes)
       character(len=*), intent(in) :: type_name
@@ -349,8 +541,9 @@ program native_multi_image
         call status("  Default init of " // type_name // " ==> " // diag)
       end if
     end subroutine
-
-#else
-  stop "Native multi-image test disabled"
-#endif
 end program
+#else
+program native_multi_image
+  stop "Native multi-image test disabled"
+end program
+#endif

@@ -122,7 +122,7 @@ jobs:
             version: latest
             container: ghcr.io/lfortran/lfortran:latest
             native_multi_image: true
-            FFLAGS: --coarray=true -DHAVE_SYNC=0 -DHAVE_COLLECTIVES=0 -DHAVE_TEAM=0 -DHAVE_EVENT_TYPE=0 -DHAVE_LOCK_TYPE=0 -DHAVE_NOTIFY_TYPE=0 -DHAVE_CO_SUM -DHAVE_SYNC_ALL -DHAVE_MAIN_COARRAY
+            FFLAGS: --coarray=true -DHAVE_SYNC=0 -DHAVE_COLLECTIVES=1 -DHAVE_TEAM=0 -DHAVE_EVENT_TYPE=0 -DHAVE_LOCK_TYPE=0 -DHAVE_NOTIFY_TYPE=0 -DHAVE_SYNC_ALL -DHAVE_SYNC_MEMORY -DHAVE_COARRAY -DHAVE_ALLOC_COARRAY=0 -DHAVE_COARRAY_QUERY=0
 
           - os: ubuntu-22.04
             compiler: lfortran
@@ -329,7 +329,7 @@ jobs:
         fi
         if [ "${NATIVE_MULTI_IMAGE}" == true ] ; then
           if [[ $COMPILER_VERSION == latest ]] ; then
-            echo "FFLAGS=$FFLAGS -fcoarray -DHAVE_COARRAY -DIGNORE_FAILURES=9" >> "$GITHUB_ENV"
+            echo "FFLAGS=$FFLAGS -fcoarray -DHAVE_COARRAY -DHAVE_ALLOC_COARRAY=0 -DHAVE_SAVE_COARRAY=0 -DHAVE_MODULE_COARRAY=0 -DIGNORE_FAILURES=6" >> "$GITHUB_ENV"
           else
             echo "FFLAGS=$FFLAGS -fcoarray -DIGNORE_FAILURES=8" >> "$GITHUB_ENV"
           fi
@@ -434,7 +434,10 @@ jobs:
       if: ${{ env.NATIVE_MULTI_IMAGE == 'true' }}
       run: |
         ./run-fpm.sh run --verbose 2>&1 | tee output
-        ! grep -q "IEEE arithmetic exceptions signaled" output
+        if [[ "${{ matrix.network }}" != "udp" ]] ; then
+          # ignore intermittent INEXACT exceptions from AMUDP at exit time
+          ! grep -q "IEEE arithmetic exceptions signaled" output
+        fi
 
     - name: Run unit tests
       run: |
