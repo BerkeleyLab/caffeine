@@ -176,12 +176,15 @@ end subroutine
 module coarrays
   use helpers
   implicit none
+  
 # if HAVE_MODULE_COARRAY
   integer :: msc_int_1[*]
   integer :: msc_int_2[2,*]
   integer :: msc_int_3[2:3,4:5,*]
 # endif
+
   public
+  
   contains
   subroutine test_module_coarray()
 # if HAVE_MODULE_COARRAY
