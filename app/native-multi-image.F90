@@ -400,12 +400,16 @@ program native_multi_image
   call test_allocatable_coarray
 
   call sync_all
-  call test_save_extern_coarray
-  call test_save_extern_coarray
+  if (MOD(THIS_IMAGE(),2) == 1) then
+    call test_save_extern_coarray
+    call test_save_extern_coarray
+  end if
 
   call sync_all
-  call test_module_coarray
-  call test_module_coarray
+  if (MOD(THIS_IMAGE(),2) == 1) then
+    call test_module_coarray
+    call test_module_coarray
+  end if
 
   call sync_all
   write(*,'(A,I1,A,I1,A)') "Goodbye from image ", me, " of ", ni, " images"
