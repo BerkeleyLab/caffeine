@@ -1,5 +1,8 @@
 ! Copyright (c), The Regents of the University of California
 ! Terms of use are as specified in LICENSE.txt
+
+#include "assert_macros.h"
+
 submodule(prif:prif_private_s) program_termination_s
   ! DO NOT ADD USE STATEMENTS HERE
   ! All use statements belong in prif_private_s.F90
@@ -32,6 +35,7 @@ contains
 
   module procedure prif_stop
 
+    call_assert(prif_init_called_previously)
     call flush_all()
 
     call prif_sync_all
@@ -87,6 +91,7 @@ contains
 
   module procedure prif_error_stop
       
+    call_assert(prif_init_called_previously)
     call flush_all()
 
     call run_callbacks(.true._c_bool, quiet, stop_code_int, stop_code_char)
@@ -135,6 +140,7 @@ contains
   end subroutine
 
   module procedure prif_fail_image
+    call_assert(prif_init_called_previously)
 #   ifndef CAF_FAIL_IMAGE_SUPPRESS_FLUSH
       call flush_all()
 #   endif

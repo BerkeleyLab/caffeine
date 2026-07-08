@@ -43,6 +43,7 @@ contains
     integer(c_int) :: corank
     type(prif_coarray_descriptor), pointer :: cdp
 
+    call_assert(prif_init_called_previously)
     call_assert(team_check(current_team))
 
     corank = size(lcobounds)
@@ -137,6 +138,8 @@ contains
   module procedure prif_allocate
     type(c_ptr) :: mem
 
+    call_assert(prif_init_called_previously)
+
     mem = caf_allocate_non_symmetric(size_in_bytes)
     if (.not. c_associated(mem)) then
       call report_error(PRIF_STAT_OUT_OF_MEMORY, out_of_memory_message(size_in_bytes, .false.), &
@@ -208,6 +211,7 @@ contains
       character(len=:), allocatable :: local_errmsg
 #   endif
 
+    call_assert(prif_init_called_previously)
     call prif_sync_all ! Need to ensure we don't deallocate anything till everyone gets here
     num_handles = size(coarray_handles)
     if (.not. all([(c_associated(coarray_handles(i)%info), i = 1, num_handles)])) then
@@ -258,6 +262,7 @@ contains
   end procedure
 
   module procedure prif_deallocate
+    call_assert(prif_init_called_previously)
     call caf_deallocate_non_symmetric(mem)
     if (present(stat)) stat = 0
   end procedure
