@@ -193,9 +193,9 @@ module coarrays
   implicit none
   
 # if HAVE_MODULE_COARRAY
-  integer :: msc_int_1[*]         ! COARRAY_INT_INIT
-  integer :: msc_int_2[2,*]       ! COARRAY_INT_INIT
-  integer :: msc_int_3[2:3,4:5,*] ! COARRAY_INT_INIT
+  integer :: msc_int_1[*]          COARRAY_INT_INIT
+  integer :: msc_int_2[2,*]        COARRAY_INT_INIT
+  integer :: msc_int_3[2:3,4:5,*]  COARRAY_INT_INIT
 # endif
 
   public
@@ -209,7 +209,7 @@ module coarrays
     if (once) then
       once = .false.
       call status("Testing module SAVE coarrays...")
-#     if HAVE_COARRAY_INIT && 0 /* disabled pending LFortran issue #12163 */
+#     if HAVE_COARRAY_INIT
         CHECK_VALI(msc_int_1, COARRAY_INT_INIT_VALUE)
         CHECK_VALI(msc_int_2, COARRAY_INT_INIT_VALUE)
         CHECK_VALI(msc_int_3, COARRAY_INT_INIT_VALUE)
