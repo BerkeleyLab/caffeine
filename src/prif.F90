@@ -22,7 +22,10 @@ module prif
       STAT_UNLOCKED, STAT_UNLOCKED_FAILED_IMAGE
 #endif
 #if CAF_IMPORT_TEAM_CONSTANTS
-  use iso_fortran_env, only: CURRENT_TEAM, INITIAL_TEAM, PARENT_TEAM
+  use, intrinsic :: iso_fortran_env, only: &
+      ISO_FORTRAN_ENV_CURRENT_TEAM => CURRENT_TEAM, &
+      ISO_FORTRAN_ENV_INITIAL_TEAM => INITIAL_TEAM, &
+      ISO_FORTRAN_ENV_PARENT_TEAM  => PARENT_TEAM
 #endif
 
   implicit none
@@ -91,9 +94,9 @@ module prif
 
 #if CAF_IMPORT_TEAM_CONSTANTS
   integer(c_int), parameter, public :: &
-    PRIF_CURRENT_TEAM               = CURRENT_TEAM, &
-    PRIF_INITIAL_TEAM               = INITIAL_TEAM, &
-    PRIF_PARENT_TEAM                = PARENT_TEAM
+    PRIF_CURRENT_TEAM               = ISO_FORTRAN_ENV_CURRENT_TEAM, &
+    PRIF_INITIAL_TEAM               = ISO_FORTRAN_ENV_INITIAL_TEAM, &
+    PRIF_PARENT_TEAM                = ISO_FORTRAN_ENV_PARENT_TEAM
 #else
   integer(c_int), parameter, public :: &
     PRIF_CURRENT_TEAM               = 101, &
