@@ -38,7 +38,7 @@ contains
 
   ! Retrieve an environment parameter or its default value
   subroutine getenv_withdefault(key, default, result)
-    use iso_fortran_env, only: error_unit
+    use, intrinsic :: iso_fortran_env, only: error_unit
     character(len=*), intent(in) :: key, default
     character(len=:), allocatable, intent(inout) :: result
     character(len=:), allocatable :: suffix

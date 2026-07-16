@@ -1,8 +1,8 @@
 #include "test-utils.F90"
 
 module prif_types_test_m
-    use iso_fortran_env, only: int8
-    use iso_c_binding, only: c_ptr, c_loc, c_intptr_t
+    use, intrinsic :: iso_fortran_env, only: int8
+    use, intrinsic :: iso_c_binding, only: c_ptr, c_loc, c_intptr_t
     use prif, only: prif_team_type, prif_event_type, prif_notify_type, prif_lock_type, prif_critical_type, prif_coarray_handle, prif_this_image_no_coarray
     use julienne_m, only: test_description_t, test_diagnosis_t, test_result_t, test_t, string_t, usher &
        ,operator(.all.), operator(.also.), operator(.equalsExpected.), operator(.greaterThan.), operator(.isAtMost.), operator(//)

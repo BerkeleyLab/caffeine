@@ -1,7 +1,7 @@
 #include "test-utils.F90"
 
 module prif_co_broadcast_test_m
-  use iso_c_binding, only: c_loc, c_size_t
+  use, intrinsic :: iso_c_binding, only: c_loc, c_size_t
   use prif, only : prif_co_broadcast, prif_co_broadcast_cptr, prif_num_images, prif_this_image_no_coarray
   use julienne_m, only : &
      usher &

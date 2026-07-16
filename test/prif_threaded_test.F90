@@ -2,7 +2,7 @@
 
 module prif_threaded_test_m
 # include "test-uses-alloc.F90"
-    use iso_c_binding, only: c_funptr, c_funloc, c_f_procpointer
+    use, intrinsic :: iso_c_binding, only: c_funptr, c_funloc, c_f_procpointer
     use prif, only: &
             prif_notify_type, prif_notify_wait, prif_put_with_notify, &
             prif_this_image_no_coarray, prif_num_images, &

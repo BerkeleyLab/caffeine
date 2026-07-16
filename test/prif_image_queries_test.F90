@@ -1,5 +1,5 @@
 module prif_image_queries_test_m
-    use iso_c_binding, only: c_int
+    use, intrinsic :: iso_c_binding, only: c_int
     use prif, only : prif_image_status, prif_stopped_images, prif_failed_images, PRIF_STAT_FAILED_IMAGE, PRIF_STAT_STOPPED_IMAGE
     use prif, only : prif_num_images
     use julienne_m, only: &

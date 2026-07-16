@@ -3,7 +3,7 @@
 
 module prif_teams_test_m
 # include "test-uses-alloc.F90"
-    use iso_c_binding, only: c_char
+    use, intrinsic :: iso_c_binding, only: c_char
     use prif
     use julienne_m, only: test_description_t, test_diagnosis_t, test_result_t, test_t, string_t, usher &
       ,operator(.also.), operator(.isAtLeast.), operator(.isAtMost.), operator(.equalsExpected.), operator(//)
