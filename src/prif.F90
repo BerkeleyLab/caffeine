@@ -6,17 +6,18 @@
 
 module prif
 
-  use iso_c_binding, only: &
+  use, intrinsic :: iso_c_binding, only: &
       c_char, c_int, c_bool, c_intptr_t, c_ptr, &
       c_funptr, c_size_t, c_ptrdiff_t, c_null_ptr, c_int64_t
 #if HAVE_LOGICAL64
-  use iso_fortran_env, only: logical64
+  use, intrinsic :: iso_fortran_env, only: logical64
 #endif
 #if CAF_IMPORT_ATOMIC_CONSTANTS
-  use iso_fortran_env, only: ATOMIC_INT_KIND, ATOMIC_LOGICAL_KIND
+  use, intrinsic :: iso_fortran_env, only: &
+      ATOMIC_INT_KIND, ATOMIC_LOGICAL_KIND
 #endif
 #if CAF_IMPORT_STAT_CONSTANTS
-  use iso_fortran_env, only: &
+  use, intrinsic :: iso_fortran_env, only: &
       STAT_FAILED_IMAGE, STAT_STOPPED_IMAGE, &
       STAT_LOCKED, STAT_LOCKED_OTHER_IMAGE, &
       STAT_UNLOCKED, STAT_UNLOCKED_FAILED_IMAGE

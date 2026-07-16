@@ -6,11 +6,11 @@
 submodule(prif) prif_private_s
   use assert_m
 
-  use iso_fortran_env, only : &
+  use, intrinsic :: iso_fortran_env, only : &
         output_unit, &
         error_unit
 
-  use iso_c_binding, only: &
+  use, intrinsic :: iso_c_binding, only: &
         c_associated, &
         c_f_pointer, &
         c_f_procpointer, &

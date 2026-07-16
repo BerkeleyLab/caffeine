@@ -10,7 +10,7 @@ submodule(prif:prif_private_s) program_startup_s
 contains
 
   module procedure prif_init
-    use ieee_arithmetic, only: ieee_inexact, ieee_set_flag
+    use, intrinsic :: ieee_arithmetic, only: ieee_inexact, ieee_set_flag
     logical, save :: shadow_init = .false.
 
     call_assert(shadow_init .eqv. prif_init_called_previously)

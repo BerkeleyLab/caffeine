@@ -5,7 +5,7 @@
 
 module caf_prif_co_min_helper
   !! F23 C1807: bind(c) callbacks written in Fortran must appear in a top-level module
-  use iso_c_binding, only: c_ptr, c_size_t, c_char, c_f_pointer
+  use, intrinsic :: iso_c_binding, only: c_ptr, c_size_t, c_char, c_f_pointer
   implicit none
 
 contains
