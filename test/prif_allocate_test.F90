@@ -3,7 +3,7 @@
 
 module prif_allocate_test_m
 # include "test-uses-alloc.F90"
-  use iso_c_binding, only: c_char
+  use, intrinsic :: iso_c_binding, only: c_char
   use prif, only : &
       prif_num_images, prif_size_bytes, &
       prif_set_context_data, prif_get_context_data, prif_local_data_pointer, &

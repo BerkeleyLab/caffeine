@@ -4,7 +4,7 @@
 program test_suite_driver
   use julienne_m
   use prif, only: prif_this_image_no_coarray, prif_num_images, prif_sync_all, prif_co_sum, prif_error_stop
-  use iso_c_binding, only: c_int, c_bool, c_funloc, c_funptr, c_f_procpointer
+  use, intrinsic :: iso_c_binding, only: c_int, c_bool, c_funloc, c_funptr, c_f_procpointer
   use prif_init_test_m, only : prif_init_test_t, check_caffeination
   use prif_num_images_test_m, only : prif_num_images_test_t
   use prif_this_image_no_coarray_test_m, only : prif_this_image_no_coarray_test_t

@@ -6,23 +6,27 @@
 
 module prif
 
-  use iso_c_binding, only: &
+  use, intrinsic :: iso_c_binding, only: &
       c_char, c_int, c_bool, c_intptr_t, c_ptr, &
       c_funptr, c_size_t, c_ptrdiff_t, c_null_ptr, c_int64_t
 #if HAVE_LOGICAL64
-  use iso_fortran_env, only: logical64
+  use, intrinsic :: iso_fortran_env, only: logical64
 #endif
 #if CAF_IMPORT_ATOMIC_CONSTANTS
-  use iso_fortran_env, only: ATOMIC_INT_KIND, ATOMIC_LOGICAL_KIND
+  use, intrinsic :: iso_fortran_env, only: &
+      ATOMIC_INT_KIND, ATOMIC_LOGICAL_KIND
 #endif
 #if CAF_IMPORT_STAT_CONSTANTS
-  use iso_fortran_env, only: &
+  use, intrinsic :: iso_fortran_env, only: &
       STAT_FAILED_IMAGE, STAT_STOPPED_IMAGE, &
       STAT_LOCKED, STAT_LOCKED_OTHER_IMAGE, &
       STAT_UNLOCKED, STAT_UNLOCKED_FAILED_IMAGE
 #endif
 #if CAF_IMPORT_TEAM_CONSTANTS
-  use iso_fortran_env, only: CURRENT_TEAM, INITIAL_TEAM, PARENT_TEAM
+  use, intrinsic :: iso_fortran_env, only: &
+      ISO_FORTRAN_ENV_CURRENT_TEAM => CURRENT_TEAM, &
+      ISO_FORTRAN_ENV_INITIAL_TEAM => INITIAL_TEAM, &
+      ISO_FORTRAN_ENV_PARENT_TEAM  => PARENT_TEAM
 #endif
 
   implicit none
@@ -91,9 +95,9 @@ module prif
 
 #if CAF_IMPORT_TEAM_CONSTANTS
   integer(c_int), parameter, public :: &
-    PRIF_CURRENT_TEAM               = CURRENT_TEAM, &
-    PRIF_INITIAL_TEAM               = INITIAL_TEAM, &
-    PRIF_PARENT_TEAM                = PARENT_TEAM
+    PRIF_CURRENT_TEAM               = ISO_FORTRAN_ENV_CURRENT_TEAM, &
+    PRIF_INITIAL_TEAM               = ISO_FORTRAN_ENV_INITIAL_TEAM, &
+    PRIF_PARENT_TEAM                = ISO_FORTRAN_ENV_PARENT_TEAM
 #else
   integer(c_int), parameter, public :: &
     PRIF_CURRENT_TEAM               = 101, &

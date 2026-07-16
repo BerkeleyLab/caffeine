@@ -2,7 +2,7 @@
 #include "julienne-assert-macros.h"
 
 module prif_co_reduce_test_m
-  use iso_c_binding, only: c_ptr, c_funptr, c_size_t, c_f_pointer, c_f_procpointer, c_funloc, c_loc, c_null_ptr, c_associated, c_int8_t
+  use, intrinsic :: iso_c_binding, only: c_ptr, c_funptr, c_size_t, c_f_pointer, c_f_procpointer, c_funloc, c_loc, c_null_ptr, c_associated, c_int8_t
   use prif, only : prif_co_reduce, prif_co_reduce_cptr, prif_num_images, prif_this_image_no_coarray, prif_operation_wrapper_interface
   use julienne_m, only : &
      call_julienne_assert_ &

@@ -1,6 +1,6 @@
 program hello_world
-  use iso_c_binding, only: c_bool
-  use iso_fortran_env, only: output_unit,error_unit
+  use, intrinsic :: iso_c_binding, only: c_bool
+  use, intrinsic :: iso_fortran_env, only: output_unit,error_unit
   use prif, only : &
      prif_init &
     ,prif_this_image_no_coarray &

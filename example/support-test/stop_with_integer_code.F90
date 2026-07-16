@@ -1,5 +1,5 @@
 program stop_with_integer_code
-  use iso_c_binding, only: c_bool
+  use, intrinsic :: iso_c_binding, only: c_bool
   use prif, only : &
      prif_init &
     ,prif_stop &

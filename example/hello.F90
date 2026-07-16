@@ -1,5 +1,5 @@
 program hello_world
-  use iso_c_binding, only: c_bool
+  use, intrinsic :: iso_c_binding, only: c_bool
   use prif, only : &
      prif_init &
     ,prif_this_image_no_coarray &

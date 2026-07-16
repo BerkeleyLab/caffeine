@@ -4,7 +4,7 @@
 #include "version.h"
 
 module unit_test_parameters_m
-  use iso_c_binding, only: c_int, c_funptr, c_null_funptr
+  use, intrinsic :: iso_c_binding, only: c_int, c_funptr, c_null_funptr
   use prif, only: prif_sync_all, prif_this_image_no_coarray
 #if CAF_PRIF_VERSION >= 8
   use prif, only: prif_coarray_cleanup_interface
@@ -38,7 +38,7 @@ contains
 
   ! Retrieve an environment parameter or its default value
   subroutine getenv_withdefault(key, default, result)
-    use iso_fortran_env, only: error_unit
+    use, intrinsic :: iso_fortran_env, only: error_unit
     character(len=*), intent(in) :: key, default
     character(len=:), allocatable, intent(inout) :: result
     character(len=:), allocatable :: suffix

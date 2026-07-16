@@ -1,5 +1,5 @@
 program fail_image
-  use iso_c_binding, only: c_bool, c_int
+  use, intrinsic :: iso_c_binding, only: c_bool, c_int
   use prif, only : &
      prif_init &
     ,prif_num_images &

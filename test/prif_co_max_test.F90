@@ -1,5 +1,5 @@
 module prif_co_max_test_m
-  use iso_c_binding, only: c_int8_t, c_int16_t, c_int32_t, c_int64_t, c_float, c_double
+  use, intrinsic :: iso_c_binding, only: c_int8_t, c_int16_t, c_int32_t, c_int64_t, c_float, c_double
   use prif, only : prif_co_max, prif_co_max_character, prif_this_image_no_coarray, prif_num_images
   use julienne_m, only: &
     operator(.all.) &
