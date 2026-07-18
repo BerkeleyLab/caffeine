@@ -65,6 +65,13 @@
 #define HAVE_COARRAY_INIT HAVE_COARRAY
 #endif
 
+#ifndef HAVE_PUTGET
+#define HAVE_PUTGET HAVE_COARRAY
+#endif
+#ifndef HAVE_PUTGET_INTRINSIC_SCALAR
+#define HAVE_PUTGET_INTRINSIC_SCALAR HAVE_PUTGET
+#endif
+
 ! coarray query intrinsics
 #ifndef HAVE_COARRAY_QUERY
 #define HAVE_COARRAY_QUERY HAVE_COARRAY
@@ -421,6 +428,24 @@ program native_multi_image
       write(*,'(A,2I3)') "this_image(sca_int_2) = ", THIS_IMAGE(sca_int_2)
       write(*,'(A,3I3)') "this_image(sca_int_3) = ", THIS_IMAGE(sca_int_3)
       write(*,'(A,I3)')  "this_image(sca_int_3, dim=2) = ", THIS_IMAGE(sca_int_3, dim=2)
+    end if
+#   endif
+#   if HAVE_PUTGET_INTRINSIC_SCALAR
+    call status("Testing put/get intrinsic scalar...")
+    sca_int_1 = THIS_IMAGE()
+    call sync_all
+    i = sca_int_1[peer] ! get
+    if (i /= peer) then
+      write(*,'(*(A,I3))')  "FAIL: get sca_int_1[peer] = ", i, " expected = ", peer
+      fail_count = fail_count + 1
+    end if
+    call sync_all
+    sca_int_1[peer] = THIS_IMAGE() ! put
+    call sync_all
+    i = sca_int_1
+    if (i /= peer) then
+      write(*,'(*(A,I3))')  "FAIL: put to sca_int_1 = ", i, " expected = ", peer
+      fail_count = fail_count + 1
     end if
 #   endif
 # endif
