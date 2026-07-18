@@ -126,6 +126,13 @@ jobs:
 
           - os: ubuntu-22.04
             compiler: lfortran
+            version: 0.64
+            container: ghcr.io/lfortran/lfortran:v0.64.0
+            native_multi_image: true
+            FFLAGS: --coarray=true -DHAVE_TEAM=0 -DHAVE_EVENT_TYPE=0 -DHAVE_LOCK_TYPE=0 -DHAVE_NOTIFY_TYPE=0 -DHAVE_COARRAY -DHAVE_ALLOC_COARRAY=0 -DHAVE_COARRAY_QUERY=0
+
+          - os: ubuntu-22.04
+            compiler: lfortran
             version: 0.63
             container: ghcr.io/lfortran/lfortran:v0.63.0
 
