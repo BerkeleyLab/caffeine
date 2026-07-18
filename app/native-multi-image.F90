@@ -41,15 +41,6 @@
 #ifndef HAVE_TEAM_TYPE
 #define HAVE_TEAM_TYPE HAVE_TEAM
 #endif
-#ifndef HAVE_EVENT_TYPE
-#define HAVE_EVENT_TYPE 1
-#endif
-#ifndef HAVE_LOCK_TYPE
-#define HAVE_LOCK_TYPE 1
-#endif
-#ifndef HAVE_NOTIFY_TYPE
-#define HAVE_NOTIFY_TYPE 1
-#endif
 ! TYPES_IMPORT_PRIF: compiler imports the real PRIF definition of ISO_FORTRAN_ENV types
 #ifndef TYPES_IMPORT_PRIF
 #define TYPES_IMPORT_PRIF 0
@@ -89,6 +80,27 @@
 #endif
 #ifndef HAVE_THIS_IMAGE_COARRAY
 #define HAVE_THIS_IMAGE_COARRAY HAVE_COARRAY_QUERY
+#endif
+
+#ifndef HAVE_EVENT
+#define HAVE_EVENT HAVE_COARRAY
+#endif
+#ifndef HAVE_EVENT_TYPE
+#define HAVE_EVENT_TYPE HAVE_EVENT
+#endif
+#ifndef HAVE_EVENT_POST_WAIT
+#define HAVE_EVENT_POST_WAIT HAVE_EVENT
+#endif
+#ifndef HAVE_EVENT_QUERY
+#define HAVE_EVENT_QUERY HAVE_EVENT
+#endif
+
+#ifndef HAVE_LOCK_TYPE
+#define HAVE_LOCK_TYPE 1
+#endif
+
+#ifndef HAVE_NOTIFY_TYPE
+#define HAVE_NOTIFY_TYPE 1
 #endif
 
 ! Helper macros
@@ -253,6 +265,7 @@ program native_multi_image
 # endif
 # if HAVE_EVENT_TYPE
       type(event_type), target :: default_event[*]
+      type(event_type) :: test_event[*]
 # endif
 # if HAVE_NOTIFY_TYPE
       type(notify_type), target :: default_notify[*]
@@ -414,6 +427,27 @@ program native_multi_image
 
 # if HAVE_EVENT_TYPE
   CHECK_TYPE_COMPLIANCE(EVENT_TYPE, default_event, .false., 64)
+# endif
+
+# if HAVE_EVENT_QUERY
+    call status("Testing event_query...")
+    i = 666
+    call EVENT_QUERY(test_event, i)
+    if (i /= 0) then
+      write(*,'(A,I3)')  "FAIL: EVENT_QUERY(test_event) = ", i
+      fail_count = fail_count + 1
+    end if
+# endif
+
+# if HAVE_EVENT_POST_WAIT
+    call status("Testing event post / event wait...")
+    if (THIS_IMAGE() == 1) then
+      !event post (test_event) ! currently broken
+      event post (test_event[1])
+      event wait (test_event, until_count=NUM_IMAGES())
+    else
+      event post (test_event[1])
+    end if
 # endif
 
 # if HAVE_LOCK_TYPE
