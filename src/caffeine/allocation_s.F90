@@ -5,6 +5,10 @@
 #include "version.h"
 #include "language-support.F90"
 
+#ifndef CAF_POISON
+#define CAF_POISON ASSERTIONS
+#endif
+
 submodule(prif:prif_private_s) allocation_s
   ! DO NOT ADD USE STATEMENTS HERE
   ! All use statements belong in prif_private_s.F90
@@ -39,6 +43,7 @@ contains
     !       15 cobounds
     integer :: me
     type(c_ptr) :: whole_block
+    integer(c_size_t) :: total_size
     integer(c_ptrdiff_t) :: block_offset
     integer(c_int) :: corank
     type(prif_coarray_descriptor), pointer :: cdp
@@ -64,18 +69,17 @@ contains
         call caf_deallocate(current_team%info%heap_mspace, current_team%info%child_heap_info%allocated_memory)
       end if
     end if
-    if (me == 1) then
     block
       type(prif_coarray_descriptor) :: unused
-      integer(c_size_t) :: total_size
       total_size = c_sizeof(unused) + size_in_bytes
+    end block
+    if (me == 1) then
       whole_block = caf_allocate(current_team%info%heap_mspace, total_size)
       if (.not. c_associated(whole_block)) then
         block_offset = -1 ! out of memory
       else
         block_offset = as_int(whole_block) - current_team%info%heap_start
       end if
-    end block
     else
       block_offset = 0
     end if
@@ -92,6 +96,18 @@ contains
       return
     end if
     if (me /= 1) whole_block = as_c_ptr(current_team%info%heap_start + block_offset)
+
+#   if CAF_POISON
+    block
+      ! The allocated memory is uninitialized, but often happens to be zero which can hide problems.
+      ! When assertions are enabled, we poison some of the first page with non-zero values
+      ! that are more likely to trigger failures in downstream use of uninitialized memory
+      integer(c_int32_t), pointer :: poison_mem(:)
+      call c_f_pointer(whole_block, poison_mem, [min(total_size,2048_c_size_t)/4])
+      poison_mem = int(z'DEADBEEF',c_int32_t)
+      call prif_sync_all ! must synchronize after poisoning to avoid races with subsequent RMA
+    end block
+#   endif
 
     coarray_handle%info = whole_block ! descriptor comes first in memory
     cdp => handle_to_cdp(coarray_handle)
@@ -145,6 +161,16 @@ contains
       call report_error(PRIF_STAT_OUT_OF_MEMORY, out_of_memory_message(size_in_bytes, .false.), &
                         stat, errmsg, errmsg_alloc)
     else
+#     if CAF_POISON
+      block
+        ! The allocated memory is uninitialized, but often happens to be zero which can hide problems.
+        ! When assertions are enabled, we poison some of the first page with non-zero values
+        ! that are more likely to trigger failures in downstream use of uninitialized memory
+        integer(c_int32_t), pointer :: poison_mem(:)
+        call c_f_pointer(mem, poison_mem, [min(size_in_bytes,2048_c_size_t)/4])
+        poison_mem = int(z'DECAFFED',c_int32_t)
+      end block
+#     endif
       allocated_memory = mem
     end if
   end procedure
