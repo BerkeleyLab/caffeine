@@ -57,6 +57,8 @@
 #ifndef CAF_IMPORT_CONSTANTS
 #  if defined(__flang__)
 #    define CAF_IMPORT_CONSTANTS 1
+#  elif __LFORTRAN_MAJOR__ > 0 || __LFORTRAN_MINOR__ >= 64
+#    define CAF_IMPORT_CONSTANTS 1
 #  else
 #    define CAF_IMPORT_CONSTANTS 0
 #  endif
