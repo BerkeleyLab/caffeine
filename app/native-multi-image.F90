@@ -35,15 +35,28 @@
 #define HAVE_CO_BROADCAST HAVE_COLLECTIVES
 #endif
 
+! TYPES_IMPORT_PRIF: compiler imports the real PRIF definition of ISO_FORTRAN_ENV types
+#ifndef TYPES_IMPORT_PRIF
+#define TYPES_IMPORT_PRIF 0
+#endif
+
 #ifndef HAVE_TEAM
 #define HAVE_TEAM 1
 #endif
 #ifndef HAVE_TEAM_TYPE
 #define HAVE_TEAM_TYPE HAVE_TEAM
 #endif
-! TYPES_IMPORT_PRIF: compiler imports the real PRIF definition of ISO_FORTRAN_ENV types
-#ifndef TYPES_IMPORT_PRIF
-#define TYPES_IMPORT_PRIF 0
+#ifndef HAVE_TEAM_QUERIES
+#define HAVE_TEAM_QUERIES HAVE_TEAM
+#endif
+#ifndef HAVE_FORM_TEAM
+#define HAVE_FORM_TEAM HAVE_TEAM
+#endif
+#ifndef HAVE_SYNC_TEAM
+#define HAVE_SYNC_TEAM HAVE_TEAM
+#endif
+#ifndef HAVE_CHANGE_TEAM
+#define HAVE_CHANGE_TEAM HAVE_TEAM
 #endif
 
 #ifndef HAVE_COARRAY
@@ -260,9 +273,9 @@ program native_multi_image
 
   integer :: me, ni, peer, i, ia(3)
   character(len=5) :: c, ca(3)
-# if HAVE_TEAM
+# if HAVE_TEAM_TYPE
   integer :: team_id
-  type(TEAM_TYPE) :: subteam, res
+  type(TEAM_TYPE) :: subteam
   type(TEAM_TYPE) :: default_team
 # endif
 # if HAVE_MAIN_COARRAY
@@ -356,25 +369,32 @@ program native_multi_image
     call CO_BROADCAST(ca,1)
 # endif
 
-# if HAVE_TEAM
-#   if HAVE_TEAM_TYPE
+# if HAVE_TEAM_TYPE
       CHECK_TYPE_COMPLIANCE(TEAM_TYPE, default_team, .true., 0)
-#   endif
-  call status("Testing TEAMS...")
-  res = GET_TEAM(CURRENT_TEAM)
-  res = GET_TEAM(INITIAL_TEAM)
-  res = GET_TEAM()
-  write(*,'(A,I3)') "Initial team number is ", TEAM_NUMBER()
-
+# endif
+# if HAVE_TEAM_QUERIES
+    call status("Testing team queries...")
+    subteam = GET_TEAM(CURRENT_TEAM)
+    subteam = GET_TEAM(INITIAL_TEAM)
+    subteam = GET_TEAM()
+    write(*,'(A,I3)') "Initial team number is ", TEAM_NUMBER()
+# endif
+# if HAVE_FORM_TEAM
+    call status("Testing FORM TEAM...")
     team_id = merge(1, 2, me <= (ni+1)/2)
-
-  FORM TEAM(team_id, subteam)
-  SYNC TEAM(subteam)
-  CHANGE TEAM(subteam)
-    write(*,'(A,I3,A,I3,A,I3)') 'Inside CHANGE TEAM construct: ', THIS_IMAGE(), ' of ', NUM_IMAGES(), ' in team number ', TEAM_NUMBER()
-  END TEAM
-  call sync_all
-  write(*,'(A,I3)') "After END TEAM statement, TEAM_NUMBER() is ", TEAM_NUMBER()
+    FORM TEAM(team_id, subteam)
+# endif
+# if HAVE_SYNC_TEAM
+    call status("Testing SYNC TEAM...")
+    SYNC TEAM(subteam)
+# endif
+# if HAVE_CHANGE_TEAM
+    call status("Testing CHANGE TEAM...")
+    CHANGE TEAM(subteam)
+      write(*,'(A,I3,A,I3,A,I3)') 'Inside CHANGE TEAM construct: ', THIS_IMAGE(), ' of ', NUM_IMAGES(), ' in team number ', TEAM_NUMBER()
+    END TEAM
+    call sync_all
+    write(*,'(A,I3)') "After END TEAM statement, TEAM_NUMBER() is ", TEAM_NUMBER()
 # endif
 
 # if HAVE_MAIN_COARRAY
@@ -570,7 +590,7 @@ program native_multi_image
       integer, intent(in) :: min_size, subject_size
       integer(c_int8_t), target, intent(in) :: default_bytes(:)
       character(len=:), allocatable :: diag
-#   if HAVE_TEAM
+#   if HAVE_TEAM_TYPE
       type(TEAM_TYPE) :: team_var
       type(dummy_team_type) :: dummy_team_type_var
       integer, parameter :: reference_size = storage_size(dummy_team_type_var)/8
@@ -581,7 +601,7 @@ program native_multi_image
       if (subject_size /= size(default_bytes)) ERROR STOP "INTERNAL ERROR: representation size mismatch"
 
       if (is_team) then
-#     if HAVE_TEAM
+#     if HAVE_TEAM_TYPE
         ! check size, should be an exact match
         if (subject_size == reference_size) then
           diag = "pass"
