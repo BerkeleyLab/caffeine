@@ -68,6 +68,12 @@
 #ifndef HAVE_ALLOC_COARRAY
 #define HAVE_ALLOC_COARRAY HAVE_COARRAY
 #endif
+#ifndef HAVE_ALLOC_COARRAY_DEALLOC
+#define HAVE_ALLOC_COARRAY_DEALLOC HAVE_ALLOC_COARRAY
+#endif
+#ifndef HAVE_ALLOC_COARRAY_CLEANUP
+#define HAVE_ALLOC_COARRAY_CLEANUP HAVE_ALLOC_COARRAY
+#endif
 #ifndef HAVE_SAVE_COARRAY
 #define HAVE_SAVE_COARRAY HAVE_COARRAY
 #endif
@@ -142,6 +148,17 @@
     if (cvi_tmp /= (expect)) then ; \
       if (THIS_IMAGE() == 1) write(*,'(A,I)') __FILE__//":"//tostring(__LINE__)//": ERROR: " // \
          #expr // " = ", cvi_tmp ; \
+      fail_count = fail_count + 1 ; \
+    end if ; \
+  END BLOCK
+#define CHECK_VALL(expr, expect) \
+  BLOCK ; \
+    use helpers ; \
+    logical :: cvl_tmp ; \
+    cvl_tmp = (expr) ; \
+    if (cvl_tmp .neqv. (expect)) then ; \
+      if (THIS_IMAGE() == 1) write(*,'(A,L)') __FILE__//":"//tostring(__LINE__)//": ERROR: " // \
+         #expr // " = ", cvl_tmp ; \
       fail_count = fail_count + 1 ; \
     end if ; \
   END BLOCK
@@ -289,6 +306,11 @@ program native_multi_image
   integer :: sca_int_1[*]     COARRAY_INT_INIT
   integer :: sca_int_2[2,*]   COARRAY_INT_INIT
   integer :: sca_int_3[2,3,*] COARRAY_INT_INIT
+# endif
+# if HAVE_ALLOC_COARRAY
+  integer, allocatable :: aca_int_1[:]
+  integer, allocatable :: aca_int_2[:,:]
+  integer, allocatable :: aca_int_3[:,:,:]
 # endif
 # if HAVE_EVENT_TYPE
       type(event_type), target :: default_event[*]
@@ -510,6 +532,36 @@ program native_multi_image
   CHECK_TYPE_COMPLIANCE(NOTIFY_TYPE, default_notify, .false., 64)
 # endif
 
+# if HAVE_ALLOC_COARRAY
+  call status("Testing coarray allocation...")
+  CHECK_VALL(ALLOCATED(aca_int_1), .false.)
+  CHECK_VALL(ALLOCATED(aca_int_2), .false.)
+  CHECK_VALL(ALLOCATED(aca_int_3), .false.)
+
+  allocate(aca_int_1[*])
+  CHECK_VALL(ALLOCATED(aca_int_1), .true.)
+
+# if !__LFORTRAN__
+  ! corank > 1 currently broken: lfortran#12370
+  ! trailing lcobound not yet supported: lfortran#12371
+  allocate(aca_int_2[10:11,*], aca_int_3[100:101,200:202,*])
+  CHECK_VALL(ALLOCATED(aca_int_2), .true.)
+  CHECK_VALL(ALLOCATED(aca_int_3), .true.)
+# endif
+
+#   if HAVE_ALLOC_COARRAY_DEALLOC
+    call status("Testing coarray deallocation...")
+    deallocate(aca_int_1)
+    CHECK_VALL(ALLOCATED(aca_int_1), .false.)
+
+#   if !__LFORTRAN__
+    deallocate(aca_int_2, aca_int_3)
+    CHECK_VALL(ALLOCATED(aca_int_2), .false.)
+    CHECK_VALL(ALLOCATED(aca_int_3), .false.)
+#   endif
+#   endif
+# endif
+
   call sync_all
   call test_allocatable_coarray
   call test_allocatable_coarray
@@ -545,43 +597,30 @@ program native_multi_image
 
   contains
     subroutine test_allocatable_coarray()
-#   if HAVE_ALLOC_COARRAY
-#   define CHECK_ALLOC(coarray, expect) \
-      BLOCK ; \
-        logical :: ca_a, ca_e ; \
-        ca_a = ALLOCATED(coarray) ; \
-        ca_e = (expect) ; \
-        if (ca_a .neqv. ca_e) then ; \
-          if (THIS_IMAGE() == 1) write(*,'(A)') __FILE__//":"//tostring(__LINE__)//": ERROR: " // \
-             " ALLOCATED(" // #coarray // ") = " // MERGE("true ","false",ca_a) // \
-             ", expected = " // MERGE("true ","false",ca_e) ; \
-          fail_count = fail_count + 1 ; \
-        end if ; \
-      END BLOCK
-
+#   if HAVE_ALLOC_COARRAY_CLEANUP
       implicit none
       logical, volatile, save :: once = .true.  ! volatile is workaround for flang optimizer bug
       integer, allocatable :: aca_int_1[:]
       integer, allocatable :: aca_int_2[:,:]
       integer, save, allocatable :: aca_int_3[:,:,:]
       if (once) then
-        call status("Testing ALLOCATABLE coarrays...")
+        call status("Testing ALLOCATABLE coarray cleanup...")
       end if
-#   if VERBOSE
+#    if VERBOSE
       if (THIS_IMAGE() == 1) &
         write (*,*) once, "ENTRY:", ALLOCATED(aca_int_1), ALLOCATED(aca_int_2), ALLOCATED(aca_int_3)
-#   endif
-      CHECK_ALLOC(aca_int_1, .false.)
-      CHECK_ALLOC(aca_int_2, .false.)
-      CHECK_ALLOC(aca_int_3, .not. once)
+#    endif
+      CHECK_VALL(ALLOCATED(aca_int_1), .false.)
+      CHECK_VALL(ALLOCATED(aca_int_2), .false.)
+      CHECK_VALL(ALLOCATED(aca_int_3), .not. once)
 
       if (once) then
         ALLOCATE(aca_int_1[*])
         ALLOCATE(aca_int_2[2,*])
         ALLOCATE(aca_int_3[2,3,*])
-        CHECK_ALLOC(aca_int_1, .true.)
-        CHECK_ALLOC(aca_int_2, .true.)
-        CHECK_ALLOC(aca_int_3, .true.)
+        CHECK_VALL(ALLOCATED(aca_int_1), .true.)
+        CHECK_VALL(ALLOCATED(aca_int_2), .true.)
+        CHECK_VALL(ALLOCATED(aca_int_3), .true.)
       end if
 #   if VERBOSE
       if (THIS_IMAGE() == 1) &
