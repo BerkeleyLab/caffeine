@@ -77,6 +77,9 @@
 #ifndef HAVE_COARRAY_INIT
 #define HAVE_COARRAY_INIT HAVE_COARRAY
 #endif
+#ifndef HAVE_COARRAY_LOCAL_ACCESS
+#define HAVE_COARRAY_LOCAL_ACCESS HAVE_COARRAY
+#endif
 
 #ifndef HAVE_PUTGET
 #define HAVE_PUTGET HAVE_COARRAY
@@ -204,6 +207,7 @@ subroutine test_save_extern_coarray()
   if (once) then
     once = .false.
     call status("Testing external SAVE coarrays...")
+#  if HAVE_COARRAY_LOCAL_ACCESS
 #   if HAVE_COARRAY_INIT
       CHECK_VALI(esc_int_1, COARRAY_INT_INIT_VALUE)
       CHECK_VALI(esc_int_2, COARRAY_INT_INIT_VALUE)
@@ -216,6 +220,7 @@ subroutine test_save_extern_coarray()
     CHECK_VALI(esc_int_1, 1)
     CHECK_VALI(esc_int_2, 2)
     CHECK_VALI(esc_int_3, 3)
+#  endif
   end if
 #endif
 end subroutine
@@ -241,6 +246,7 @@ module coarrays
     if (once) then
       once = .false.
       call status("Testing module SAVE coarrays...")
+#    if HAVE_COARRAY_LOCAL_ACCESS
 #     if HAVE_COARRAY_INIT
         CHECK_VALI(msc_int_1, COARRAY_INT_INIT_VALUE)
         CHECK_VALI(msc_int_2, COARRAY_INT_INIT_VALUE)
@@ -253,6 +259,7 @@ module coarrays
       CHECK_VALI(msc_int_1, 1)
       CHECK_VALI(msc_int_2, 2)
       CHECK_VALI(msc_int_3, 3)
+#    endif
     end if
 #  endif
   end subroutine
