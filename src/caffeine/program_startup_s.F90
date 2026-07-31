@@ -63,10 +63,14 @@ contains
     pure subroutine assert_callback_error_stop(stop_code_char)
       implicit none
       character(len=*), intent(in) :: stop_code_char
-      character(len=:), allocatable, target :: tmp
-      tmp = stop_code_char
-    
-      call caf_fatal_error(tmp)
+#     if __LFORTRAN__
+        ! LFortran currently miscompiles the call to caf_fatal_error below
+        error stop stop_code_char, quiet=.false.
+#     else
+        character(len=:), allocatable, target :: tmp
+        tmp = stop_code_char
+        call caf_fatal_error(tmp)
+#     endif
     end subroutine
 #else 
     subroutine assert_init()  
