@@ -65,6 +65,9 @@
 #ifndef HAVE_MAIN_COARRAY
 #define HAVE_MAIN_COARRAY HAVE_COARRAY
 #endif
+#ifndef HAVE_MAIN_COARRAY_ARRAY
+#define HAVE_MAIN_COARRAY_ARRAY HAVE_COARRAY
+#endif
 #ifndef HAVE_ALLOC_COARRAY
 #define HAVE_ALLOC_COARRAY HAVE_COARRAY
 #endif
@@ -92,6 +95,9 @@
 #endif
 #ifndef HAVE_PUTGET_INTRINSIC_SCALAR
 #define HAVE_PUTGET_INTRINSIC_SCALAR HAVE_PUTGET
+#endif
+#ifndef HAVE_PUTGET_INTRINSIC_ARRAY_CONTIG
+#define HAVE_PUTGET_INTRINSIC_ARRAY_CONTIG HAVE_PUTGET
 #endif
 
 ! coarray query intrinsics
@@ -307,6 +313,11 @@ program native_multi_image
   integer :: sca_int_2[2,*]   COARRAY_INT_INIT
   integer :: sca_int_3[2,3,*] COARRAY_INT_INIT
 # endif
+# if HAVE_MAIN_COARRAY_ARRAY
+  integer :: sca_int100_1(100)[*]     COARRAY_INT_INIT
+  integer :: sca_int100_2(100)[2,*]   COARRAY_INT_INIT
+  integer :: sca_int100_3(100)[2,3,*] COARRAY_INT_INIT
+# endif
 # if HAVE_ALLOC_COARRAY
   integer, allocatable :: aca_int_1[:]
   integer, allocatable :: aca_int_2[:,:]
@@ -494,6 +505,32 @@ program native_multi_image
     i = sca_int_1
     if (i /= peer) then
       write(*,'(*(A,I3))')  "FAIL: put to sca_int_1 = ", i, " expected = ", peer
+      fail_count = fail_count + 1
+    end if
+#   endif
+# endif
+# if HAVE_MAIN_COARRAY_ARRAY
+#   if HAVE_COARRAY_INIT
+    call status("Testing main program array coarray initialization...")
+    CHECK_VALI(sca_int100_1(3), COARRAY_INT_INIT_VALUE)
+    CHECK_VALI(sca_int100_2(4), COARRAY_INT_INIT_VALUE)
+    CHECK_VALI(sca_int100_3(5), COARRAY_INT_INIT_VALUE)
+#   endif
+#   if HAVE_PUTGET_INTRINSIC_ARRAY_CONTIG
+    call status("Testing put/get intrinsic array (contiguous)...")
+    sca_int100_1 = THIS_IMAGE()
+    call sync_all
+    ia = sca_int100_1(10:12)[peer] ! get
+    if (any(ia /= peer)) then
+      write(*,'(A,3I,A,I3)')  "FAIL: get sca_int100_1[peer] = ", ia, " expected = ", peer
+      fail_count = fail_count + 1
+    end if
+    call sync_all
+    sca_int100_1(20:22)[peer] = THIS_IMAGE() ! put
+    call sync_all
+    ia = sca_int100_1(20:22)
+    if (any(ia /= peer)) then
+      write(*,'(A,3I,A,I3)')  "FAIL: put to sca_int100_1 = ", ia, " expected = ", peer
       fail_count = fail_count + 1
     end if
 #   endif
