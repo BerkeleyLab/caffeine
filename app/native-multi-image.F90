@@ -64,7 +64,7 @@
 #endif
 
 #ifndef HAVE_COARRAY
-#define HAVE_COARRAY 0
+#define HAVE_COARRAY 1
 #endif
 #ifndef HAVE_MAIN_COARRAY
 #define HAVE_MAIN_COARRAY HAVE_COARRAY
@@ -140,12 +140,18 @@
 #define HAVE_EVENT_QUERY HAVE_EVENT
 #endif
 
+#ifndef HAVE_LOCK
+#define HAVE_LOCK HAVE_COARRAY
+#endif
 #ifndef HAVE_LOCK_TYPE
-#define HAVE_LOCK_TYPE 1
+#define HAVE_LOCK_TYPE HAVE_LOCK
 #endif
 
+#ifndef HAVE_NOTIFY
+#define HAVE_NOTIFY HAVE_COARRAY
+#endif
 #ifndef HAVE_NOTIFY_TYPE
-#define HAVE_NOTIFY_TYPE 1
+#define HAVE_NOTIFY_TYPE HAVE_NOTIFY
 #endif
 
 ! Helper macros
