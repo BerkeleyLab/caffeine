@@ -176,9 +176,9 @@
                     storage_size(subject)/8, bytes); \
   END BLOCK
 ! check that an expression has a given integer value
-#define CHECK_VALI(expr, expect) \
+#define CHECK_VALIK(expr, expect, kind) \
   BLOCK ; \
-    integer :: cvi_tmp ; \
+    integer kind :: cvi_tmp ; \
     cvi_tmp = (expr) ; \
     if (cvi_tmp /= (expect)) then ; \
       if (THIS_IMAGE() == 1) write(*,'(A,I0)') __FILE__//":"//tostring(__LINE__)//": ERROR: " // \
@@ -186,6 +186,8 @@
       fail_count = fail_count + 1 ; \
     end if ; \
   END BLOCK
+#define CHECK_VALI(expr, expect) CHECK_VALIK(expr, expect, )
+#define CHECK_VALI64(expr, expect) CHECK_VALIK(expr, expect, (int64))
 ! check that an expression has a given logical value
 #define CHECK_VALL(expr, expect) \
   BLOCK ; \
@@ -197,6 +199,7 @@
       fail_count = fail_count + 1 ; \
     end if ; \
   END BLOCK
+#define CHECK_ASSERT(expr) CHECK_VALL((expr), .true.)
 
 #define COARRAY_INT_INIT_VALUE 123456789
 #if HAVE_COARRAY_INIT
@@ -218,6 +221,12 @@ module helpers
       character(len=:), allocatable :: res
       write(str, *) int
       res = trim(adjustl(str))
+    end function
+
+    function element(intarr, idx) result(res)
+      integer, intent(in) :: intarr(*), idx
+      integer :: res
+      res = intarr(idx)
     end function
 
     function hexdump(arr) result(res)
@@ -461,6 +470,12 @@ program native_multi_image
     STATUS("Testing CHANGE TEAM...")
     CHANGE TEAM(subteam)
       write(*,'(I3,A,I3,A,I3,A,I3)') me, ': Inside CHANGE TEAM construct: ', THIS_IMAGE(), ' of ', NUM_IMAGES(), ' in team number ', TEAM_NUMBER()
+#    if !(__flang_major__ == 22 && __flang_minor__ == 1 && __flang_patchlevel__ < 3) /* avoid llvm #171048 */
+      CHECK_ASSERT(THIS_IMAGE() >= 1)
+      CHECK_ASSERT(THIS_IMAGE() <= NUM_IMAGES())
+      CHECK_ASSERT(NUM_IMAGES() <= (ni+1)/2)
+      CHECK_VALI(TEAM_NUMBER(), team_id)
+#    endif
     END TEAM
     call sync_all
     CHECK_VALI(TEAM_NUMBER(), -1)
@@ -476,51 +491,93 @@ program native_multi_image
 #   if HAVE_COBOUND
     STATUS("Testing LCOBOUND/UCOBOUND...")
     if (THIS_IMAGE() == 1) then
-      ! Note output is affected by llvm-project issue #207858
       write(*,'(A,2I3)') "lcobound(sca_int_2) = ", LCOBOUND(sca_int_2)
       write(*,'(A,2I3)') "ucobound(sca_int_2) = ", UCOBOUND(sca_int_2)
       write(*,'(A,3I3)') "lcobound(sca_int_3) = ", LCOBOUND(sca_int_3)
       write(*,'(A,3I3)') "ucobound(sca_int_3) = ", UCOBOUND(sca_int_3)
-      write(*,'(A,I3)')  "lcobound(sca_int_3, dim=2) = ", LCOBOUND(sca_int_3, dim=2)
-      write(*,'(A,I3)')  "ucobound(sca_int_3, dim=2) = ", UCOBOUND(sca_int_3, dim=2)
-      write(*,'(A,I3)')  "lcobound(sca_int_3, dim=2, kind=int64) = ", LCOBOUND(sca_int_3, dim=2, kind=int64)
-      write(*,'(A,I3)')  "ucobound(sca_int_3, dim=2, kind=int64) = ", UCOBOUND(sca_int_3, dim=2, kind=int64)
     end if
+    block
+      integer :: co3(3)
+      integer(int64) :: co3_64(3)
+      CHECK_ASSERT(all(LCOBOUND(sca_int_3) == 1))
+      CHECK_ASSERT(all(LCOBOUND(sca_int_3, kind=int64) == 1_int64))
+      co3 =    UCOBOUND(sca_int_3)
+      co3_64 = UCOBOUND(sca_int_3, kind=int64)
+      CHECK_ASSERT(all(co3(1:2) == [2,3]))
+      CHECK_ASSERT(co3(3) >= 1)
+      CHECK_ASSERT(all(co3_64(1:2) == [2_int64,3_int64]))
+      CHECK_ASSERT(co3_64(3) >= 1_int64)
+    end block
+    CHECK_VALI(LCOBOUND(sca_int_2, dim=1), 1)
+    CHECK_VALI(UCOBOUND(sca_int_2, dim=1), 2)
+    CHECK_VALI(LCOBOUND(sca_int_3, dim=1), 1)
+    CHECK_VALI(LCOBOUND(sca_int_3, dim=2), 1)
+    CHECK_VALI(LCOBOUND(sca_int_3, dim=3), 1)
+    CHECK_VALI(UCOBOUND(sca_int_3, dim=1), 2)
+    CHECK_VALI(UCOBOUND(sca_int_3, dim=2), 3)
+    CHECK_VALI64(LCOBOUND(sca_int_3, dim=2, kind=int64), 1)
+    CHECK_VALI64(UCOBOUND(sca_int_3, dim=2, kind=int64), 3)
 #   endif
 #   if HAVE_COSHAPE
     STATUS("Testing COSHAPE...")
     if (THIS_IMAGE() == 1) then
-      ! Note output is affected by llvm-project issue #207858
       write(*,'(A,3I3)') "coshape(sca_int_3) = ", COSHAPE(sca_int_3)
-      write(*,'(A,3I3)') "coshape(sca_int_3, kind=int64) = ", COSHAPE(sca_int_3, kind=int64)
     end if
+    block
+      integer :: co3(3)
+      integer(int64) :: co3_64(3)
+      co3 =    COSHAPE(sca_int_3)
+      co3_64 = COSHAPE(sca_int_3, kind=int64)
+      CHECK_ASSERT(all(co3(1:2) == [2,3]))
+      CHECK_ASSERT(co3(3) >= 1)
+      CHECK_ASSERT(all(co3_64(1:2) == [2_int64,3_int64]))
+      CHECK_ASSERT(co3_64(3) >= 1_int64)
+    end block
 #   endif
 #   if HAVE_IMAGE_INDEX
     STATUS("Testing IMAGE_INDEX...")
-    if (THIS_IMAGE() == 1) then
-      write(*,'(A,I3)') "image_index(sca_int_1, [1]) = ", IMAGE_INDEX(sca_int_1, [1])
-      write(*,'(A,I3)') "image_index(sca_int_2, [1,1]) = ", IMAGE_INDEX(sca_int_2, [1,1])
-      write(*,'(A,I3)') "image_index(sca_int_3, [1,1,1]) = ", IMAGE_INDEX(sca_int_3, [1,1,1])
-#     if HAVE_TEAM
+    CHECK_VALI(IMAGE_INDEX(sca_int_1, [1]), 1) 
+    CHECK_VALI(IMAGE_INDEX(sca_int_1, [ni]), ni) 
+    CHECK_VALI(IMAGE_INDEX(sca_int_2, [1,1]), 1) 
+    CHECK_VALI(IMAGE_INDEX(sca_int_3, [1,1,1]), 1) 
+#    if HAVE_TEAM
 #      if HAVE_IMAGE_INDEX_TEAM_NUMBER
-        write(*,'(A,I3)') "image_index(sca_int_1, [1], team_number=-1) = ", IMAGE_INDEX(sca_int_1, [1], TEAM_NUMBER=-1)
-        write(*,'(A,I3)') "image_index(sca_int_3, [1,1,1], team_number=-1) = ", IMAGE_INDEX(sca_int_3, [1,1,1], TEAM_NUMBER=-1)
+       CHECK_VALI(IMAGE_INDEX(sca_int_1, [1],     team_number=-1), 1) 
+       CHECK_VALI(IMAGE_INDEX(sca_int_1, [ni],    team_number=-1), ni) 
+       CHECK_VALI(IMAGE_INDEX(sca_int_2, [1,1],   team_number=-1), 1) 
+       CHECK_VALI(IMAGE_INDEX(sca_int_3, [1,1,1], team_number=-1), 1) 
 #      endif
 #      if HAVE_IMAGE_INDEX_TEAM
-        ! affected by llvm-project issue #205953
-        write(*,'(A,I3)') "image_index(sca_int_1, [1], get_team()) = ", IMAGE_INDEX(sca_int_1, [1], GET_TEAM())
-        write(*,'(A,I3)') "image_index(sca_int_3, [1,1,1], get_team()) = ", IMAGE_INDEX(sca_int_3, [1,1,1], GET_TEAM())
+       ! affected by llvm-project issue #205953
+       CHECK_VALI(IMAGE_INDEX(sca_int_1, [1],     GET_TEAM()), 1) 
+#      ifndef __GFORTRAN__
+       ! ICE's gfortran 16:
+       CHECK_VALI(IMAGE_INDEX(sca_int_1, [ni], GET_TEAM()), ni) 
+#      endif
+       CHECK_VALI(IMAGE_INDEX(sca_int_2, [1,1],   GET_TEAM()), 1) 
+       CHECK_VALI(IMAGE_INDEX(sca_int_3, [1,1,1], GET_TEAM()), 1) 
 #      endif
 #     endif
-    end if
 #   endif
 #   if HAVE_THIS_IMAGE_COARRAY
     STATUS("Testing THIS_IMAGE(coarray)...")
     if (THIS_IMAGE() == NUM_IMAGES()) then
-      write(*,'(A,I3)')  "this_image(sca_int_1) = ", THIS_IMAGE(sca_int_1)
-      write(*,'(A,2I3)') "this_image(sca_int_2) = ", THIS_IMAGE(sca_int_2)
-      write(*,'(A,3I3)') "this_image(sca_int_3) = ", THIS_IMAGE(sca_int_3)
-      write(*,'(A,I3)')  "this_image(sca_int_3, dim=2) = ", THIS_IMAGE(sca_int_3, dim=2)
+      write(*,'(I3,A,I3)')  me, ": this_image(sca_int_1) = ", THIS_IMAGE(sca_int_1)
+      write(*,'(I3,A,2I3)') me, ": this_image(sca_int_2) = ", THIS_IMAGE(sca_int_2)
+      write(*,'(I3,A,3I3)') me, ": this_image(sca_int_3) = ", THIS_IMAGE(sca_int_3)
+    end if
+    CHECK_VALI(element(THIS_IMAGE(sca_int_1),1), THIS_IMAGE())
+    CHECK_VALI(THIS_IMAGE(sca_int_3, dim=1), element(THIS_IMAGE(sca_int_3),1))
+    CHECK_VALI(THIS_IMAGE(sca_int_3, dim=2), element(THIS_IMAGE(sca_int_3),2))
+    CHECK_VALI(THIS_IMAGE(sca_int_3, dim=3), element(THIS_IMAGE(sca_int_3),3))
+    if (THIS_IMAGE() == 1) then
+      CHECK_ASSERT(all(THIS_IMAGE(sca_int_2) == 1))
+      CHECK_ASSERT(all(THIS_IMAGE(sca_int_3) == 1))
+    else
+      CHECK_ASSERT(all(THIS_IMAGE(sca_int_2) >= 1))
+      CHECK_ASSERT(all(THIS_IMAGE(sca_int_3) >= 1))
+      CHECK_ASSERT(any(THIS_IMAGE(sca_int_2) > 1))
+      CHECK_ASSERT(any(THIS_IMAGE(sca_int_3) > 1))
     end if
 #   endif
 #   if HAVE_PUTGET_INTRINSIC_SCALAR
