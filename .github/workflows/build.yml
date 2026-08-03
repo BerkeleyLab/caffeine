@@ -66,6 +66,17 @@ jobs:
         network: [ smp ]
         include:
 
+        # --- Other selected GFortran+Linux combos ---
+          - os: ubuntu-26.04
+            compiler: gfortran
+            version: 16
+          - os: ubuntu-26.04-arm
+            compiler: gfortran
+            version: 16
+          - os: ubuntu-24.04-arm
+            compiler: gfortran
+            version: 16
+          
         # --- flang coverage ---
           - os: macos-14
             compiler: flang
@@ -86,6 +97,12 @@ jobs:
           - os: ubuntu-24.04
             compiler: flang
             label: Homebrew
+            brew_via_install: 1
+            install_filter: 2>&1 | grep -v 'Sandbox unavailable'
+
+          - os: ubuntu-26.04-arm
+            label: Homebrew
+            compiler: flang
             brew_via_install: 1
             install_filter: 2>&1 | grep -v 'Sandbox unavailable'
 
@@ -264,7 +281,7 @@ jobs:
       run: |
         sudo apt update
         sudo apt install -y build-essential pkg-config make
-        if [[ ${COMPILER_VERSION} -lt 15 ]] ; then
+        if [[ ${COMPILER_VERSION} -lt 15 ]] || type -p gfortran-${COMPILER_VERSION} ; then
           sudo apt install -y gfortran-${COMPILER_VERSION} g++-${COMPILER_VERSION}
         else
           curl $CURL_OPTIONS https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh -o install-homebrew.sh
@@ -308,16 +325,16 @@ jobs:
         echo "PATH=$(brew --prefix)/opt/llvm/bin:${PATH}" >> "$GITHUB_ENV"
 
     - name: Setup FPM
-      if: ${{ !matrix.brew_via_install }}
+      if: ${{ !matrix.brew_via_install && !(runner.os == 'Linux' && runner.arch == 'ARM64') }}
       uses: fortran-lang/setup-fpm@main
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
         fpm-version: latest
 
     - name: Build FPM
-      if: false
+      if: ${{ !matrix.brew_via_install && runner.os == 'Linux' && runner.arch == 'ARM64' }}
       run: |
-        export FPM_VERSION=0.12.0
+        export FPM_VERSION=0.13.0
         curl --retry 5 -LOsS https://github.com/fortran-lang/fpm/releases/download/v$FPM_VERSION/fpm-$FPM_VERSION.F90
         mkdir fpm-temp
         gfortran-14 -o fpm-temp/fpm fpm-$FPM_VERSION.F90
