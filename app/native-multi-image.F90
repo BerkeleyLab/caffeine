@@ -215,12 +215,25 @@ module helpers
   public
     integer :: fail_count = 0 
   contains
-    function tostring(int) result(res)
-      integer :: int
-      character(len=128) :: str
+    function tostring(int, width) result(res)
+      integer, intent(in) :: int
+      integer, intent(in), optional :: width
       character(len=:), allocatable :: res
-      write(str, *) int
-      res = trim(adjustl(str))
+      integer :: w
+      if (present(width)) then
+        w = width
+        block 
+          character(len=w) :: str
+          write(str, *) int
+          res = adjustr(str)
+        end block
+      else
+        block 
+          character(len=128) :: str
+          write(str, *) int
+          res = trim(adjustl(str))
+        end block
+      end if
     end function
 
     function element(intarr, idx) result(res)
@@ -340,7 +353,7 @@ program native_multi_image
   end type
 
   integer :: me, ni, peer, i, ia(3)
-  character(len=5) :: c, ca(3)
+  character(len=10) :: c, ca(3)
 # if HAVE_TEAM_TYPE
   integer :: team_id
   type(TEAM_TYPE) :: subteam
@@ -406,45 +419,69 @@ program native_multi_image
     if (me /= peer) SYNC IMAGES([me, peer])
 #endif
 
-  i = me
-  ia = me
-  c = "hello"
-  ca = c
 # if HAVE_CO_SUM
     STATUS("Testing CO_SUM...")
+    i = me
+    ia = me
     call CO_SUM(i)
+    CHECK_VALI(i,ni*(ni+1)/2)
     call CO_SUM(i,1)
     call CO_SUM(ia)
+    CHECK_ASSERT(all(ia == ni*(ni+1)/2))
     call CO_SUM(ia,1)
 # endif
 # if HAVE_CO_MIN
     STATUS("Testing CO_MIN...")
+    i = 100*me
+    ia = i
     call CO_MIN(i)
+    CHECK_VALI(i,100)
     call CO_MIN(i,1)
     call CO_MIN(ia)
+    CHECK_ASSERT(all(ia == 100))
     call CO_MIN(ia,1)
+    c = tostring(100*me, len(c))
+    ca = c
     call CO_MIN(c)
+    CHECK_ASSERT(c == tostring(100, len(c)))
     call CO_MIN(c,1)
     call CO_MIN(ca)
+    CHECK_ASSERT(all(ca == tostring(100, len(c))))
     call CO_MIN(ca,1)
 # endif
 # if HAVE_CO_MAX
     STATUS("Testing CO_MAX...")
+    i = 10*me
+    ia = i
     call CO_MAX(i)
+    CHECK_VALI(i,10*ni)
     call CO_MAX(i,1)
     call CO_MAX(ia)
+    CHECK_ASSERT(all(ia == 10*ni))
     call CO_MAX(ia,1)
+    c = tostring(10*me, len(c))
+    ca = c
     call CO_MAX(c)
+    CHECK_ASSERT(c == tostring(10*ni, len(c)))
     call CO_MAX(c,1)
     call CO_MAX(ca)
+    CHECK_ASSERT(all(ca == tostring(10*ni, len(c))))
     call CO_MAX(ca,1)
 # endif
 # if HAVE_CO_BROADCAST
     STATUS("Testing CO_BROADCAST...")
+    i = me*1000
+    ia = i
     call CO_BROADCAST(i,1)
+    CHECK_VALI(i,1000)
     call CO_BROADCAST(ia,1)
+    CHECK_ASSERT(all(ia == 1000))
+    c = "hello"
+    ca = c
     call CO_BROADCAST(c,1)
+    CHECK_ASSERT(c == 'hello')
     call CO_BROADCAST(ca,1)
+    CHECK_ASSERT(all(ca == 'hello'))
 # endif
 
 # if HAVE_TEAM_TYPE
