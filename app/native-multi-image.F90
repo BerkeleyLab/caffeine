@@ -50,8 +50,11 @@
 #ifndef HAVE_TEAM_TYPE
 #define HAVE_TEAM_TYPE HAVE_TEAM
 #endif
-#ifndef HAVE_TEAM_QUERIES
-#define HAVE_TEAM_QUERIES HAVE_TEAM
+#ifndef HAVE_GET_TEAM
+#define HAVE_GET_TEAM HAVE_TEAM
+#endif
+#ifndef HAVE_TEAM_NUMBER
+#define HAVE_TEAM_NUMBER HAVE_TEAM
 #endif
 #ifndef HAVE_FORM_TEAM
 #define HAVE_FORM_TEAM HAVE_TEAM
@@ -487,11 +490,14 @@ program native_multi_image
 # if HAVE_TEAM_TYPE
       CHECK_TYPE_COMPLIANCE(TEAM_TYPE, default_team, .true., 0)
 # endif
-# if HAVE_TEAM_QUERIES
-    STATUS("Testing team queries...")
+# if HAVE_GET_TEAM
+    STATUS("Testing GET_TEAM...")
     subteam = GET_TEAM(CURRENT_TEAM)
     subteam = GET_TEAM(INITIAL_TEAM)
     subteam = GET_TEAM()
+# endif
+# if HAVE_TEAM_NUMBER
+    STATUS("Testing TEAM_NUMBER...")
     CHECK_VALI(TEAM_NUMBER(), -1)
 # endif
 # if HAVE_FORM_TEAM
@@ -506,16 +512,20 @@ program native_multi_image
 # if HAVE_CHANGE_TEAM
     STATUS("Testing CHANGE TEAM...")
     CHANGE TEAM(subteam)
-      write(*,'(I3,A,I3,A,I3,A,I3)') me, ': Inside CHANGE TEAM construct: ', THIS_IMAGE(), ' of ', NUM_IMAGES(), ' in team number ', TEAM_NUMBER()
+      write(*,'(I3,A,I3,A,I3,A,I3)') me, ': Inside CHANGE TEAM construct: ', THIS_IMAGE(), ' of ', NUM_IMAGES(), ' in team number ', team_id
 #    if !(__flang_major__ == 22 && __flang_minor__ == 1 && __flang_patchlevel__ < 3) /* avoid llvm #171048 */
       CHECK_ASSERT(THIS_IMAGE() >= 1)
       CHECK_ASSERT(THIS_IMAGE() <= NUM_IMAGES())
       CHECK_ASSERT(NUM_IMAGES() <= (ni+1)/2)
-      CHECK_VALI(TEAM_NUMBER(), team_id)
+#     if HAVE_TEAM_NUMBER
+        CHECK_VALI(TEAM_NUMBER(), team_id)
+#     endif
 #    endif
     END TEAM
     call sync_all
-    CHECK_VALI(TEAM_NUMBER(), -1)
+#   if HAVE_TEAM_NUMBER
+      CHECK_VALI(TEAM_NUMBER(), -1)
+#   endif
 # endif
 
 # if HAVE_MAIN_COARRAY
@@ -584,7 +594,7 @@ program native_multi_image
        CHECK_VALI(IMAGE_INDEX(sca_int_2, [1,1],   team_number=-1), 1) 
        CHECK_VALI(IMAGE_INDEX(sca_int_3, [1,1,1], team_number=-1), 1) 
 #      endif
-#      if HAVE_IMAGE_INDEX_TEAM
+#      if HAVE_IMAGE_INDEX_TEAM && HAVE_GET_TEAM
        ! affected by llvm-project issue #205953
        CHECK_VALI(IMAGE_INDEX(sca_int_1, [1],     GET_TEAM()), 1) 
 #      ifndef __GFORTRAN__
