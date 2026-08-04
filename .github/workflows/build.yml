@@ -144,7 +144,7 @@ jobs:
             version: latest
             container: ghcr.io/lfortran/lfortran:latest
             native_multi_image: true
-            FFLAGS: --coarray=true -DHAVE_TEAM=0 -DHAVE_TEAM_TYPE -DHAVE_FORM_TEAM -DHAVE_SYNC_TEAM -DHAVE_ALLOC_COARRAY_CLEANUP=0 -DHAVE_COARRAY_QUERY=0 -DHAVE_COBOUND -DHAVE_PUTGET_INTRINSIC_ARRAY_CONTIG=0 -DHAVE_EVENT=0 -DHAVE_LOCK=0 -DHAVE_NOTIFY=0 
+            FFLAGS: --coarray=true -DHAVE_TEAM_NUMBER=0 -DHAVE_GET_TEAM=0 -DHAVE_ALLOC_COARRAY_CLEANUP=0 -DHAVE_COARRAY_QUERY=0 -DHAVE_COBOUND -DHAVE_PUTGET_INTRINSIC_ARRAY_CONTIG=0 -DHAVE_EVENT=0 -DHAVE_LOCK=0 -DHAVE_NOTIFY=0 
 
           - os: ubuntu-22.04
             compiler: lfortran
