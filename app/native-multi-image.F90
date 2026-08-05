@@ -56,6 +56,9 @@
 #ifndef HAVE_TEAM_NUMBER
 #define HAVE_TEAM_NUMBER HAVE_TEAM
 #endif
+#ifndef HAVE_TEAM_NUMBER_TEAM
+#define HAVE_TEAM_NUMBER_TEAM HAVE_TEAM_NUMBER
+#endif
 #ifndef HAVE_FORM_TEAM
 #define HAVE_FORM_TEAM HAVE_TEAM
 #endif
@@ -64,6 +67,12 @@
 #endif
 #ifndef HAVE_CHANGE_TEAM
 #define HAVE_CHANGE_TEAM HAVE_TEAM
+#endif
+#ifndef HAVE_THIS_IMAGE_TEAM
+#define HAVE_THIS_IMAGE_TEAM HAVE_TEAM
+#endif
+#ifndef HAVE_NUM_IMAGES_TEAM
+#define HAVE_NUM_IMAGES_TEAM HAVE_TEAM
 #endif
 
 #ifndef HAVE_COARRAY
@@ -519,6 +528,27 @@ program native_multi_image
       CHECK_ASSERT(NUM_IMAGES() <= (ni+1)/2)
 #     if HAVE_TEAM_NUMBER
         CHECK_VALI(TEAM_NUMBER(), team_id)
+#     endif
+#     if HAVE_THIS_IMAGE_TEAM
+        CHECK_VALI(THIS_IMAGE(subteam),THIS_IMAGE())
+#       if HAVE_GET_TEAM
+        CHECK_VALI(THIS_IMAGE(GET_TEAM()),THIS_IMAGE())
+        CHECK_VALI(THIS_IMAGE(TEAM=GET_TEAM(INITIAL_TEAM)),me)
+#       endif
+#     endif
+#     if HAVE_NUM_IMAGES_TEAM
+        CHECK_VALI(NUM_IMAGES(subteam),NUM_IMAGES())
+#       if HAVE_GET_TEAM
+        CHECK_VALI(NUM_IMAGES(GET_TEAM()),NUM_IMAGES())
+        CHECK_VALI(NUM_IMAGES(TEAM=GET_TEAM(INITIAL_TEAM)),ni)
+#       endif
+#     endif
+#     if HAVE_TEAM_NUMBER_TEAM
+        CHECK_VALI(TEAM_NUMBER(subteam),team_id)
+#       if HAVE_GET_TEAM
+        CHECK_VALI(TEAM_NUMBER(GET_TEAM()),team_id)
+        CHECK_VALI(TEAM_NUMBER(TEAM=GET_TEAM(INITIAL_TEAM)),-1)
+#       endif
 #     endif
 #    endif
     END TEAM
