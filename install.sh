@@ -27,6 +27,8 @@ Options:
                     disabling optimization and enabling assertions to help find defects.
  --enable-threads   Build a thread-safe Caffeine library and link to
                     thread-safe GASNet, for use in threaded do-concurrent.
+ --enable-cmake or --disable-fpm 
+                    Build Caffeine library using CMake instead of FPM (the default).
 
 All unrecognized arguments will be passed to GASNet's configure.
 
@@ -59,6 +61,7 @@ JULIENNE_GIT=$(awk -F'"' '/^julienne =/ {print $2}' manifest/fpm.toml.template)
 JULIENNE_VERSION=$(awk -F'"' '/^julienne =/ {print $4}' manifest/fpm.toml.template)
 VERBOSE=""
 YES=false
+USE_FPM=true
 APPEND_CFLAGS=""
 APPEND_LDFLAGS=""
 # these variables deliberately inherited from the caller environment
@@ -193,6 +196,9 @@ while [ "$1" != "" ]; do
         --enable-threads)  GASNET_THREADMODE=par ;;
         --disable-threads) GASNET_THREADMODE=seq ;;
 
+        --enable-cmake | --disable-fpm) USE_FPM= ;;
+        --disable-cmake | --enable-fpm) USE_FPM=true ;;
+
         --enable-debug)  GASNET_CODEMODE=debug ; append_gasnet_configure_arg "$orig_arg" ;;
         --disable-debug) GASNET_CODEMODE=opt ;   append_gasnet_configure_arg "$orig_arg" ;;
 
@@ -279,7 +285,12 @@ PKG_CONFIG=$(abswhich ${PKG_CONFIG:-pkg-config} silent)
 MAKE=$(abswhich ${MAKE:-gmake} silent) # prefer 'gmake' over 'make'
 MAKE=$(abswhich ${MAKE:-make} silent)
 
+CMAKE=$(abswhich ${CMAKE:-cmake} silent)
+
 FPM=$(abswhich ${FPM:-fpm} silent)
+if [[ -z $FPM && -z $USE_FPM ]] ; then
+  FPM="fpm" # deliberately NOT path-expanded
+fi
 
 # FPM disallows override of the git command, so don't allow it here either
 # Homebrew requires git and curl to operate, so cannot be used to provide them when they are missing
@@ -302,10 +313,11 @@ fi
 
 ask_permission_to_use_homebrew()
 {
+  BUILDER=$( [[ $USE_FPM ]] && echo "fpm" || echo "cmake" )
   cat << EOF
 
 Either one or more of the environment variables FC and CC are unset or
-one or more of the following packages are not in the PATH: pkg-config, make, fpm.
+one or more of the following packages are not in the PATH: pkg-config, make, $BUILDER.
 If you grant permission to install prerequisites, you will be prompted before each installation.
 
 Press 'Enter' to choose the square-bracketed default answer:
@@ -359,7 +371,8 @@ exit_if_user_declines()
 DEPENDENCIES_DIR="build/dependencies"
 mkdir -p $DEPENDENCIES_DIR
 
-if [ -z ${FC:+x} ] || [ -z ${CC:+x} ] || [ -z ${PKG_CONFIG:+x} ] || [ -z ${MAKE:+x} ] || [ -z ${FPM:+x} ] ; then
+if [ -z ${FC:+x} ] || [ -z ${CC:+x} ] || [ -z ${PKG_CONFIG:+x} ] || [ -z ${MAKE:+x} ] || \
+   [ -z ${FPM:+x} ] || [[ -z ${CMAKE:+x} && -z ${USE_FPM:+x} ]] ; then
 
   ask_permission_to_use_homebrew 
   exit_if_user_declines "brew"
@@ -441,6 +454,13 @@ EOF
     exit_if_user_declines "fpm"
     $BREW install fpm
     FPM=$(abswhich fpm)
+  fi
+
+  if [ -z ${CMAKE:+x} -a -z ${USE_FPM:+x} ] ; then
+    ask_permission_to_install_homebrew_package "'cmake'"
+    exit_if_user_declines "cmake"
+    $BREW install cmake
+    CMAKE=$(abswhich cmake)
   fi
 fi
 
@@ -680,8 +700,8 @@ cat << EOF > "$PKG_CONFIG_DIR/$CAFFEINE_PC"
 
 CAFFEINE_FC=$FC
 CAFFEINE_CC=$CC
-CAFFEINE_FFLAGS=$FFLAGS
-CAFFEINE_CFLAGS=$APPEND_CFLAGS
+CAFFEINE_FFLAGS="$FFLAGS"
+CAFFEINE_CFLAGS="$APPEND_CFLAGS"
 CAFFEINE_LDFLAGS="-L$PREFIX/lib $APPEND_LDFLAGS"
 CAFFEINE_NETWORK=$GASNET_CONDUIT
 CAFFEINE_THREADMODE=$GASNET_THREADMODE
@@ -775,6 +795,8 @@ info)
   SRCDIR=\$(dirname \$FPM_DRIVER)
   GASNETDIR="$GASNET_PREFIX"
   GASNETCONFIG="\$GASNETDIR/include/gasnet_config.h"
+  MAKE=$MAKE
+  CMAKE=${CMAKE:-}
   echo \$LINE
   echo Version info:
   echo Caffeine \$(grep version \$SRCDIR/fpm.toml)
@@ -796,6 +818,8 @@ info)
   echo ID="\$(date) \$(whoami)"
   echo PREFIX=$PREFIX
   echo FPM=\$FPM
+  echo CMAKE=\$CMAKE
+  echo MAKE=\$MAKE
   echo FC=\$FC
   echo CC=\$CC
   echo FFLAGS=\$FFLAGS
@@ -809,7 +833,7 @@ info)
   if [[ -r "\$GASNETCONFIG" ]]; then
     grep -e GASNETI_BUILD_ID -e GASNETI_CONFIGURE_ARGS \$GASNETCONFIG | cut -d' ' -f2-
   fi
-  for tool in FPM FC CC ; do
+  for tool in FC CC $( [[ $USE_FPM ]] && echo "FPM" || echo "CMAKE" ) MAKE ; do
     echo \$LINE
     eval toolval="\\$\$tool"
     echo \$tool : \$toolval
@@ -832,12 +856,10 @@ chmod u+x $RUN_FPM_SH
 ( cd build && ln -f -s ../$RUN_FPM_SH run-fpm.sh )
 
 # ---------------------------------------------------------------
-# Caffeine build
-
-./$RUN_FPM_SH set-native
-
-./$RUN_FPM_SH build $VERBOSE || \
-( set +x
+# Install an ERR handler for build failures
+error_handler() {
+  set +ex
+  echo "Error: Command '$BASH_COMMAND' failed on line $1 with exit code $?."
   echo "Defect reporting information:"
   ./$RUN_FPM_SH info
   echo
@@ -845,16 +867,76 @@ chmod u+x $RUN_FPM_SH
   echo Please paste the ENTIRE output above into a new issue here:
   echo "   https://github.com/berkeleylab/caffeine/issues"
   exit 1
-)
+}
+
+trap 'error_handler $LINENO' ERR
+
+# ---------------------------------------------------------------
+# Caffeine build
+
+LIBCAFFEINE_DST=libcaffeine-$GASNET_CONDUIT-$GASNET_THREADMODE.a
+
+./$RUN_FPM_SH set-native
+
+if [[ -n $USE_FPM ]] ; then
+  ./$RUN_FPM_SH build $VERBOSE
+
+  LIBCAFFEINE_SRC=$(./$RUN_FPM_SH install --list 2>/dev/null | grep libcaffeine | cut -d' ' -f2)
+else # Using CMake instead of FPM to build
+  ASSERT_DIR=$DEPENDENCIES_DIR/assert
+  mkdir -p $ASSERT_DIR
+  if ! [[ -r $ASSERT_DIR/fpm.toml ]] ; then
+    # Download Assert: Assumes git version 1.7.7 (2011-09) or later
+    $GIT clone -c advice.detachedHead=false --depth 1 --branch $ASSERT_VERSION $ASSERT_GIT $ASSERT_DIR
+    ( cd $ASSERT_DIR && $GIT log -n 1 --oneline )
+  fi
+
+  # CMake botches module name analysis unless we match the name in the source file:
+  ASSERT_SRC="$ASSERT_DIR/src/caf_caffiene_assert_m.F90"
+  $FC $FFLAGS -I$ASSERT_DIR/include -E $ASSERT_DIR/src/assert_m.F90 > $ASSERT_SRC
+
+  # Generate CMakeLists.txt
+  cat << EOF > CMakeLists.txt
+cmake_minimum_required(VERSION 3.0...4.4 FATAL_ERROR)
+
+# Provide the compilers BEFORE the project() command
+set(CMAKE_C_COMPILER "$CC")
+set(CMAKE_Fortran_COMPILER "$FC")
+
+project(Caffeine LANGUAGES C Fortran)
+
+# Set the command-line options for the compilers
+set(CMAKE_C_FLAGS "$CAFFEINE_CFLAGS -I$(abspath include)")
+set(CMAKE_Fortran_FLAGS "$FFLAGS -I$(abspath include) -I$(abspath $ASSERT_DIR)/include")
+
+add_library(caffeine-$GASNET_CONDUIT-$GASNET_THREADMODE STATIC
+EOF
+  echo $ASSERT_SRC >> CMakeLists.txt
+  # Ownership check to avoid "fatal: detected dubious ownership in repository" in containers
+  if [[ -d .git ]] && [[ $(ls -ld .git | awk '{print $3}') == $(id -un) ]] ; then
+    $GIT ls-files src | grep -e '.F90$' -e '.c$' >> CMakeLists.txt
+  else
+    find src -name '*.F90' -or -name '*.c' >> CMakeLists.txt
+  fi
+  echo ")" >> CMakeLists.txt
+
+  rm -Rf build/cmake
+  mkdir -p build/cmake
+  (
+    cd build/cmake
+    $CMAKE ../..
+    $MAKE -j 8 ${VERBOSE:+VERBOSE=1}
+  )
+
+  LIBCAFFEINE_SRC=build/cmake/$LIBCAFFEINE_DST
+fi
 
 # ---------------------------------------------------------------
 # Caffeine installation
 
-LIBCAFFEINE_DST=libcaffeine-$GASNET_CONDUIT-$GASNET_THREADMODE.a
-LIBCAFFEINE_SRC=$(./$RUN_FPM_SH install --list 2>/dev/null | grep libcaffeine | cut -d' ' -f2)
 
-if [ -z "$LIBCAFFEINE_SRC" ]; then
-  echo "ERROR: Failed to detect libcaffeine.a from fpm"
+if ! [ -r "$LIBCAFFEINE_SRC" ]; then
+  echo "ERROR: Failed to build/detect libcaffeine"
   exit 1
 else
   mkdir -p "$PREFIX/lib"
