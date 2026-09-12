@@ -87,9 +87,6 @@ jobs:
             version: 16
           
         # --- flang coverage ---
-          - os: macos-14
-            compiler: flang
-            brew_via_install: 1
           - os: macos-15
             compiler: flang
             brew_via_install: 1
@@ -427,7 +424,7 @@ jobs:
       run: |
         curl --retry 5 -LOsS https://github.com/fortran-lang/fpm/releases/download/v$FPM_VERSION/fpm-$FPM_VERSION.F90
         mkdir fpm-temp
-        gfortran-14 -o fpm-temp/fpm fpm-$FPM_VERSION.F90
+        gfortran-14 -fopenmp -o fpm-temp/fpm fpm-$FPM_VERSION.F90
         echo "PATH=${PWD}/fpm-temp:${PATH}" >> "$GITHUB_ENV"
 
     ##########################################################################
