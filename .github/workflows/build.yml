@@ -87,9 +87,6 @@ jobs:
             version: 16
           
         # --- flang coverage ---
-          - os: macos-14
-            compiler: flang
-            brew_via_install: 1
           - os: macos-15
             compiler: flang
             brew_via_install: 1
