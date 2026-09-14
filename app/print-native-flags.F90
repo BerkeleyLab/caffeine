@@ -73,6 +73,9 @@ subroutine write_flags
    ! no multi-image support before 0.64.0
 #  else
      call set("--coarray=true")
+     call no("EVENT")
+     call no("LOCK")
+     call no("NOTIFY")
 #    if  __LFORTRAN_MAJOR__ == 0 && __LFORTRAN_MINOR__ == 64
      call no("TEAM")
 
@@ -81,14 +84,7 @@ subroutine write_flags
      call no("ALLOC_COARRAY")
      call no("COARRAY_QUERY")
      call no("PUTGET_INTRINSIC_ARRAY_CONTIG")
-
-     call no("EVENT")
-     call no("LOCK")
-     call no("NOTIFY")
-#    else
-   if (INDEX(COMPILER_VERSION(), 'version 0.65') /= 0 .and. &
-       INDEX(COMPILER_VERSION(), '-g') == 0) then 
-     ! LFortran release 0.65
+#    elif  __LFORTRAN_MAJOR__ == 0 && __LFORTRAN_MINOR__ == 65
      call no("GET_TEAM")
      call no("NUM_IMAGES_TEAM")
      call no("THIS_IMAGE_TEAM")
@@ -100,10 +96,19 @@ subroutine write_flags
      call no("IMAGE_INDEX")
      call no("THIS_IMAGE_COARRAY")
      call no("PUTGET_INTRINSIC_ARRAY_CONTIG")
+#    else
+   if (INDEX(COMPILER_VERSION(), 'version 0.66') /= 0 .and. &
+       INDEX(COMPILER_VERSION(), '-g') == 0) then 
+     ! LFortran release 0.66
+     call no("GET_TEAM")
+     call no("NUM_IMAGES_TEAM")
+     call no("THIS_IMAGE_TEAM")
+     call no("TEAM_NUMBER")
 
-     call no("EVENT")
-     call no("LOCK")
-     call no("NOTIFY")
+     call no("ALLOC_COARRAY_CLEANUP")
+     call no("IMAGE_INDEX")
+     call no("THIS_IMAGE_COARRAY")
+     call no("PUTGET_INTRINSIC_ARRAY_CONTIG")
    else 
      ! LFortran git snapshot or newer, assume latest we know about
      call no("GET_TEAM")
@@ -115,10 +120,6 @@ subroutine write_flags
      call no("IMAGE_INDEX")
      call no("THIS_IMAGE_COARRAY")
      call no("PUTGET_INTRINSIC_ARRAY_CONTIG")
-
-     call no("EVENT")
-     call no("LOCK")
-     call no("NOTIFY")
    end if
 #  endif
 #  endif
