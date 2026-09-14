@@ -12,13 +12,13 @@ Release Procedure for Caffeine
     1. Update all instances of the copyright year embedded in: [LICENSE.txt](../LICENSE.txt),
        [manifest/fpm.toml.template](../manifest/fpm.toml.template)
     2. Update all instances of the release package version number embedded in:
-       [manifest/fpm.toml.template](../manifest/fpm.toml.template), [install.sh](../install.sh), [version.h](../include/version.h)
+       [manifest/fpm.toml.template](../manifest/fpm.toml.template), [install.sh](../install.sh), [caffeine-version.h](../include/caffeine-version.h)
     3. Update the author list embedded in: [manifest/fpm.toml.template](../manifest/fpm.toml.template)
     4. Review top-level [README.md](../README.md) and other user-facing documentation for any
        necessary changes
     5. Update [docs/implementation-status.md](../docs/implementation-status.md) with current status
     6. If the PRIF specification revision is changing, search and update all instances of the old revision,
-       including `CAF_PRIF_VERSION_{MAJOR,MINOR}` in [version.h](../include/version.h)
+       including `CAF_PRIF_VERSION_{MAJOR,MINOR}` in [caffeine-version.h](../include/caffeine-version.h)
     7. Temporarily hardcode version of gasnet installer in [install.sh](../install.sh) as the
        last commit in the release. Set GASNET_VERSION flag to the latest gasnet release
 5. Produce the ChangeLog
@@ -42,7 +42,7 @@ Release Procedure for Caffeine
 10. Post release chores
     1. Git revert the commit that hardcoded the gasnet version or manually edit
     2. Update patch number of the version number embedded in:
-       [manifest/fpm.toml.template](../manifest/fpm.toml.template), [install.sh](../install.sh), [version.h](../include/version.h)
+       [manifest/fpm.toml.template](../manifest/fpm.toml.template), [install.sh](../install.sh), [caffeine-version.h](../include/caffeine-version.h)
        Update to an odd number to indicate that the `main` branch is currently a snapshot of something
        that is beyond the offical release
     3. PR a version bump to the Caffeine version in [LFortran third-party CI](https://github.com/lfortran/lfortran/blob/main/ci/test_third_party_codes.sh) and the [LFortran end-to-end tests](https://github.com/lfortran/lfortran/blob/main/ci/test_caffeine.sh)

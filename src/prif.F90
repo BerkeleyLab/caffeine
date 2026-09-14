@@ -1,8 +1,8 @@
 ! Copyright (c), The Regents of the University of California
 ! Terms of use are as specified in LICENSE.txt
 
-#include "language-support.F90"
-#include "version.h"
+#include "caffeine-language-support.F90"
+#include "caffeine-version.h"
 
 module prif
 

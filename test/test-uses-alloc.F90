@@ -5,8 +5,8 @@
 #ifndef CAF_INCLUDED_TEST_USES_ALLOC
 #define CAF_INCLUDED_TEST_USES_ALLOC
 
-#include "version.h"
-#include "language-support.F90"
+#include "caffeine-version.h"
+#include "caffeine-language-support.F90"
 
 use prif, only : &
     prif_allocate_coarray, &

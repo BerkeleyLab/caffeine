@@ -1,7 +1,7 @@
 ! Copyright (c), The Regents of the University of California
 ! Terms of use are as specified in LICENSE.txt
 
-#include "version.h"
+#include "caffeine-version.h"
 #include "assert_macros.h"
 
 submodule(prif:prif_private_s) teams_s
