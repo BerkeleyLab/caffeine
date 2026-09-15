@@ -1,7 +1,7 @@
 ! Copyright (c), The Regents of the University
 ! Terms of use are as specified in LICENSE.txt
 
-#include "version.h"
+#include "caffeine-version.h"
 
 module unit_test_parameters_m
   use, intrinsic :: iso_c_binding, only: c_int, c_funptr, c_null_funptr

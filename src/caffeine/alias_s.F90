@@ -2,7 +2,7 @@
 ! Terms of use are as specified in LICENSE.txt
 
 #include "assert_macros.h"
-#include "version.h"
+#include "caffeine-version.h"
 
 submodule(prif:prif_private_s) alias_s
   ! DO NOT ADD USE STATEMENTS HERE
