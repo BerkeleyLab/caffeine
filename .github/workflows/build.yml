@@ -98,11 +98,10 @@ jobs:
             compiler: flang
             version: 23
             macports: 1
-          # flang MacPort missing for Tahoe
-          #- os: macos-26-intel
-          #  compiler: flang
-          #  version: 23
-          #  macports: 1
+          - os: macos-26-intel
+            compiler: flang
+            version: 23
+            macports: 1
 
           - os: ubuntu-24.04
             compiler: flang
@@ -235,12 +234,11 @@ jobs:
             version: 23
             macports: 1
             network: udp
-          # flang MacPort missing for Tahoe
-          #- os: macos-26-intel
-          #  compiler: flang
-          #  version: 23
-          #  macports: 1
-          #  network: udp
+          - os: macos-26-intel
+            compiler: flang
+            version: 23
+            macports: 1
+            network: udp
 
           - os: macos-15
             compiler: flang
@@ -374,8 +372,6 @@ jobs:
       if: matrix.macports
       run: |
         #sudo port -v selfupdate
-        # fpm binary distribution for macOS requires gfortran shared libraries from gcc@12
-        sudo port -v install --allow-failing libgcc12
         if [[ ${{ matrix.compiler }} == 'gfortran' && ${COMPILER_VERSION} -gt 15 ]] ; then
           sudo port -v install gcc${COMPILER_VERSION}
         fi
@@ -405,7 +401,11 @@ jobs:
     - name: Choose FPM
       if: ${{ !matrix.brew_via_install }}
       run: |
-        if [[ ${{ runner.arch == 'ARM64' && (runner.os == 'Linux' || env.FPM_VERSION < '0.13.0') }} == true ]] ; then
+        # FPM binary distros currently unavailable for ARM64 on Linux (or versions older than 0.13)
+        # macports: avoid need for libgcc12 shared library dependency, which pulls in alot more MacPors
+        if [[ ${{ !!matrix.macports ||
+                  ( runner.arch == 'ARM64' && (runner.os == 'Linux' || env.FPM_VERSION < '0.13.0') )
+               }} == true ]] ; then
           echo "FPM_BUILD=true" >> "$GITHUB_ENV"
         else
           echo "FPM_SETUP=true" >> "$GITHUB_ENV"
@@ -421,10 +421,15 @@ jobs:
     - name: Build FPM
       if: env.FPM_BUILD
       run: |
+        for suff in -14 -15 -16 "" -13 -12 ; do
+          GFORTRAN=gfortran$suff
+          if type -P $GFORTRAN ; then break ; fi
+        done
+        [[ -n "$GFORTRAN" ]]
         mkdir -p fpm-temp/bin
         cd fpm-temp
         curl --retry 5 -LOsS https://github.com/fortran-lang/fpm/releases/download/v$FPM_VERSION/fpm-$FPM_VERSION.F90
-        gfortran-14 -fopenmp -o bin/fpm fpm-$FPM_VERSION.F90
+        $GFORTRAN -fopenmp -o bin/fpm fpm-$FPM_VERSION.F90
         echo "PATH=$PWD/bin:${PATH}" >> "$GITHUB_ENV"
 
     ##########################################################################
