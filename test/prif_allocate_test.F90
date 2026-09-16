@@ -1,5 +1,5 @@
 #include "test-utils.F90"
-#include "version.h"
+#include "caffeine-version.h"
 
 module prif_allocate_test_m
 # include "test-uses-alloc.F90"

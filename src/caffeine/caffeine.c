@@ -17,7 +17,7 @@
 #include "../dlmalloc/dl_malloc_caf.h"
 #include "../dlmalloc/dl_malloc.h"
 #include "caffeine-internal.h"
-#include "version.h"
+#include "caffeine-version.h"
 
 // Ensure assertion enforcement in this file tracks the Caffeine ASSERTIONS setting
 #undef NDEBUG

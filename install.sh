@@ -533,8 +533,14 @@ else
   FFLAGS="$FFLAGS_opt $FFLAGS"
 fi
 
-# enable Assert's multi-image support with PRIF callbacks provided by libcaffeine
-FFLAGS+=" -DASSERT_MULTI_IMAGE -DASSERT_PARALLEL_CALLBACKS"
+# Configure dependencies:
+# We utilize Assert's parallel callbacks feature, with PRIF callbacks provided by libcaffeine.
+# This feature previously required ASSERT_PARALLEL_CALLBACKS, but is now always enabled.
+# We leave Assert's multi-image support disabled (default), because this is
+# subsumed by the parallel callbacks, and we don't want native calls to
+# this_image() on compilers that might not support it through PRIF.
+# We do rename the assert module to reduce the chance of name conflicts:
+FFLAGS+=" -Dassert_m=caf_caffiene_assert_m"
 # enable Julienne's multi-image support with PRIF callbacks provided by julienne-driver
 FFLAGS+=" -DHAVE_MULTI_IMAGE_SUPPORT -DJULIENNE_PARALLEL_CALLBACKS"
 

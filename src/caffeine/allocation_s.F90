@@ -2,8 +2,8 @@
 ! Terms of use are as specified in LICENSE.txt
 
 #include "assert_macros.h"
-#include "version.h"
-#include "language-support.F90"
+#include "caffeine-version.h"
+#include "caffeine-language-support.F90"
 
 #ifndef CAF_POISON
 #define CAF_POISON ASSERTIONS
