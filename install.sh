@@ -684,6 +684,7 @@ GASNET_LIB_LOCATIONS=$(awk '{locs=""; for(i = 1; i <= NF; i++) if ($i ~ /^-L/) {
 GASNET_LIB_NAMES=$(awk '{names=""; for(i=1; i<=NF; i++) if(sub(/^-l/, "", $i)) names=(names ? names " " : "") $i; print names}' <<< $GASNET_LIBS)
 if [[ $GASNET_CONDUIT == "udp" ]] ; then
   GASNET_LIB_NAMES+=" stdc++" # udp-conduit requires C++ libraries
+  APPEND_LDFLAGS+=" -lstdc++"
 fi
 FPM_TOML_LINK_ENTRY="link = [\"$(sed 's/ /", "/g' <<< $GASNET_LIB_NAMES)\"]"
 echo "${FPM_TOML_LINK_ENTRY}" >> $FPM_TOML
