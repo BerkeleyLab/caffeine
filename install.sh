@@ -998,9 +998,23 @@ ________________ Caffeine has been dispensed! ________________
 Caffeine is now installed in $PREFIX
 
 To rebuild or to run tests or examples via the Fortran Package
-Manager (fpm) with the required compiler/linker flags, pass a
+Manager (FPM) with the required compiler/linker flags, pass a
 fpm command to the run-fpm.sh script. For example, run
 the program example/hello.f90 as follows:
 
-./$RUN_FPM_SH run --example hello
+  ./$RUN_FPM_SH run --example hello
+
 EOF
+if grep '^NATIVEFLAGS=' $RUN_FPM_SH | grep -q DHAVE_MULTI_IMAGE ; then
+cat << EOF
+To run the more comprehensive test program app/native-multi-image.F90, try:
+
+  ./$RUN_FPM_SH run
+
+or alternatively (without FPM):
+
+  make -C app prif
+
+EOF
+fi
+
