@@ -59,11 +59,12 @@ ASSERT_GIT=$(awk -F'"' '/^assert =/ {print $2}' manifest/fpm.toml.template)
 ASSERT_VERSION=$(awk -F'"' '/^assert =/ {print $4}' manifest/fpm.toml.template)
 JULIENNE_GIT=$(awk -F'"' '/^julienne =/ {print $2}' manifest/fpm.toml.template)
 JULIENNE_VERSION=$(awk -F'"' '/^julienne =/ {print $4}' manifest/fpm.toml.template)
-VERBOSE=""
+VERBOSE=
 YES=false
 USE_FPM=true
-APPEND_CFLAGS=""
-APPEND_LDFLAGS=""
+APPEND_CFLAGS=
+APPEND_CFLAGS_lib=
+APPEND_LDFLAGS=
 # these variables deliberately inherited from the caller environment
 GASNET_CONDUIT="${GASNET_CONDUIT:-smp}"
 GASNET_THREADMODE="${GASNET_THREADMODE:-seq}"
@@ -515,7 +516,10 @@ fi
 user_compiler_flags="${CPPFLAGS:-} ${FFLAGS:-}"
 
 # compiler-specific flag defaults
-FFLAGS="-g"
+# FFLAGS is exported via pkg-config
+# FFLAGS_lib adds flags for library build that should not be exported
+FFLAGS=
+FFLAGS_lib="-g"
 FFLAGS_debug="-O0"
 FFLAGS_opt="-O3"
 compiler_version=$($FC --version)
@@ -526,11 +530,12 @@ if [[ $compiler_version =~ 'flang' ]]; then
   # flang-19 and older need extra args:
   awk "BEGIN { exit ($supported_version < 20) }" || FFLAGS+=" -mmlir -allow-assumed-rank"
 elif [[ $compiler_version =~ 'GNU Fortran' ]]; then
-  FFLAGS="-g -ffree-line-length-0 -Wno-unused-dummy-argument"
+  FFLAGS="-ffree-line-length-0 -Wno-unused-dummy-argument"
   supported_version=$(awk 'NR==1 && match($0, /) [0-9]+\.[0-9]+/){ v=substr($0, RSTART+2, RLENGTH-2); if (v+0 >= 13) print v; }' <<< "$compiler_version")
 elif [[ $compiler_version =~ 'LFortran' ]]; then
   # LFortran -g deliberately omitted: not always available, and leads to bizarre errors when it's not
-  FFLAGS="--cpp --realloc-lhs-arrays --separate-compilation --no-style-suggestions --implicit-argument-casting"
+  FFLAGS_lib="--cpp --realloc-lhs-arrays --no-style-suggestions --implicit-argument-casting"
+  FFLAGS="--separate-compilation"
   supported_version=$(awk 'NR==1 && match($0, /version: [0-9]+\.[0-9]+/){ v=substr($0, RSTART+9, RLENGTH-9); if (v+0 >= 0.63) print v; }' <<< "$compiler_version")
 else # unknown compiler
   FFLAGS_opt=-O2
@@ -548,9 +553,9 @@ if [[ -z "$supported_version" ]] ; then
 fi
 
 if [[ "$GASNET_CODEMODE" == "debug" ]] ; then 
-  FFLAGS="$FFLAGS_debug $FFLAGS"
+  FFLAGS_lib="$FFLAGS_debug $FFLAGS_lib"
 else
-  FFLAGS="$FFLAGS_opt $FFLAGS"
+  FFLAGS_lib="$FFLAGS_opt $FFLAGS_lib"
 fi
 
 # Configure dependencies:
@@ -560,9 +565,9 @@ fi
 # subsumed by the parallel callbacks, and we don't want native calls to
 # this_image() on compilers that might not support it through PRIF.
 # We do rename the assert module to reduce the chance of name conflicts:
-FFLAGS+=" -Dassert_m=caf_caffiene_assert_m"
+FFLAGS_lib+=" -Dassert_m=caf_caffiene_assert_m"
 # enable Julienne's multi-image support with PRIF callbacks provided by julienne-driver
-FFLAGS+=" -DHAVE_MULTI_IMAGE_SUPPORT -DJULIENNE_PARALLEL_CALLBACKS"
+FFLAGS_lib+=" -DHAVE_MULTI_IMAGE_SUPPORT -DJULIENNE_PARALLEL_CALLBACKS"
 
 if [[ $GASNET_THREADMODE == "par" ]] ; then
   FFLAGS+=" -DCAF_THREAD_SAFE"
@@ -574,19 +579,19 @@ FFLAGS+=" -DCAF_NETWORK_$GASNET_CONDUIT_UPPER"
 # Append user flags last to allow command-line overrides
 FFLAGS+=" $user_compiler_flags"
 
-if ! [[ "$FFLAGS " =~ -[DU]ASSERTIONS[=\ ] ]] ; then 
+if ! [[ "$FFLAGS_lib $FFLAGS " =~ -[DU]ASSERTIONS[=\ ] ]] ; then 
   # assertions not explicitly enabled or disabled on the command-line
   # default assertions based on codemode (--enable-debug)
   if [[ "$GASNET_CODEMODE" == "debug" ]] ; then 
-    FFLAGS+=" -DASSERTIONS"
+    FFLAGS_lib+=" -DASSERTIONS"
   fi
 fi
 
 # Ensure that certain preprocessor settings in FFLAGS are always appended to CFLAGS
-for opt in $FFLAGS; do
+for opt in $FFLAGS_lib $FFLAGS; do
   case "$opt" in
     -DASSERTIONS* | -UASSERTIONS* | -DFORCE_PRIF_* | -UFORCE_PRIF_*)
-       APPEND_CFLAGS+=" $opt"
+       APPEND_CFLAGS_lib+=" $opt"
        ;;
   esac
 done
@@ -690,7 +695,7 @@ FPM_TOML_LINK_ENTRY="link = [\"$(sed 's/ /", "/g' <<< $GASNET_LIB_NAMES)\"]"
 echo "${FPM_TOML_LINK_ENTRY}" >> $FPM_TOML
 
 # flag outputs
-CAFFEINE_CFLAGS="$GASNET_CFLAGS $GASNET_CPPFLAGS $APPEND_CFLAGS"
+CAFFEINE_CFLAGS="$GASNET_CFLAGS $GASNET_CPPFLAGS $APPEND_CFLAGS_lib $APPEND_CFLAGS"
 CAFFEINE_LDFLAGS="$GASNET_LDFLAGS $GASNET_LIB_LOCATIONS $APPEND_LDFLAGS"
 
 CAFFEINE_PC="caffeine-$GASNET_CONDUIT-$GASNET_THREADMODE.pc"
@@ -703,7 +708,7 @@ CAFFEINE_FC=$FC
 CAFFEINE_CC=$CC
 CAFFEINE_FFLAGS="$FFLAGS"
 CAFFEINE_CFLAGS="$APPEND_CFLAGS"
-CAFFEINE_LDFLAGS="-L$PREFIX/lib $APPEND_LDFLAGS"
+CAFFEINE_LDFLAGS="-L$PREFIX/lib"
 CAFFEINE_NETWORK=$GASNET_CONDUIT
 CAFFEINE_THREADMODE=$GASNET_THREADMODE
 CAFFEINE_CODEMODE=$GASNET_CODEMODE
@@ -714,7 +719,7 @@ URL: https://go.lbl.gov/caffeine
 Version: 0.8.1
 Requires: gasnet-$GASNET_CONDUIT-$GASNET_THREADMODE
 Cflags: \${CAFFEINE_CFLAGS}
-Libs: \${CAFFEINE_LDFLAGS} -lcaffeine-$GASNET_CONDUIT-$GASNET_THREADMODE
+Libs: \${CAFFEINE_LDFLAGS} -lcaffeine-$GASNET_CONDUIT-$GASNET_THREADMODE $APPEND_LDFLAGS
 EOF
 ln -sf "$CAFFEINE_PC" "$PKG_CONFIG_DIR/caffeine-$GASNET_CONDUIT.pc"
 ln -sf "$CAFFEINE_PC" "$PKG_CONFIG_DIR/caffeine.pc"
@@ -748,7 +753,7 @@ FPM="$FPM"
 FC="$FC"
 CC="$CC"
 NATIVEFLAGS=""
-RAWFLAGS="$FFLAGS"
+RAWFLAGS="$FFLAGS_lib $FFLAGS"
 FFLAGS="\$NATIVEFLAGS \$RAWFLAGS"
 CFLAGS="$CAFFEINE_CFLAGS"
 LDFLAGS="$CAFFEINE_LDFLAGS"
@@ -894,7 +899,7 @@ else # Using CMake instead of FPM to build
 
   # CMake botches module name analysis unless we match the name in the source file:
   ASSERT_SRC="$ASSERT_DIR/src/caf_caffiene_assert_m.F90"
-  $FC $FFLAGS -I$ASSERT_DIR/include -E $ASSERT_DIR/src/assert_m.F90 > $ASSERT_SRC
+  $FC $FFLAGS_lib $FFLAGS -I$ASSERT_DIR/include -E $ASSERT_DIR/src/assert_m.F90 > $ASSERT_SRC
 
   # Generate CMakeLists.txt
   cat << EOF > CMakeLists.txt
@@ -908,7 +913,7 @@ project(Caffeine LANGUAGES C Fortran)
 
 # Set the command-line options for the compilers
 set(CMAKE_C_FLAGS "$CAFFEINE_CFLAGS -I$(abspath include)")
-set(CMAKE_Fortran_FLAGS "$FFLAGS -I$(abspath include) -I$(abspath $ASSERT_DIR)/include")
+set(CMAKE_Fortran_FLAGS "$FFLAGS_lib $FFLAGS -I$(abspath include) -I$(abspath $ASSERT_DIR)/include")
 
 add_library(caffeine-$GASNET_CONDUIT-$GASNET_THREADMODE STATIC
 EOF
