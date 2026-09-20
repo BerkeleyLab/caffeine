@@ -236,7 +236,15 @@ fi
 # ---------------------------------------------------------------
 # Initial compiler identification
 
-if [ -z ${FC:+x} ] || [ -z ${CC:+x} ]; then
+if [ -n "${FC:+x}" ] && ! type -P "$FC" > /dev/null 2>&1; then
+  echo "FC=$FC not found. If you don't yet have a Fortran compiler, please leave environment variable FC unset."
+  exit 1
+fi
+if [ -n "${CC:+x}" ] && ! type -P "$CC" > /dev/null 2>&1; then
+  echo "CC=$CC not found. If you don't yet have a C compiler, please leave environment variable CC unset."
+  exit 1
+fi
+if [ -z ${FC:+x} ] ; then # FC unset: default to LLVM if it's in PATH
   if type -P flang > /dev/null 2>&1; then
     FC=$(abswhich flang)
     echo "Setting FC=$FC"
@@ -250,15 +258,26 @@ if [ -z ${FC:+x} ] || [ -z ${CC:+x} ]; then
     echo "Setting CC=$CC"
   fi
 fi
-if [ -n "${CC:+x}" ] && ! type -P "$CC" > /dev/null 2>&1; then
-  echo "CC=$CC not found. If you don't yet have a C compiler, please leave environment variable CC unset."
-  exit 1
+if [[ -n ${FC:+x} && -z ${CC:+x} ]] ; then # Have FC but missing CC
+  # try to auto-detect CC from FC
+  if [[ $(basename $FC) =~ flang ]] || [[ $(basename $FC) =~ lfortran ]] ; then 
+    CC_guess=clang
+  else
+    CC_guess=gcc
+  fi
+  if ! [[ $(basename $FC) =~ lfortran ]] && [[ $FC =~ (-[0-9a-z-]+)$ ]] ; then 
+    CC_guess_suff=$CC_guess${BASH_REMATCH[0]} 
+    if type -P $CC_guess_suff > /dev/null 2>&1; then
+      CC=$(abswhich $CC_guess_suff)
+      echo "Setting CC=$CC"
+    fi
+  fi
+  if [ -z ${CC:+x} ] && type -P $CC_guess > /dev/null 2>&1; then
+    CC=$(abswhich $CC_guess)
+    echo "Setting CC=$CC"
+  fi
 fi
-if [ -n "${FC:+x}" ] && ! type -P "$FC" > /dev/null 2>&1; then
-  echo "FC=$FC not found. If you don't yet have a Fortran compiler, please leave environment variable FC unset."
-  exit 1
-fi
-if [ -z ${CXX:+x} ] && [ -n "$CC" ] ; then 
+if [[ -z ${CXX:+x} && -n ${CC:+x} ]] ; then 
   # C++ is an optional dependency
   # try to auto-detect from CC
   if [[ $(basename $CC) =~ clang ]] ; then 
@@ -267,9 +286,13 @@ if [ -z ${CXX:+x} ] && [ -n "$CC" ] ; then
     CXX_guess=g++
   fi
   if [[ $CC =~ (-[0-9a-z-]+)$ ]] ; then 
-    CXX_guess=${CXX_guess}${BASH_REMATCH[0]} 
+    CXX_guess_suff=$CXX_guess${BASH_REMATCH[0]} 
+    if type -P $CXX_guess_suff > /dev/null 2>&1; then
+      CXX=$(abswhich $CXX_guess_suff)
+      echo "Setting CXX=$CXX"
+    fi
   fi
-  if type -P $CXX_guess > /dev/null 2>&1; then
+  if [ -z ${CXX:+x} ] && type -P $CXX_guess > /dev/null 2>&1; then
     CXX=$(abswhich $CXX_guess)
     echo "Setting CXX=$CXX"
   fi
