@@ -701,6 +701,18 @@ if [ "$(realpath $GASNET_CC_STRIPPED)" != "$(realpath $CC)" ]; then
   exit 1;
 fi
 
+if [[ $compiler_version =~ 'LFortran' ]]; then
+  # Some LFortan builds issue a fatal error if -g appears on the Fortran compile or link line
+  # GASNet sometimes injects this linker option, so ensure we strip it out
+  for var in GASNET_LDFLAGS GASNET_LIBS ; do
+    space=' ' 
+    eval $var="\$space\${$var}\$space"    # surround start/end with space to avoid anchors
+    eval $var="\${$var// -g / }" # space is our option boundary
+    eval $var="\${$var%% }" # strip the space we added
+    eval $var="\${$var## }" # strip the space we added
+  done
+fi
+
 # ---------------------------------------------------------------
 # Output file generation
 
