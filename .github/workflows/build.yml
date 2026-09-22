@@ -474,11 +474,8 @@ jobs:
         echo "FC=lfortran" >> "$GITHUB_ENV" 
         echo "CC=clang" >> "$GITHUB_ENV"
         echo "CXX=clang++" >> "$GITHUB_ENV"
-        HEADER_NAME=ISO_Fortran_binding.h
-        HEADER_TARGET=include/$HEADER_NAME
-        HEADER_SOURCE=$(lfortran --print-c-include-dir)/$HEADER_NAME 
-        echo "#include <$HEADER_SOURCE>" > $HEADER_TARGET
-        find / -name $HEADER_NAME -exec ls -al {} \; -exec md5sum {} \; -exec head {} \; -exec echo --- \;
+        ls -R $(lfortran --print-c-include-dir)
+        #find / -name $HEADER_NAME -exec ls -al {} \; -exec md5sum {} \; -exec head {} \; -exec echo --- \;
 
     - name: Set Caffeine variables
       run: |
