@@ -73,6 +73,7 @@ subroutine write_flags
    ! no multi-image support before 0.64.0
 #  else
      call set("--coarray=true")
+     call set("--realloc-lhs-arrays")
      call no("EVENT")
      call no("LOCK")
      call no("NOTIFY")

@@ -300,6 +300,7 @@ jobs:
       GASNET_MASTERIP: 127.0.0.1
       CAF_IMAGES: 8
       BREW_WARNING_FILTER: 's/^[[:punct:]]*warning[[:punct:]]*(You are using macOS on Intel)/warn: \1/i'
+      INSTALL_VARS: FC CC CXX FFLAGS CPPFLAGS CFLAGS CXXFLAGS LDFLAGS LIBS GASNET_CONFIGURE_ARGS FPM CMAKE MAKE PKG_CONFIG
 
     steps:
     - name: Checkout code
@@ -312,7 +313,7 @@ jobs:
       if: ${{ contains(matrix.os, 'ubuntu') && matrix.container != '' && !contains(matrix.container, 'phhargrove') }}
       run: |
         apt update
-        apt install -y build-essential pkg-config make git curl
+        apt install -y build-essential pkg-config make git curl cmake
 
     - name: Install Ubuntu Native Dependencies
       if: ${{ contains(matrix.os, 'ubuntu') && matrix.container == '' && !matrix.brew_via_install }}
@@ -473,11 +474,8 @@ jobs:
         echo "FC=lfortran" >> "$GITHUB_ENV" 
         echo "CC=clang" >> "$GITHUB_ENV"
         echo "CXX=clang++" >> "$GITHUB_ENV"
-        HEADER_NAME=ISO_Fortran_binding.h
-        HEADER_TARGET=include/$HEADER_NAME
-        HEADER_SOURCE=$(lfortran --print-c-include-dir)/$HEADER_NAME 
-        echo "#include <$HEADER_SOURCE>" > $HEADER_TARGET
-        find / -name $HEADER_NAME -exec ls -al {} \; -exec md5sum {} \; -exec head {} \; -exec echo --- \;
+        ls -R $(lfortran --print-c-include-dir)
+        #find / -name $HEADER_NAME -exec ls -al {} \; -exec md5sum {} \; -exec head {} \; -exec echo --- \;
 
     - name: Set Caffeine variables
       run: |
@@ -538,8 +536,7 @@ jobs:
 
     - name: Build Caffeine (install.sh)
       run: |
-        for var in FC CC CXX FFLAGS CPPFLAGS CFLAGS CXXFLAGS LDFLAGS LIBS GASNET_CONFIGURE_ARGS ; do
-            eval echo "$var=\$$var"; done
+        (set +x ; for var in ${{ env.INSTALL_VARS }} ; do eval echo "$var=\$$var"; done)
         ./install.sh ${CONFIGURE_ARGS} ${NETWORK_ARG} \
                      ${{ inputs.install_args }} ${{ matrix.install_filter }}
         if ! grep -q 'NATIVEFLAGS=""' run-fpm.sh ; then
@@ -554,6 +551,8 @@ jobs:
         ./run-fpm.sh info
         ./install/bin/ident ./install/lib/libcaffeine.a | tee output
           test ${PIPESTATUS[0]} = 0 && grep -q "CaffeineAssertions" output
+        pkg-config --validate install/lib/pkgconfig/caffeine.pc | tee output
+          test ${PIPESTATUS[0]} = 0 && ! grep -q -v pkgconfig/gasnet output
 
     - name: Run examples
       run: |
@@ -617,16 +616,35 @@ jobs:
       if: ${{ contains(matrix.os, 'ubuntu') && matrix.brew_via_install }}
       run: |
         # the first install.sh command established Linux Brew, so add it to the
-        # PATH to prevent pointless overwrites in the second install.sh below
+        # PATH to prevent pointless overwrites in subsequent install.sh below
         HOMEBREW_PREFIX="/home/linuxbrew/.linuxbrew"
         ( set +e ; ls -al ${HOMEBREW_PREFIX}/bin ; exit 0 )
         echo "PATH=${HOMEBREW_PREFIX}/bin:${PATH}" >> "$GITHUB_ENV"
 
     - name: Build and Test Caffeine (thread-safe)
       run: |
-        for var in FC CC CXX FFLAGS CPPFLAGS CFLAGS LDFLAGS LIBS GASNET_CONFIGURE_ARGS ; do
-            eval echo "$var=\$$var"; done
+        rm -Rf build install/lib/libcaffeine* install/lib/pkgconfig/caffeine*
+        (set +x ; for var in ${{ env.INSTALL_VARS }} ; do eval echo "$var=\$$var"; done)
         ./install.sh ${CONFIGURE_ARGS} ${NETWORK_ARG} --enable-threads \
                      ${{ inputs.install_args }} ${{ matrix.install_filter }}
         ./run-fpm.sh test --verbose -- ${{ inputs.julienne_args }}
+        ./install/bin/ident ./install/lib/libcaffeine.a | tee output
+          test ${PIPESTATUS[0]} = 0 && grep -q "CaffeineAssertions" output
+        pkg-config --validate install/lib/pkgconfig/caffeine.pc | tee output
+          test ${PIPESTATUS[0]} = 0 && ! grep -q -v pkgconfig/gasnet output
 
+    - name: Build Caffeine (CMake)
+      run: |
+        rm -Rf build install/lib/libcaffeine* install/lib/pkgconfig/caffeine*
+        (set +e ; rm -f $(type -P fpm) )
+        (set +x ; for var in ${{ env.INSTALL_VARS }} ; do eval echo "$var=\$$var"; done)
+        ./install.sh ${CONFIGURE_ARGS} ${NETWORK_ARG} --enable-cmake \
+                     ${{ inputs.install_args }} ${{ matrix.install_filter }}
+        ./run-fpm.sh info
+        ./install/bin/ident ./install/lib/libcaffeine.a | tee output
+          test ${PIPESTATUS[0]} = 0 && grep -q "CaffeineAssertions" output
+        pkg-config --validate install/lib/pkgconfig/caffeine.pc | tee output
+          test ${PIPESTATUS[0]} = 0 && ! grep -q -v pkgconfig/gasnet output
+        if [[ -n $NATIVE_MULTI_IMAGE ]] ; then 
+          make -C app prif
+        fi
