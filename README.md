@@ -58,7 +58,8 @@ The `install.sh` script uses the following packages to build Caffeine:
    - LLVM Flang versions 19 or newer,
    - GNU Fortran versions 13 or newer, and
    - LFortran versions 0.64 or newer
-* [`fpm`](https://github.com/fortran-lang/fpm), the Fortran package manager
+* [`fpm`](https://github.com/fortran-lang/fpm), the Fortran package manager (optional)
+  * -*or*- [`cmake`](https://cmake.org/)
 * [pkg-config](https://www.freedesktop.org/wiki/Software/pkg-config/)
 * [GNU make](https://www.gnu.org/software/make/)
 * [git](https://git-scm.com)
@@ -102,6 +103,12 @@ env FC=<Fortran-compiler> CC=<C-compiler> CXX=<C++-compiler> ./install.sh <optio
 env CAF_IMAGES=8 ./run-fpm.sh run --example hello
 ```
 
+If you prefer not to use FPM, you can instead opt to use CMake with `install.sh --enable-cmake`, eg:
+```
+env FC=<Fortran-compiler> CC=<C-compiler> CXX=<C++-compiler> ./install.sh --enable-cmake <options>
+make -C app prif
+```
+
 If `$FC` or `$CC` are unset, then `install.sh` will look for LLVM-based compilers in
 the `PATH`, and failing that, offer to install such compilers using Homebrew.
 
@@ -139,18 +146,23 @@ using Fortran's multi-image features to print a message from each image.
 Caffeine also includes a broad "smoke test" of multi-image Fortran features.
 When Caffeine was installed using a PRIF-compatible Fortran compiler (currently
 LLVM Flang 22+ or LFortran 0.64+) the following command will invoke this smoke
-test:
+test using FPM:
 ```bash
 env CAF_IMAGES=8 ./run-fpm.sh run
 ```
-This will exercise the available PRIF feature set of the compiler version
+Alternatively without use of FPM:
+```bash
+make -C app prif
+```
+
+This test will exercise the available PRIF feature set of the compiler version
 detected at install time.
 
 Run tests
 ---------
 
 After installation, one can optionally issue the following command to run
-Caffeine's correctness unit tests to exercise the PRIF subroutines:
+Caffeine's correctness unit tests to exercise the PRIF subroutines (requires FPM):
 
 ```
 ./run-fpm.sh test
