@@ -62,7 +62,7 @@ JULIENNE_VERSION=$(awk -F'"' '/^julienne =/ {print $4}' manifest/fpm.toml.templa
 VERBOSE=
 YES=false
 USE_FPM=true
-APPEND_CFLAGS=
+APPEND_CFLAGS="${CPPFLAGS:-} ${CFLAGS:-}"
 APPEND_CFLAGS_lib=
 APPEND_LDFLAGS=
 # these variables deliberately inherited from the caller environment
@@ -523,7 +523,7 @@ if [ "${BREW_PREFIX:-unset}" != unset ] ; then
   # fixups necessitated by using Brew flang:
   if [[ $FC =~ flang ]] && [[ $FC =~ $BREW_PREFIX ]] ; then
     # workaround issue #228: clang cannot find Homebrew flang's C header
-    APPEND_CFLAGS="-I$(dirname $(find "$BREW_PREFIX/Cellar/flang" -name ISO_Fortran_binding.h | head -1))"
+    APPEND_CFLAGS+=" -I$(dirname $(find "$BREW_PREFIX/Cellar/flang" -name ISO_Fortran_binding.h | head -1))"
 
     if [ $(uname) = "Linux" ]; then
       # workaround brew's libflang_rt.runtime.so missing from default linker path on Linux
