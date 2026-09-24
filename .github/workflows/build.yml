@@ -293,7 +293,7 @@ jobs:
       CFLAGS: ${{ matrix.CFLAGS }} ${{ inputs.cflags }}
       FPM_VERSION: ${{ matrix.FPM_VERSION || '0.13.0' }}
       NETWORK_ARG: ${{ matrix.network && format('--network={0}',matrix.network) || '' }}
-      CURL_OPTIONS: -L --retry 10 --retry-all-errors --fail 
+      CURL_OPTIONS: --retry 10 --retry-all-errors --fail -L
       CONFIGURE_ARGS: --prefix=install --enable-rpath --enable-debug --verbose ${{ matrix.CONFIGURE_ARGS }}
       GASNET_SPAWN_VERBOSE: 1
       GASNET_SPAWNFN: L
@@ -306,28 +306,49 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v1
 
+    - name: Install shell functions
+      run: |
+        mkdir -p ~/.bash_helpers
+        cat << 'EOF' > ~/.bash_helpers/custom_functions.sh
+        retry() { 
+          local retry_cnt=0
+          local retry_delay
+          while ! "$@" ; do 
+            retry_cnt=$(expr $retry_cnt + 1)
+            if [[ $retry_cnt > 5 ]] ; then exit 1 ; fi 
+            ( set +x ; 
+              echo "::warning::Command failed: <$@> Pausing before retry $retry_cnt..." ); 
+            retry_delay=$(( 5 ** retry_cnt ))
+            if [[ $retry_delay > 600 ]] ; then retry_delay=600 ; fi
+            sleep $retry_delay
+          done 
+        }
+        EOF
+        # Register file in BASH_ENV so it automatically loads in all future steps
+        echo "BASH_ENV=~/.bash_helpers/custom_functions.sh" >> $GITHUB_ENV
+
     ##########################################################################
     # Establish Dependencies
 
     - name: Install Ubuntu Container Dependencies
       if: ${{ contains(matrix.os, 'ubuntu') && matrix.container != '' && !contains(matrix.container, 'phhargrove') }}
       run: |
-        apt update
-        apt install -y build-essential pkg-config make git curl cmake
+        retry apt update
+        retry apt install -y build-essential pkg-config make git curl cmake
 
     - name: Install Ubuntu Native Dependencies
       if: ${{ contains(matrix.os, 'ubuntu') && matrix.container == '' && !matrix.brew_via_install }}
       run: |
-        sudo apt update
-        sudo apt install -y build-essential pkg-config make
+        retry sudo apt update
+        retry sudo apt install -y build-essential pkg-config make
         if [[ ${COMPILER_VERSION} -lt 15 ]] || type -p gfortran-${COMPILER_VERSION} ; then
-          sudo apt install -y gfortran-${COMPILER_VERSION} g++-${COMPILER_VERSION}
+          retry sudo apt install -y gfortran-${COMPILER_VERSION} g++-${COMPILER_VERSION}
         else
           curl $CURL_OPTIONS https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh -o install-homebrew.sh
           chmod +x install-homebrew.sh
           env CI=1 ./install-homebrew.sh
           HOMEBREW_PREFIX="/home/linuxbrew/.linuxbrew"
-          ${HOMEBREW_PREFIX}/bin/brew install -v gcc@${COMPILER_VERSION} binutils
+          retry ${HOMEBREW_PREFIX}/bin/brew install -v gcc@${COMPILER_VERSION} binutils
           ls -al ${HOMEBREW_PREFIX}/bin
           echo "PATH=${HOMEBREW_PREFIX}/bin:${PATH}" >> "$GITHUB_ENV"
           : Homebrew GCC@15 needs binutils 2.44+
@@ -360,12 +381,12 @@ jobs:
     - name: Install macOS Dependencies (Homebrew)
       if: ${{ contains(matrix.os, 'macos') && !matrix.macports && !matrix.brew_via_install }}
       run: |
-        brew update
+        retry brew update
         # fpm binary distribution for macOS requires gfortran shared libraries from gcc@12
-        brew install gcc@12 \
+        retry brew install gcc@12 \
             2>&1 | perl -pe "$BREW_WARNING_FILTER" ; test ${PIPESTATUS[0]} = 0
         if [[ ${{ matrix.compiler }} == 'gfortran' && ${COMPILER_VERSION} -gt 15 ]] ; then
-          brew install gcc@${COMPILER_VERSION} \
+          retry brew install gcc@${COMPILER_VERSION} \
             2>&1 | perl -pe "$BREW_WARNING_FILTER" ; test ${PIPESTATUS[0]} = 0
         fi
 
@@ -374,7 +395,7 @@ jobs:
       run: |
         #sudo port -v selfupdate
         if [[ ${{ matrix.compiler }} == 'gfortran' && ${COMPILER_VERSION} -gt 15 ]] ; then
-          sudo port -v install gcc${COMPILER_VERSION}
+          retry sudo port -v install gcc${COMPILER_VERSION}
         fi
         # Append Macports dynamic library directory
         echo "DYLD_FALLBACK_LIBRARY_PATH=/opt/local/lib/libgcc/:$DYLD_FALLBACK_LIBRARY_PATH" >> "$GITHUB_ENV"
@@ -382,7 +403,7 @@ jobs:
     - name: Install LLVM flang on macOS (Homebrew)
       if: ${{ contains(matrix.os, 'macos') && matrix.compiler == 'flang' && !matrix.macports && !matrix.brew_via_install }}
       run: |
-        brew install llvm@${COMPILER_VERSION} flang \
+        retry brew install llvm@${COMPILER_VERSION} flang \
             2>&1 | perl -pe "$BREW_WARNING_FILTER" ; test ${PIPESTATUS[0]} = 0
           perl -pe "$BREW_WARNING_FILTER" ; test ${PIPESTATUS[0]} = 0
         # Prepend homebrew clang to PATH:
@@ -391,7 +412,7 @@ jobs:
     - name: Install LLVM flang on macOS (Macports)
       if: ${{ matrix.compiler == 'flang' && matrix.macports }}
       run: |
-        sudo port -v install flang-${COMPILER_VERSION}
+        retry sudo port -v install flang-${COMPILER_VERSION}
         sudo ln -sf /opt/local/bin/flang-mp-${COMPILER_VERSION} /opt/local/bin/flang
         sudo ln -sf /opt/local/bin/flang-mp-${COMPILER_VERSION} /opt/local/bin/flang-new
         sudo ln -sf /opt/local/bin/clang-mp-${COMPILER_VERSION} /opt/local/bin/clang
@@ -463,8 +484,8 @@ jobs:
     - name: Setup lfortran dependencies and variables
       if: ${{ matrix.compiler == 'lfortran' }}
       run: |
-        apt update
-        apt install -y llvm clang
+        retry apt update
+        retry apt install -y llvm clang
         if [ ${{ contains(matrix.container, 'ghcr.io/lfortran') }} = true ]; then
           ls -alR /app 
           # Add container lfortran to PATH:
