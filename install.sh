@@ -929,6 +929,29 @@ error_handler() {
 trap 'error_handler $LINENO' ERR
 
 # ---------------------------------------------------------------
+# Pre-fetch dependencies, with retries for resilience to transient network failures
+# This is required for CMake, and optional but recommended for FPM
+
+ASSERT_DIR=$DEPENDENCIES_DIR/assert
+JULIENNE_DIR=$DEPENDENCIES_DIR/julienne
+
+PREFETCH_DEPS=${PREFETCH_DEPS:-true}
+[[ -z $USE_FPM ]] && PREFETCH_DEPS=true
+
+if [[ $PREFETCH_DEPS == "true" ]] ; then
+  # Git commands assume git version 1.7.7 (2011-09) or later
+  mkdir -p $ASSERT_DIR
+  if ! [[ -r $ASSERT_DIR/fpm.toml ]] ; then
+    retry $GIT clone -c advice.detachedHead=false --depth 1 --branch $ASSERT_VERSION $ASSERT_GIT $ASSERT_DIR
+    ( cd $ASSERT_DIR && $GIT log -n 1 --oneline )
+  fi
+  if [[ -n $USE_FPM ]] && ! [[ -r $JULIENNE_DIR/fpm.toml ]] ; then
+    retry $GIT clone -c advice.detachedHead=false --depth 1 --branch $JULIENNE_VERSION $JULIENNE_GIT $JULIENNE_DIR
+    ( cd $JULIENNE_DIR && $GIT log -n 1 --oneline )
+  fi
+fi
+
+# ---------------------------------------------------------------
 # Caffeine build
 
 LIBCAFFEINE_DST=libcaffeine-$GASNET_CONDUIT-$GASNET_THREADMODE.a
@@ -940,13 +963,6 @@ if [[ -n $USE_FPM ]] ; then
 
   LIBCAFFEINE_SRC=$(./$RUN_FPM_SH install --list 2>/dev/null | grep libcaffeine | cut -d' ' -f2)
 else # Using CMake instead of FPM to build
-  ASSERT_DIR=$DEPENDENCIES_DIR/assert
-  mkdir -p $ASSERT_DIR
-  if ! [[ -r $ASSERT_DIR/fpm.toml ]] ; then
-    # Download Assert: Assumes git version 1.7.7 (2011-09) or later
-    $GIT clone -c advice.detachedHead=false --depth 1 --branch $ASSERT_VERSION $ASSERT_GIT $ASSERT_DIR
-    ( cd $ASSERT_DIR && $GIT log -n 1 --oneline )
-  fi
 
   # CMake botches module name analysis unless we match the name in the source file:
   ASSERT_SRC="$ASSERT_DIR/src/caf_caffiene_assert_m.F90"
