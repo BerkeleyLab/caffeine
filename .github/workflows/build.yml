@@ -299,7 +299,7 @@ jobs:
       GASNET_SPAWNFN: L
       GASNET_MASTERIP: 127.0.0.1
       CAF_IMAGES: 8
-      BREW_WARNING_FILTER: 's/^[[:punct:]]*warning[[:punct:]]*(You are using macOS on Intel)/warn: \1/i'
+      BREW_WARNING_FILTER: 's/^[[:punct:]]*warning[[:punct:]]*(You are using macOS)/warn: \1/i'
       INSTALL_VARS: FC CC CXX FFLAGS CPPFLAGS CFLAGS CXXFLAGS LDFLAGS LIBS GASNET_CONFIGURE_ARGS FPM CMAKE MAKE PKG_CONFIG
 
     steps:
@@ -405,7 +405,6 @@ jobs:
       run: |
         retry brew install llvm@${COMPILER_VERSION} flang \
             2>&1 | perl -pe "$BREW_WARNING_FILTER" ; test ${PIPESTATUS[0]} = 0
-          perl -pe "$BREW_WARNING_FILTER" ; test ${PIPESTATUS[0]} = 0
         # Prepend homebrew clang to PATH:
         echo "PATH=$(brew --prefix)/opt/llvm/bin:${PATH}" >> "$GITHUB_ENV"
 
