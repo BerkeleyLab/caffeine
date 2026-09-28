@@ -794,7 +794,7 @@ CAFFEINE_RUNCMD="${GASNET_RUNNER_ARG//'${CAF_IMAGES'*'}'/\$CAF_IMAGES}"
 Name: caffeine
 Description: The CoArray Fortran Framework of Efficient Interfaces to Network Environments (Caffeine) implements the Parallel Runtime Interface for Fortran (PRIF), providing runtime support for multi-image features in modern Fortran compilers.
 URL: https://go.lbl.gov/caffeine
-Version: 0.8.1
+Version: 0.8.2
 Requires: gasnet-$GASNET_CONDUIT-$GASNET_THREADMODE
 Cflags: \${CAFFEINE_CFLAGS}
 Libs: \${CAFFEINE_LDFLAGS} -lcaffeine-$GASNET_CONDUIT-$GASNET_THREADMODE $APPEND_LDFLAGS
