@@ -107,11 +107,13 @@ jobs:
             compiler: flang
             label: Homebrew
             brew_via_install: 1
+            install_filter: '2>&1 | perl -pe "$LINUXBREW_WARNING_FILTER" ; test ${PIPESTATUS[0]} = 0'
 
           - os: ubuntu-26.04-arm
             label: Homebrew
             compiler: flang
             brew_via_install: 1
+            install_filter: '2>&1 | perl -pe "$LINUXBREW_WARNING_FILTER" ; test ${PIPESTATUS[0]} = 0'
 
           # https://hub.docker.com/r/snowstep/llvm/tags
           - os: ubuntu-24.04
@@ -300,6 +302,7 @@ jobs:
       GASNET_MASTERIP: 127.0.0.1
       CAF_IMAGES: 8
       BREW_WARNING_FILTER: 's/^[[:punct:]]*warning[[:punct:]]*(You are using macOS)/warn: \1/i'
+      LINUXBREW_WARNING_FILTER: 's/^[[:punct:]]*warning[[:punct:]]*(Landlock)/warn: \1/i'
       INSTALL_VARS: FC CC CXX FFLAGS CPPFLAGS CFLAGS CXXFLAGS LDFLAGS LIBS GASNET_CONFIGURE_ARGS FPM CMAKE MAKE PKG_CONFIG
 
     steps:
@@ -348,7 +351,8 @@ jobs:
           chmod +x install-homebrew.sh
           env CI=1 ./install-homebrew.sh
           HOMEBREW_PREFIX="/home/linuxbrew/.linuxbrew"
-          retry ${HOMEBREW_PREFIX}/bin/brew install -v gcc@${COMPILER_VERSION} binutils
+          retry ${HOMEBREW_PREFIX}/bin/brew install -v gcc@${COMPILER_VERSION} binutils \
+              2>&1 | perl -pe "$LINUXBREW_WARNING_FILTER" ; test ${PIPESTATUS[0]} = 0
           ls -al ${HOMEBREW_PREFIX}/bin
           echo "PATH=${HOMEBREW_PREFIX}/bin:${PATH}" >> "$GITHUB_ENV"
           : Homebrew GCC@15 needs binutils 2.44+
