@@ -149,6 +149,20 @@ realpath() {
     ' "$1"
 }
 
+retry() { 
+  local retry_cnt=0
+  local retry_delay
+  while ! "$@" ; do
+    retry_cnt=$(expr $retry_cnt + 1)
+    if [[ $retry_cnt > 5 ]] ; then return 1 ; fi
+    ( set +x ; 
+      echo "::warning::Command failed: <$@> Pausing before retry $retry_cnt..." );
+    retry_delay=$(( 5 ** retry_cnt ))
+    if [[ $retry_delay > 600 ]] ; then retry_delay=600 ; fi
+    sleep $retry_delay
+  done 
+}
+
 append_gasnet_configure_arg() {
   if [[ -z "$GASNET_CONFIGURE_ARGS" ]] ; then
     GASNET_CONFIGURE_ARGS="\"$1\""
@@ -406,7 +420,7 @@ if [ -z ${FC:+x} ] || [ -z ${CC:+x} ] || [ -z ${PKG_CONFIG:+x} ] || [ -z ${MAKE:
     ask_permission_to_install_homebrew
     exit_if_user_declines "brew"
 
-    $CURL -L https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh -o $DEPENDENCIES_DIR/install-homebrew.sh --create-dirs
+    $CURL --retry 10 --retry-all-errors --fail -L https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh -o $DEPENDENCIES_DIR/install-homebrew.sh --create-dirs
     chmod u+x $DEPENDENCIES_DIR/install-homebrew.sh
 
     if [ -p /dev/stdin ] && [ $CI = false ]; then
@@ -437,12 +451,12 @@ EOF
   fi
 
   # fetch the latest package definitions:
-  $BREW update
+  retry $BREW update
 
   if [ -z ${FC:+x} ] || [ -z ${CC:+x} ] ; then
     ask_permission_to_install_homebrew_package "'llvm' and 'flang'"
     exit_if_user_declines "FC"
-    $BREW install llvm flang
+    retry $BREW install llvm flang
 
     # Homebrew does not inject clang/clang++ into PATH on macOS
     export PATH="$BREW_PREFIX/opt/llvm/bin:$PATH"
@@ -462,28 +476,28 @@ EOF
   if [ -z ${MAKE:+x} ] ; then
     ask_permission_to_install_homebrew_package "'make'"
     exit_if_user_declines "make"
-    $BREW install make
+    retry $BREW install make
     MAKE=$(abswhich gmake)
   fi
 
   if [ -z ${PKG_CONFIG:+x} ]; then
     ask_permission_to_install_homebrew_package "'pkg-config'"
     exit_if_user_declines "pkg-config"
-    $BREW install pkg-config
+    retry $BREW install pkg-config
     PKG_CONFIG=$(abswhich pkg-config)
   fi
 
   if [ -z ${FPM:+x} ] ; then
     ask_permission_to_install_homebrew_package "'fpm'"
     exit_if_user_declines "fpm"
-    $BREW install fpm
+    retry $BREW install fpm
     FPM=$(abswhich fpm)
   fi
 
   if [ -z ${CMAKE:+x} -a -z ${USE_FPM:+x} ] ; then
     ask_permission_to_install_homebrew_package "'cmake'"
     exit_if_user_declines "cmake"
-    $BREW install cmake
+    retry $BREW install cmake
     CMAKE=$(abswhich cmake)
   fi
 fi
@@ -632,7 +646,7 @@ if ! $PKG_CONFIG $pkg ; then
     rm -Rf $GASNET_DIR
   fi
   
-  $CURL -L $VERBOSE --retry 10 --retry-all-errors --fail $GASNET_SOURCE_URL -o $GASNET_TAR_FILE
+  $CURL $VERBOSE --retry 10 --retry-all-errors --fail -L $GASNET_SOURCE_URL -o $GASNET_TAR_FILE
   tar xvzf $GASNET_TAR_FILE -C $DEPENDENCIES_DIR
   
   ( 
@@ -915,6 +929,29 @@ error_handler() {
 trap 'error_handler $LINENO' ERR
 
 # ---------------------------------------------------------------
+# Pre-fetch dependencies, with retries for resilience to transient network failures
+# This is required for CMake, and optional but recommended for FPM
+
+ASSERT_DIR=$DEPENDENCIES_DIR/assert
+JULIENNE_DIR=$DEPENDENCIES_DIR/julienne
+
+PREFETCH_DEPS=${PREFETCH_DEPS:-true}
+[[ -z $USE_FPM ]] && PREFETCH_DEPS=true
+
+if [[ $PREFETCH_DEPS == "true" ]] ; then
+  # Git commands assume git version 1.7.7 (2011-09) or later
+  mkdir -p $ASSERT_DIR
+  if ! [[ -r $ASSERT_DIR/fpm.toml ]] ; then
+    retry $GIT clone -c advice.detachedHead=false --depth 1 --branch $ASSERT_VERSION $ASSERT_GIT $ASSERT_DIR
+    ( cd $ASSERT_DIR && $GIT log -n 1 --oneline )
+  fi
+  if [[ -n $USE_FPM ]] && ! [[ -r $JULIENNE_DIR/fpm.toml ]] ; then
+    retry $GIT clone -c advice.detachedHead=false --depth 1 --branch $JULIENNE_VERSION $JULIENNE_GIT $JULIENNE_DIR
+    ( cd $JULIENNE_DIR && $GIT log -n 1 --oneline )
+  fi
+fi
+
+# ---------------------------------------------------------------
 # Caffeine build
 
 LIBCAFFEINE_DST=libcaffeine-$GASNET_CONDUIT-$GASNET_THREADMODE.a
@@ -926,13 +963,6 @@ if [[ -n $USE_FPM ]] ; then
 
   LIBCAFFEINE_SRC=$(./$RUN_FPM_SH install --list 2>/dev/null | grep libcaffeine | cut -d' ' -f2)
 else # Using CMake instead of FPM to build
-  ASSERT_DIR=$DEPENDENCIES_DIR/assert
-  mkdir -p $ASSERT_DIR
-  if ! [[ -r $ASSERT_DIR/fpm.toml ]] ; then
-    # Download Assert: Assumes git version 1.7.7 (2011-09) or later
-    $GIT clone -c advice.detachedHead=false --depth 1 --branch $ASSERT_VERSION $ASSERT_GIT $ASSERT_DIR
-    ( cd $ASSERT_DIR && $GIT log -n 1 --oneline )
-  fi
 
   # CMake botches module name analysis unless we match the name in the source file:
   ASSERT_SRC="$ASSERT_DIR/src/caf_caffiene_assert_m.F90"
