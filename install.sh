@@ -53,7 +53,7 @@ EOF
 # ---------------------------------------------------------------
 # Global variables
 
-GASNET_VERSION="stable"
+GASNET_VERSION="2025.8.0"
 GASNET_SOURCE_URL="https://github.com/BerkeleyLab/gasnet/releases/download/gex-$GASNET_VERSION/GASNet-$GASNET_VERSION.tar.gz"
 ASSERT_GIT=$(awk -F'"' '/^assert =/ {print $2}' manifest/fpm.toml.template)
 ASSERT_VERSION=$(awk -F'"' '/^assert =/ {print $4}' manifest/fpm.toml.template)
