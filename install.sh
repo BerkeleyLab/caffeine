@@ -717,7 +717,7 @@ fi
 
 if [[ $compiler_version =~ 'LFortran' ]]; then
   # Ensure we use LFortran's copy of ISO_Fortran_binding.h
-  APPEND_CFLAGS+=-I$(lfortran --print-c-include-dir)
+  APPEND_CFLAGS+=-I$($FC --print-c-include-dir)
   # Some LFortan builds issue a fatal error if -g appears on the Fortran compile or link line
   # GASNet sometimes injects this linker option, so ensure we strip it out
   for var in GASNET_LDFLAGS GASNET_LIBS ; do
