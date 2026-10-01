@@ -9,16 +9,19 @@ Release Procedure for Caffeine
 3. Validate correctness testing has been performed across all supported systems and supported
    versions of external dependencies
 4. Complete release related chores in repository files
-    1. Update all instances of the copyright year embedded in: [LICENSE.txt](../LICENSE.txt),
+    1. Update all instances of the copyright year embedded in:    
+       [LICENSE.txt](../LICENSE.txt)
        [manifest/fpm.toml.template](../manifest/fpm.toml.template)
-    2. Update all instances of the release package version number embedded in:
-       [manifest/fpm.toml.template](../manifest/fpm.toml.template), [install.sh](../install.sh), [caffeine-version.h](../include/caffeine-version.h)
+    2. Update all instances of the release package version number embedded in:    
+       [install.sh](../install.sh)
+       [manifest/fpm.toml.template](../manifest/fpm.toml.template)
+       [include/caffeine-version.h](../include/caffeine-version.h)
     3. Update the author list embedded in: [manifest/fpm.toml.template](../manifest/fpm.toml.template)
     4. Review top-level [README.md](../README.md) and other user-facing documentation for any
        necessary changes
     5. Update [docs/implementation-status.md](../docs/implementation-status.md) with current status
     6. If the PRIF specification revision is changing, search and update all instances of the old revision,
-       including `CAF_PRIF_VERSION_{MAJOR,MINOR}` in [caffeine-version.h](../include/caffeine-version.h)
+       including `CAF_PRIF_VERSION_{MAJOR,MINOR}` in [include/caffeine-version.h](../include/caffeine-version.h)
     7. Temporarily hardcode version of gasnet installer in [install.sh](../install.sh) as the
        last commit in the release. Set GASNET_VERSION flag to the latest gasnet release
 5. Produce the ChangeLog
@@ -35,14 +38,17 @@ Release Procedure for Caffeine
     2. When testing on Perlmutter, use the following steps:
         1. Build source and tests on the login node using the desired compiler
         2. Get a dedicated node: `salloc -t 10 -N 2 -n 8 -q interactive -A PROJECT_ID -C cpu`
-        3. Launch the parallel job to run the tests: `env SUBJOB_PREFIX=skip GASNET_SPAWN_VERBOSE=1 GASNET_SUPERNODE_MAXSIZE=2 CAF_IMAGES=8 build/run-fpm.sh test --verbose`
-8. Create annotated tag (only after release candidate has been checked by team members)
+        3. Launch the parallel job to run the tests:     
+        `env SUBJOB_PREFIX=skip GASNET_SPAWN_VERBOSE=1 GASNET_SUPERNODE_MAXSIZE=2 CAF_IMAGES=8 build/run-fpm.sh test --verbose`
+8. Create annotated tag (only after release candidate has been checked by team members)    
     For example `git tag -a #.#.# -m "release version #.#.#"`, then `git push origin #.#.#`
-9. Publish the release
+9. Publish the release on GitHub UI
 10. Post release chores
     1. Git revert the commit that hardcoded the gasnet version or manually edit
-    2. Update patch number of the version number embedded in:
-       [manifest/fpm.toml.template](../manifest/fpm.toml.template), [install.sh](../install.sh), [caffeine-version.h](../include/caffeine-version.h)
+    2. Update patch number of the version number embedded in:    
+       [install.sh](../install.sh)
+       [manifest/fpm.toml.template](../manifest/fpm.toml.template)
+       [include/caffeine-version.h](../include/caffeine-version.h)    
        Update to an odd number to indicate that the `main` branch is currently a snapshot of something
        that is beyond the offical release
     3. PR a version bump to the Caffeine version in [LFortran third-party CI](https://github.com/lfortran/lfortran/blob/main/ci/test_third_party_codes.sh) and the [LFortran end-to-end tests](https://github.com/lfortran/lfortran/blob/main/ci/test_caffeine.sh)
