@@ -273,43 +273,51 @@ if [ -z ${FC:+x} ] ; then # FC unset: default to LLVM if it's in PATH
   fi
 fi
 if [[ -n ${FC:+x} && -z ${CC:+x} ]] ; then # Have FC but missing CC
+  FC=$(abswhich $FC)
   # try to auto-detect CC from FC
-  if [[ $(basename $FC) =~ flang ]] || [[ $(basename $FC) =~ lfortran ]] ; then 
-    CC_guess=clang
-  else
+  CC_guess_suff=
+  [[ $FC =~ (-[0-9a-z-]+)$ ]] && CC_guess_suff=${BASH_REMATCH[0]}
+  if [[ $(basename $FC) =~ gfortran ]] ; then 
     CC_guess=gcc
+  else
+    CC_guess=clang
   fi
-  if ! [[ $(basename $FC) =~ lfortran ]] && [[ $FC =~ (-[0-9a-z-]+)$ ]] ; then 
-    CC_guess_suff=$CC_guess${BASH_REMATCH[0]} 
-    if type -P $CC_guess_suff > /dev/null 2>&1; then
-      CC=$(abswhich $CC_guess_suff)
+  for guess in \
+     $(dirname $FC)/$CC_guess$CC_guess_suff \
+     $(dirname $FC)/$CC_guess \
+     $CC_guess$CC_guess_suff \
+     $CC_guess \
+  ; do
+    if type -P $guess > /dev/null 2>&1 ; then
+      CC=$(abswhich $guess) 
       echo "Setting CC=$CC"
+      break
     fi
-  fi
-  if [ -z ${CC:+x} ] && type -P $CC_guess > /dev/null 2>&1; then
-    CC=$(abswhich $CC_guess)
-    echo "Setting CC=$CC"
-  fi
+  done
 fi
 if [[ -z ${CXX:+x} && -n ${CC:+x} ]] ; then 
+  CC=$(abswhich $CC)
   # C++ is an optional dependency
   # try to auto-detect from CC
+  CXX_guess_suff=
+  [[ $CC =~ (-[0-9a-z-]+)$ ]] && CXX_guess_suff=${BASH_REMATCH[0]}
   if [[ $(basename $CC) =~ clang ]] ; then 
     CXX_guess=clang++
   else
     CXX_guess=g++
   fi
-  if [[ $CC =~ (-[0-9a-z-]+)$ ]] ; then 
-    CXX_guess_suff=$CXX_guess${BASH_REMATCH[0]} 
-    if type -P $CXX_guess_suff > /dev/null 2>&1; then
-      CXX=$(abswhich $CXX_guess_suff)
+  for guess in \
+     $(dirname $CC)/$CXX_guess$CXX_guess_suff \
+     $(dirname $CC)/$CXX_guess \
+     $CXX_guess$CXX_guess_suff \
+     $CXX_guess \
+  ; do
+    if type -P $guess > /dev/null 2>&1 ; then
+      CXX=$(abswhich $guess) 
       echo "Setting CXX=$CXX"
+      break
     fi
-  fi
-  if [ -z ${CXX:+x} ] && type -P $CXX_guess > /dev/null 2>&1; then
-    CXX=$(abswhich $CXX_guess)
-    echo "Setting CXX=$CXX"
-  fi
+  done
 fi
 
 set -u # error on use of undefined variable
@@ -717,7 +725,7 @@ fi
 
 if [[ $compiler_version =~ 'LFortran' ]]; then
   # Ensure we use LFortran's copy of ISO_Fortran_binding.h
-  APPEND_CFLAGS+=-I$(lfortran --print-c-include-dir)
+  APPEND_CFLAGS+=-I$($FC --print-c-include-dir)
   # Some LFortan builds issue a fatal error if -g appears on the Fortran compile or link line
   # GASNet sometimes injects this linker option, so ensure we strip it out
   for var in GASNET_LDFLAGS GASNET_LIBS ; do
