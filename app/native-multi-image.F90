@@ -151,6 +151,9 @@
 #ifndef HAVE_EVENT_POST_WAIT
 #define HAVE_EVENT_POST_WAIT HAVE_EVENT
 #endif
+#ifndef HAVE_EVENT_POST_WAIT_ARRAY
+#define HAVE_EVENT_POST_WAIT_ARRAY HAVE_EVENT
+#endif
 #ifndef HAVE_EVENT_QUERY
 #define HAVE_EVENT_QUERY HAVE_EVENT
 #endif
@@ -408,6 +411,7 @@ program native_multi_image
 # if HAVE_EVENT_TYPE
       type(event_type), target :: default_event[*]
       type(event_type) :: test_event[*]
+      type(event_type) :: test_event_arr(4)[*]
 # endif
 # if HAVE_NOTIFY_TYPE
       type(notify_type), target :: default_notify[*]
@@ -782,6 +786,21 @@ program native_multi_image
       event wait (test_event, until_count=NUM_IMAGES())
     else
       event post (test_event[1])
+    end if
+# endif
+# if HAVE_EVENT_POST_WAIT_ARRAY
+    STATUS("Testing event post / event wait (array)...")
+    if (THIS_IMAGE() == 1) then
+      do i = 1, size(test_event_arr)
+        event post (test_event_arr(i))
+        event post (test_event_arr(i)[1])
+        event wait (test_event_arr(i))
+        event wait (test_event_arr(i), until_count=NUM_IMAGES())
+      end do
+    else
+      do i = 1, size(test_event_arr)
+        event post (test_event_arr(i)[1])
+      end do
     end if
 # endif
 
