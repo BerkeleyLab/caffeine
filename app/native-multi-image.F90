@@ -776,8 +776,9 @@ program native_multi_image
 # if HAVE_EVENT_POST_WAIT
     STATUS("Testing event post / event wait...")
     if (THIS_IMAGE() == 1) then
-      !event post (test_event) ! currently broken
+      event post (test_event)
       event post (test_event[1])
+      event wait (test_event)
       event wait (test_event, until_count=NUM_IMAGES())
     else
       event post (test_event[1])
