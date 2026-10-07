@@ -98,9 +98,9 @@ subroutine write_flags
      call no("THIS_IMAGE_COARRAY")
      call no("PUTGET_INTRINSIC_ARRAY_CONTIG")
 #    else
-   if (INDEX(COMPILER_VERSION(), 'version 0.66') /= 0 .and. &
+   if (INDEX(COMPILER_VERSION(), 'version 0.6') /= 0 .and. &
        INDEX(COMPILER_VERSION(), '-g') == 0) then 
-     ! LFortran release 0.66
+     ! LFortran release 0.66 .. 0.67
      call no("GET_TEAM")
      call no("NUM_IMAGES_TEAM")
      call no("THIS_IMAGE_TEAM")

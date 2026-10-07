@@ -159,6 +159,11 @@ jobs:
 
           - os: ubuntu-22.04
             compiler: lfortran
+            version: 0.67
+            container: ghcr.io/lfortran/lfortran:v0.67.0
+
+          - os: ubuntu-22.04
+            compiler: lfortran
             version: 0.66
             container: ghcr.io/lfortran/lfortran:v0.66.0
 
@@ -186,10 +191,10 @@ jobs:
             container: phhargrove/llvm-flang:23.1.0-latest
           - os: ubuntu-22.04
             compiler: lfortran
-            version: 0.66
+            version: 0.67
             label: OPT
             CONFIGURE_ARGS: --disable-debug
-            container: ghcr.io/lfortran/lfortran:v0.66.0
+            container: ghcr.io/lfortran/lfortran:v0.67.0
 
         # --- PRIF-old coverage ---
           - os: ubuntu-24.04
