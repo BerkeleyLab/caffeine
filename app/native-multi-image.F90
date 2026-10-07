@@ -411,7 +411,7 @@ program native_multi_image
 # if HAVE_EVENT_TYPE
       type(event_type), target :: default_event[*]
       type(event_type) :: test_event[*]
-      type(event_type) :: test_event_arr(4)[*]
+      type(event_type), allocatable :: test_event_arr(:)[:]
 # endif
 # if HAVE_NOTIFY_TYPE
       type(notify_type), target :: default_notify[*]
@@ -789,7 +789,8 @@ program native_multi_image
     end if
 # endif
 # if HAVE_EVENT_POST_WAIT_ARRAY
-    STATUS("Testing event post / event wait (array)...")
+    STATUS("Testing event post / event wait (allocatable array)...")
+    allocate(test_event_arr(4)[*])
     if (THIS_IMAGE() == 1) then
       do i = 1, size(test_event_arr)
         event post (test_event_arr(i))
@@ -802,6 +803,7 @@ program native_multi_image
         event post (test_event_arr(i)[1])
       end do
     end if
+    deallocate(test_event_arr)
 # endif
 
 # if HAVE_LOCK_TYPE
