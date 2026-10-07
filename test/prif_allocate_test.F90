@@ -78,6 +78,7 @@ contains
     type(c_ptr) :: allocated_memory
     integer, pointer :: local_slice
     integer(c_size_t) :: data_size, query_size
+    integer(c_int) :: stat
 
     diag = .true.
 
@@ -86,10 +87,11 @@ contains
     ALSO(.not. associated(local_slice))
 
     data_size = storage_size(dummy_element)/8
+    stat = -111
     call prif_allocate_coarray( &
       [integer(c_int64_t) :: 1], [integer(c_int64_t) :: ], data_size, null_final_proc, &
-      coarray_handle, allocated_memory)
-
+      coarray_handle, allocated_memory, stat)
+    ALSO(stat .equalsExpected. 0)
     call c_f_pointer(allocated_memory, local_slice)
     ALSO(associated(local_slice))
 
@@ -111,7 +113,9 @@ contains
       end do
     end block
 
-    call prif_deallocate_coarray(coarray_handle)
+    stat = -222
+    call prif_deallocate_coarray(coarray_handle, stat)
+    ALSO(stat .equalsExpected. 0)
 
   end function
 
@@ -250,14 +254,21 @@ contains
 
     type(c_ptr) :: allocated_memory
     integer(c_int), pointer :: local_slice
+    integer(c_int) :: stat
 
-    call prif_allocate(c_sizeof(local_slice), allocated_memory)
+    diag = .true.
+
+    stat = -111
+    call prif_allocate(c_sizeof(local_slice), allocated_memory, stat)
+    ALSO(stat .equalsExpected. 0)
     call c_f_pointer(allocated_memory, local_slice)
 
     local_slice = 42
-    diag = local_slice .equalsExpected. 42
+    ALSO(local_slice .equalsExpected. 42)
 
-    call prif_deallocate(c_loc(local_slice))
+    stat = -222
+    call prif_deallocate(c_loc(local_slice), stat)
+    ALSO(stat .equalsExpected. 0)
   end function
 
   ! returns (p + off)
