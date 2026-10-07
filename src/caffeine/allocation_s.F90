@@ -94,6 +94,8 @@ contains
         call caf_establish_child_heap
       end if
       return
+    else if (present(stat)) then
+      stat = 0
     end if
     if (me /= 1) whole_block = as_c_ptr(current_team%info%heap_start + block_offset)
 
@@ -161,6 +163,7 @@ contains
       call report_error(PRIF_STAT_OUT_OF_MEMORY, out_of_memory_message(size_in_bytes, .false.), &
                         stat, errmsg, errmsg_alloc)
     else
+      if (present(stat)) stat = 0
 #     if CAF_POISON
       block
         ! The allocated memory is uninitialized, but often happens to be zero which can hide problems.
