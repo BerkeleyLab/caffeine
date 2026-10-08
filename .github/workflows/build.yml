@@ -107,13 +107,11 @@ jobs:
             compiler: flang
             label: Homebrew
             brew_via_install: 1
-            install_filter: '2>&1 | perl -pe "$LINUXBREW_WARNING_FILTER" ; test ${PIPESTATUS[0]} = 0'
 
           - os: ubuntu-26.04-arm
             label: Homebrew
             compiler: flang
             brew_via_install: 1
-            install_filter: '2>&1 | perl -pe "$LINUXBREW_WARNING_FILTER" ; test ${PIPESTATUS[0]} = 0'
 
           # https://hub.docker.com/r/snowstep/llvm/tags
           - os: ubuntu-24.04
@@ -197,24 +195,12 @@ jobs:
             container: ghcr.io/lfortran/lfortran:v0.67.0
 
         # --- PRIF-old coverage ---
-          - os: ubuntu-24.04
-            compiler: flang
-            version: 21
-            label: PRIF-0.5
-            FFLAGS: -DFORCE_PRIF_0_5
-            container: phhargrove/llvm-flang:21.1.0-latest
-          - os: ubuntu-24.04
-            compiler: flang
-            version: 21
-            label: PRIF-0.6
-            FFLAGS: -DFORCE_PRIF_0_6
-            container: phhargrove/llvm-flang:21.1.0-latest
-          - os: ubuntu-24.04
-            compiler: flang
-            version: 21
-            label: PRIF-0.7
-            FFLAGS: -DFORCE_PRIF_0_7
-            container: phhargrove/llvm-flang:21.1.0-latest
+        #  - os: ubuntu-24.04
+        #    compiler: flang
+        #    version: 23
+        #    label: PRIF-0.8
+        #    FFLAGS: -DFORCE_PRIF_0_8
+        #    container: phhargrove/llvm-flang:23.1.0-latest
 
         # --- udp coverage for selected configs ---
           - os: macos-26
@@ -306,8 +292,10 @@ jobs:
       GASNET_SPAWNFN: L
       GASNET_MASTERIP: 127.0.0.1
       CAF_IMAGES: 8
-      BREW_WARNING_FILTER: 's/^[[:punct:]]*warning[[:punct:]]*(You are using macOS)/warn: \1/i'
-      LINUXBREW_WARNING_FILTER: 's/^[[:punct:]]*warning[[:punct:]]*(Landlock)/warn: \1/i'
+      BREW_WARNING_FILTER: 's/^[[:punct:]]+warning[[:punct:]]+/warning: /i'
+      INSTALL_FILTER: ${{ matrix.brew_via_install && 
+                          '2>&1 | perl -pe "$BREW_WARNING_FILTER" ; test ${PIPESTATUS[0]} = 0' || 
+                          '' }}
       INSTALL_VARS: FC CC CXX FFLAGS CPPFLAGS CFLAGS CXXFLAGS LDFLAGS LIBS GASNET_CONFIGURE_ARGS FPM CMAKE MAKE PKG_CONFIG
 
     steps:
@@ -357,7 +345,7 @@ jobs:
           env CI=1 ./install-homebrew.sh
           HOMEBREW_PREFIX="/home/linuxbrew/.linuxbrew"
           retry ${HOMEBREW_PREFIX}/bin/brew install -v gcc@${COMPILER_VERSION} binutils \
-              2>&1 | perl -pe "$LINUXBREW_WARNING_FILTER" ; test ${PIPESTATUS[0]} = 0
+              2>&1 | perl -pe "$BREW_WARNING_FILTER" ; test ${PIPESTATUS[0]} = 0
           ls -al ${HOMEBREW_PREFIX}/bin
           echo "PATH=${HOMEBREW_PREFIX}/bin:${PATH}" >> "$GITHUB_ENV"
           : Homebrew GCC@15 needs binutils 2.44+
@@ -373,7 +361,8 @@ jobs:
       if: ${{ contains(matrix.os, 'macos') && !matrix.macports }}
       run: |
         # silence Homebrew tap trust warnings:
-        (set +e ; brew untap -f aws/tap hashicorp/tap 2>&1 | perl -pe 's/^::*//;s/^##*//' ; brew trust azure/bicep ; echo )
+        (set +e ; brew untap -f aws/tap hashicorp/tap ; brew trust azure/bicep ; echo ) \
+            2>&1 | perl -pe "$BREW_WARNING_FILTER" 
         # set some Homebrew knobs to accelerate installation
         # but only when we are not simulating the user environment brew-via-install workflow
         if [[ -z "${{ matrix.brew_via_install }}" ]] ; then
@@ -390,7 +379,8 @@ jobs:
     - name: Install macOS Dependencies (Homebrew)
       if: ${{ contains(matrix.os, 'macos') && !matrix.macports && !matrix.brew_via_install }}
       run: |
-        retry brew update
+        retry brew update \
+            2>&1 | perl -pe "$BREW_WARNING_FILTER" ; test ${PIPESTATUS[0]} = 0
         # fpm binary distribution for macOS requires gfortran shared libraries from gcc@12
         retry brew install gcc@12 \
             2>&1 | perl -pe "$BREW_WARNING_FILTER" ; test ${PIPESTATUS[0]} = 0
@@ -567,7 +557,7 @@ jobs:
       run: |
         (set +x ; for var in ${{ env.INSTALL_VARS }} ; do eval echo "$var=\$$var"; done)
         ./install.sh ${CONFIGURE_ARGS} ${NETWORK_ARG} \
-                     ${{ inputs.install_args }} ${{ matrix.install_filter }}
+                     ${{ inputs.install_args }} ${{ env.INSTALL_FILTER }}
         if ! grep -q 'NATIVEFLAGS=""' run-fpm.sh ; then
           echo "NATIVE_MULTI_IMAGE=true" >> "$GITHUB_ENV"
         fi
@@ -655,7 +645,7 @@ jobs:
         rm -Rf build install/lib/libcaffeine* install/lib/pkgconfig/caffeine*
         (set +x ; for var in ${{ env.INSTALL_VARS }} ; do eval echo "$var=\$$var"; done)
         ./install.sh ${CONFIGURE_ARGS} ${NETWORK_ARG} --enable-threads \
-                     ${{ inputs.install_args }} ${{ matrix.install_filter }}
+                     ${{ inputs.install_args }} ${{ env.INSTALL_FILTER }}
         ./run-fpm.sh test --verbose -- ${{ inputs.julienne_args }}
         ./install/bin/ident ./install/lib/libcaffeine.a | tee output
           test ${PIPESTATUS[0]} = 0 && grep -q "CaffeineAssertions" output
@@ -668,7 +658,7 @@ jobs:
         (set +e ; rm -f $(type -P fpm) )
         (set +x ; for var in ${{ env.INSTALL_VARS }} ; do eval echo "$var=\$$var"; done)
         ./install.sh ${CONFIGURE_ARGS} ${NETWORK_ARG} --enable-cmake \
-                     ${{ inputs.install_args }} ${{ matrix.install_filter }}
+                     ${{ inputs.install_args }} ${{ env.INSTALL_FILTER }}
         ./run-fpm.sh info
         ./install/bin/ident ./install/lib/libcaffeine.a | tee output
           test ${PIPESTATUS[0]} = 0 && grep -q "CaffeineAssertions" output

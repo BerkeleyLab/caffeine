@@ -27,19 +27,13 @@ module prif_allocate_test_m
   integer(kind=c_int), bind(c), target :: ff_count
   type(prif_coarray_handle) :: ff_handle
   type(test_diagnosis_t) :: ff_diag
-#if CAF_PRIF_VERSION < 8
-  logical :: ff_force_fail = .false.
-  character(len=*), parameter :: ff_err = "test error message"
-#endif
 
-#if CAF_PRIF_VERSION >= 8
   interface
     subroutine coarray_cleanup_simple_c(handle) bind(C)
       import prif_coarray_handle
       type(prif_coarray_handle), value, intent(in) :: handle
     end subroutine
   end interface
-#endif
 
 contains
 
@@ -78,6 +72,7 @@ contains
     type(c_ptr) :: allocated_memory
     integer, pointer :: local_slice
     integer(c_size_t) :: data_size, query_size
+    integer(c_int) :: stat
 
     diag = .true.
 
@@ -86,10 +81,11 @@ contains
     ALSO(.not. associated(local_slice))
 
     data_size = storage_size(dummy_element)/8
+    stat = -111
     call prif_allocate_coarray( &
       [integer(c_int64_t) :: 1], [integer(c_int64_t) :: ], data_size, null_final_proc, &
-      coarray_handle, allocated_memory)
-
+      coarray_handle, allocated_memory, stat)
+    ALSO(stat .equalsExpected. 0)
     call c_f_pointer(allocated_memory, local_slice)
     ALSO(associated(local_slice))
 
@@ -111,7 +107,9 @@ contains
       end do
     end block
 
-    call prif_deallocate_coarray(coarray_handle)
+    stat = -222
+    call prif_deallocate_coarray(coarray_handle, stat)
+    ALSO(stat .equalsExpected. 0)
 
   end function
 
@@ -145,7 +143,6 @@ contains
     call prif_deallocate_coarray(ff_handle)
     ALSO(ff_count .equalsExpected. 1)
 
-# if CAF_PRIF_VERSION >= 8
     ! final_proc written in C
     call prif_allocate_coarray( &
       [integer(c_int64_t) :: 1], [integer(c_int64_t) :: ], &
@@ -163,86 +160,17 @@ contains
     call prif_deallocate_coarray(ff_handle)
     ALSO(ff_count .equalsExpected. 3)
     
-# else 
-  block
-    integer(c_int) :: stat
-    character(len=len(ff_err)) :: errmsg
-    character(len=:), allocatable :: errmsg_alloc
-    
-    ! CAF_PRIF_VERSION < 8
-    ! final_func that errors on first three deallocations
-    ff_count = 0
-    call prif_allocate_coarray( &
-      [integer(c_int64_t) :: 1], [integer(c_int64_t) :: ], &
-      data_size, final_proc(coarray_cleanup_first_error), &
-      ff_handle, allocated_memory)
-    ALSO(ff_count .equalsExpected. 0)
-
-    call prif_deallocate_coarray3(ff_handle, stat, errmsg=errmsg)
-    ALSO(ff_count .equalsExpected. 1)
-    ALSO(stat .equalsExpected. 10)
-    ALSO(errmsg .equalsExpected. ff_err)
-    
-    call prif_deallocate_coarrays3([ff_handle], stat, errmsg_alloc=errmsg_alloc)
-    ALSO(ff_count .equalsExpected. 2)
-    ALSO(stat .equalsExpected. 20)
-    ALSO(errmsg_alloc .equalsExpected. ff_err)
-    deallocate(errmsg_alloc)
-   
-    if (me == num_imgs) then ! test non-single-valued failure
-      ff_force_fail = .true.
-    end if 
-    call prif_deallocate_coarray3(ff_handle, stat, errmsg_alloc=errmsg_alloc)
-    ALSO(ff_count .equalsExpected. 3)
-    ALSO(stat .equalsExpected. 30)
-    ALSO(errmsg_alloc .equalsExpected. ff_err)
-    deallocate(errmsg_alloc)
-    ff_force_fail = .false.
-    
-    call prif_deallocate_coarray3(ff_handle, stat, errmsg_alloc=errmsg_alloc)
-    ALSO(ff_count .equalsExpected. 4)
-    ALSO(stat .equalsExpected. 0)
-    ALSO(.not. allocated(errmsg_alloc))
-  end block
-# endif
     retdiag = diag
   end function
 
-#if CAF_PRIF_VERSION < 8
-  subroutine coarray_cleanup_simple(handle , stat, errmsg) bind(C)
-    type(prif_coarray_handle), pointer, intent(in) :: handle
-    integer(c_int), intent(out) :: stat
-    character(kind=c_char,len=:), intent(out), allocatable :: errmsg
-#else
   subroutine coarray_cleanup_simple(handle) bind(C)
     type(prif_coarray_handle), value, intent(in) :: handle
-#endif
 
     ALSO(assert_aliased(handle, ff_handle))
 
     ff_count = ff_count + 1
-#  if CAF_PRIF_VERSION < 8
-    stat = 0
-#  endif
   end subroutine
 
-#if CAF_PRIF_VERSION < 8
-  subroutine coarray_cleanup_first_error(handle , stat, errmsg) bind(C)
-    type(prif_coarray_handle), pointer, intent(in) :: handle
-    integer(c_int), intent(out) :: stat
-    character(kind=c_char,len=:), intent(out), allocatable :: errmsg
-
-    ALSO(assert_aliased(handle, ff_handle))
-
-    ff_count = ff_count + 1
-    errmsg = ff_err
-    if (ff_count <= 2 .or. ff_force_fail) then
-      stat = 10 * ff_count
-    else
-      stat = 0
-    end if
-  end subroutine
-#endif
 # undef diag
 
   function check_allocate_non_symmetric() result(diag)
@@ -250,14 +178,21 @@ contains
 
     type(c_ptr) :: allocated_memory
     integer(c_int), pointer :: local_slice
+    integer(c_int) :: stat
 
-    call prif_allocate(c_sizeof(local_slice), allocated_memory)
+    diag = .true.
+
+    stat = -111
+    call prif_allocate(c_sizeof(local_slice), allocated_memory, stat)
+    ALSO(stat .equalsExpected. 0)
     call c_f_pointer(allocated_memory, local_slice)
 
     local_slice = 42
-    diag = local_slice .equalsExpected. 42
+    ALSO(local_slice .equalsExpected. 42)
 
-    call prif_deallocate(c_loc(local_slice))
+    stat = -222
+    call prif_deallocate(c_loc(local_slice), stat)
+    ALSO(stat .equalsExpected. 0)
   end function
 
   ! returns (p + off)
@@ -365,37 +300,30 @@ contains
     end block
 
     block ! check aliasing creation
-#   if CAF_PRIF_VERSION <= 5
-#     define data_pointer_offset
-#   else
-#     define data_pointer_offset 0_c_size_t,
-#   endif
       integer i, j
       integer, parameter :: lim = 10
       type(prif_coarray_handle) :: a(lim)
       a(1) = coarray_handle
       do i=2, lim
         call prif_alias_create(a(i-1), [integer(c_int64_t) :: i-5], [integer(c_int64_t) :: i-5 + num_imgs], &
-                               data_pointer_offset a(i))
+                               0_c_size_t, a(i))
         ALSO(assert_aliased(a(i-1), a(i)))
         do j = i+1,lim
           call prif_alias_create(a(i), [integer(c_int64_t) :: i, j-5], [integer(c_int64_t) :: j], &
-                                 data_pointer_offset a(j))
+                                 0_c_size_t, a(j))
           ALSO(assert_aliased(a(i), a(j)))
           ALSO(assert_aliased(a(j), coarray_handle))
         end do
-#       if CAF_PRIF_VERSION >= 6
-          ! test PRIF 0.6 data_pointer_offset
-          block
-            type(prif_coarray_handle) :: b
-            integer(c_size_t) :: off
-            off = i
-            call prif_alias_create(a(i), [integer(c_int64_t) :: i], [integer(c_int64_t) :: ], &
-                                   off, b)
-            ALSO(assert_aliased(a(i), b, off))
-            call prif_alias_destroy(b)
-          end block
-#       endif
+        ! test PRIF data_pointer_offset
+        block
+          type(prif_coarray_handle) :: b
+          integer(c_size_t) :: off
+          off = i
+          call prif_alias_create(a(i), [integer(c_int64_t) :: i], [integer(c_int64_t) :: ], &
+                                 off, b)
+          ALSO(assert_aliased(a(i), b, off))
+          call prif_alias_destroy(b)
+        end block
         do j = i+1,lim
           call prif_alias_destroy(a(j))
         end do

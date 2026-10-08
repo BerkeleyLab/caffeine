@@ -41,12 +41,8 @@ contains
     !   ALLOCATE( si_evt(NUM_IMAGES()) )
     type(prif_event_type) :: dummy_event
     type(c_ptr) :: allocated_memory
-#   if CAF_PRIF_VERSION >= 8
-      procedure(prif_coarray_cleanup_interface), pointer :: null_final_proc
-      null_final_proc => NULL()
-#   else
-      type(c_funptr), parameter :: null_final_proc = c_null_funptr
-#   endif
+    procedure(prif_coarray_cleanup_interface), pointer :: null_final_proc
+    null_final_proc => NULL()
 
     associate(num_imgs => initial_team%num_images) 
 

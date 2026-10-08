@@ -17,21 +17,12 @@ submodule(prif:prif_private_s) allocation_s
 contains
 
   module subroutine prif_allocate_coarray(lcobounds, ucobounds, size_in_bytes, &
-#   if CAF_PRIF_VERSION >= 8
-        final_proc, &
-#   else
-        final_func, &
-#   endif
-        coarray_handle, allocated_memory, stat, errmsg, errmsg_alloc)
+        final_proc, coarray_handle, allocated_memory, stat, errmsg, errmsg_alloc)
       implicit none
       ! redundant redeclaration of arguments here is a GCC 13..15 bug workaround:
       integer(c_int64_t), dimension(:), intent(in) :: lcobounds, ucobounds
       integer(c_size_t), intent(in) :: size_in_bytes
-#   if CAF_PRIF_VERSION >= 8
       procedure(prif_coarray_cleanup_interface), pointer, intent(in) :: final_proc
-#   else
-      type(c_funptr), intent(in) :: final_func
-#   endif
       type(prif_coarray_handle), intent(out) :: coarray_handle
       type(c_ptr), intent(out) :: allocated_memory
       integer(c_int), intent(out), optional :: stat
@@ -94,6 +85,8 @@ contains
         call caf_establish_child_heap
       end if
       return
+    else if (present(stat)) then
+      stat = 0
     end if
     if (me /= 1) whole_block = as_c_ptr(current_team%info%heap_start + block_offset)
 
@@ -118,15 +111,13 @@ contains
     end block
     cdp%corank = corank
     cdp%coarray_size = size_in_bytes
-#   if CAF_PRIF_VERSION >= 8
-      if (associated(final_proc)) then
-        cdp%final_proc = CAF_C_FUNLOC_PROCPTR(final_proc)
-      else
-        cdp%final_proc = c_null_funptr
-      end if
-#   else
-      cdp%final_proc = final_func
-#   endif
+
+    if (associated(final_proc)) then
+      cdp%final_proc = CAF_C_FUNLOC_PROCPTR(final_proc)
+    else
+      cdp%final_proc = c_null_funptr
+    end if
+
     cdp%lcobounds(1:corank) = lcobounds
     cdp%ucobounds(1:corank-1) = ucobounds(1:corank-1)
     call compute_coshape_epp(lcobounds, ucobounds, cdp%coshape_epp(1:corank))
@@ -161,6 +152,7 @@ contains
       call report_error(PRIF_STAT_OUT_OF_MEMORY, out_of_memory_message(size_in_bytes, .false.), &
                         stat, errmsg, errmsg_alloc)
     else
+      if (present(stat)) stat = 0
 #     if CAF_POISON
       block
         ! The allocated memory is uninitialized, but often happens to be zero which can hide problems.
@@ -209,33 +201,15 @@ contains
     end function
   end function
 
-#if CAF_PRIF_VERSION <= 6
-  module procedure prif_deallocate_coarray
-#else
   module procedure prif_deallocate_coarray
     call prif_deallocate_coarrays([coarray_handle], stat, errmsg, errmsg_alloc)
   end procedure
+
   module procedure prif_deallocate_coarrays
-#endif
     integer :: i, num_handles
     type(prif_coarray_handle), target :: coarray_handle
     type(prif_coarray_descriptor), pointer :: cdp
-#   if CAF_PRIF_VERSION >= 8
-      procedure(prif_coarray_cleanup_interface), pointer :: coarray_cleanup
-#   else
-      abstract interface
-      subroutine coarray_cleanup_i(handle, stat, errmsg) bind(C)
-        import c_char, c_int, prif_coarray_handle
-        implicit none
-        type(prif_coarray_handle), pointer, intent(in) :: handle
-        integer(c_int), intent(out) :: stat
-        character(kind=c_char,len=:), intent(out), allocatable :: errmsg
-      end subroutine
-      end interface
-      procedure(coarray_cleanup_i), pointer :: coarray_cleanup
-      integer(c_int) :: local_stat
-      character(len=:), allocatable :: local_errmsg
-#   endif
+    procedure(prif_coarray_cleanup_interface), pointer :: coarray_cleanup
 
     call_assert(prif_init_called_previously)
     call prif_sync_all ! Need to ensure we don't deallocate anything till everyone gets here
@@ -254,20 +228,7 @@ contains
       cdp => handle_to_cdp(coarray_handle)
       if (c_associated(cdp%final_proc)) then
         call c_f_procpointer(cdp%final_proc, coarray_cleanup)
-#     if CAF_PRIF_VERSION >= 8
         call coarray_cleanup(coarray_handle)
-#     else
-        call coarray_cleanup(coarray_handle, local_stat, local_errmsg)
-        call prif_co_max(local_stat) ! Need to be sure it didn't fail on any images
-        if (local_stat /= 0) then
-          if (.not. allocated(local_errmsg)) then ! provide a default errmsg
-            local_errmsg = "coarray_cleanup finalization callback failed"
-          end if
-          call report_error(local_stat, local_errmsg, &
-                            stat, errmsg, errmsg_alloc)
-          return ! NOTE: We no longer have guarantees that coarrays are in consistent state
-        end if
-#     endif
       end if
     end do
 

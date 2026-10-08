@@ -22,11 +22,11 @@
 #endif
 #define   CAF_PRIF_VERSION_MAJOR 0
 #if   FORCE_PRIF_0_5
-#  define CAF_PRIF_VERSION_MINOR 5
+#  error FORCE_PRIF_0_5 is not supported
 #elif FORCE_PRIF_0_6
-#  define CAF_PRIF_VERSION_MINOR 6
+#  error FORCE_PRIF_0_6 is not supported
 #elif FORCE_PRIF_0_7
-#  define CAF_PRIF_VERSION_MINOR 7
+#  error FORCE_PRIF_0_7 is not supported
 #elif FORCE_PRIF_0_8
 #  define CAF_PRIF_VERSION_MINOR 8
 #else

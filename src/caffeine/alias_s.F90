@@ -33,10 +33,8 @@ contains
     ! start with a copy of the source descriptor
     allocate(alias_cdp, source=cdp)
 
-#   if CAF_PRIF_VERSION >= 6
-       alias_cdp%coarray_data = &
-         as_c_ptr(as_int(alias_cdp%coarray_data) + data_pointer_offset)
-#   endif
+    alias_cdp%coarray_data = &
+       as_c_ptr(as_int(alias_cdp%coarray_data) + data_pointer_offset)
 
     ! apply provided cobounds
     alias_cdp%corank = corank

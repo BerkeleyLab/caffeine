@@ -10,34 +10,18 @@
 
 use prif, only : &
     prif_allocate_coarray, &
+    prif_deallocate_coarray, prif_deallocate_coarrays, &
     prif_allocate, prif_deallocate, &
     prif_coarray_handle
 
-#if !defined(CAF_PRIF_VERSION) || CAF_PRIF_VERSION >= 7
-  ! PRIF 0.7+ deallocate
-  use prif, only : prif_deallocate_coarray, prif_deallocate_coarrays
-# define prif_deallocate_coarray3  prif_deallocate_coarray
-# define prif_deallocate_coarrays3 prif_deallocate_coarrays
-#else
-  ! emulate PRIF 0.7 deallocate with older interfaces
-  use prif, only : prif_deallocate_coarray_ => prif_deallocate_coarray
-# define prif_deallocate_coarray(h)           prif_deallocate_coarray_([h])
-# define prif_deallocate_coarrays(arr)        prif_deallocate_coarray_(arr)
-# define prif_deallocate_coarray3(h,a2,a3)    prif_deallocate_coarray_([h],a2,a3)
-# define prif_deallocate_coarrays3(arr,a2,a3) prif_deallocate_coarray_(arr,a2,a3)
-#endif
 
   ! final func support
   use unit_test_parameters_m, only: null_final_proc
-#if !defined(CAF_PRIF_VERSION) || CAF_PRIF_VERSION >= 8
   use unit_test_parameters_m, only: final_proc_usher
-#  if HAVE_PROCEDURE_ACTUAL_FOR_POINTER_DUMMY
-#    define final_proc(proc) proc
-#  else
-#    define final_proc(proc) final_proc_usher(proc)
-#  endif
+#if HAVE_PROCEDURE_ACTUAL_FOR_POINTER_DUMMY
+#  define final_proc(proc) proc
 #else
-#  define final_proc(proc) c_funloc(proc)
+#  define final_proc(proc) final_proc_usher(proc)
 #endif
 
   use, intrinsic :: iso_c_binding, only: &
