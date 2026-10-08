@@ -63,12 +63,7 @@ contains
         call c_f_pointer(cdp%next_handle, cdp)
       end do
       teams_coarrays(num_coarrays_in_team)%info = c_loc(cdp)
-#if CAF_PRIF_VERSION <= 6
-      call prif_deallocate_coarray &
-#else
-      call prif_deallocate_coarrays &
-#endif
-                (teams_coarrays, stat, errmsg, errmsg_alloc)
+      call prif_deallocate_coarrays(teams_coarrays, stat, errmsg, errmsg_alloc)
       nullify(current_team%info%coarrays)
     else
       ! child team sync required by F23 11.1.5.2,

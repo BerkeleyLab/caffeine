@@ -36,14 +36,8 @@ module prif
   public :: prif_register_stop_callback, prif_stop_callback_interface
   public :: prif_stop, prif_error_stop, prif_fail_image
   public :: prif_allocate_coarray, prif_allocate, prif_deallocate
-#if CAF_PRIF_VERSION >= 8
   public :: prif_coarray_cleanup_interface
-#endif
-#if CAF_PRIF_VERSION <= 6
-  public :: prif_deallocate_coarray
-#else
   public :: prif_deallocate_coarray, prif_deallocate_coarrays
-#endif
   public :: prif_put, prif_put_indirect, prif_get, prif_get_indirect, prif_put_with_notify, prif_put_with_notify_indirect
   public :: prif_put_indirect_with_notify, prif_put_indirect_with_notify_indirect
   public :: prif_get_strided, prif_get_strided_indirect, prif_put_strided, prif_put_strided_indirect
@@ -180,13 +174,11 @@ module prif
       type(c_ptr), intent(in), value :: cdata
     end subroutine
 
-#  if CAF_PRIF_VERSION >= 8
     subroutine prif_coarray_cleanup_interface(handle) bind(C)
       import :: prif_coarray_handle
       implicit none
       type(prif_coarray_handle), value, intent(in) :: handle
     end subroutine
-#  endif
   end interface
 
   interface
@@ -220,21 +212,12 @@ module prif
     end subroutine
 
     module subroutine prif_allocate_coarray( &
-        lcobounds, ucobounds, size_in_bytes, &
-#   if CAF_PRIF_VERSION >= 8
-        final_proc, &
-#   else
-        final_func, &
-#   endif
+        lcobounds, ucobounds, size_in_bytes, final_proc, &
         coarray_handle, allocated_memory, stat, errmsg, errmsg_alloc)
       implicit none
       integer(c_int64_t), dimension(:), intent(in) :: lcobounds, ucobounds
       integer(c_size_t), intent(in) :: size_in_bytes
-#   if CAF_PRIF_VERSION >= 8
       procedure(prif_coarray_cleanup_interface), pointer, intent(in) :: final_proc
-#   else
-      type(c_funptr), intent(in) :: final_func
-#   endif
       type(prif_coarray_handle), intent(out) :: coarray_handle
       type(c_ptr), intent(out) :: allocated_memory
       integer(c_int), intent(out), optional :: stat
@@ -251,15 +234,6 @@ module prif
       character(len=:), intent(inout), allocatable, optional :: errmsg_alloc
     end subroutine
 
-#if CAF_PRIF_VERSION <= 6
-    module subroutine prif_deallocate_coarray(coarray_handles, stat, errmsg, errmsg_alloc)
-      implicit none
-      type(prif_coarray_handle), intent(in) :: coarray_handles(:)
-      integer(c_int), intent(out), optional :: stat
-      character(len=*), intent(inout), optional :: errmsg
-      character(len=:), intent(inout), allocatable, optional :: errmsg_alloc
-    end subroutine
-#else
     module subroutine prif_deallocate_coarray(coarray_handle, stat, errmsg, errmsg_alloc)
       implicit none
       type(prif_coarray_handle), intent(in) :: coarray_handle
@@ -267,6 +241,7 @@ module prif
       character(len=*), intent(inout), optional :: errmsg
       character(len=:), intent(inout), allocatable, optional :: errmsg_alloc
     end subroutine
+
     module subroutine prif_deallocate_coarrays(coarray_handles, stat, errmsg, errmsg_alloc)
       implicit none
       type(prif_coarray_handle), intent(in) :: coarray_handles(:)
@@ -274,7 +249,6 @@ module prif
       character(len=*), intent(inout), optional :: errmsg
       character(len=:), intent(inout), allocatable, optional :: errmsg_alloc
     end subroutine
-#endif
 
     module subroutine prif_deallocate(mem, stat, errmsg, errmsg_alloc)
       implicit none
@@ -530,17 +504,12 @@ module prif
     end subroutine
 
     module subroutine prif_alias_create(source_handle, alias_lcobounds, alias_ucobounds, &
-#   if CAF_PRIF_VERSION >= 6
-                                        data_pointer_offset, &
-#   endif
-                                        alias_handle)
+                                        data_pointer_offset, alias_handle)
       implicit none
       type(prif_coarray_handle), intent(in) :: source_handle
       integer(c_int64_t), intent(in) :: alias_lcobounds(:)
       integer(c_int64_t), intent(in) :: alias_ucobounds(:)
-#   if CAF_PRIF_VERSION >= 6
       integer(c_size_t), intent(in) :: data_pointer_offset
-#   endif
       type(prif_coarray_handle), intent(out) :: alias_handle
     end subroutine
 
