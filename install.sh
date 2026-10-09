@@ -53,7 +53,7 @@ EOF
 # ---------------------------------------------------------------
 # Global variables
 
-GASNET_VERSION="2025.8.0"
+GASNET_VERSION="stable"
 GASNET_SOURCE_URL="https://github.com/BerkeleyLab/gasnet/releases/download/gex-$GASNET_VERSION/GASNet-$GASNET_VERSION.tar.gz"
 ASSERT_GIT=$(awk -F'"' '/^assert =/ {print $2}' manifest/fpm.toml.template)
 ASSERT_VERSION=$(awk -F'"' '/^assert =/ {print $4}' manifest/fpm.toml.template)
@@ -794,7 +794,7 @@ CAFFEINE_RUNCMD="${GASNET_RUNNER_ARG//'${CAF_IMAGES'*'}'/\$CAF_IMAGES}"
 Name: caffeine
 Description: The CoArray Fortran Framework of Efficient Interfaces to Network Environments (Caffeine) implements the Parallel Runtime Interface for Fortran (PRIF), providing runtime support for multi-image features in modern Fortran compilers.
 URL: https://go.lbl.gov/caffeine
-Version: 0.8.4
+Version: 0.8.5
 Requires: gasnet-$GASNET_CONDUIT-$GASNET_THREADMODE
 Cflags: \${CAFFEINE_CFLAGS}
 Libs: \${CAFFEINE_LDFLAGS} -lcaffeine-$GASNET_CONDUIT-$GASNET_THREADMODE $APPEND_LDFLAGS
