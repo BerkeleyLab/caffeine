@@ -149,6 +149,14 @@ jobs:
 
         # --- lfortran coverage ---
 
+          # https://github.com/fortran-lang/homebrew-fortran
+          - os: macos-15
+            compiler: lfortran
+            version: 0.67.0
+          - os: macos-26
+            compiler: lfortran
+            version: 0.67.0
+
           # https://github.com/lfortran/lfortran/pkgs/container/lfortran
           - os: ubuntu-22.04
             compiler: lfortran
@@ -331,6 +339,9 @@ jobs:
       run: |
         retry apt update
         retry apt install -y build-essential pkg-config make git curl cmake
+        if [[ ${{ matrix.compiler }} == 'lfortran' ]] ; then
+          retry apt install -y llvm clang
+        fi
 
     - name: Install Ubuntu Native Dependencies
       if: ${{ contains(matrix.os, 'ubuntu') && matrix.container == '' && !matrix.brew_via_install }}
@@ -361,7 +372,7 @@ jobs:
       if: ${{ contains(matrix.os, 'macos') && !matrix.macports }}
       run: |
         # silence Homebrew tap trust warnings:
-        (set +e ; brew untap -f aws/tap hashicorp/tap ; brew trust azure/bicep ; echo ) \
+        (set +e ; brew untap -f aws/tap hashicorp/tap ; brew trust azure/bicep ) \
             2>&1 | perl -pe "$BREW_WARNING_FILTER" 
         # set some Homebrew knobs to accelerate installation
         # but only when we are not simulating the user environment brew-via-install workflow
@@ -386,6 +397,10 @@ jobs:
             2>&1 | perl -pe "$BREW_WARNING_FILTER" ; test ${PIPESTATUS[0]} = 0
         if [[ ${{ matrix.compiler }} == 'gfortran' && ${COMPILER_VERSION} -gt 15 ]] ; then
           retry brew install gcc@${COMPILER_VERSION} \
+            2>&1 | perl -pe "$BREW_WARNING_FILTER" ; test ${PIPESTATUS[0]} = 0
+        fi
+        if [[ ${{ matrix.compiler }} == 'lfortran' ]] ; then
+          retry brew install fortran-lang/fortran/lfortran \
             2>&1 | perl -pe "$BREW_WARNING_FILTER" ; test ${PIPESTATUS[0]} = 0
         fi
 
@@ -482,8 +497,6 @@ jobs:
     - name: Setup lfortran dependencies and variables
       if: ${{ matrix.compiler == 'lfortran' }}
       run: |
-        retry apt update
-        retry apt install -y llvm clang
         if [ ${{ contains(matrix.container, 'ghcr.io/lfortran') }} = true ]; then
           ls -alR /app 
           # Add container lfortran to PATH:
