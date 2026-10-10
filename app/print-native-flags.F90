@@ -155,6 +155,7 @@ subroutine write_flags
 #    endif
      call set("-DTYPES_PRIF_COMPLIANT=0")
      call no("COSHAPE") ! missing F2018 feature
+     call no("CO_BROADCAST_DERIVED_POD") ! fails to broadcast the entire array of derived type
      call set("-DIGNORE_FAILURES=2") ! CO_MIN(character) get wrong answer with > 9 images
 #  endif
 #elif __INTEL_COMPILER
