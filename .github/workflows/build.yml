@@ -152,16 +152,21 @@ jobs:
           # https://github.com/fortran-lang/homebrew-fortran
           - os: macos-15
             compiler: lfortran
-            version: 0.67.0
+            version: 0.68.0
           - os: macos-26
             compiler: lfortran
-            version: 0.67.0
+            version: 0.68.0
 
           # https://github.com/lfortran/lfortran/pkgs/container/lfortran
           - os: ubuntu-22.04
             compiler: lfortran
             version: latest
             container: ghcr.io/lfortran/lfortran:latest
+
+          - os: ubuntu-22.04
+            compiler: lfortran
+            version: 0.68
+            container: ghcr.io/lfortran/lfortran:v0.68.0
 
           - os: ubuntu-22.04
             compiler: lfortran
@@ -197,10 +202,10 @@ jobs:
             container: phhargrove/llvm-flang:23.1.0-latest
           - os: ubuntu-22.04
             compiler: lfortran
-            version: 0.67
+            version: 0.68
             label: OPT
             CONFIGURE_ARGS: --disable-debug
-            container: ghcr.io/lfortran/lfortran:v0.67.0
+            container: ghcr.io/lfortran/lfortran:v0.68.0
 
         # --- PRIF-old coverage ---
         #  - os: ubuntu-24.04
@@ -228,6 +233,12 @@ jobs:
             compiler: gfortran
             version: 14
             network: udp
+
+          - os: ubuntu-22.04
+            compiler: lfortran
+            version: 0.68
+            network: udp
+            container: ghcr.io/lfortran/lfortran:v0.68.0
 
           # No Homebrew bottle for Intel, use MacPorts instead
           - os: macos-15-intel
