@@ -420,7 +420,7 @@ jobs:
       run: |
         #sudo port -v selfupdate
         if [[ ${{ matrix.compiler }} == 'gfortran' && ${COMPILER_VERSION} -gt 15 ]] ; then
-          retry sudo port -v install gcc${COMPILER_VERSION}
+          retry sudo port -v -b install gcc${COMPILER_VERSION}
         fi
         # Append Macports dynamic library directory
         echo "DYLD_FALLBACK_LIBRARY_PATH=/opt/local/lib/libgcc/:$DYLD_FALLBACK_LIBRARY_PATH" >> "$GITHUB_ENV"
@@ -436,7 +436,7 @@ jobs:
     - name: Install LLVM flang on macOS (Macports)
       if: ${{ matrix.compiler == 'flang' && matrix.macports }}
       run: |
-        retry sudo port -v install flang-${COMPILER_VERSION}
+        retry sudo port -v -b install flang-${COMPILER_VERSION}
         sudo ln -sf /opt/local/bin/flang-mp-${COMPILER_VERSION} /opt/local/bin/flang
         sudo ln -sf /opt/local/bin/flang-mp-${COMPILER_VERSION} /opt/local/bin/flang-new
         sudo ln -sf /opt/local/bin/clang-mp-${COMPILER_VERSION} /opt/local/bin/clang
