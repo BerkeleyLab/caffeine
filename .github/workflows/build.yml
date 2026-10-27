@@ -60,7 +60,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ macos-14, macos-15, macos-15-intel, macos-26, macos-26-intel, ubuntu-24.04 ]
+        os: [ macos-15, macos-15-intel, macos-26, macos-26-intel, ubuntu-24.04 ]
         compiler: [ gfortran ]
         version: [ 13, 14, 15, 16 ]
         network: [ smp ]
@@ -94,14 +94,15 @@ jobs:
             compiler: flang
             brew_via_install: 1
           # No Homebrew bottle for Intel, use MacPorts instead
-          - os: macos-15-intel
-            compiler: flang
-            version: 23
-            macports: 1
-          - os: macos-26-intel
-            compiler: flang
-            version: 23
-            macports: 1
+          # Currently broken
+          #- os: macos-15-intel
+          #  compiler: flang
+          #  version: 23
+          #  macports: 1
+          #- os: macos-26-intel
+          #  compiler: flang
+          #  version: 23
+          #  macports: 1
 
           - os: ubuntu-24.04
             compiler: flang
@@ -152,16 +153,21 @@ jobs:
           # https://github.com/fortran-lang/homebrew-fortran
           - os: macos-15
             compiler: lfortran
-            version: 0.67.0
+            version: 0.68.0
           - os: macos-26
             compiler: lfortran
-            version: 0.67.0
+            version: 0.68.0
 
           # https://github.com/lfortran/lfortran/pkgs/container/lfortran
           - os: ubuntu-22.04
             compiler: lfortran
             version: latest
             container: ghcr.io/lfortran/lfortran:latest
+
+          - os: ubuntu-22.04
+            compiler: lfortran
+            version: 0.68
+            container: ghcr.io/lfortran/lfortran:v0.68.0
 
           - os: ubuntu-22.04
             compiler: lfortran
@@ -197,10 +203,10 @@ jobs:
             container: phhargrove/llvm-flang:23.1.0-latest
           - os: ubuntu-22.04
             compiler: lfortran
-            version: 0.67
+            version: 0.68
             label: OPT
             CONFIGURE_ARGS: --disable-debug
-            container: ghcr.io/lfortran/lfortran:v0.67.0
+            container: ghcr.io/lfortran/lfortran:v0.68.0
 
         # --- PRIF-old coverage ---
         #  - os: ubuntu-24.04
@@ -229,17 +235,24 @@ jobs:
             version: 14
             network: udp
 
+          - os: ubuntu-22.04
+            compiler: lfortran
+            version: 0.68
+            network: udp
+            container: ghcr.io/lfortran/lfortran:v0.68.0
+
           # No Homebrew bottle for Intel, use MacPorts instead
-          - os: macos-15-intel
-            compiler: flang
-            version: 23
-            macports: 1
-            network: udp
-          - os: macos-26-intel
-            compiler: flang
-            version: 23
-            macports: 1
-            network: udp
+          # Currently broken
+          #- os: macos-15-intel
+          #  compiler: flang
+          #  version: 23
+          #  macports: 1
+          #  network: udp
+          #- os: macos-26-intel
+          #  compiler: flang
+          #  version: 23
+          #  macports: 1
+          #  network: udp
 
           - os: macos-15
             compiler: flang
@@ -409,7 +422,7 @@ jobs:
       run: |
         #sudo port -v selfupdate
         if [[ ${{ matrix.compiler }} == 'gfortran' && ${COMPILER_VERSION} -gt 15 ]] ; then
-          retry sudo port -v install gcc${COMPILER_VERSION}
+          retry sudo port -v -b install gcc${COMPILER_VERSION}
         fi
         # Append Macports dynamic library directory
         echo "DYLD_FALLBACK_LIBRARY_PATH=/opt/local/lib/libgcc/:$DYLD_FALLBACK_LIBRARY_PATH" >> "$GITHUB_ENV"
@@ -425,7 +438,7 @@ jobs:
     - name: Install LLVM flang on macOS (Macports)
       if: ${{ matrix.compiler == 'flang' && matrix.macports }}
       run: |
-        retry sudo port -v install flang-${COMPILER_VERSION}
+        retry sudo port -v -b install flang-${COMPILER_VERSION}
         sudo ln -sf /opt/local/bin/flang-mp-${COMPILER_VERSION} /opt/local/bin/flang
         sudo ln -sf /opt/local/bin/flang-mp-${COMPILER_VERSION} /opt/local/bin/flang-new
         sudo ln -sf /opt/local/bin/clang-mp-${COMPILER_VERSION} /opt/local/bin/clang

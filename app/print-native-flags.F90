@@ -100,7 +100,7 @@ subroutine write_flags
 #    else
    if (INDEX(COMPILER_VERSION(), 'version 0.6') /= 0 .and. &
        INDEX(COMPILER_VERSION(), '-g') == 0) then 
-     ! LFortran release 0.66 .. 0.67
+     ! LFortran release 0.66 .. 0.68
      call no("GET_TEAM")
      call no("NUM_IMAGES_TEAM")
      call no("THIS_IMAGE_TEAM")
