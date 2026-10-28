@@ -887,7 +887,8 @@ info)
   echo MAKE=\$MAKE
   echo FC=\$FC
   echo CC=\$CC
-  echo FFLAGS=\$FFLAGS
+  echo FFLAGS=\$RAWFLAGS
+  echo NATIVEFLAGS=\$NATIVEFLAGS
   echo CFLAGS=\$CFLAGS
   echo LDFLAGS=\$LDFLAGS
   grep -e link \$SRCDIR/fpm.toml

@@ -59,14 +59,14 @@ subroutine write_flags
      call no("COARRAY_LOCAL_ACCESS")
      call no("PUTGET")
 
-     call no("EVENT")
-     call  yes("EVENT_TYPE")
+     call yes("EVENT")
+     call  no("EVENT_QUERY")
      call no("LOCK")
      call  yes("LOCK_TYPE")
      call no("NOTIFY")
      call  yes("NOTIFY_TYPE")
 
-     call set("-DIGNORE_FAILURES=6") ! type checks for event, notify, lock
+     call set("-DIGNORE_FAILURES=4") ! type checks for notify, lock
 #  endif
 #elif __LFORTRAN__
 #  if   __LFORTRAN_MAJOR__ == 0 && __LFORTRAN_MINOR__ <= 63
@@ -155,6 +155,7 @@ subroutine write_flags
 #    endif
      call set("-DTYPES_PRIF_COMPLIANT=0")
      call no("COSHAPE") ! missing F2018 feature
+     call no("CO_BROADCAST_DERIVED_POD") ! fails to broadcast the entire array of derived type
      call set("-DIGNORE_FAILURES=2") ! CO_MIN(character) get wrong answer with > 9 images
 #  endif
 #elif __INTEL_COMPILER
