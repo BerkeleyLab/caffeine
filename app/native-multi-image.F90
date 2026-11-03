@@ -381,7 +381,7 @@ program native_multi_image
   type(bcast_type) :: bcast_var(4)
 #endif
 
-  integer :: me, ni, peer, i, ia(3)
+  integer :: me, ni, peer, i, j, ia(3)
   character(len=10) :: c, ca(3)
 # if HAVE_FORM_TEAM
   integer :: team_id
@@ -769,12 +769,9 @@ program native_multi_image
 
 # if HAVE_EVENT_QUERY
     STATUS("Testing event_query...")
-    i = 666
-    call EVENT_QUERY(test_event, i)
-    if (i /= 0) then
-      write(*,'(A,I3)')  "FAIL: EVENT_QUERY(test_event) = ", i
-      fail_count = fail_count + 1
-    end if
+    j = 666
+    call EVENT_QUERY(test_event, j)
+    CHECK_VALI(j, 0)
 # endif
 
 # if HAVE_EVENT_POST_WAIT
@@ -782,8 +779,21 @@ program native_multi_image
     if (THIS_IMAGE() == 1) then
       event post (test_event)
       event post (test_event[1])
+#     if HAVE_EVENT_QUERY
+        j = 0
+        call EVENT_QUERY(test_event, j)
+        if (j < 2) then
+          write(*,'(A,I3,A)')  "FAIL: event_query returned ", j, " expected >= 2"
+          fail_count = fail_count + 1
+        end if
+#     endif
       event wait (test_event)
       event wait (test_event, until_count=NUM_IMAGES())
+#     if HAVE_EVENT_QUERY
+        j = 666
+        call EVENT_QUERY(test_event, j)
+        CHECK_VALI(j, 0)
+#     endif
     else
       event post (test_event[1])
     end if
@@ -795,12 +805,30 @@ program native_multi_image
       do i = 1, size(test_event_arr)
         event post (test_event_arr(i))
         event post (test_event_arr(i)[1])
+#       if HAVE_EVENT_QUERY
+          j = 0
+          call EVENT_QUERY(test_event_arr(i), j)
+          if (j < 2) then
+            write(*,'(A,I3,A)')  "FAIL: event_query returned ", j, " expected >= 2"
+            fail_count = fail_count + 1
+          end if
+#       endif
         event wait (test_event_arr(i))
         event wait (test_event_arr(i), until_count=NUM_IMAGES())
+#       if HAVE_EVENT_QUERY
+          j = 666
+          call EVENT_QUERY(test_event_arr(i), j)
+          CHECK_VALI(j, 0)
+#       endif
       end do
     else
       do i = 1, size(test_event_arr)
         event post (test_event_arr(i)[1])
+#       if HAVE_EVENT_QUERY
+          j = 666
+          call EVENT_QUERY(test_event_arr(i), j)
+          CHECK_VALI(j, 0)
+#       endif
       end do
     end if
     deallocate(test_event_arr)
