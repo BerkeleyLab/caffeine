@@ -29,6 +29,7 @@ Options:
                     thread-safe GASNet, for use in threaded do-concurrent.
  --enable-cmake or --disable-fpm 
                     Build Caffeine library using CMake instead of FPM (the default).
+ --without-cxx      Disable optional use of the C++ compiler
 
 All unrecognized arguments will be passed to GASNet's configure.
 
@@ -36,6 +37,7 @@ Some influential environment variables:
   FC          Fortran compiler command
   FFLAGS      Fortran compiler flags
   CC          C compiler command
+  CXX         C++ compiler command (optional)
   CFLAGS      C compiler flags
   CPPFLAGS    C preprocessor flags, e.g. -I<include dir> if you have
               headers in a nonstandard directory <include dir>
@@ -216,6 +218,8 @@ while [ "$1" != "" ]; do
 
         --enable-debug)  GASNET_CODEMODE=debug ; append_gasnet_configure_arg "$orig_arg" ;;
         --disable-debug) GASNET_CODEMODE=opt ;   append_gasnet_configure_arg "$orig_arg" ;;
+
+        --without-cxx)   CXX=false ; append_gasnet_configure_arg "$orig_arg" ;;
 
         *) # Pass unrecognized args unmodified to GASNet configure
             append_gasnet_configure_arg "$orig_arg"
@@ -469,7 +473,9 @@ EOF
     # Homebrew does not inject clang/clang++ into PATH on macOS
     export PATH="$BREW_PREFIX/opt/llvm/bin:$PATH"
     CC="clang"
-    CXX="clang++"
+    if [ -z ${CXX:+x} ] || [[ $(basename ${CXX}) != false ]] ; then
+      CXX="clang++"
+    fi
     FC="flang-new"
     for tool in CC CXX FC ; do
       if ! type -P ${!tool} > /dev/null 2>&1 ; then
@@ -661,15 +667,18 @@ if ! $PKG_CONFIG $pkg ; then
       cd $GASNET_DIR
       cmd="set -x ; ./configure --prefix=\"$PREFIX\""
       # user-provided overrides:
-      cmd="$cmd $GASNET_CONFIGURE_ARGS"
+      cmd+=" $GASNET_CONFIGURE_ARGS"
       # pass-thru compiler settings:
-      cmd="$cmd --with-cc=\"$CC\" --with-cxx=\"$CXX\""
+      cmd+=" --with-cc=\"$CC\""
+      if [[ $(basename ${CXX}) != false ]] ; then
+        cmd+=" --with-cxx=\"$CXX\""
+      fi
       # select the GASNet config settings Caffeine requires, and disable unused features:
-      cmd="$cmd --enable-$GASNET_CONDUIT"
-      cmd="$cmd --enable-seq --enable-par --disable-parsync"
-      cmd="$cmd --disable-segment-everything"
+      cmd+=" --enable-$GASNET_CONDUIT"
+      cmd+=" --enable-seq --enable-par --disable-parsync"
+      cmd+=" --disable-segment-everything"
       # TEMPORARY: disable MPI compatibility until we figure out how to support in fpm
-      cmd="$cmd --disable-mpi-compat"
+      cmd+=" --disable-mpi-compat"
       eval $cmd
       $MAKE -j 8 all
       $MAKE -j 8 install
