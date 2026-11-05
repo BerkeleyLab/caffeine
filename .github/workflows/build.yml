@@ -407,8 +407,9 @@ jobs:
     - name: Install macOS Dependencies (Homebrew)
       if: ${{ contains(matrix.os, 'macos') && !matrix.macports && !matrix.brew_via_install }}
       run: |
-        retry brew update \
-            2>&1 | perl -pe "$BREW_WARNING_FILTER" ; test ${PIPESTATUS[0]} = 0
+        # Brew update takes a VERY long time to do cleanup and we don't care
+        #retry brew update \
+        #    2>&1 | perl -pe "$BREW_WARNING_FILTER" ; test ${PIPESTATUS[0]} = 0
         # fpm binary distribution for macOS requires gfortran shared libraries from gcc@12
         retry brew install gcc@12 \
             2>&1 | perl -pe "$BREW_WARNING_FILTER" ; test ${PIPESTATUS[0]} = 0
