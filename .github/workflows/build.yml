@@ -262,6 +262,8 @@ jobs:
           - os: macos-26
             compiler: flang
             network: udp
+            label: FPM-current
+            FPM_VERSION: current
 
           - os: ubuntu-24.04
             compiler: flang
@@ -283,6 +285,8 @@ jobs:
             network: udp
             version: 23
             container: phhargrove/llvm-flang:23.1.0-latest-arm64
+            label: FPM-current
+            FPM_VERSION: current
           - os: ubuntu-24.04
             compiler: flang
             version: 23
@@ -464,7 +468,7 @@ jobs:
       uses: fortran-lang/setup-fpm@main
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
-        fpm-version: v${{ env.FPM_VERSION }}
+        fpm-version: ${{ env.FPM_VERSION == 'current' && 'current' || format('v{0}', env.FPM_VERSION) }}
 
     - name: Build FPM
       if: env.FPM_BUILD
@@ -476,7 +480,12 @@ jobs:
         [[ -n "$GFORTRAN" ]]
         mkdir -p fpm-temp/bin
         cd fpm-temp
-        curl $CURL_OPTIONS https://github.com/fortran-lang/fpm/releases/download/v$FPM_VERSION/fpm-$FPM_VERSION.F90 -o fpm.F90
+        if [[ $FPM_VERSION == 'current' ]] ; then
+          FPM_ASSET=current/fpm.F90
+        else
+          FPM_ASSET=v$FPM_VERSION/fpm-$FPM_VERSION.F90
+        fi
+        curl $CURL_OPTIONS https://github.com/fortran-lang/fpm/releases/download/$FPM_ASSET -o fpm.F90
         $GFORTRAN -fopenmp -o bin/fpm fpm.F90
         echo "PATH=$PWD/bin:${PATH}" >> "$GITHUB_ENV"
 
