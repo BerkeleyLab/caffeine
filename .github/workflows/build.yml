@@ -400,9 +400,22 @@ jobs:
           echo HOMEBREW_NO_INSTALL_CLEANUP=1 >> "$GITHUB_ENV"
         fi
 
+    - name: Set Macports configuration
+      if: matrix.macports
+      run: |
+        # Create a config file to inject our ports into the cache key,
+        # while still allowing them to be installed as a separate step
+        echo "cache-mix: ${{ matrix.compiler }}-${{ matrix.version }}" > .github/setup-macports.yaml
+        # keep the default prefix to avoid triggering a rebuild of macports
+        MACPORTS_PREFIX="/opt/local"
+        echo "MACPORTS_PREFIX=$MACPORTS_PREFIX" >> "$GITHUB_ENV"
+
     - name: Setup Macports
       if: matrix.macports
       uses: melusina-org/setup-macports@v1
+      with:
+        parameters: '.github/setup-macports.yaml'
+        cache: enable
 
     - name: Install macOS Dependencies (Homebrew)
       if: ${{ contains(matrix.os, 'macos') && !matrix.macports && !matrix.brew_via_install }}
@@ -430,7 +443,7 @@ jobs:
           retry sudo port -v -b install gcc${COMPILER_VERSION}
         fi
         # Append Macports dynamic library directory
-        echo "DYLD_FALLBACK_LIBRARY_PATH=/opt/local/lib/libgcc/:$DYLD_FALLBACK_LIBRARY_PATH" >> "$GITHUB_ENV"
+        echo "DYLD_FALLBACK_LIBRARY_PATH=$MACPORTS_PREFIX/lib/libgcc/:$DYLD_FALLBACK_LIBRARY_PATH" >> "$GITHUB_ENV"
 
     - name: Install LLVM flang on macOS (Homebrew)
       if: ${{ contains(matrix.os, 'macos') && matrix.compiler == 'flang' && !matrix.macports && !matrix.brew_via_install }}
@@ -444,12 +457,12 @@ jobs:
       if: ${{ matrix.compiler == 'flang' && matrix.macports }}
       run: |
         retry sudo port -v -b install flang-${COMPILER_VERSION}
-        sudo ln -sf /opt/local/bin/flang-mp-${COMPILER_VERSION} /opt/local/bin/flang
-        sudo ln -sf /opt/local/bin/flang-mp-${COMPILER_VERSION} /opt/local/bin/flang-new
-        sudo ln -sf /opt/local/bin/clang-mp-${COMPILER_VERSION} /opt/local/bin/clang
-        sudo ln -sf /opt/local/bin/clang++-mp-${COMPILER_VERSION} /opt/local/bin/clang++
+        sudo ln -sf $MACPORTS_PREFIX/bin/flang-mp-${COMPILER_VERSION} $MACPORTS_PREFIX/bin/flang
+        sudo ln -sf $MACPORTS_PREFIX/bin/flang-mp-${COMPILER_VERSION} $MACPORTS_PREFIX/bin/flang-new
+        sudo ln -sf $MACPORTS_PREFIX/bin/clang-mp-${COMPILER_VERSION} $MACPORTS_PREFIX/bin/clang
+        sudo ln -sf $MACPORTS_PREFIX/bin/clang++-mp-${COMPILER_VERSION} $MACPORTS_PREFIX/bin/clang++
         # Prepend Macports clang to PATH:
-        echo "PATH=/opt/local/bin:${PATH}" >> "$GITHUB_ENV"
+        echo "PATH=$MACPORTS_PREFIX/bin:${PATH}" >> "$GITHUB_ENV"
 
     - name: Choose FPM
       if: ${{ !matrix.brew_via_install }}
