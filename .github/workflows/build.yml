@@ -94,15 +94,16 @@ jobs:
             compiler: flang
             brew_via_install: 1
           # No Homebrew bottle for Intel, use MacPorts instead
-          # Currently broken
-          #- os: macos-15-intel
-          #  compiler: flang
-          #  version: 23
-          #  macports: 1
-          #- os: macos-26-intel
-          #  compiler: flang
-          #  version: 23
-          #  macports: 1
+          # Binary ports for the current LLVM major version are frequently stale (broken)
+          # so use a prior release where the binary ports are stable
+          - os: macos-15-intel
+            compiler: flang
+            version: 22
+            macports: 1
+          - os: macos-26-intel
+            compiler: flang
+            version: 22
+            macports: 1
 
           - os: ubuntu-24.04
             compiler: flang
@@ -242,17 +243,16 @@ jobs:
             container: ghcr.io/lfortran/lfortran:v0.68.0
 
           # No Homebrew bottle for Intel, use MacPorts instead
-          # Currently broken
-          #- os: macos-15-intel
-          #  compiler: flang
-          #  version: 23
-          #  macports: 1
-          #  network: udp
-          #- os: macos-26-intel
-          #  compiler: flang
-          #  version: 23
-          #  macports: 1
-          #  network: udp
+          - os: macos-15-intel
+            compiler: flang
+            version: 22
+            macports: 1
+            network: udp
+          - os: macos-26-intel
+            compiler: flang
+            version: 22
+            macports: 1
+            network: udp
 
           - os: macos-15
             compiler: flang
