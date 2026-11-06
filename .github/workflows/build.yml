@@ -262,6 +262,8 @@ jobs:
           - os: macos-26
             compiler: flang
             network: udp
+            label: FPM-current
+            FPM_VERSION: current
 
           - os: ubuntu-24.04
             compiler: flang
@@ -283,6 +285,8 @@ jobs:
             network: udp
             version: 23
             container: phhargrove/llvm-flang:23.1.0-latest-arm64
+            label: FPM-current
+            FPM_VERSION: current
           - os: ubuntu-24.04
             compiler: flang
             version: 23
@@ -403,8 +407,9 @@ jobs:
     - name: Install macOS Dependencies (Homebrew)
       if: ${{ contains(matrix.os, 'macos') && !matrix.macports && !matrix.brew_via_install }}
       run: |
-        retry brew update \
-            2>&1 | perl -pe "$BREW_WARNING_FILTER" ; test ${PIPESTATUS[0]} = 0
+        # Brew update takes a VERY long time to do cleanup and we don't care
+        #retry brew update \
+        #    2>&1 | perl -pe "$BREW_WARNING_FILTER" ; test ${PIPESTATUS[0]} = 0
         # fpm binary distribution for macOS requires gfortran shared libraries from gcc@12
         retry brew install gcc@12 \
             2>&1 | perl -pe "$BREW_WARNING_FILTER" ; test ${PIPESTATUS[0]} = 0
@@ -464,7 +469,7 @@ jobs:
       uses: fortran-lang/setup-fpm@main
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
-        fpm-version: v${{ env.FPM_VERSION }}
+        fpm-version: ${{ env.FPM_VERSION == 'current' && 'current' || format('v{0}', env.FPM_VERSION) }}
 
     - name: Build FPM
       if: env.FPM_BUILD
@@ -476,7 +481,12 @@ jobs:
         [[ -n "$GFORTRAN" ]]
         mkdir -p fpm-temp/bin
         cd fpm-temp
-        curl $CURL_OPTIONS https://github.com/fortran-lang/fpm/releases/download/v$FPM_VERSION/fpm-$FPM_VERSION.F90 -o fpm.F90
+        if [[ $FPM_VERSION == 'current' ]] ; then
+          FPM_ASSET=current/fpm.F90
+        else
+          FPM_ASSET=v$FPM_VERSION/fpm-$FPM_VERSION.F90
+        fi
+        curl $CURL_OPTIONS https://github.com/fortran-lang/fpm/releases/download/$FPM_ASSET -o fpm.F90
         $GFORTRAN -fopenmp -o bin/fpm fpm.F90
         echo "PATH=$PWD/bin:${PATH}" >> "$GITHUB_ENV"
 
