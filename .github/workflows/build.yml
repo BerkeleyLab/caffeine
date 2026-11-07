@@ -94,15 +94,16 @@ jobs:
             compiler: flang
             brew_via_install: 1
           # No Homebrew bottle for Intel, use MacPorts instead
-          # Currently broken
-          #- os: macos-15-intel
-          #  compiler: flang
-          #  version: 23
-          #  macports: 1
-          #- os: macos-26-intel
-          #  compiler: flang
-          #  version: 23
-          #  macports: 1
+          # Binary ports for the current LLVM major version are frequently stale (broken)
+          # so use a prior release where the binary ports are stable
+          - os: macos-15-intel
+            compiler: flang
+            version: 22
+            macports: 1
+          - os: macos-26-intel
+            compiler: flang
+            version: 22
+            macports: 1
 
           - os: ubuntu-24.04
             compiler: flang
@@ -242,17 +243,16 @@ jobs:
             container: ghcr.io/lfortran/lfortran:v0.68.0
 
           # No Homebrew bottle for Intel, use MacPorts instead
-          # Currently broken
-          #- os: macos-15-intel
-          #  compiler: flang
-          #  version: 23
-          #  macports: 1
-          #  network: udp
-          #- os: macos-26-intel
-          #  compiler: flang
-          #  version: 23
-          #  macports: 1
-          #  network: udp
+          - os: macos-15-intel
+            compiler: flang
+            version: 22
+            macports: 1
+            network: udp
+          - os: macos-26-intel
+            compiler: flang
+            version: 22
+            macports: 1
+            network: udp
 
           - os: macos-15
             compiler: flang
@@ -365,6 +365,7 @@ jobs:
       run: |
         retry sudo apt update
         retry sudo apt install -y build-essential pkg-config make
+        [[ ${{ matrix.compiler }} == 'gfortran' ]] # assert no container means gfortran
         if [[ ${COMPILER_VERSION} -lt 15 ]] || type -p gfortran-${COMPILER_VERSION} ; then
           retry sudo apt install -y gfortran-${COMPILER_VERSION} g++-${COMPILER_VERSION}
         else
@@ -379,10 +380,10 @@ jobs:
           : Homebrew GCC@15 needs binutils 2.44+
           HOMEBREW_BINUTILS=$(ls -d ${HOMEBREW_PREFIX}/Cellar/binutils/2.*/bin )
           ls -al ${HOMEBREW_BINUTILS}
-          echo "FFLAGS=${FFLAGS:+"$FFLAGS" }-B ${HOMEBREW_BINUTILS}" >> "$GITHUB_ENV"
-          echo "CFLAGS=${CFLAGS:+"$CFLAGS" }-B ${HOMEBREW_BINUTILS}" >> "$GITHUB_ENV"
-          echo "CXXFLAGS=${CXXFLAGS:+"$CXXFLAGS" }-B ${HOMEBREW_BINUTILS}" >> "$GITHUB_ENV"
-          echo "LDFLAGS=${LDFLAGS:+"$LDFLAGS" }-B ${HOMEBREW_BINUTILS}" >> "$GITHUB_ENV"
+          echo "FFLAGS=${FFLAGS:+"$FFLAGS" }-B${HOMEBREW_BINUTILS}" >> "$GITHUB_ENV"
+          echo "CFLAGS=${CFLAGS:+"$CFLAGS" }-B${HOMEBREW_BINUTILS}" >> "$GITHUB_ENV"
+          echo "CXXFLAGS=${CXXFLAGS:+"$CXXFLAGS" }-B${HOMEBREW_BINUTILS}" >> "$GITHUB_ENV"
+          echo "LDFLAGS=${LDFLAGS:+"$LDFLAGS" }-B${HOMEBREW_BINUTILS}" >> "$GITHUB_ENV"
         fi
 
     - name: Fix macOS Homebrew Configuration
@@ -400,9 +401,22 @@ jobs:
           echo HOMEBREW_NO_INSTALL_CLEANUP=1 >> "$GITHUB_ENV"
         fi
 
+    - name: Set Macports configuration
+      if: matrix.macports
+      run: |
+        # Create a config file to inject our ports into the cache key,
+        # while still allowing them to be installed as a separate step
+        echo "cache-mix: ${{ matrix.compiler }}-${{ matrix.version }}" > .github/setup-macports.yaml
+        # keep the default prefix to avoid triggering a rebuild of macports
+        MACPORTS_PREFIX="/opt/local"
+        echo "MACPORTS_PREFIX=$MACPORTS_PREFIX" >> "$GITHUB_ENV"
+
     - name: Setup Macports
       if: matrix.macports
       uses: melusina-org/setup-macports@v1
+      with:
+        parameters: '.github/setup-macports.yaml'
+        cache: enable
 
     - name: Install macOS Dependencies (Homebrew)
       if: ${{ contains(matrix.os, 'macos') && !matrix.macports && !matrix.brew_via_install }}
@@ -430,7 +444,7 @@ jobs:
           retry sudo port -v -b install gcc${COMPILER_VERSION}
         fi
         # Append Macports dynamic library directory
-        echo "DYLD_FALLBACK_LIBRARY_PATH=/opt/local/lib/libgcc/:$DYLD_FALLBACK_LIBRARY_PATH" >> "$GITHUB_ENV"
+        echo "DYLD_FALLBACK_LIBRARY_PATH=$MACPORTS_PREFIX/lib/libgcc/:$DYLD_FALLBACK_LIBRARY_PATH" >> "$GITHUB_ENV"
 
     - name: Install LLVM flang on macOS (Homebrew)
       if: ${{ contains(matrix.os, 'macos') && matrix.compiler == 'flang' && !matrix.macports && !matrix.brew_via_install }}
@@ -444,12 +458,12 @@ jobs:
       if: ${{ matrix.compiler == 'flang' && matrix.macports }}
       run: |
         retry sudo port -v -b install flang-${COMPILER_VERSION}
-        sudo ln -sf /opt/local/bin/flang-mp-${COMPILER_VERSION} /opt/local/bin/flang
-        sudo ln -sf /opt/local/bin/flang-mp-${COMPILER_VERSION} /opt/local/bin/flang-new
-        sudo ln -sf /opt/local/bin/clang-mp-${COMPILER_VERSION} /opt/local/bin/clang
-        sudo ln -sf /opt/local/bin/clang++-mp-${COMPILER_VERSION} /opt/local/bin/clang++
+        sudo ln -sf $MACPORTS_PREFIX/bin/flang-mp-${COMPILER_VERSION} $MACPORTS_PREFIX/bin/flang
+        sudo ln -sf $MACPORTS_PREFIX/bin/flang-mp-${COMPILER_VERSION} $MACPORTS_PREFIX/bin/flang-new
+        sudo ln -sf $MACPORTS_PREFIX/bin/clang-mp-${COMPILER_VERSION} $MACPORTS_PREFIX/bin/clang
+        sudo ln -sf $MACPORTS_PREFIX/bin/clang++-mp-${COMPILER_VERSION} $MACPORTS_PREFIX/bin/clang++
         # Prepend Macports clang to PATH:
-        echo "PATH=/opt/local/bin:${PATH}" >> "$GITHUB_ENV"
+        echo "PATH=$MACPORTS_PREFIX/bin:${PATH}" >> "$GITHUB_ENV"
 
     - name: Choose FPM
       if: ${{ !matrix.brew_via_install }}
