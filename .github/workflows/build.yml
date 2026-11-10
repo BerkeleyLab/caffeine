@@ -48,13 +48,17 @@ jobs:
     outputs: 
       # The LLVM Flang version on Homebrew : https://formulae.brew.sh/formula/flang
       BREW_FLANG_VERSION: ${{ steps.vars.outputs.BREW_FLANG_VERSION }}
+      # The LFortran version on Homebrew: https://github.com/fortran-lang/homebrew-fortran
+      BREW_LFORTRAN_VERSION: ${{ steps.vars.outputs.BREW_LFORTRAN_VERSION }}
     steps:
       - name: Set default configuration variables
         id: vars
-        run: echo "BREW_FLANG_VERSION=23" >> $GITHUB_OUTPUT
+        run: |
+          echo "BREW_FLANG_VERSION=23" >> $GITHUB_OUTPUT
+          echo "BREW_LFORTRAN_VERSION=0.69" >> $GITHUB_OUTPUT
 
   build:
-    name: ${{ matrix.compiler }}-${{ matrix.version || needs.setup.outputs.BREW_FLANG_VERSION }} ${{ ( matrix.network != 'smp' && matrix.network ) || '' }} (${{ matrix.os }}) ${{ matrix.label }}
+    name: ${{ matrix.compiler }}-${{ matrix.version || ( matrix.compiler == 'flang' && needs.setup.outputs.BREW_FLANG_VERSION ) || ( matrix.compiler == 'lfortran' && needs.setup.outputs.BREW_LFORTRAN_VERSION ) || 'unknown' }} ${{ ( matrix.network != 'smp' && matrix.network ) || '' }} (${{ matrix.os }}) ${{ matrix.label }}
     needs: setup
     runs-on: ${{ matrix.os }}
     strategy:
@@ -154,16 +158,19 @@ jobs:
           # https://github.com/fortran-lang/homebrew-fortran
           - os: macos-15
             compiler: lfortran
-            version: 0.68.0
           - os: macos-26
             compiler: lfortran
-            version: 0.68.0
 
           # https://github.com/lfortran/lfortran/pkgs/container/lfortran
           - os: ubuntu-22.04
             compiler: lfortran
             version: latest
             container: ghcr.io/lfortran/lfortran:latest
+
+          - os: ubuntu-22.04
+            compiler: lfortran
+            version: 0.69
+            container: ghcr.io/lfortran/lfortran:v0.69.0
 
           - os: ubuntu-22.04
             compiler: lfortran
@@ -204,10 +211,9 @@ jobs:
             container: phhargrove/llvm-flang:23.1.0-latest
           - os: ubuntu-22.04
             compiler: lfortran
-            version: 0.68
             label: OPT
             CONFIGURE_ARGS: --disable-debug
-            container: ghcr.io/lfortran/lfortran:v0.68.0
+            container: ghcr.io/lfortran/lfortran:v${{ needs.setup.outputs.BREW_LFORTRAN_VERSION }}.0
 
         # --- PRIF-old coverage ---
         #  - os: ubuntu-24.04
@@ -238,9 +244,8 @@ jobs:
 
           - os: ubuntu-22.04
             compiler: lfortran
-            version: 0.68
             network: udp
-            container: ghcr.io/lfortran/lfortran:v0.68.0
+            container: ghcr.io/lfortran/lfortran:v${{ needs.setup.outputs.BREW_LFORTRAN_VERSION }}.0
 
           # No Homebrew bottle for Intel, use MacPorts instead
           - os: macos-15-intel
@@ -306,7 +311,7 @@ jobs:
       options: --shm-size=2gb
 
     env:
-      COMPILER_VERSION: ${{ matrix.version || needs.setup.outputs.BREW_FLANG_VERSION }}
+      COMPILER_VERSION: ${{ matrix.version || ( matrix.compiler == 'flang' && needs.setup.outputs.BREW_FLANG_VERSION ) || ( matrix.compiler == 'lfortran' && needs.setup.outputs.BREW_LFORTRAN_VERSION ) || 'unknown' }}
       FFLAGS: ${{ matrix.FFLAGS }} ${{ inputs.fflags }}
       CFLAGS: ${{ matrix.CFLAGS }} ${{ inputs.cflags }}
       FPM_VERSION: ${{ matrix.FPM_VERSION || '0.13.0' }}
@@ -406,7 +411,7 @@ jobs:
       run: |
         # Create a config file to inject our ports into the cache key,
         # while still allowing them to be installed as a separate step
-        echo "cache-mix: ${{ matrix.compiler }}-${{ matrix.version }}" > .github/setup-macports.yaml
+        echo "cache-mix: ${{ matrix.compiler }}-$COMPILER_VERSION" > .github/setup-macports.yaml
         # keep the default prefix to avoid triggering a rebuild of macports
         MACPORTS_PREFIX="/opt/local"
         echo "MACPORTS_PREFIX=$MACPORTS_PREFIX" >> "$GITHUB_ENV"
@@ -639,7 +644,7 @@ jobs:
         fi
 
     - name: Run native multi-image test (stand-alone)
-      if: ${{ matrix.compiler == 'gfortran' && matrix.version >= '16' }}
+      if: ${{ matrix.compiler == 'gfortran' && env.COMPILER_VERSION >= '16' }}
       run: |
         make -C app gcc GFORTRAN=$FC
 
