@@ -429,9 +429,11 @@ jobs:
         # Brew update takes a VERY long time to do cleanup and we don't care
         #retry brew update \
         #    2>&1 | perl -pe "$BREW_WARNING_FILTER" ; test ${PIPESTATUS[0]} = 0
-        # fpm binary distribution for macOS requires gfortran shared libraries from gcc@12
-        retry brew install gcc@12 \
+        # fpm binary distribution prior to 0.14.0 require gfortran shared libraries from gcc@12
+        if [[ "$(printf '%s\n' 0.14.0 $FPM_VERSION | sort --version-sort | head -n1 )" != "0.14.0" ]] ; then
+          retry brew install gcc@12 \
             2>&1 | perl -pe "$BREW_WARNING_FILTER" ; test ${PIPESTATUS[0]} = 0
+        fi
         if [[ ${{ matrix.compiler }} == 'gfortran' && ${COMPILER_VERSION} -gt 15 ]] ; then
           retry brew install gcc@${COMPILER_VERSION} \
             2>&1 | perl -pe "$BREW_WARNING_FILTER" ; test ${PIPESTATUS[0]} = 0
@@ -473,10 +475,15 @@ jobs:
     - name: Choose FPM
       if: ${{ !matrix.brew_via_install }}
       run: |
-        # FPM binary distros currently unavailable for ARM64 on Linux (or versions older than 0.13)
-        # macports: avoid need for libgcc12 shared library dependency, which pulls in alot more MacPors
-        if [[ ${{ !!matrix.macports ||
-                  ( runner.arch == 'ARM64' && (runner.os == 'Linux' || env.FPM_VERSION < '0.13.0') )
+        # Workaround historical deficiencies in FPM binary distros
+        # FPM 0.14+ and 'current' binaries are complete and static, use setup-fpm
+        # otherwise, build from source if:
+        #   macports: avoid libgcc12 dep, which pulls in alot more MacPorts 
+        #   missing binaries: linux-arm64 added in 0.14, macos-arm64 added in 0.13
+        if [[ ${{ (env.FPM_VERSION < '0.14.0') && 
+                  ( !!matrix.macports || 
+                    ( runner.arch == 'ARM64' && (runner.os == 'Linux' || env.FPM_VERSION < '0.13.0') )
+                  )
                }} == true ]] ; then
           echo "FPM_BUILD=true" >> "$GITHUB_ENV"
         else
@@ -497,7 +504,7 @@ jobs:
           GFORTRAN=gfortran$suff
           if type -P $GFORTRAN ; then break ; fi
         done
-        [[ -n "$GFORTRAN" ]]
+        type -p "$GFORTRAN"
         mkdir -p fpm-temp/bin
         cd fpm-temp
         if [[ $FPM_VERSION == 'current' ]] ; then
