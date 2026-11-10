@@ -321,7 +321,7 @@ jobs:
       INSTALL_FILTER: ${{ matrix.brew_via_install && 
                           '2>&1 | perl -pe "$BREW_WARNING_FILTER" ; test ${PIPESTATUS[0]} = 0' || 
                           '' }}
-      INSTALL_VARS: FC CC CXX FFLAGS CPPFLAGS CFLAGS CXXFLAGS LDFLAGS LIBS GASNET_CONFIGURE_ARGS FPM CMAKE MAKE PKG_CONFIG
+      INSTALL_VARS: FC CC CXX FFLAGS CPPFLAGS CFLAGS CXXFLAGS LDFLAGS LIBS GASNET_CONFIGURE_ARGS FPM CMAKE MAKE PKG_CONFIG PATH
 
     steps:
     - name: Checkout code
@@ -376,7 +376,7 @@ jobs:
           retry ${HOMEBREW_PREFIX}/bin/brew install -v gcc@${COMPILER_VERSION} binutils \
               2>&1 | perl -pe "$BREW_WARNING_FILTER" ; test ${PIPESTATUS[0]} = 0
           ls -al ${HOMEBREW_PREFIX}/bin
-          echo "PATH=${HOMEBREW_PREFIX}/bin:${PATH}" >> "$GITHUB_ENV"
+          echo "${HOMEBREW_PREFIX}/bin" >> "$GITHUB_PATH"
           : Homebrew GCC@15 needs binutils 2.44+
           HOMEBREW_BINUTILS=$(ls -d ${HOMEBREW_PREFIX}/Cellar/binutils/2.*/bin )
           ls -al ${HOMEBREW_BINUTILS}
@@ -452,7 +452,7 @@ jobs:
         retry brew install llvm@${COMPILER_VERSION} flang \
             2>&1 | perl -pe "$BREW_WARNING_FILTER" ; test ${PIPESTATUS[0]} = 0
         # Prepend homebrew clang to PATH:
-        echo "PATH=$(brew --prefix)/opt/llvm/bin:${PATH}" >> "$GITHUB_ENV"
+        echo "$(brew --prefix)/opt/llvm/bin" >> "$GITHUB_PATH"
 
     - name: Install LLVM flang on macOS (Macports)
       if: ${{ matrix.compiler == 'flang' && matrix.macports }}
@@ -463,7 +463,7 @@ jobs:
         sudo ln -sf $MACPORTS_PREFIX/bin/clang-mp-${COMPILER_VERSION} $MACPORTS_PREFIX/bin/clang
         sudo ln -sf $MACPORTS_PREFIX/bin/clang++-mp-${COMPILER_VERSION} $MACPORTS_PREFIX/bin/clang++
         # Prepend Macports clang to PATH:
-        echo "PATH=$MACPORTS_PREFIX/bin:${PATH}" >> "$GITHUB_ENV"
+        echo "$MACPORTS_PREFIX/bin" >> "$GITHUB_PATH"
 
     - name: Choose FPM
       if: ${{ !matrix.brew_via_install }}
@@ -502,7 +502,7 @@ jobs:
         fi
         curl $CURL_OPTIONS https://github.com/fortran-lang/fpm/releases/download/$FPM_ASSET -o fpm.F90
         $GFORTRAN -fopenmp -o bin/fpm fpm.F90
-        echo "PATH=$PWD/bin:${PATH}" >> "$GITHUB_ENV"
+        echo "$PWD/bin" >> "$GITHUB_PATH"
 
     ##########################################################################
     # Set Install Variables
@@ -688,7 +688,7 @@ jobs:
         # PATH to prevent pointless overwrites in subsequent install.sh below
         HOMEBREW_PREFIX="/home/linuxbrew/.linuxbrew"
         ( set +e ; ls -al ${HOMEBREW_PREFIX}/bin ; exit 0 )
-        echo "PATH=${HOMEBREW_PREFIX}/bin:${PATH}" >> "$GITHUB_ENV"
+        echo "${HOMEBREW_PREFIX}/bin" >> "$GITHUB_PATH"
 
     - name: Build and Test Caffeine (thread-safe)
       run: |
