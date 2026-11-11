@@ -94,6 +94,7 @@ jobs:
           - os: macos-15
             compiler: flang
             brew_via_install: 1
+            CONFIGURE_ARGS: --without-cxx # just for argument coverage
           - os: macos-26
             compiler: flang
             brew_via_install: 1
@@ -144,6 +145,7 @@ jobs:
             compiler: flang
             version: 21
             container: phhargrove/llvm-flang:21.1.0-latest
+            CONFIGURE_ARGS: --without-cxx # just for argument coverage
           - os: ubuntu-24.04
             compiler: flang
             version: 20
@@ -196,6 +198,7 @@ jobs:
             compiler: lfortran
             version: 0.64
             container: ghcr.io/lfortran/lfortran:v0.64.0
+            CONFIGURE_ARGS: --without-cxx # just for argument coverage
 
           - os: ubuntu-22.04
             compiler: lfortran
@@ -524,7 +527,7 @@ jobs:
       run: |
         echo "FC=gfortran-${COMPILER_VERSION}" >> "$GITHUB_ENV"
         echo "CC=gcc-${COMPILER_VERSION}" >> "$GITHUB_ENV"
-        echo "CXX=g++-${COMPILER_VERSION}" >> "$GITHUB_ENV"
+        grep -q without-cxx <<< "$CONFIGURE_ARGS" || echo "CXX=g++-${COMPILER_VERSION}" >> "$GITHUB_ENV"
         # XCode 26 / gfortran bug workaround
         if [[ ${{ matrix.os }} =~ macos-26 ]] ; then
           echo "CONFIGURE_ARGS=$CONFIGURE_ARGS --enable-force-posix-realtime" >> "$GITHUB_ENV"
@@ -540,7 +543,7 @@ jobs:
             echo "FC=flang" >> "$GITHUB_ENV"
           fi
           echo "CC=clang" >> "$GITHUB_ENV"
-          echo "CXX=clang++" >> "$GITHUB_ENV"
+          grep -q without-cxx <<< "$CONFIGURE_ARGS" || echo "CXX=clang++" >> "$GITHUB_ENV"
         fi
 
     - name: Setup lfortran dependencies and variables
@@ -554,7 +557,7 @@ jobs:
         fi
         echo "FC=lfortran" >> "$GITHUB_ENV" 
         echo "CC=clang" >> "$GITHUB_ENV"
-        echo "CXX=clang++" >> "$GITHUB_ENV"
+        grep -q without-cxx <<< "$CONFIGURE_ARGS" || echo "CXX=clang++" >> "$GITHUB_ENV"
         ls -R $(lfortran --print-c-include-dir)
         #find / -name $HEADER_NAME -exec ls -al {} \; -exec md5sum {} \; -exec head {} \; -exec echo --- \;
 
