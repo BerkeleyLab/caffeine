@@ -48,13 +48,17 @@ jobs:
     outputs: 
       # The LLVM Flang version on Homebrew : https://formulae.brew.sh/formula/flang
       BREW_FLANG_VERSION: ${{ steps.vars.outputs.BREW_FLANG_VERSION }}
+      # The LFortran version on Homebrew: https://github.com/fortran-lang/homebrew-fortran
+      BREW_LFORTRAN_VERSION: ${{ steps.vars.outputs.BREW_LFORTRAN_VERSION }}
     steps:
       - name: Set default configuration variables
         id: vars
-        run: echo "BREW_FLANG_VERSION=23" >> $GITHUB_OUTPUT
+        run: |
+          echo "BREW_FLANG_VERSION=23" >> $GITHUB_OUTPUT
+          echo "BREW_LFORTRAN_VERSION=0.69" >> $GITHUB_OUTPUT
 
   build:
-    name: ${{ matrix.compiler }}-${{ matrix.version || needs.setup.outputs.BREW_FLANG_VERSION }} ${{ ( matrix.network != 'smp' && matrix.network ) || '' }} (${{ matrix.os }}) ${{ matrix.label }}
+    name: ${{ matrix.compiler }}-${{ matrix.version || ( matrix.compiler == 'flang' && needs.setup.outputs.BREW_FLANG_VERSION ) || ( matrix.compiler == 'lfortran' && needs.setup.outputs.BREW_LFORTRAN_VERSION ) || 'unknown' }} ${{ ( matrix.network != 'smp' && matrix.network ) || '' }} (${{ matrix.os }}) ${{ matrix.label }}
     needs: setup
     runs-on: ${{ matrix.os }}
     strategy:
@@ -154,16 +158,19 @@ jobs:
           # https://github.com/fortran-lang/homebrew-fortran
           - os: macos-15
             compiler: lfortran
-            version: 0.68.0
           - os: macos-26
             compiler: lfortran
-            version: 0.68.0
 
           # https://github.com/lfortran/lfortran/pkgs/container/lfortran
           - os: ubuntu-22.04
             compiler: lfortran
             version: latest
             container: ghcr.io/lfortran/lfortran:latest
+
+          - os: ubuntu-22.04
+            compiler: lfortran
+            version: 0.69
+            container: ghcr.io/lfortran/lfortran:v0.69.0
 
           - os: ubuntu-22.04
             compiler: lfortran
@@ -204,10 +211,9 @@ jobs:
             container: phhargrove/llvm-flang:23.1.0-latest
           - os: ubuntu-22.04
             compiler: lfortran
-            version: 0.68
             label: OPT
             CONFIGURE_ARGS: --disable-debug
-            container: ghcr.io/lfortran/lfortran:v0.68.0
+            container: ghcr.io/lfortran/lfortran:v${{ needs.setup.outputs.BREW_LFORTRAN_VERSION }}.0
 
         # --- PRIF-old coverage ---
         #  - os: ubuntu-24.04
@@ -238,9 +244,8 @@ jobs:
 
           - os: ubuntu-22.04
             compiler: lfortran
-            version: 0.68
             network: udp
-            container: ghcr.io/lfortran/lfortran:v0.68.0
+            container: ghcr.io/lfortran/lfortran:v${{ needs.setup.outputs.BREW_LFORTRAN_VERSION }}.0
 
           # No Homebrew bottle for Intel, use MacPorts instead
           - os: macos-15-intel
@@ -306,7 +311,7 @@ jobs:
       options: --shm-size=2gb
 
     env:
-      COMPILER_VERSION: ${{ matrix.version || needs.setup.outputs.BREW_FLANG_VERSION }}
+      COMPILER_VERSION: ${{ matrix.version || ( matrix.compiler == 'flang' && needs.setup.outputs.BREW_FLANG_VERSION ) || ( matrix.compiler == 'lfortran' && needs.setup.outputs.BREW_LFORTRAN_VERSION ) || 'unknown' }}
       FFLAGS: ${{ matrix.FFLAGS }} ${{ inputs.fflags }}
       CFLAGS: ${{ matrix.CFLAGS }} ${{ inputs.cflags }}
       FPM_VERSION: ${{ matrix.FPM_VERSION || '0.13.0' }}
@@ -321,7 +326,7 @@ jobs:
       INSTALL_FILTER: ${{ matrix.brew_via_install && 
                           '2>&1 | perl -pe "$BREW_WARNING_FILTER" ; test ${PIPESTATUS[0]} = 0' || 
                           '' }}
-      INSTALL_VARS: FC CC CXX FFLAGS CPPFLAGS CFLAGS CXXFLAGS LDFLAGS LIBS GASNET_CONFIGURE_ARGS FPM CMAKE MAKE PKG_CONFIG
+      INSTALL_VARS: FC CC CXX FFLAGS CPPFLAGS CFLAGS CXXFLAGS LDFLAGS LIBS GASNET_CONFIGURE_ARGS FPM CMAKE MAKE PKG_CONFIG PATH
 
     steps:
     - name: Checkout code
@@ -376,7 +381,7 @@ jobs:
           retry ${HOMEBREW_PREFIX}/bin/brew install -v gcc@${COMPILER_VERSION} binutils \
               2>&1 | perl -pe "$BREW_WARNING_FILTER" ; test ${PIPESTATUS[0]} = 0
           ls -al ${HOMEBREW_PREFIX}/bin
-          echo "PATH=${HOMEBREW_PREFIX}/bin:${PATH}" >> "$GITHUB_ENV"
+          echo "${HOMEBREW_PREFIX}/bin" >> "$GITHUB_PATH"
           : Homebrew GCC@15 needs binutils 2.44+
           HOMEBREW_BINUTILS=$(ls -d ${HOMEBREW_PREFIX}/Cellar/binutils/2.*/bin )
           ls -al ${HOMEBREW_BINUTILS}
@@ -406,7 +411,7 @@ jobs:
       run: |
         # Create a config file to inject our ports into the cache key,
         # while still allowing them to be installed as a separate step
-        echo "cache-mix: ${{ matrix.compiler }}-${{ matrix.version }}" > .github/setup-macports.yaml
+        echo "cache-mix: ${{ matrix.compiler }}-$COMPILER_VERSION" > .github/setup-macports.yaml
         # keep the default prefix to avoid triggering a rebuild of macports
         MACPORTS_PREFIX="/opt/local"
         echo "MACPORTS_PREFIX=$MACPORTS_PREFIX" >> "$GITHUB_ENV"
@@ -424,9 +429,11 @@ jobs:
         # Brew update takes a VERY long time to do cleanup and we don't care
         #retry brew update \
         #    2>&1 | perl -pe "$BREW_WARNING_FILTER" ; test ${PIPESTATUS[0]} = 0
-        # fpm binary distribution for macOS requires gfortran shared libraries from gcc@12
-        retry brew install gcc@12 \
+        # fpm binary distribution prior to 0.14.0 require gfortran shared libraries from gcc@12
+        if [[ "$(printf '%s\n' 0.14.0 $FPM_VERSION | sort --version-sort | head -n1 )" != "0.14.0" ]] ; then
+          retry brew install gcc@12 \
             2>&1 | perl -pe "$BREW_WARNING_FILTER" ; test ${PIPESTATUS[0]} = 0
+        fi
         if [[ ${{ matrix.compiler }} == 'gfortran' && ${COMPILER_VERSION} -gt 15 ]] ; then
           retry brew install gcc@${COMPILER_VERSION} \
             2>&1 | perl -pe "$BREW_WARNING_FILTER" ; test ${PIPESTATUS[0]} = 0
@@ -452,7 +459,7 @@ jobs:
         retry brew install llvm@${COMPILER_VERSION} flang \
             2>&1 | perl -pe "$BREW_WARNING_FILTER" ; test ${PIPESTATUS[0]} = 0
         # Prepend homebrew clang to PATH:
-        echo "PATH=$(brew --prefix)/opt/llvm/bin:${PATH}" >> "$GITHUB_ENV"
+        echo "$(brew --prefix)/opt/llvm/bin" >> "$GITHUB_PATH"
 
     - name: Install LLVM flang on macOS (Macports)
       if: ${{ matrix.compiler == 'flang' && matrix.macports }}
@@ -463,15 +470,20 @@ jobs:
         sudo ln -sf $MACPORTS_PREFIX/bin/clang-mp-${COMPILER_VERSION} $MACPORTS_PREFIX/bin/clang
         sudo ln -sf $MACPORTS_PREFIX/bin/clang++-mp-${COMPILER_VERSION} $MACPORTS_PREFIX/bin/clang++
         # Prepend Macports clang to PATH:
-        echo "PATH=$MACPORTS_PREFIX/bin:${PATH}" >> "$GITHUB_ENV"
+        echo "$MACPORTS_PREFIX/bin" >> "$GITHUB_PATH"
 
     - name: Choose FPM
       if: ${{ !matrix.brew_via_install }}
       run: |
-        # FPM binary distros currently unavailable for ARM64 on Linux (or versions older than 0.13)
-        # macports: avoid need for libgcc12 shared library dependency, which pulls in alot more MacPors
-        if [[ ${{ !!matrix.macports ||
-                  ( runner.arch == 'ARM64' && (runner.os == 'Linux' || env.FPM_VERSION < '0.13.0') )
+        # Workaround historical deficiencies in FPM binary distros
+        # FPM 0.14+ and 'current' binaries are complete and static, use setup-fpm
+        # otherwise, build from source if:
+        #   macports: avoid libgcc12 dep, which pulls in alot more MacPorts 
+        #   missing binaries: linux-arm64 added in 0.14, macos-arm64 added in 0.13
+        if [[ ${{ (env.FPM_VERSION < '0.14.0') && 
+                  ( !!matrix.macports || 
+                    ( runner.arch == 'ARM64' && (runner.os == 'Linux' || env.FPM_VERSION < '0.13.0') )
+                  )
                }} == true ]] ; then
           echo "FPM_BUILD=true" >> "$GITHUB_ENV"
         else
@@ -492,7 +504,7 @@ jobs:
           GFORTRAN=gfortran$suff
           if type -P $GFORTRAN ; then break ; fi
         done
-        [[ -n "$GFORTRAN" ]]
+        type -p "$GFORTRAN"
         mkdir -p fpm-temp/bin
         cd fpm-temp
         if [[ $FPM_VERSION == 'current' ]] ; then
@@ -502,7 +514,7 @@ jobs:
         fi
         curl $CURL_OPTIONS https://github.com/fortran-lang/fpm/releases/download/$FPM_ASSET -o fpm.F90
         $GFORTRAN -fopenmp -o bin/fpm fpm.F90
-        echo "PATH=$PWD/bin:${PATH}" >> "$GITHUB_ENV"
+        echo "$PWD/bin" >> "$GITHUB_PATH"
 
     ##########################################################################
     # Set Install Variables
@@ -639,7 +651,7 @@ jobs:
         fi
 
     - name: Run native multi-image test (stand-alone)
-      if: ${{ matrix.compiler == 'gfortran' && matrix.version >= '16' }}
+      if: ${{ matrix.compiler == 'gfortran' && env.COMPILER_VERSION >= '16' }}
       run: |
         make -C app gcc GFORTRAN=$FC
 
@@ -688,7 +700,7 @@ jobs:
         # PATH to prevent pointless overwrites in subsequent install.sh below
         HOMEBREW_PREFIX="/home/linuxbrew/.linuxbrew"
         ( set +e ; ls -al ${HOMEBREW_PREFIX}/bin ; exit 0 )
-        echo "PATH=${HOMEBREW_PREFIX}/bin:${PATH}" >> "$GITHUB_ENV"
+        echo "${HOMEBREW_PREFIX}/bin" >> "$GITHUB_PATH"
 
     - name: Build and Test Caffeine (thread-safe)
       run: |
