@@ -64,6 +64,8 @@ JULIENNE_VERSION=$(awk -F'"' '/^julienne =/ {print $4}' manifest/fpm.toml.templa
 VERBOSE=
 YES=false
 USE_FPM=true
+SPACK=
+MAKE_J="-j 8"
 APPEND_CFLAGS="${CPPFLAGS:-} ${CFLAGS:-}"
 APPEND_CFLAGS_lib=
 APPEND_LDFLAGS=
@@ -215,6 +217,9 @@ while [ "$1" != "" ]; do
 
         --enable-cmake | --disable-fpm) USE_FPM= ;;
         --disable-cmake | --enable-fpm) USE_FPM=true ;;
+
+        --enable-spack-install)  SPACK=true ;;
+        --disable-spack-install) SPACK= ;;
 
         --enable-debug)  GASNET_CODEMODE=debug ; append_gasnet_configure_arg "$orig_arg" ;;
         --disable-debug) GASNET_CODEMODE=opt ;   append_gasnet_configure_arg "$orig_arg" ;;
@@ -650,6 +655,10 @@ done
 # ---------------------------------------------------------------
 # GASNet identification/build
 
+if [[ -n $SPACK ]]; then # Spack manages make concurrency
+  MAKE_J=
+fi
+
 pkg="gasnet-$GASNET_CONDUIT-$GASNET_THREADMODE"
 
 if ! $PKG_CONFIG $pkg ; then
@@ -680,8 +689,8 @@ if ! $PKG_CONFIG $pkg ; then
       # TEMPORARY: disable MPI compatibility until we figure out how to support in fpm
       cmd+=" --disable-mpi-compat"
       eval $cmd
-      $MAKE -j 8 all
-      $MAKE -j 8 install
+      $MAKE $MAKE_J all
+      $MAKE $MAKE_J install
   )
 fi # if ! $PKG_CONFIG $pkg ; then
 
@@ -705,9 +714,10 @@ GASNET_CPPFLAGS=$($PKG_CONFIG $pkg --variable=GASNET_CPPFLAGS)
 GASNET_LIBDIR=$(awk '{print $1};' <<< $GASNET_LIBS)
 GASNET_LIBDIR=${GASNET_LIBDIR#-L}
 
-# Check whether GASNet appears to be a Spack install. If yes, bail out.
+# Check whether we are outside spack and GASNet appears to be a Spack install
 # Note: most Spack installations have "opt/spack" in the directory path.
-if [[ $GASNET_LIBDIR == *spack* ]] && \
+if [[ -z "$SPACK" ]] && \
+   [[ $GASNET_LIBDIR == *spack* ]] && \
    [[ $(realpath $GASNET_LIBDIR) != $(realpath "$PREFIX/lib") ]]; then
   cat << EOF
 ***NOTICE***: The GASNet library built by Spack is ONLY intended for
@@ -727,7 +737,7 @@ fi
 # Strip compiler flags
 # Warning: This assumes the full path doesn't contain any spaces!
 GASNET_CC_STRIPPED=$(awk '{print $1};' <<< $GASNET_CC)
-if [ "$(realpath $GASNET_CC_STRIPPED)" != "$(realpath $CC)" ]; then 
+if [ "$(realpath $GASNET_CC_STRIPPED)" != "$(realpath $CC)" ] && [[ -z "$SPACK" ]] ; then
   echo "ERROR: C Compiler mismatch: GASNET_CC=$(realpath $GASNET_CC_STRIPPED) and CC=$(realpath $CC) don't match"
   exit 1;
 fi
@@ -1016,7 +1026,7 @@ EOF
   (
     cd build/cmake
     $CMAKE ../..
-    $MAKE -j 8 ${VERBOSE:+VERBOSE=1}
+    $MAKE $MAKE_J ${VERBOSE:+VERBOSE=1}
   )
 
   LIBCAFFEINE_SRC=build/cmake/$LIBCAFFEINE_DST
